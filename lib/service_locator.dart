@@ -9,6 +9,7 @@ import 'package:test_us_app/data/data_sources/post_data/post_datasource_impl.dar
 import 'package:test_us_app/data/data_sources/user_data/user_data_source.dart';
 import 'package:test_us_app/data/data_sources/user_data/user_data_source_impl.dart';
 import 'package:test_us_app/data/repositories/post_repository_impl.dart';
+import 'package:test_us_app/services/common_height_provider.dart';
 
 import 'core/net_driver.dart';
 import 'data/repositories/application_repository_impl.dart';
@@ -24,6 +25,7 @@ final getIt = GetIt.instance;
 Future<void> serviceLocator() async {
 
   getIt.registerLazySingleton<NetDriver>(() => NetDriver(Host.baseUrl));
+  getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());
 
   // data
   getIt.registerLazySingleton<UserDataSource>(() => UserDataSourceImpl(getIt<NetDriver>()));
