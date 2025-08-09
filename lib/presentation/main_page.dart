@@ -42,7 +42,11 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
               inputDecoratorIsFilled: false),
           useMaterial3: true,
           swapLegacyOnMaterial3: true,
-          fontFamily: GoogleFonts.notoSans().fontFamily),
+          fontFamily: GoogleFonts.notoSans().fontFamily).copyWith(
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        )
+      ),
       darkTheme: FlexThemeData.dark(
           scheme: FlexScheme.ebonyClay,
           surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,

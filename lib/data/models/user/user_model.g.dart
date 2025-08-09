@@ -9,8 +9,14 @@ part of 'user_model.dart';
 UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       userId: json['userId'] as String?,
       email: json['email'] as String?,
-      nickName: json['nickName'] as String?,
+      password: json['password'] as String?,
+      nickname: json['nickname'] as String?,
       userType: $enumDecodeNullable(_$UserTypeEnumMap, json['userType']),
+      role: $enumDecodeNullable(_$UserRoleEnumMap, json['role']),
+      userName: json['userName'] as String?,
+      birth: json['birth'] == null
+          ? null
+          : DateTime.parse(json['birth'] as String),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -22,13 +28,31 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'userId': instance.userId,
       'email': instance.email,
-      'nickName': instance.nickName,
+      'password': instance.password,
+      'nickname': instance.nickname,
       'userType': _$UserTypeEnumMap[instance.userType],
+      'role': _$UserRoleEnumMap[instance.role],
+      'userName': instance.userName,
+      'birth': instance.birth?.toIso8601String(),
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };
 
 const _$UserTypeEnumMap = {
   UserType.individuals: 'INDIVIDUALS',
-  UserType.organizations: 'ORGANIZATIONS',
+  UserType.companies: 'COMPANIES',
+};
+
+const _$UserRoleEnumMap = {
+  UserRole.programmer: 'PROGRAMMER',
+  UserRole.designer: 'DESIGNER',
+  UserRole.manager: 'MANAGER',
+  UserRole.marketer: 'MARKETER',
+  UserRole.planner: 'PLANNER',
+  UserRole.publisher: 'PUBLISHER',
+  UserRole.analyst: 'ANALYST',
+  UserRole.operator: 'OPERATOR',
+  UserRole.pm: 'PM',
+  UserRole.qa: 'QA',
+  UserRole.cs: 'CS',
 };
