@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 
 class PostTesterPage extends StatefulWidget {
-  const PostTesterPage({super.key});
+  final String platform;
+  const PostTesterPage({super.key, required this.platform});
 
   @override
   State<PostTesterPage> createState() => _PostTesterPageState();

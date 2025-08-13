@@ -7,15 +7,21 @@ class NetDriver {
   final logger = Logger();
   final dio = Dio();
 
-  Future<Map<String, dynamic>> requestGetJson(String token, String url, String? parma ) async {
+  Future<Map<String, dynamic>> requestGetJson(String token, String url,
+      {String? parma = ""}) async {
     dio.options.headers['Content-Type'] = 'application/json';
     // dio.options.headers['Authorization'] = 'Bearer $token';
-    final api = '$baseUrl$url$parma';
-    final res = await dio.get(api);
+    final api = '$baseUrl$url/$parma';
+    final res = await dio.get(api, options: Options(
+      validateStatus: (status) {
+        return status != null && status < 500;
+      }
+    ));
     if(res.statusCode == 200) {
       return res.data;
     } else {
       logger.e("${res.statusCode} : ${res.statusMessage}s");
+      logger.w(res.data);
       return res.data;
     }
   }

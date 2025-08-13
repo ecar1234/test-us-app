@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/signup_page.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:provider/provider.dart';
+
+import 'bloc/auth_bloc/auth_event.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -58,14 +61,37 @@ class _LoginPageState extends State<LoginPage> {
                     child: ElevatedButton(
                         onPressed: () async {
                           if(emailController.text.isEmpty || passwordController.text.isEmpty){
-                            Get.snackbar("필수 입력 정보가 누락 되었습니다.", "이메일 또는 비밀번호는 빈 값으로 설정할 수 없습니다.");
+                            Get.snackbar("로그인 실패", "이메일 또는 비밀번호는 빈 값으로 설정할 수 없습니다.");
                             return;
                           }
-                          await context.read<UserProvider>().login(emailController.text, passwordController.text);
+                          final isLogin = await context.read<UserProvider>().login(emailController.text, passwordController.text);
                           if(context.mounted){
+                            if(isLogin == 401){
+                              Get.snackbar("로그인 실패", "이메일 또는 비밀번호가 일치하지 않습니다.");
+                              return;
+                            }
                             final user = context.read<UserProvider>().user;
-                            Get.snackbar("로그인 성공", "로그인에 성공하였습니다. ${user?.nickname}님 환영합니다.");
-                            return;
+                            context.read<AuthBloc>().add(LoginEvent(user!));
+                            // context.read<AuthBloc>().add(LoginCompletedEvent(context));
+                            await showDialog(context: context, builder: (context) {
+                              return AlertDialog(
+                                title: Text("로그인 성공"),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text("함께 해주셔서 감사합니다."),
+                                  ],
+                                ),
+                                actions: [
+                                  SizedBox(
+                                    child: ElevatedButton(onPressed: (){
+                                      Get.back(result: true);
+                                    }, child: Text("확인")),
+                                  )
+                                ],
+                              );
+                            });
+                            Get.back();
                           }
                         },
                         child: Text("로그인")

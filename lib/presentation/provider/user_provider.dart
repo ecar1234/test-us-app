@@ -9,15 +9,24 @@ class UserProvider with ChangeNotifier {
   UserProvider(this.useCase);
 
   UserEntity? _user;
+  String? _token;
+
+  String? get token => _token;
   UserEntity? get user => _user;
 
-  Future<void> login(String email, String password) async {
-    _user = await useCase.login(email, password);
-    debugPrint("user: $_user");
+  Future<int> login(String email, String password) async {
+    final res = await useCase.login(email, password);
+    if(res['user'].id == null){
+      return 401;
+    }else {
+      _user = res['user'] as UserEntity;
+      _token = res['token'] as String;
+    }
     notifyListeners();
+    return 200;
   }
 
-  Future<bool> signup(UserEntity userInfo) async {
+  Future<int> signup(UserEntity userInfo) async {
     return await useCase.signup(userInfo);
   }
 

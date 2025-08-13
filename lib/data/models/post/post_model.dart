@@ -3,21 +3,23 @@ import 'package:json_annotation/json_annotation.dart';
 part 'post_model.g.dart';
 
 enum PostStatus {
-  @JsonValue('ACTIVE')
+  @JsonValue('active')
   active,
-  @JsonValue('END')
+  @JsonValue('end')
   end,
-  @JsonValue('EXPIRED')
-  expired
+  @JsonValue('expired')
+  expired,
+  @JsonValue('delete')
+  delete
 }
 
 @JsonSerializable()
 class PostModel {
-  String? id;
+  String? postId;
   String? title;
-  String? subTitle;
-  String? platform;
-  String? content;
+  String? subtitle;
+  List<String>? platform;
+  String? contents;
   PostStatus? status;
   int? period;
   String? author;
@@ -26,15 +28,15 @@ class PostModel {
   DateTime? updatedAt;
 
   PostModel({
-    this.id,
-    this.title,
-    this.subTitle,
+    this.postId,
     this.author,
-    this.applications,
+    this.title,
+    this.subtitle,
+    this.contents,
     this.platform,
-    this.content,
     this.status,
     this.period,
+    this.applications,
     this.createdAt,
     this.updatedAt,
   });

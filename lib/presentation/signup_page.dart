@@ -51,25 +51,25 @@ class _SignupPageState extends State<SignupPage> {
 
   UserRole _toUserRole(String role) {
     switch (role) {
-      case "programmer":
+      case "프로그래머":
         return UserRole.programmer;
-      case "planner":
+      case "기획자":
         return UserRole.planner;
-      case "marketer":
+      case "마케터":
         return UserRole.marketer;
-      case "designer":
+      case "디자이너":
         return UserRole.designer;
-      case "publisher":
+      case "퍼블리셔":
         return UserRole.publisher;
-        case "analyst":
+      case "데이터 분석":
         return UserRole.analyst;
-      case "operator":
+      case "서비스 운영":
         return UserRole.operator;
-      case "manager":
+      case "PM":
         return UserRole.pm;
-      case "qa":
+      case "QA":
         return UserRole.qa;
-      case "cs":
+      case "CS":
         return UserRole.cs;
       default:
         return UserRole.programmer;
@@ -112,98 +112,111 @@ class _SignupPageState extends State<SignupPage> {
                   _userTypeSection(),
                   const Gap(40),
                   SizedBox(
-                    width: 300,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if(!isValidateEmail){
-                          Get.snackbar("알림", "이메일 형식을 다시 확인해 주세요.");
-                          return;
-                        }
-                        if(!isValidatePassword){
-                          Get.snackbar("알림", "비밀번호 형식을 다시 확인해 주세요.");
-                          return;
-                        }
-                        if(!isValidatePasswordCheck){
-                          Get.snackbar("알림", "비밀번호 확인이 일치하지 않습니다.");
-                          return;
-                        }
-                        if(!isValidateNickname){
-                          Get.snackbar("알림", "닉네임 중복 확인을 해주세요.");
-                          return;
-                        }
-                        if(userTypeController.text.isEmpty){
-                          Get.snackbar("알림", "유저 타입을 선택해 주세요.");
-                          return;
-                        }
-                        if(roleController.text.isEmpty){
-                          Get.snackbar("알림", "역할을 선택해 주세요.");
-                          return;
-                        }
-                        final userInfo = UserEntity(
-                          email: emailController.text,
-                          password: passwordController.text,
-                          nickname: nicknameController.text,
-                          userType: userTypeController.text == "INDIVIDUALS" ? UserType.individuals : UserType.companies,
-                          role: _toUserRole(roleController.text),
-                        );
-                        try {
-                          // logger.i('회원가입 시도: ${{
-                          //   "email": userInfo.email,
-                          //   "password": userInfo.password,
-                          //   "nickname": userInfo.nickname,
-                          //   "userType": userInfo.userType,
-                          //   "role": userInfo.role
-                          // }}');
-                          final isSignup = await context.read<UserProvider>().signup(userInfo);
-                          if(isSignup && context.mounted){
-                            final isCheck = await showDialog(context: context, builder: (context) {
-                              return AlertDialog(
-                                title: Text("회원가입 완료"),
-                                content: Column(
-                                  children: [
-                                    Text("함께 해주셔서 감사합니다."),
-                                    Text("모두가 함께 인사이트를 얻었으면 합니다.")
-                                  ],
-                                ),
-                                actions: [
-                                  SizedBox(
-                                    child: ElevatedButton(onPressed: (){
-                                      Get.back(result: true);
-                                    }, child: Text("확인")),
-                                  )
-                                ],
-                              );
-                            });
-                            // if(isCheck){
-                            //   Get.back();
-                            // }
-                          }
-                        } on Exception catch (e, stackTrace) {
-                          // TODO
-                          // 구체적인 에러 타입에 따른 분기 처리 권장
-                          logger.e('회원가입 중 에러 발생: $e');
-                          logger.i('Stack trace: $stackTrace');
-                          if (context.mounted) {
-                            // 사용자에게 일반적인 에러 메시지 표시
-                            Get.snackbar("에러", "회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+                      width: 300,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (!isValidateEmail) {
+                            Get.snackbar("알림", "이메일 형식을 다시 확인해 주세요.");
                             return;
-                            // 또는 특정 에러에 맞는 메시지 표시
-                            // if (e is NetworkException) { ... }
                           }
-                        }
+                          if (!isValidatePassword) {
+                            Get.snackbar("알림", "비밀번호 형식을 다시 확인해 주세요.");
+                            return;
+                          }
+                          if (!isValidatePasswordCheck) {
+                            Get.snackbar("알림", "비밀번호 확인이 일치하지 않습니다.");
+                            return;
+                          }
+                          if (!isValidateNickname) {
+                            Get.snackbar("알림", "닉네임 중복 확인을 해주세요.");
+                            return;
+                          }
+                          if (userTypeController.text.isEmpty) {
+                            Get.snackbar("알림", "유저 타입을 선택해 주세요.");
+                            return;
+                          }
+                          if (roleController.text.isEmpty) {
+                            Get.snackbar("알림", "역할을 선택해 주세요.");
+                            return;
+                          }
+                          final userInfo = UserEntity(
+                            email: emailController.text,
+                            password: passwordController.text,
+                            nickname: nicknameController.text,
+                            userType: userTypeController.text == "1인 개발자"
+                                ? UserType.individuals
+                                : UserType.companies,
+                            role: _toUserRole(roleController.text),
+                          );
+                          try {
+                            // logger.i('회원가입 시도: ${{
+                            //   "email": userInfo.email,
+                            //   "password": userInfo.password,
+                            //   "nickname": userInfo.nickname,
+                            //   "userType": userInfo.userType,
+                            //   "role": userInfo.role
+                            // }}');
+                            final state = await context
+                                .read<UserProvider>()
+                                .signup(userInfo);
+                            // final isSignup = false;
+                            if (context.mounted) {
+                              if(state == 200){
+                                await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text("회원가입 완료"),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text("함께 해주셔서 감사합니다."),
+                                            Text("모두가 함께 인사이트를 얻었으면 합니다.")
+                                          ],
+                                        ),
+                                        actions: [
+                                          SizedBox(
+                                            child: ElevatedButton(
+                                                onPressed: () {
+                                                  Get.back(result: true);
+                                                },
+                                                child: Text("확인")),
+                                          )
+                                        ],
+                                      );
+                                    });
+                                Get.back();
+                              }else if(state == 409){
+                                Get.snackbar("회원 가입 실패", "동일한 Email이 존재 합니다.");
+                                return;
+                              }
+                            }
+                          } on Exception catch (e, stackTrace) {
+                            // TODO
+                            // 구체적인 에러 타입에 따른 분기 처리 권장
+                            logger.e('회원가입 중 에러 발생: $e');
+                            logger.i('Stack trace: $stackTrace');
+                            if (context.mounted) {
+                              // 사용자에게 일반적인 에러 메시지 표시
+                              Get.snackbar(
+                                  "에러", "회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+                              return;
+                              // 또는 특정 에러에 맞는 메시지 표시
+                              // if (e is NetworkException) { ... }
+                            }
+                          }
 
-                        Get.back();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          // Get.back();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: EdgeInsets.zero,
                         ),
-                        padding: EdgeInsets.zero,
-                      ),
-                      child: Text("회원가입"),
-                    )
-                  )
+                        child: Text("회원가입"),
+                      ))
                 ],
               ),
             ),
@@ -232,7 +245,8 @@ class _SignupPageState extends State<SignupPage> {
                       if (value.isEmpty) {
                         isValidateEmail = false;
                       } else {
-                        isValidateEmail = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                        isValidateEmail = RegExp(
+                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                             .hasMatch(emailController.text);
                       }
                     });
@@ -244,35 +258,37 @@ class _SignupPageState extends State<SignupPage> {
                   children: [
                     isValidateEmail
                         ? SizedBox(
-                        child: Icon(
-                          Icons.check,
-                          color: Colors.green,
-                          size: 20,
-                        ))
+                            child: Icon(
+                            Icons.check,
+                            color: Colors.green,
+                            size: 20,
+                          ))
                         : SizedBox(
-                        child: Icon(
-                          Icons.cancel,
-                          color: Colors.redAccent,
-                          size: 20,
-                        )),
+                            child: Icon(
+                            Icons.cancel,
+                            color: Colors.redAccent,
+                            size: 20,
+                          )),
                     const Gap(8),
                     isValidateEmail
                         ? SizedBox(
-                      child: Text(
-                        "올바른 이메일 형식입니다",
-                        style: TextStyle(color: Colors.green),
-                      ),
-                    )
+                            child: Text(
+                              "올바른 이메일 형식입니다",
+                              style: TextStyle(color: Colors.green),
+                            ),
+                          )
                         : SizedBox(
-                      child: Text(
-                        "이메일 형식을 다시 확인해 주세요.",
-                        style: TextStyle(color: Colors.redAccent),
-                      ),
-                    )
+                            child: Text(
+                              "이메일 형식을 다시 확인해 주세요.",
+                              style: TextStyle(color: Colors.redAccent),
+                            ),
+                          )
                   ],
                 ))
           else
-            SizedBox(height: 20,)
+            SizedBox(
+              height: 20,
+            )
         ],
       ),
     );
@@ -300,19 +316,21 @@ class _SignupPageState extends State<SignupPage> {
           const Gap(8),
           SizedBox(
               child: TextField(
-                controller: passwordController,
-                obscureText: true,
-                onChanged: (value) {
-                  setState(() {
-                    isPasswordVisible = true;
-                    if(value.isEmpty) {
-                      isPasswordVisible = false;
-                    }else{
-                      isValidatePassword = RegExp(r'^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\$&*~]).{8,}$').hasMatch(passwordController.text);
-                    }
-                  });
-                },
-              )),
+            controller: passwordController,
+            obscureText: true,
+            onChanged: (value) {
+              setState(() {
+                isPasswordVisible = true;
+                if (value.isEmpty) {
+                  isPasswordVisible = false;
+                } else {
+                  isValidatePassword = RegExp(
+                          r'^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\$&*~]).{8,}$')
+                      .hasMatch(passwordController.text);
+                }
+              });
+            },
+          )),
           if (isPasswordVisible && passwordController.text.isNotEmpty)
             SizedBox(
                 height: 20,
@@ -320,35 +338,37 @@ class _SignupPageState extends State<SignupPage> {
                   children: [
                     isValidatePassword
                         ? SizedBox(
-                        child: Icon(
-                          Icons.check,
-                          color: Colors.green,
-                          size: 20,
-                        ))
+                            child: Icon(
+                            Icons.check,
+                            color: Colors.green,
+                            size: 20,
+                          ))
                         : SizedBox(
-                        child: Icon(
-                          Icons.cancel,
-                          color: Colors.redAccent,
-                          size: 20,
-                        )),
+                            child: Icon(
+                            Icons.cancel,
+                            color: Colors.redAccent,
+                            size: 20,
+                          )),
                     const Gap(8),
                     isValidatePassword
                         ? SizedBox(
-                      child: Text(
-                        "사용할 수 있는 비밀번호 입니다.",
-                        style: TextStyle(color: Colors.green),
-                      ),
-                    )
+                            child: Text(
+                              "사용할 수 있는 비밀번호 입니다.",
+                              style: TextStyle(color: Colors.green),
+                            ),
+                          )
                         : SizedBox(
-                      child: Text(
-                        "비밀번호 형식을 다시 확인해 주세요.",
-                        style: TextStyle(color: Colors.redAccent),
-                      ),
-                    )
+                            child: Text(
+                              "비밀번호 형식을 다시 확인해 주세요.",
+                              style: TextStyle(color: Colors.redAccent),
+                            ),
+                          )
                   ],
                 ))
           else
-            SizedBox(height: 20,)
+            SizedBox(
+              height: 20,
+            )
         ],
       ),
     );
@@ -366,19 +386,20 @@ class _SignupPageState extends State<SignupPage> {
           const Gap(8),
           SizedBox(
               child: TextField(
-                controller: passwordCheckController,
-                obscureText: true,
-                onChanged: (value) {
-                  setState(() {
-                    isPasswordCheckVisible = true;
-                    if(value.isEmpty) {
-                      isPasswordCheckVisible = false;
-                    }else{
-                      isValidatePasswordCheck = passwordController.text == passwordCheckController.text;
-                    }
-                  });
-                },
-              )),
+            controller: passwordCheckController,
+            obscureText: true,
+            onChanged: (value) {
+              setState(() {
+                isPasswordCheckVisible = true;
+                if (value.isEmpty) {
+                  isPasswordCheckVisible = false;
+                } else {
+                  isValidatePasswordCheck =
+                      passwordController.text == passwordCheckController.text;
+                }
+              });
+            },
+          )),
           if (isPasswordCheckVisible && passwordCheckController.text.isNotEmpty)
             SizedBox(
                 height: 20,
@@ -386,29 +407,33 @@ class _SignupPageState extends State<SignupPage> {
                   children: [
                     isValidatePasswordCheck
                         ? SizedBox(
-                        child: Icon(
-                          Icons.check,
-                          color: Colors.green,
-                          size: 20,
-                        ))
+                            child: Icon(
+                            Icons.check,
+                            color: Colors.green,
+                            size: 20,
+                          ))
                         : SizedBox(
-                        child: Icon(
-                          Icons.cancel,
-                          color: Colors.redAccent,
-                          size: 20,
-                        )),
+                            child: Icon(
+                            Icons.cancel,
+                            color: Colors.redAccent,
+                            size: 20,
+                          )),
                     const Gap(8),
                     isValidatePasswordCheck
                         ? SizedBox(
-                      child: Text("비밀번호가 일치 합니다.", style: TextStyle(color: Colors.green)),
-                    )
+                            child: Text("비밀번호가 일치 합니다.",
+                                style: TextStyle(color: Colors.green)),
+                          )
                         : SizedBox(
-                      child: Text("비밀번호가 일치하지 않습니다.", style: TextStyle(color: Colors.redAccent)),
-                    )
+                            child: Text("비밀번호가 일치하지 않습니다.",
+                                style: TextStyle(color: Colors.redAccent)),
+                          )
                   ],
                 ))
           else
-            SizedBox(height: 20,)
+            SizedBox(
+              height: 20,
+            )
         ],
       ),
     );
@@ -426,80 +451,93 @@ class _SignupPageState extends State<SignupPage> {
           const Gap(8),
           SizedBox(
               child: Row(
-                children: [
-                  Flexible(
-                    flex: 8,
-                    child: SizedBox(
-                      width: (MediaQuery.sizeOf(context).width - 40) * 0.7,
-                      child: TextField(
-                        controller: nicknameController,
-                      ),
-                    ),
+            children: [
+              Flexible(
+                flex: 8,
+                child: SizedBox(
+                  width: (MediaQuery.sizeOf(context).width - 40) * 0.7,
+                  child: TextField(
+                    controller: nicknameController,
                   ),
-                  const Gap(16),
-                  Flexible(
-                    flex: 2,
-                    child: SizedBox(
-                      width: (MediaQuery.sizeOf(context).width - 40) * 0.2,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if(nicknameController.text.isEmpty) {
-                            Get.snackbar("알림", "닉네임을 입력해 주세요.");
-                            return;
-                          }
-                          setState(() {
-                            isNicknameVisible = true;
-                            isValidateNickname = true;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: EdgeInsets.zero,
-                        ),
-                        child: Text("중복확인"),
+                ),
+              ),
+              const Gap(16),
+              Flexible(
+                flex: 2,
+                child: SizedBox(
+                  width: (MediaQuery.sizeOf(context).width - 40) * 0.2,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () async{
+                      if (nicknameController.text.isEmpty) {
+                        Get.snackbar("알림", "닉네임을 입력해 주세요.");
+                        return;
+                      }
+                      final isNickname = await context.read<UserProvider>().isNicknameAvailable(nicknameController.text);
+                      if(!isNickname){
+                        Get.snackbar("알림", "이미 사용중인 닉네임 입니다.");
+                        setState(() {
+                          isNicknameVisible = true;
+                          isValidateNickname = false;
+                        });
+                        return;
+                      }else {
+                        setState(() {
+                          isNicknameVisible = true;
+                          isValidateNickname = true;
+                        });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
+                      padding: EdgeInsets.zero,
                     ),
-                  )
-                ],
-              )),
-          if(isNicknameVisible && nicknameController.text.isNotEmpty)
+                    child: Text("중복확인"),
+                  ),
+                ),
+              )
+            ],
+          )),
+          if (isNicknameVisible && nicknameController.text.isNotEmpty)
             SizedBox(
                 height: 20,
                 child: Row(
                   children: [
                     isValidateNickname
-                        ? SizedBox(child: Icon(
-                      Icons.check,
-                      color: Colors.green,
-                      size: 20,
-                    ))
+                        ? SizedBox(
+                            child: Icon(
+                            Icons.check,
+                            color: Colors.green,
+                            size: 20,
+                          ))
                         : SizedBox(
-                        child: Icon(
-                          Icons.cancel,
-                          color: Colors.redAccent,
-                          size: 20,
-                        )),
+                            child: Icon(
+                            Icons.cancel,
+                            color: Colors.redAccent,
+                            size: 20,
+                          )),
                     const Gap(8),
-                    isValidateNickname ?
-                    SizedBox(
-                      child: Text(
-                        "사용할 수 있는 닉네임 입니다.",
-                        style: TextStyle(color: Colors.green),
-                      ),
-                    ): SizedBox(
-                      child: Text(
-                        "이미 사용중인 닉네임 입니다.",
-                        style: TextStyle(color: Colors.redAccent),
-                      ),
-                    )
+                    isValidateNickname
+                        ? SizedBox(
+                            child: Text(
+                              "사용할 수 있는 닉네임 입니다.",
+                              style: TextStyle(color: Colors.green),
+                            ),
+                          )
+                        : SizedBox(
+                            child: Text(
+                              "이미 사용중인 닉네임 입니다.",
+                              style: TextStyle(color: Colors.redAccent),
+                            ),
+                          )
                   ],
-                )
-            )
+                ))
           else
-            SizedBox(height: 20,)
+            SizedBox(
+              height: 20,
+            )
         ],
       ),
     );
@@ -520,9 +558,9 @@ class _SignupPageState extends State<SignupPage> {
                 children: [
                   SizedBox(
                       child: Text(
-                        "유져 타입",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                      )),
+                    "유져 타입",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  )),
                   const Gap(8),
                   SizedBox(
                     child: DropdownMenu(
@@ -536,7 +574,8 @@ class _SignupPageState extends State<SignupPage> {
                         initialSelection: "",
                         dropdownMenuEntries: [
                           DropdownMenuEntry(value: "", label: "선택"),
-                          DropdownMenuEntry(value: "INDIVIDUALS", label: "1인 개발자"),
+                          DropdownMenuEntry(
+                              value: "INDIVIDUALS", label: "1인 개발자"),
                           DropdownMenuEntry(value: "COMPANIES", label: "기업"),
                         ]),
                   )
@@ -553,9 +592,9 @@ class _SignupPageState extends State<SignupPage> {
                 children: [
                   SizedBox(
                       child: Text(
-                        "역할",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                      )),
+                    "역할",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  )),
                   const Gap(8),
                   SizedBox(
                     child: DropdownMenu(
@@ -569,7 +608,8 @@ class _SignupPageState extends State<SignupPage> {
                         initialSelection: "",
                         dropdownMenuEntries: [
                           DropdownMenuEntry(value: "", label: "선택"),
-                          DropdownMenuEntry(value: "programmer", label: "프로그래머"),
+                          DropdownMenuEntry(
+                              value: "programmer", label: "프로그래머"),
                           DropdownMenuEntry(value: "planner", label: "기획자"),
                           DropdownMenuEntry(value: "marketer", label: "마케터"),
                           DropdownMenuEntry(value: "designer", label: "디자이너"),

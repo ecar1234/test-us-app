@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_us_app/domain/use_cases/application_usecase.dart';
+import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
+import 'package:test_us_app/presentation/bloc/data_bloc.dart';
 import 'package:test_us_app/presentation/main_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider.dart';
@@ -18,6 +21,11 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (context) => PostProvider(getIt<PostUseCase>())),
       ChangeNotifierProvider(create: (context) => ApplicationProvider(getIt<ApplicationUseCase>())),
     ],
-    child: const MetaDataSetting(),
+    child: MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => AuthBloc()),
+        BlocProvider(create: (context) => DataBloc()),
+      ], child: const MetaDataSetting(),
+    ),
   ));
 }

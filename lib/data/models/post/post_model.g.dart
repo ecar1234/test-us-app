@@ -7,17 +7,19 @@ part of 'post_model.dart';
 // **************************************************************************
 
 PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
-      id: json['id'] as String?,
-      title: json['title'] as String?,
-      subTitle: json['subTitle'] as String?,
+      postId: json['postId'] as String?,
       author: json['author'] as String?,
+      title: json['title'] as String?,
+      subtitle: json['subtitle'] as String?,
+      contents: json['contents'] as String?,
+      platform: (json['platform'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
+      status: $enumDecodeNullable(_$PostStatusEnumMap, json['status']),
+      period: (json['period'] as num?)?.toInt(),
       applications: (json['applications'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      platform: json['platform'] as String?,
-      content: json['content'] as String?,
-      status: $enumDecodeNullable(_$PostStatusEnumMap, json['status']),
-      period: (json['period'] as num?)?.toInt(),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -27,11 +29,11 @@ PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
     );
 
 Map<String, dynamic> _$PostModelToJson(PostModel instance) => <String, dynamic>{
-      'id': instance.id,
+      'postId': instance.postId,
       'title': instance.title,
-      'subTitle': instance.subTitle,
+      'subtitle': instance.subtitle,
       'platform': instance.platform,
-      'content': instance.content,
+      'contents': instance.contents,
       'status': _$PostStatusEnumMap[instance.status],
       'period': instance.period,
       'author': instance.author,
@@ -41,7 +43,8 @@ Map<String, dynamic> _$PostModelToJson(PostModel instance) => <String, dynamic>{
     };
 
 const _$PostStatusEnumMap = {
-  PostStatus.active: 'ACTIVE',
-  PostStatus.end: 'END',
-  PostStatus.expired: 'EXPIRED',
+  PostStatus.active: 'active',
+  PostStatus.end: 'end',
+  PostStatus.expired: 'expired',
+  PostStatus.delete: 'delete',
 };

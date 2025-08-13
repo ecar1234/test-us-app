@@ -2,17 +2,21 @@
 import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
+import '../../data/sharedPreferences/auth_preference.dart';
 import '../repositories/user_repository.dart';
 
 class UserUseCase {
   final UserRepository repository;
   UserUseCase(this.repository);
-
-  Future<UserEntity> login(String email, String password) async {
+  final pref = AuthPreference.instance;
+  Future<Map<String,dynamic>> login(String email, String password) async {
     final res = await repository.login(email, password);
+    if(res['user'].id != null){
+      pref.setToken(res['token']);
+    }
     return res;
   }
-  Future<bool> signup(UserEntity userInfo) async {
+  Future<int> signup(UserEntity userInfo) async {
     final res = await repository.signup(userInfo);
     return res;
   }

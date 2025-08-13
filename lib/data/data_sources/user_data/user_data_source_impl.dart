@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
@@ -11,12 +9,14 @@ import '../../../core/net_driver.dart';
 class UserDataSourceImpl implements UserDataSource {
   final logger = Logger();
   final NetDriver netDriver;
+
   UserDataSourceImpl(this.netDriver);
 
   @override
   Future<UserModel> getUserByEmail(String email) async {
-    final res = await netDriver.requestGetJson("",UserApi.getUserByEmail, email);
-    if(res['code'] == 200){
+    final res =
+        await netDriver.requestGetJson("", UserApi.getUserByEmail, parma: email);
+    if (res['status'] == 200) {
       return UserModel.fromJson(res['data']);
     } else {
       throw Exception('Error');
@@ -25,8 +25,8 @@ class UserDataSourceImpl implements UserDataSource {
 
   @override
   Future<UserModel> getUserById(String id) async {
-    final res = await netDriver.requestGetJson("",UserApi.getUserById, id);
-    if(res['code'] == 200){
+    final res = await netDriver.requestGetJson("", UserApi.getUserById, parma:id);
+    if (res['status'] == 200) {
       return UserModel.fromJson(res['data']);
     } else {
       throw Exception('Error');
@@ -35,8 +35,9 @@ class UserDataSourceImpl implements UserDataSource {
 
   @override
   Future<UserModel> getUserByNickname(String nickname) async {
-    final res = await netDriver.requestGetJson("",UserApi.getUserByNickname, nickname);
-    if(res['code'] == 200){
+    final res =
+        await netDriver.requestGetJson("", UserApi.getUserByNickname, parma:nickname);
+    if (res['status'] == 200) {
       return UserModel.fromJson(res['data']);
     } else {
       throw Exception('Error');
@@ -45,56 +46,57 @@ class UserDataSourceImpl implements UserDataSource {
 
   @override
   Future<bool> isEmailAvailable(String email) async {
-    final res = await netDriver.requestGetJson("",UserApi.isEmailAvailable, email);
-    if(res['code'] == 200){
+    final res =
+        await netDriver.requestGetJson("", UserApi.isEmailAvailable, parma:email);
+    if (res['status'] == 200) {
       return true;
-    } else if(res['code'] == 404){
+    } else if (res['status'] == 404) {
       return false;
-    }
-    else {
+    } else {
       throw Exception('Server 500 Error');
     }
   }
 
   @override
   Future<bool> isNicknameAvailable(String nickname) async {
-   final res = await netDriver.requestGetJson("",UserApi.isNicknameAvailable, nickname);
-    if(res['code'] == 200){
-      return true;
-    } else if(res['code'] == 404){
-      return false;
-    }
-    else {
+    final res = await netDriver.requestGetJson(
+        "", UserApi.isNicknameAvailable, parma:nickname);
+    if (res['status'] == 200) {
+      return res['available'];
+    } else if (res['status'] == 409) {
+      return res['available'];
+    } else {
       throw Exception('Server 500 Error');
     }
   }
 
   @override
   Future<bool> isPasswordValid(String password) async {
-    final res = await netDriver.requestGetJson("",UserApi.isPasswordValid, password);
-    if(res['code'] == 200){
+    final res =
+        await netDriver.requestGetJson("", UserApi.isPasswordValid, parma:password);
+    if (res['status'] == 200) {
       return true;
-    } else if(res['code'] == 404){
+    } else if (res['status'] == 404) {
       return false;
-    }
-    else {
+    } else {
       throw Exception('Server 500 Error');
     }
   }
 
   @override
-  Future<UserModel> login(String email, String password) async {
-    final res = await netDriver.requestPostJson("", AuthApi.login, {"email": email, "password": password});
-    if(res['status'] == 200){
-      return UserModel.fromJson(res['user']);
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    final res = await netDriver.requestPostJson(
+        "", AuthApi.login, {"email": email, "password": password});
+    if (res['status'] == 200) {
+      return {'user': UserModel.fromJson(res['user']), 'token': res['token']};
     } else {
       // debugPrint("$res, ${res['message']}");
-      return UserModel();
+      return {'user': UserModel()};
     }
   }
 
   @override
-  Future<bool> signup(UserModel userInfo) async {
+  Future<int> signup(UserModel userInfo) async {
     // logger.i('회원가입 시도: ${{
     //   "email": userInfo.email,
     //   "password": userInfo.password,
@@ -102,20 +104,21 @@ class UserDataSourceImpl implements UserDataSource {
     //   "userType": userInfo.userType,
     //   "role": userInfo.role
     // }}');
-    final res = await netDriver.requestPostJson("", AuthApi.signup, userInfo.toJson());
+    final res =
+        await netDriver.requestPostJson("", AuthApi.signup, userInfo.toJson());
     logger.i('회원가입 결과: $res');
-    if(res['status'] == 200){
-      return true;
+    if (res['status'] == 200) {
+      return res['state'];
     } else {
-      return false;
+      return res['state'];
     }
-
   }
 
   @override
   Future<bool> updatePassword(String newPassword) async {
-    final res = await netDriver.requestPutJson("", UserApi.updatePassword, {"newPassword": newPassword});
-    if(res['code'] == 200){
+    final res = await netDriver.requestPutJson(
+        "", UserApi.updatePassword, {"newPassword": newPassword});
+    if (res['status'] == 200) {
       return true;
     } else {
       throw Exception('Error');

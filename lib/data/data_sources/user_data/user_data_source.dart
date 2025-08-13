@@ -3,8 +3,8 @@
 import '../../models/user/user_model.dart';
 
 abstract class UserDataSource {
-  Future<UserModel> login(String email, String password);
-  Future<bool> signup(UserModel userInfo);
+  Future<Map<String,dynamic>> login(String email, String password);
+  Future<int> signup(UserModel userInfo);
   Future<UserModel> getUserByEmail(String email);
   Future<UserModel> getUserByNickname(String nickname);
   Future<UserModel> getUserById(String id);

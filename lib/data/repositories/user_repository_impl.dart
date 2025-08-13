@@ -45,13 +45,13 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<UserEntity> login(String email, String password) async {
+  Future<Map<String, dynamic>> login(String email, String password) async {
     final res = await remote.login(email, password);
-    return UserEntity.toEntity(res);
+    return {'user':UserEntity.toEntity(res['user']), 'token':res['token']};
   }
 
   @override
-  Future<bool> signup(UserEntity userInfo) async {
+  Future<int> signup(UserEntity userInfo) async {
     final userModel = UserEntity.toModel(userInfo);
     final res = await remote.signup(userModel);
     return res;
