@@ -9,7 +9,14 @@ class RequestUserInfoEvent extends DataEvent {
   RequestUserInfoEvent(this.context);
 }
 
+class RequestInitDataEvent extends DataEvent {
+  BuildContext context;
+  RequestInitDataEvent(this.context);
+}
+
 class RequestPostDataEvent extends DataEvent {
   BuildContext context;
-  RequestPostDataEvent(this.context);
+  String platform;
+  int page;
+  RequestPostDataEvent(this.context, this.platform, this.page);
 }

@@ -23,6 +23,7 @@ class PostModel {
   PostStatus? status;
   int? period;
   String? author;
+  int? views;
   List<String>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;

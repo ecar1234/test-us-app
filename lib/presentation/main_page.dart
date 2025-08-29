@@ -10,7 +10,9 @@ import 'package:test_us_app/presentation/bloc/data_state.dart';
 import 'package:test_us_app/presentation/login_page.dart';
 import 'package:test_us_app/presentation/post_tester_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider.dart';
+import 'package:test_us_app/presentation/purchase_page.dart';
 import 'package:test_us_app/presentation/setting_page.dart';
+import 'package:test_us_app/presentation/user_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -19,6 +21,8 @@ import 'bloc/auth_bloc/auth_bloc.dart';
 import 'bloc/auth_bloc/auth_state.dart';
 import 'bloc/data_bloc.dart';
 import 'bloc/data_event.dart';
+import 'components/custom_bottom_bar.dart';
+import 'home_page.dart';
 
 class MetaDataSetting extends StatefulWidget {
   const MetaDataSetting({super.key});
@@ -42,8 +46,8 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DataBloc, DataState>(builder: (context, state) {
-      if(state.state == DataStatus.startService){
-        context.read<DataBloc>().add(RequestPostDataEvent(context));
+      if (state.state == DataLoadState.serviceStartState) {
+        // context.read<DataBloc>().add(RequestInitDataEvent(context));
       }
       return GetMaterialApp(
         theme: FlexThemeData.light(
@@ -92,302 +96,64 @@ class MainPage extends StatefulWidget {
 class _MainState extends State<MainPage> {
   bool isLogin = false;
 
+  int _currentIdx = 0;
+
+  late List<Widget>_pageList = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _pageList = [
+      HomePage(
+        onTap: (idx) {
+          setState(() {
+            _currentIdx = idx;
+          });
+        },
+      ),
+      const PostTesterPage(),
+      const UserPage(),
+      const PurchasePage(),
+    ];
+  }
   @override
   Widget build(BuildContext context) {
-    final hei = GetIt.I<ResponsiveHeightProvider>().hei;
-
+    final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ??
+        MediaQuery.sizeOf(context).height - 120;
     return SafeArea(
-        child: Scaffold(
-            appBar: AppBar(
-              title: const Text('Testus',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              // 추후 로고 이미지로 변경
-              actions: [
-                IconButton(
-                    onPressed: () {
-                      Get.to(() => LoginPage());
-                    },
-                    icon: const Icon(Icons.login)),
-                IconButton(
-                    onPressed: () {
-                      Get.to(() => SettingPage());
-                    },
-                    icon: const Icon(Icons.settings)),
-              ],
+        child: PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) {
+          return;
+        }
+        if (context.mounted) {
+          setState(() {
+            _currentIdx = 0;
+          });
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(color: Colors.white),
+        child: Stack(children: [
+          SizedBox(
+            height: hei - 20,
+            child: _pageList[_currentIdx],
+          ),
+          Positioned(
+            bottom: 0,
+            child: CustomBottomBar(
+              currentIndex: _currentIdx,
+              onTap: (idx) {
+                setState(() {
+                  _currentIdx = idx;
+                });
+              },
             ),
-            // drawer: Drawer(
-            //   child: ListView(padding: EdgeInsets.zero, children: [
-            //     Container(
-            //         height: 100,
-            //         width: MediaQuery.sizeOf(context).width,
-            //         padding: EdgeInsets.all(10),
-            //         // decoration: BoxDecoration(
-            //         //   border: Border.all()
-            //         // ),
-            //         child: Row(
-            //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //           children: [
-            //             SizedBox(
-            //               child: Text(
-            //                 'Testus',
-            //                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            //               ),
-            //             ),
-            //             // SizedBox(
-            //             //   width: 40,
-            //             //   height: 40,
-            //             //   child: IconButton(onPressed: () {
-            //             //     Navigator.pop(context);
-            //             //   }, icon: Icon(Icons.arrow_back_ios)),
-            //             // )
-            //
-            //           ],
-            //         )),
-            //     Container(padding: EdgeInsets.symmetric(horizontal: 20), child: Divider()),
-            //     const Gap(20),
-            //     ListTile(
-            //       title: Text("테스터 모집"),
-            //       onTap: () {},
-            //     ),
-            //     ListTile(
-            //       title: Text("서비스 홍보"),
-            //       onTap: () {},
-            //     ),
-            //     ListTile(
-            //       title: Text("지원 현황"),
-            //       onTap: () {},
-            //     ),
-            //     ListTile(
-            //       title: Text("커뮤니티"),
-            //       onTap: () {},
-            //     ),
-            //   ]),
-            //
-            // ),
-            body: SingleChildScrollView(
-                child: Container(
-                    // height: hei,
-                    width: MediaQuery.sizeOf(context).width,
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    // decoration: BoxDecoration(
-                    //   border: Border.all()
-                    // ),
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 100,
-                          width: MediaQuery.sizeOf(context).width,
-                          // decoration: BoxDecoration(
-                          //   border: Border.all()
-                          // ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                  height: 80,
-                                  width:
-                                      (MediaQuery.sizeOf(context).width - 80) /
-                                          4,
-                                  child: ElevatedButton(
-                                      onPressed: () {},
-                                      style: ElevatedButton.styleFrom(
-                                          padding: EdgeInsets.zero,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10))),
-                                      child: Center(
-                                        child: Text("테스터 모집"),
-                                      ))),
-                              const Gap(10),
-                              SizedBox(
-                                  height: 80,
-                                  width:
-                                      (MediaQuery.sizeOf(context).width - 80) /
-                                          4,
-                                  child: ElevatedButton(
-                                      onPressed: () {},
-                                      style: ElevatedButton.styleFrom(
-                                          padding: EdgeInsets.zero,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10))),
-                                      child: Center(
-                                        child: Text("서비스 홍보"),
-                                      ))),
-                              const Gap(10),
-                              SizedBox(
-                                  height: 80,
-                                  width:
-                                      (MediaQuery.sizeOf(context).width - 80) /
-                                          4,
-                                  child: ElevatedButton(
-                                      onPressed: () {},
-                                      style: ElevatedButton.styleFrom(
-                                          padding: EdgeInsets.zero,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10))),
-                                      child: Center(
-                                        child: Text("지원 현황"),
-                                      ))),
-                              const Gap(10),
-                              SizedBox(
-                                  height: 80,
-                                  width:
-                                      (MediaQuery.sizeOf(context).width - 80) /
-                                          4,
-                                  child: ElevatedButton(
-                                      onPressed: () {},
-                                      style: ElevatedButton.styleFrom(
-                                          padding: EdgeInsets.zero,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10))),
-                                      child: Center(
-                                        child: Text("커뮤니티"),
-                                      ))),
-                            ],
-                          ),
-                        ),
-                        const Gap(20),
-                        _favoritePostList(),
-                        const Gap(20),
-                        _appServiceList(),
-                        const Gap(20),
-                        _webServiceList()
-                      ],
-                    )))));
-  }
-
-  Widget _favoritePostList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Text("조회 Top 10",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        ),
-        Container(
-            height: 230,
-            width: MediaQuery.sizeOf(context).width,
-            // padding: EdgeInsets.all(10),
-
-            child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.only(left: 20),
-                shrinkWrap: true,
-                itemBuilder: (context, idx) {
-                  return Container(
-                    height: 200,
-                    width: 180,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
-                    child: Text("${idx + 1}"),
-                  );
-                },
-                separatorBuilder: (context, idx) => const Gap(10),
-                itemCount: 10)),
-      ],
-    );
-  }
-
-  Widget _appServiceList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('앱 서비스',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  child: Text("더보기"))
-            ],
-          ),
-        ),
-        Selector<PostProvider, List<PostEntity>>(
-          selector: (context, provider) => provider.mobilePost,
-          builder:(context, mobilePost, child) => SizedBox(
-              height: 150,
-              width: MediaQuery.sizeOf(context).width,
-              // padding: EdgeInsets.all(10),
-              // decoration: BoxDecoration(
-              //     border: Border.all()
-              // ),
-              child: mobilePost.isEmpty ? const Center(child: Text("앱 서비스 게시글이 아직 없습니다.")) : ListView.separated(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.only(left: 20),
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, idx) {
-                    return Container(
-                      height: 120,
-                      width: 150,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                      child: Text("$idx"),
-                    );
-                  },
-                  separatorBuilder: (context, idx) => const Gap(10),
-                  itemCount: 4)),
-        ),
-      ],
-    );
-  }
-
-  Widget _webServiceList(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('웹 서비스',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              TextButton(
-                  onPressed: () {
-                    Get.to(() => PostTesterPage(platform: 'web'));
-                  },
-                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  child: Text("더보기"))
-            ],
-          ),
-        ),
-        Selector<PostProvider, List<PostEntity>>(
-          selector: (context, provider) => provider.webPost,
-          builder:(context, webPost, child) => SizedBox(
-              height: 150,
-              width: MediaQuery.sizeOf(context).width,
-              // padding: EdgeInsets.all(10),
-              // decoration: BoxDecoration(
-              //     border: Border.all()
-              // ),
-              child: webPost.isEmpty ? const Center(child: Text("웹 서비스 게시글이 아직 없습니다.")) : ListView.separated(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.only(left: 20),
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, idx) {
-                    return Container(
-                      height: 120,
-                      width: 150,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                      child: Text("$idx"),
-                    );
-                  },
-                  separatorBuilder: (context, idx) => const Gap(10),
-                  itemCount: 4)),
-        ),
-      ],
-    );
+          )
+        ]),
+      ),
+    ));
   }
 }

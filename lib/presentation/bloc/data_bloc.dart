@@ -6,16 +6,27 @@ import '../provider/user_provider.dart';
 import 'data_event.dart';
 
 class DataBloc extends Bloc<DataEvent, DataState> {
-  DataBloc() : super (DataState(state: DataStatus.startService)){
-    on<RequestUserInfoEvent>((event, emit) async {
-      // event.context.read<UserProvider>().;
-      emit(DataState(state: DataStatus.getUserDataState));
+  DataBloc() : super(DataState(state: DataLoadState.serviceStartState)) {
+    // on<RequestUserInfoEvent>((event, emit) async {
+    //   emit(DataState(state: DataLoadState.dataLoadState));
+    //   event.context.read<UserProvider>().;
+    //
+    // });
+    on<RequestInitDataEvent>((event, emit) {
+      emit(DataState(state: DataLoadState.dataLoadState));
+      event.context.read<PostProvider>().getInitPosts();
+      emit(DataState(state: DataLoadState.initDataLoadCompletedState));
     });
 
     on<RequestPostDataEvent>((event, emit) async {
-      event.context.read<PostProvider>().getPosts();
-      emit(DataState(state: DataStatus.postsInitCompletedState));
+      emit(DataState(state: DataLoadState.dataLoadState));
+      if (event.platform == 'web') {
+        event.context.read<PostProvider>().getWebPosts(page: event.page);
+        emit(DataState(state: DataLoadState.webDataLoadCompletedState));
+      } else {
+        event.context.read<PostProvider>().getMobilePosts(page: event.page);
+        emit(DataState(state: DataLoadState.mobileDataLoadCompletedState));
+      }
     });
-
   }
 }

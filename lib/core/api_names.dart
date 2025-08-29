@@ -1,6 +1,8 @@
 
 class Host {
-  static const String baseUrl = 'http://192.168.45.100:3000';
+  static const String baseDevUrl = 'http://192.168.45.100:3000';
+  // static const String baseDevUrl = 'http://172.30.1.100:3000';
+  // static const String baseDevUrl = 'http://testusserver.ddns.net:3000';
 }
 
 class AuthApi {
@@ -27,7 +29,9 @@ class PostApi {
   static const String delete = '/api/v1/post/delete';
   static const String getPostById = '/api/v1/post/getPostById';
   static const String getPostsByTitle = '/api/v1/post/getPostsByTitle';
-  static const String getAllPosts = '/api/v1/post/getAllPosts';
+  static const String getInitPosts = '/api/v1/post/getInitPosts';
+  static const String getWebPosts = '/api/v1/post/getWebPostsPagination';
+  static const String getMobilePosts = '/api/v1/post/getMobilePostsPagination';
 }
 
 class ApplicationApi {

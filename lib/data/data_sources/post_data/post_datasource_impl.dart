@@ -1,5 +1,7 @@
 
 
+import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/post_data/post_datasource.dart';
 import 'package:test_us_app/data/models/post/post_model.dart';
@@ -11,12 +13,12 @@ class PostDataSourceImpl implements PostDataSource {
   PostDataSourceImpl(this.netDriver);
 
   @override
-  Future<Map<String, dynamic>> createPost(String token, PostModel post) async {
+  Future<bool> createPost(String token, PostModel post) async {
     final res = await netDriver.requestPostJson(token, PostApi.create, post.toJson());
     if (res['status'] == 200) {
-      return {'status': 200, 'post': res['post']};
+      return true;
     } else {
-      throw Exception('Error');
+      throw false;
     }
   }
 
@@ -27,10 +29,18 @@ class PostDataSourceImpl implements PostDataSource {
   }
 
   @override
-  Future<List<PostModel>> getPostAllData() async {
-    final res = await netDriver.requestGetJson("", PostApi.getAllPosts);
+  Future<List<List<PostModel>>> getPostsInitData() async {
+    final res = await netDriver.requestGetJson("", PostApi.getInitPosts);
+
+    List<PostModel> webPosts = [];
+    List<PostModel> mobilePosts = [];
+    List<PostModel> favoritePosts = [];
+
     if (res['status'] == 200) {
-      return res['posts'].map<PostModel>((e) => PostModel.fromJson(e)).toList();
+      webPosts = (res['webPosts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
+      mobilePosts = (res['mobilePosts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
+      favoritePosts = (res['favoritePosts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
+      return [webPosts, mobilePosts, favoritePosts];
     } else {
       throw Exception('Error');
     }
@@ -54,6 +64,28 @@ class PostDataSourceImpl implements PostDataSource {
     throw UnimplementedError();
   }
 
+  @override
+  Future<List<PostModel>> getWebPosts(int page) async {
+    final res = await netDriver.requestGetJson(page.toString(), PostApi.getWebPosts);
+    if(res['status'] == 200){
+      return (res['posts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
+    }else {
+      throw Exception('Error');
+    }
+  }
 
-
+  @override
+  Future<List<PostModel>> getMobilePosts(int page) async {
+    final res = await netDriver.requestGetJson(page.toString(), PostApi.getMobilePosts);
+    if(res['status'] == 200){
+      return (res['posts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
+    }else {
+      throw Exception('Error');
+    }
+  }
+  @override
+  Future<List<PostModel>> getPostsPagination(int page) {
+    // TODO: implement getPostsPagination
+    throw UnimplementedError();
+  }
 }

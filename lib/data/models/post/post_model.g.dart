@@ -26,7 +26,7 @@ PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
-    );
+    )..views = (json['views'] as num?)?.toInt();
 
 Map<String, dynamic> _$PostModelToJson(PostModel instance) => <String, dynamic>{
       'postId': instance.postId,
@@ -37,6 +37,7 @@ Map<String, dynamic> _$PostModelToJson(PostModel instance) => <String, dynamic>{
       'status': _$PostStatusEnumMap[instance.status],
       'period': instance.period,
       'author': instance.author,
+      'views': instance.views,
       'applications': instance.applications,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),

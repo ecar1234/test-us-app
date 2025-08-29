@@ -1,6 +1,6 @@
-enum DataStatus { startService, postsInitCompletedState, getUserDataState, endInitState }
+enum DataLoadState { serviceStartState, dataLoadState, userDataLoadState, initDataLoadCompletedState, webDataLoadCompletedState, mobileDataLoadCompletedState }
 
 class DataState {
-  DataStatus state;
-  DataState({this.state = DataStatus.startService});
+  DataLoadState state;
+  DataState({this.state = DataLoadState.serviceStartState});
 }

@@ -8,6 +8,7 @@ class PostEntity {
   String? contents;
   PostStatus? status;
   int? period;
+  int? views;
   String? author;
   List<String>? applications;
   DateTime? createdAt;
@@ -23,6 +24,7 @@ class PostEntity {
     this.contents,
     this.status,
     this.period,
+    this.views,
     this.createdAt,
     this.updatedAt,
   });

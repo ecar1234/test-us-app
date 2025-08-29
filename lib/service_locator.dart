@@ -24,7 +24,7 @@ import 'domain/use_cases/user_usecase.dart';
 final getIt = GetIt.instance;
 Future<void> serviceLocator() async {
 
-  getIt.registerLazySingleton<NetDriver>(() => NetDriver(Host.baseUrl));
+  getIt.registerLazySingleton<NetDriver>(() => NetDriver(Host.baseDevUrl));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());
 
   // data

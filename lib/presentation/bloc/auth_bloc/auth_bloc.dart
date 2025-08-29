@@ -35,6 +35,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
       emit(AuthState(state: UserAuthState.beforeLoginState));
     });
 
-  add(TokenCheckEvent());
+  // add(TokenCheckEvent());
   }
 }

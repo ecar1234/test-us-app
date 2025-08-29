@@ -6,8 +6,16 @@ class PostUseCase {
   final PostRepository repository;
   PostUseCase(this.repository);
 
-  Future<List<PostEntity>> getPostAllData() async {
-    final res = await repository.getPostAllData();
+  Future<List<List<PostEntity>>> getPostInitData() async {
+    final res = await repository.getPostInitData();
+    return res;
+  }
+  Future<List<PostEntity>> getWebPosts(int page) async {
+    final res = await repository.getWebPosts(page);
+    return res;
+  }
+  Future<List<PostEntity>> getMobilePosts(int page) async {
+    final res = await repository.getMobilePosts(page);
     return res;
   }
   Future<bool> updatePost(String token, PostEntity post) async {
@@ -18,7 +26,7 @@ class PostUseCase {
     final res = await repository.deletePost(token, id);
     return res;
   }
-  Future<Map<String, dynamic>> createPost(String token, PostEntity post) async {
+  Future<bool> createPost(String token, PostEntity post) async {
     final res = await repository.createPost(token, post);
     return res;
   }
@@ -28,6 +36,10 @@ class PostUseCase {
   }
   Future<List<PostEntity>> getPostByTitle(String title) async {
     final res = await repository.getPostByTitle(title);
+    return res;
+  }
+  Future<List<PostEntity>> getPostPagination(int page) async {
+    final res = await repository.getPostPagination(page);
     return res;
   }
 }

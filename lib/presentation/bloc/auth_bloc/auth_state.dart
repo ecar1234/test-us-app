@@ -1,5 +1,5 @@
 
-enum UserAuthState {serviceStartState, beforeLoginState, loginCompletedState, logoutState}
+enum UserAuthState {serviceStartState, beforeLoginState, authPendingState, loginCompletedState, logoutState}
 
 class AuthState {
   final UserAuthState state;

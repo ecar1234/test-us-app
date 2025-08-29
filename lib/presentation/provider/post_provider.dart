@@ -7,34 +7,48 @@ class PostProvider with ChangeNotifier {
   final PostUseCase useCase;
 
   PostProvider(this.useCase);
+  final List<PostEntity> _posts = [];
+  // final List<PostEntity> _webPost = [];
+  // final List<PostEntity> _mobilePost = [];
+  final List<PostEntity> _favoritePost = [];
 
-  final List<PostEntity> _webPost = [];
-  final List<PostEntity> _mobilePost = [];
+  // List<PostEntity> get webPost => _webPost;
+  // List<PostEntity> get mobilePost => _mobilePost;
+  List<PostEntity> get favoritePost => _favoritePost;
+  List<PostEntity> get posts => _posts;
 
-  List<PostEntity> get webPost => _webPost;
-  List<PostEntity> get mobilePost => _mobilePost;
-
-  Future<void> getPosts() async {
-    final res = await useCase.getPostAllData();
-    res.map((post) => {
-          if (post.platform!.any((p) => p == 'web'))
-            {_webPost.add(post)}
-          else
-            {_mobilePost.add(post)}
-        });
+  Future<void> getInitPosts() async {
+    final res = await useCase.getPostInitData();
+    // _webPost.clear();
+    // _mobilePost.clear();
+    // _webPost.addAll(res[0]);
+    // _mobilePost.addAll(res[1]);
+    _favoritePost.clear();
+    _favoritePost.addAll(res[2]);
+    notifyListeners();
   }
 
-  Future<int> createPost(String token, PostEntity post) async {
+  Future<void> getWebPosts({int page = 1}) async {
+    final res = await useCase.getWebPosts(page);
+    // _webPost.clear();
+    // _webPost.addAll(res);
+    notifyListeners();
+  }
+  Future<void> getMobilePosts({int page = 1}) async {
+    final res = await useCase.getMobilePosts(page);
+    // _mobilePost.clear();
+    // _mobilePost.addAll(res);
+    notifyListeners();
+  }
+  Future<void> getPostPagination({int page = 1}) async {
+    final res = await useCase.getPostPagination(page);
+    // _mobilePost.clear();
+    // _mobilePost.addAll(res);
+    notifyListeners();
+  }
+
+  Future<bool> createPost(String token, PostEntity post) async {
     final res = await useCase.createPost(token, post);
-    if (res['status'] == 200) {
-      if (post.platform == 'web') {
-        _webPost.add(res['post']);
-      } else {
-        _mobilePost.add(res['post']);
-      }
-      return 200;
-    } else {
-      return 500;
-    }
+    return res;
   }
 }
