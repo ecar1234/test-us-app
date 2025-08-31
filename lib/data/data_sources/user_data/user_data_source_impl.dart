@@ -108,9 +108,9 @@ class UserDataSourceImpl implements UserDataSource {
         await netDriver.requestPostJson("", AuthApi.signup, userInfo.toJson());
     logger.i('회원가입 결과: $res');
     if (res['status'] == 200) {
-      return res['state'];
+      return res['status'];
     } else {
-      return res['state'];
+      return res['status'];
     }
   }
 

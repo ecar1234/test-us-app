@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
+import '../login_page.dart';
 import '../post_create_page.dart';
+import '../provider/user_provider.dart';
 
 class CustomBottomBar extends StatefulWidget {
   final int currentIndex;
@@ -85,6 +88,21 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                         borderRadius: BorderRadius.circular(10)),
                     child: IconButton(
                         onPressed: () {
+                          final token = context.read<UserProvider>().token;
+                          if(token == null) {
+                            Get.defaultDialog(
+                              title: "로그인이 필요해요",
+                              middleText: "로그인 하시겠습니까?",
+                              textConfirm: "로그인",
+                              textCancel: "확인",
+                              onConfirm: () {
+                                Get.back();
+                                Get.to(() => LoginPage());
+                              },
+                              onCancel: () => Get.back(),
+                            );
+                            return;
+                          }
                           Get.to(() => PostCreatePage());
                         },
                         icon: Icon(Icons.add, color: Colors.white)),

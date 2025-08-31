@@ -22,12 +22,10 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<List<List<PostEntity>>> getPostInitData() async {
+  Future<List<PostEntity>> getPostInitData() async {
     final res = await remote.getPostsInitData();
-    final webPosts = res[0].map((e) => PostEntity.toPostEntity(e)).toList();
-    final mobilePosts = res[1].map((e) => PostEntity.toPostEntity(e)).toList();
-    final favoritePosts = res[2].map((e) => PostEntity.toPostEntity(e)).toList();
-    return [webPosts, mobilePosts, favoritePosts];
+    final favoritePosts = res.map((e) => PostEntity.toPostEntity(e)).toList();
+    return favoritePosts;
   }
 
   @override
@@ -62,6 +60,6 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<List<PostEntity>> getPostPagination(int page) async {
     final res = await remote.getPostsPagination(page);
-    return [];
+    return res.map((e) => PostEntity.toPostEntity(e)).toList();
   }
 }

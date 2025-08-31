@@ -29,18 +29,15 @@ class PostDataSourceImpl implements PostDataSource {
   }
 
   @override
-  Future<List<List<PostModel>>> getPostsInitData() async {
+  Future<List<PostModel>> getPostsInitData() async {
     final res = await netDriver.requestGetJson("", PostApi.getInitPosts);
 
-    List<PostModel> webPosts = [];
-    List<PostModel> mobilePosts = [];
+    List<PostModel> posts = [];
     List<PostModel> favoritePosts = [];
 
     if (res['status'] == 200) {
-      webPosts = (res['webPosts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
-      mobilePosts = (res['mobilePosts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
       favoritePosts = (res['favoritePosts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
-      return [webPosts, mobilePosts, favoritePosts];
+      return favoritePosts;
     } else {
       throw Exception('Error');
     }
@@ -84,8 +81,12 @@ class PostDataSourceImpl implements PostDataSource {
     }
   }
   @override
-  Future<List<PostModel>> getPostsPagination(int page) {
-    // TODO: implement getPostsPagination
-    throw UnimplementedError();
+  Future<List<PostModel>> getPostsPagination(int page) async {
+    final res = await netDriver.requestGetJson(page.toString(), PostApi.getPostsPagination);
+    if(res['status'] == 200){
+      return (res['posts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
+    }else {
+      throw Exception('Error');
+    }
   }
 }

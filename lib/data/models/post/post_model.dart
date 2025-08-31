@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../user/user_model.dart';
+
 part 'post_model.g.dart';
 
 enum PostStatus {
@@ -22,7 +24,7 @@ class PostModel {
   String? contents;
   PostStatus? status;
   int? period;
-  String? author;
+  UserModel? author;
   int? views;
   List<String>? applications;
   DateTime? createdAt;

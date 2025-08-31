@@ -1,26 +1,19 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
-import 'package:test_us_app/presentation/bloc/data_state.dart';
-import 'package:test_us_app/presentation/login_page.dart';
 import 'package:test_us_app/presentation/post_tester_page.dart';
-import 'package:test_us_app/presentation/provider/post_provider.dart';
 import 'package:test_us_app/presentation/purchase_page.dart';
-import 'package:test_us_app/presentation/setting_page.dart';
 import 'package:test_us_app/presentation/user_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../domain/entities/post_entity.dart';
 import 'bloc/auth_bloc/auth_bloc.dart';
-import 'bloc/auth_bloc/auth_state.dart';
-import 'bloc/data_bloc.dart';
-import 'bloc/data_event.dart';
+import 'bloc/data_bloc/data_bloc.dart';
+import 'bloc/data_bloc/data_event.dart';
+import 'bloc/data_bloc/data_state.dart';
 import 'components/custom_bottom_bar.dart';
 import 'home_page.dart';
 
@@ -45,9 +38,11 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
 
   @override
   Widget build(BuildContext context) {
+
     return BlocBuilder<DataBloc, DataState>(builder: (context, state) {
       if (state.state == DataLoadState.serviceStartState) {
-        // context.read<DataBloc>().add(RequestInitDataEvent(context));
+        context.read<DataBloc>().add(RequestInitDataEvent(context));
+        context.read<AuthBloc>().add(TokenCheckEvent());
       }
       return GetMaterialApp(
         theme: FlexThemeData.light(

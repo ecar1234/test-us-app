@@ -7,7 +7,9 @@ class PostUseCase {
   PostUseCase(this.repository);
 
   Future<List<List<PostEntity>>> getPostInitData() async {
-    final res = await repository.getPostInitData();
+    final favorite = await repository.getPostInitData();
+    final post = await repository.getPostPagination(1);
+    final res = [favorite, post];
     return res;
   }
   Future<List<PostEntity>> getWebPosts(int page) async {

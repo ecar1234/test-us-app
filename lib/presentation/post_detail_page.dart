@@ -42,7 +42,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     PopupMenuItem(value: 2, child: Text("Delete"))
                   ];
                 }, )
-                    : Container()
+                    : SizedBox()
               ],
               expandedHeight: 300,
               // pinned: true,

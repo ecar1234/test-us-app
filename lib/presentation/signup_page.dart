@@ -188,7 +188,7 @@ class _SignupPageState extends State<SignupPage> {
                                     });
                                 Get.back();
                               }else if(state == 409){
-                                Get.snackbar("회원 가입 실패", "동일한 Email이 존재 합니다.");
+                                Get.snackbar("회원 가입 실패", "이미 가입된 Email 입니다.");
                                 return;
                               }
                             }

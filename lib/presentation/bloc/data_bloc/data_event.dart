@@ -16,7 +16,6 @@ class RequestInitDataEvent extends DataEvent {
 
 class RequestPostDataEvent extends DataEvent {
   BuildContext context;
-  String platform;
   int page;
-  RequestPostDataEvent(this.context, this.platform, this.page);
+  RequestPostDataEvent(this.context, this.page);
 }

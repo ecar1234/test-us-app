@@ -1,3 +1,6 @@
+import 'package:test_us_app/data/models/user/user_model.dart';
+import 'package:test_us_app/domain/entities/user_entity.dart';
+
 import '../../data/models/post/post_model.dart';
 
 class PostEntity {
@@ -9,7 +12,7 @@ class PostEntity {
   PostStatus? status;
   int? period;
   int? views;
-  String? author;
+  UserEntity? author;
   List<String>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -30,11 +33,15 @@ class PostEntity {
   });
 
   static PostEntity toPostEntity(PostModel model){
+    final user = UserEntity(
+      id: model.author!.userId,
+      nickname: model.author!.nickname,
+    );
     return PostEntity(
       id: model.postId,
       title: model.title,
       subtitle: model.subtitle,
-      author: model.author,
+      author: user,
       applications: model.applications,
       platform: model.platform,
       contents: model.contents,
@@ -42,11 +49,15 @@ class PostEntity {
     );
   }
   static PostModel toPostModel(PostEntity entity){
+    final user = UserModel(
+      userId: entity.author!.id,
+      nickname: entity.author!.nickname,
+    );
     return PostModel(
       postId: entity.id,
       title: entity.title,
       subtitle: entity.subtitle,
-      author: entity.author,
+      author: user,
       applications: entity.applications,
       platform: entity.platform,
       contents: entity.contents,

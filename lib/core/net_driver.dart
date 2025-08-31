@@ -27,7 +27,9 @@ class NetDriver {
   }
   Future<Map<String, dynamic>> requestPostJson(String token, String url, Map<String, dynamic> data) async {
     dio.options.headers['Content-Type'] = 'application/json';
-    // dio.options.headers['Authorization'] = 'Bearer $token';
+    if(token != "" || token != ''){
+      dio.options.headers['Authorization'] = 'Bearer $token';
+    }
     final api = '$baseUrl$url';
     
     try {

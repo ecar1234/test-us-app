@@ -3,7 +3,7 @@
 import '../../models/post/post_model.dart';
 
 abstract class PostDataSource {
-  Future<List<List<PostModel>>> getPostsInitData();
+  Future<List<PostModel>> getPostsInitData();
   Future<List<PostModel>> getWebPosts(int page);
   Future<List<PostModel>> getMobilePosts(int page);
   Future<List<PostModel>> getPostsPagination(int page);

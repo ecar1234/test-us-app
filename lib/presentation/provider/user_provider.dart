@@ -31,6 +31,7 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    _token = null;
     _user = null;
     notifyListeners();
   }

@@ -3,7 +3,7 @@
 import 'package:test_us_app/domain/entities/post_entity.dart';
 
 abstract class PostRepository{
-  Future<List<List<PostEntity>>> getPostInitData();
+  Future<List<PostEntity>> getPostInitData();
   Future<List<PostEntity>> getWebPosts(int page);
   Future<List<PostEntity>> getMobilePosts(int page);
   Future<List<PostEntity>> getPostPagination(int page);
