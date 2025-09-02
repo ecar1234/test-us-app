@@ -20,7 +20,7 @@ class PostUseCase {
     final res = await repository.getMobilePosts(page);
     return res;
   }
-  Future<bool> updatePost(String token, PostEntity post) async {
+  Future<Map<String, dynamic>> updatePost(String token, PostEntity post) async {
     final res = await repository.updatePost(token, post);
     return res;
   }
@@ -28,7 +28,7 @@ class PostUseCase {
     final res = await repository.deletePost(token, id);
     return res;
   }
-  Future<bool> createPost(String token, PostEntity post) async {
+  Future<Map<String, dynamic>> createPost(String token, PostEntity post) async {
     final res = await repository.createPost(token, post);
     return res;
   }

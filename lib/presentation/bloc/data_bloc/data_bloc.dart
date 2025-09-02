@@ -30,13 +30,44 @@ class DataBloc extends Bloc<DataEvent, DataState> {
       logger.i("data state : postDataLoadCompletedState");
       emit(DataState(state: DataLoadState.beforeDataLoadState));
       logger.i("data state : beforeDataLoadState");
-      // if (event.platform == 'web') {
-      //   event.context.read<PostProvider>().getWebPosts(page: event.page);
-      //   emit(DataState(state: DataLoadState.webDataLoadCompletedState));
-      // } else {
-      //   event.context.read<PostProvider>().getMobilePosts(page: event.page);
-      //   emit(DataState(state: DataLoadState.mobileDataLoadCompletedState));
-      // }
+    });
+
+    on<RequestPostCreateEvent>((event, emit) async {
+      emit(DataState(state: DataLoadState.dataLoadState));
+      final res = await event.context.read<PostProvider>().createPost(event.token, event.post);
+      if(!res) {
+        emit(DataState(state: DataLoadState.errorState));
+        return;
+      }
+      emit(DataState(state: DataLoadState.postCreateCompletedState));
+    });
+
+    on<RequestPostUpdateEvent>((event, emit) async {
+      emit(DataState(state: DataLoadState.dataLoadState));
+      final res = await event.context.read<PostProvider>().updatePost(event.token, event.post);
+      if(!res) {
+        emit(DataState(state: DataLoadState.errorState));
+        return;
+      }
+      emit(DataState(state: DataLoadState.postUpdateCompletedState));
+      logger.i("data state : postUpdateCompletedState");
+      // emit(DataState(state: DataLoadState.postDataLoadCompletedState));
+    });
+
+    on<RequestPostDeleteEvent>((event, emit) async {
+      emit(DataState(state: DataLoadState.dataLoadState));
+      final res = await event.context.read<PostProvider>().deletePost(event.token, event.postId);
+      if(res) {
+        emit(DataState(state: DataLoadState.postDeleteCompletedState));
+      } else {
+        emit(DataState(state: DataLoadState.errorState));
+      }
+    });
+
+    on<RequestCompleteEvent>((event, emit) {
+      emit(DataState(state: DataLoadState.dataLoadState));
+      emit(DataState(state: DataLoadState.postDataLoadCompletedState));
+      logger.i("data state : postDataLoadCompletedState");
     });
   }
 }

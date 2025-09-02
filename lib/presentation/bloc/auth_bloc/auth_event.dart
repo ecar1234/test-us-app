@@ -7,7 +7,8 @@ import 'package:test_us_app/domain/entities/user_entity.dart';
 class AuthEvent {}
 
 class TokenCheckEvent extends AuthEvent {
-  TokenCheckEvent();
+  BuildContext context;
+  TokenCheckEvent(this.context);
 }
 class LoginEvent extends AuthEvent {
   UserEntity user;

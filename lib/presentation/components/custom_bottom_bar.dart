@@ -88,8 +88,8 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                         borderRadius: BorderRadius.circular(10)),
                     child: IconButton(
                         onPressed: () {
-                          final token = context.read<UserProvider>().token;
-                          if(token == null) {
+                          final isLogin = context.read<UserProvider>().isLogged??false;
+                          if(!isLogin) {
                             Get.defaultDialog(
                               title: "로그인이 필요해요",
                               middleText: "로그인 하시겠습니까?",

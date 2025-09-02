@@ -42,7 +42,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
     return BlocBuilder<DataBloc, DataState>(builder: (context, state) {
       if (state.state == DataLoadState.serviceStartState) {
         context.read<DataBloc>().add(RequestInitDataEvent(context));
-        context.read<AuthBloc>().add(TokenCheckEvent());
+        context.read<AuthBloc>().add(TokenCheckEvent(context));
       }
       return GetMaterialApp(
         theme: FlexThemeData.light(

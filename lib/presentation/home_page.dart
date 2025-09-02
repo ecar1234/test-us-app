@@ -17,6 +17,7 @@ import 'bloc/auth_bloc/auth_event.dart';
 import 'bloc/auth_bloc/auth_state.dart';
 import 'bloc/data_bloc/data_bloc.dart';
 import 'bloc/data_bloc/data_event.dart';
+import 'bloc/data_bloc/data_state.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,102 +30,112 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _islogin = false;
+  bool _isLogin = false;
+
+
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ??
         MediaQuery.sizeOf(context).height - 120;
     return BlocBuilder<AuthBloc, AuthState>(
-
       builder: (context, state) {
-        if(state.state == UserAuthState.loginCompletedState){
-          _islogin = true;
-        }else if(state.state == UserAuthState.beforeLoginState){
-          _islogin = false;
-        }
-       return SafeArea(
-          child:  Scaffold(
-              appBar: AppBar(
-                title: const Text('Testus',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                // 추후 로고 이미지로 변경
-                actions: [
-                  if (!_islogin)
-                    IconButton(
-                        onPressed: () {
-                          Get.to(() => LoginPage());
-                        },
-                        icon: const Icon(Icons.login))
-                  else
-                    IconButton(
-                        onPressed: () {
-                          Get.defaultDialog(
-                            title: '로그아웃',
-                            middleText: '로그아웃 하시겠습니까?',
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('취소')),
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    context.read<AuthBloc>().add(LogoutEvent(context));
-                                  },
-                                  child: const Text('확인')),
-                            ],
-                          );
-                          // context.read<AuthBloc>().add(LogoutEvent(context));
-                        },
-                        icon: const Icon(Icons.logout)),
-                  IconButton(
-                      onPressed: () {
-                        Get.to(() => SettingPage());
-                      },
-                      icon: const Icon(Icons.settings)),
-                ],
-              ),
-              body: SizedBox(
-                  height: hei,
-                  width: MediaQuery.sizeOf(context).width,
-                  // padding: EdgeInsets.only(top: 10),
-                  // decoration: BoxDecoration(
-                  //   border: Border.all()
-                  // ),
-                  child: SizedBox(
-                    height: hei - 20,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                const Gap(10),
-                                _mainButtonSection(),
-                                const Gap(20),
-                                _favoritePostList(),
-                                const Gap(20),
-                                _testerList(),
-                                // const Gap(20),
-                                // _webServiceList(),
-                              ],
+      if(state.state == UserAuthState.loginCompletedState){
+        _isLogin = true;
+      }else if(state.state == UserAuthState.beforeLoginState){
+        _isLogin = false;
+      }
+       return BlocBuilder<DataBloc, DataState>(
+         builder: (context, state) {
+           if(state.state == DataLoadState.postCreateCompletedState){
+             context.read<DataBloc>().add(RequestCompleteEvent());
+           }
+           return SafeArea(
+              child: Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Testus',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    // 추후 로고 이미지로 변경
+                    actions: [
+                      if (!_isLogin)
+                        IconButton(
+                            onPressed: () {
+                              Get.to(() => LoginPage());
+                            },
+                            icon: const Icon(Icons.login))
+                      else
+                        IconButton(
+                            onPressed: () {
+                              Get.defaultDialog(
+                                title: '로그아웃',
+                                middleText: '로그아웃 하시겠습니까?',
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('취소')),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        context
+                                            .read<AuthBloc>()
+                                            .add(LogoutEvent(context));
+                                      },
+                                      child: const Text('확인')),
+                                ],
+                              );
+                              // context.read<AuthBloc>().add(LogoutEvent(context));
+                            },
+                            icon: const Icon(Icons.logout)),
+                      IconButton(
+                          onPressed: () {
+                            Get.to(() => SettingPage());
+                          },
+                          icon: const Icon(Icons.settings)),
+                    ],
+                  ),
+                  body: SizedBox(
+                      height: hei,
+                      width: MediaQuery.sizeOf(context).width,
+                      // padding: EdgeInsets.only(top: 10),
+                      // decoration: BoxDecoration(
+                      //   border: Border.all()
+                      // ),
+                      child: SizedBox(
+                        height: hei - 20,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    const Gap(10),
+                                    _mainButtonSection(),
+                                    const Gap(20),
+                                    _favoritePostList(),
+                                    const Gap(20),
+                                    _testerList(),
+                                    // const Gap(20),
+                                    // _webServiceList(),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
+                            // CustomBottomBar(
+                            //   currentIndex: 0,
+                            //   onTap: (idx) {
+                            //     setState(() {
+                            //       _currentIdx = idx;
+                            //     });
+                            //   },
+                            // )
+                          ],
                         ),
-                        // CustomBottomBar(
-                        //   currentIndex: 0,
-                        //   onTap: (idx) {
-                        //     setState(() {
-                        //       _currentIdx = idx;
-                        //     });
-                        //   },
-                        // )
-                      ],
-                    ),
-                  ))),
-        );
+                      ))),
+            );
+          },
+       );
       },
     );
   }
@@ -233,62 +244,64 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _testerList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('테스터 모집',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              TextButton(
-                  onPressed: () {
-                    context
-                        .read<DataBloc>()
-                        .add(RequestPostDataEvent(context, 1));
-                    widget.onTap(1);
-                  },
-                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  child: Text("전체 보기"))
-            ],
+    return BlocBuilder<DataBloc, DataState>(
+      builder:(context, state) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('테스터 모집',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                TextButton(
+                    onPressed: () {
+                      context
+                          .read<DataBloc>()
+                          .add(RequestPostDataEvent(context, 1));
+                      widget.onTap(1);
+                    },
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                    child: Text("전체 보기"))
+              ],
+            ),
           ),
-        ),
-        Selector<PostProvider, List<PostEntity>>(
-          selector: (context, provider) => provider.posts ?? [],
-          builder: (context, post, child) => SizedBox(
-              height: 150,
-              width: MediaQuery.sizeOf(context).width,
-              // padding: EdgeInsets.all(10),
-              // decoration: BoxDecoration(
-              //     border: Border.all()
-              // ),
-              child: post.isEmpty
-                  ? const Center(child: Text("테스터 모집이 아직 없습니다."))
-                  : ListView.separated(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.only(left: 20),
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, idx) {
-                        return GestureDetector(
-                          onTap: () {
-                            Get.to(() => PostDetailPage(post: post[idx]));
-                          },
-                          child: Container(
-                            height: 120,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surface,
+          Selector<PostProvider, List<PostEntity>>(
+            selector: (context, provider) => provider.posts ?? [],
+            builder: (context, post, child) => SizedBox(
+                height: 150,
+                width: MediaQuery.sizeOf(context).width,
+                // padding: EdgeInsets.all(10),
+                // decoration: BoxDecoration(
+                //     border: Border.all()
+                // ),
+                child: post.isEmpty
+                    ? const Center(child: Text("테스터 모집이 아직 없습니다."))
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.only(left: 20),
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, idx) {
+                          return GestureDetector(
+                            onTap: () {
+                              Get.to(() => PostDetailPage(post: post[idx]));
+                            },
+                            child: Container(
+                              height: 120,
+                              width: 150,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface,
+                              ),
+                              child: Text("${post[idx].title}"),
                             ),
-                            child: Text("${post[idx].title}"),
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, idx) => const Gap(10),
-                      itemCount: post.length)),
-        ),
-      ],
+                          );
+                        },
+                        separatorBuilder: (context, idx) => const Gap(10),
+                        itemCount: post.length)),
+          ),
+        ],
+      ),
     );
   }
 

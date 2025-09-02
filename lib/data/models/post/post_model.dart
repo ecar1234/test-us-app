@@ -17,7 +17,7 @@ enum PostStatus {
 
 @JsonSerializable()
 class PostModel {
-  String? postId;
+  String? id;
   String? title;
   String? subtitle;
   List<String>? platform;
@@ -31,7 +31,7 @@ class PostModel {
   DateTime? updatedAt;
 
   PostModel({
-    this.postId,
+    this.id,
     this.author,
     this.title,
     this.subtitle,

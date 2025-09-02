@@ -10,9 +10,18 @@ class UserProvider with ChangeNotifier {
 
   UserEntity? _user;
   String? _token;
+  bool? _isLogged;
 
   String? get token => _token;
   UserEntity? get user => _user;
+  bool? get isLogged => _isLogged;
+
+  Future<void> autoLogin(String token, UserEntity user) async {
+    _token = token;
+    _user = user;
+    _isLogged = true;
+    notifyListeners();
+  }
 
   Future<int> login(String email, String password) async {
     final res = await useCase.login(email, password);
@@ -21,6 +30,7 @@ class UserProvider with ChangeNotifier {
     }else {
       _user = res['user'] as UserEntity;
       _token = res['token'] as String;
+      _isLogged = true;
     }
     notifyListeners();
     return 200;

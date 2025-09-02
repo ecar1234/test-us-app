@@ -11,6 +11,7 @@ import 'package:test_us_app/presentation/provider/post_provider.dart';
 import '../domain/entities/post_entity.dart';
 import '../services/common_height_provider.dart';
 import 'bloc/data_bloc/data_bloc.dart';
+import 'bloc/data_bloc/data_event.dart';
 import 'bloc/data_bloc/data_state.dart';
 
 class PostTesterPage extends StatefulWidget {
@@ -27,7 +28,10 @@ class _PostTesterPageState extends State<PostTesterPage> {
   Widget build(BuildContext context) {
     return BlocBuilder<DataBloc, DataState>(builder: (context, state) {
       if (state.state == DataLoadState.dataLoadState) {
-        return CircularProgressIndicator();
+        return SizedBox(child: Center(child: CircularProgressIndicator()));
+      }else if(state.state == DataLoadState.postCreateCompletedState || state.state == DataLoadState.postDeleteCompletedState ||
+          state.state == DataLoadState.postUpdateCompletedState){
+        context.read<DataBloc>().add(RequestCompleteEvent());
       }
 
       return SafeArea(
@@ -37,7 +41,7 @@ class _PostTesterPageState extends State<PostTesterPage> {
         ),
         body: Container(
             width: MediaQuery.sizeOf(context).width,
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.symmetric(horizontal: 20),
             child:
             // platform == 'web' ? _webPost() :
             _testerPost()

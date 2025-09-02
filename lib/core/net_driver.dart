@@ -51,7 +51,9 @@ class NetDriver {
   }
   Future<Map<String, dynamic>> requestPutJson(String token, String url, Map<String, dynamic> data) async {
     dio.options.headers['Content-Type'] = 'application/json';
-    // dio.options.headers['Authorization'] = 'Bearer $token';
+    if(token != "" || token != ''){
+      dio.options.headers['Authorization'] = 'Bearer $token';
+    }
     final api = '$baseUrl$url';
     final res = await dio.put(api, data: data);
     if(res.statusCode == 200) {

@@ -1,5 +1,6 @@
 
 
+import 'package:test_us_app/data/models/post/post_model.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
 
 import '../../domain/repositories/post_repository.dart';
@@ -10,15 +11,17 @@ class PostRepositoryImpl implements PostRepository {
   PostRepositoryImpl(this.remote);
 
   @override
-  Future<bool> createPost(String token, PostEntity post) async {
+  Future<Map<String, dynamic>> createPost(String token, PostEntity post) async {
     final res = await remote.createPost(token, PostEntity.toPostModel(post));
+    PostModel postModel = PostModel.fromJson(res['post']);
+    res['post'] = PostEntity.toPostEntity(postModel);
     return res;
   }
 
   @override
-  Future<bool> deletePost(String token, String id) {
-    // TODO: implement deletePost
-    throw UnimplementedError();
+  Future<bool> deletePost(String token, String id) async {
+    final res = await remote.deletePost(token, id);
+    return res;
   }
 
   @override
@@ -41,9 +44,10 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<bool> updatePost(String token, PostEntity post) {
-    // TODO: implement updatePost
-    throw UnimplementedError();
+  Future<Map<String, dynamic>> updatePost(String token, PostEntity post) async {
+    final res = await remote.updatePost(token, PostEntity.toPostModel(post));
+    res['post'] = PostEntity.toPostEntity(res['post']);
+    return res;
   }
 
   @override

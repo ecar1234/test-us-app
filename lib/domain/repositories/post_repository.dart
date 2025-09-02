@@ -10,7 +10,7 @@ abstract class PostRepository{
   // Future<List<PostEntity>> getPostByPlatform(int page);
   Future<PostEntity> getPostById(String id);
   Future<List<PostEntity>> getPostByTitle(String title);
-  Future<bool> createPost(String token, PostEntity post);
-  Future<bool> updatePost(String token, PostEntity post);
+  Future<Map<String, dynamic>> createPost(String token, PostEntity post);
+  Future<Map<String, dynamic>> updatePost(String token, PostEntity post);
   Future<bool> deletePost(String token, String id);
 }

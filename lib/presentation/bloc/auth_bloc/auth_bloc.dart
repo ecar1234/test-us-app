@@ -20,6 +20,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
         logger.d('token is empty');
         return;
       }else {
+        final user = await pref.getUserInfo();
+        final token = await pref.getToken();
+        if(event.context.mounted){
+          event.context.read<UserProvider>().autoLogin(token, user);
+        }
         emit(AuthState(state: UserAuthState.loginCompletedState));
         logger.d('token is not empty');
       }

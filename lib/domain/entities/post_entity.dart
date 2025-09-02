@@ -38,7 +38,7 @@ class PostEntity {
       nickname: model.author!.nickname,
     );
     return PostEntity(
-      id: model.postId,
+      id: model.id,
       title: model.title,
       subtitle: model.subtitle,
       author: user,
@@ -54,7 +54,7 @@ class PostEntity {
       nickname: entity.author!.nickname,
     );
     return PostModel(
-      postId: entity.id,
+      id: entity.id,
       title: entity.title,
       subtitle: entity.subtitle,
       author: user,
