@@ -6,7 +6,6 @@ import '../../provider/post_provider.dart';
 import '../../provider/user_provider.dart';
 import 'data_event.dart';
 
-
 class DataBloc extends Bloc<DataEvent, DataState> {
   Logger logger = Logger();
 
@@ -35,7 +34,7 @@ class DataBloc extends Bloc<DataEvent, DataState> {
     on<RequestPostCreateEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
       final res = await event.context.read<PostProvider>().createPost(event.token, event.post);
-      if(!res) {
+      if (!res) {
         emit(DataState(state: DataLoadState.errorState));
         return;
       }
@@ -45,7 +44,7 @@ class DataBloc extends Bloc<DataEvent, DataState> {
     on<RequestPostUpdateEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
       final res = await event.context.read<PostProvider>().updatePost(event.token, event.post);
-      if(!res) {
+      if (!res) {
         emit(DataState(state: DataLoadState.errorState));
         return;
       }
@@ -57,7 +56,7 @@ class DataBloc extends Bloc<DataEvent, DataState> {
     on<RequestPostDeleteEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
       final res = await event.context.read<PostProvider>().deletePost(event.token, event.postId);
-      if(res) {
+      if (res) {
         emit(DataState(state: DataLoadState.postDeleteCompletedState));
       } else {
         emit(DataState(state: DataLoadState.errorState));
@@ -68,6 +67,10 @@ class DataBloc extends Bloc<DataEvent, DataState> {
       emit(DataState(state: DataLoadState.dataLoadState));
       emit(DataState(state: DataLoadState.postDataLoadCompletedState));
       logger.i("data state : postDataLoadCompletedState");
+    });
+
+    on<ReloadPostEvent>((event, emit) {
+      emit(DataState(state: DataLoadState.postUpdateCompletedState));
     });
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_us_app/domain/use_cases/application_usecase.dart';
+import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/data_bloc/data_bloc.dart';
 import 'package:test_us_app/presentation/main_page.dart';
@@ -25,6 +26,7 @@ Future<void> main() async {
       providers: [
         BlocProvider(create: (context) => AuthBloc()),
         BlocProvider(create: (context) => DataBloc()),
+        BlocProvider(create: (context) => AppBloc()),
       ], child: const MetaDataSetting(),
     ),
   ));

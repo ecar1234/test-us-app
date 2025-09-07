@@ -5,12 +5,16 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:test_us_app/presentation/post_tester_page.dart';
+import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/purchase_page.dart';
 import 'package:test_us_app/presentation/user_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'bloc/app_bloc/app_bloc.dart';
+import 'bloc/app_bloc/app_event.dart';
 import 'bloc/auth_bloc/auth_bloc.dart';
+import 'bloc/auth_bloc/auth_state.dart';
 import 'bloc/data_bloc/data_bloc.dart';
 import 'bloc/data_bloc/data_event.dart';
 import 'bloc/data_bloc/data_state.dart';
@@ -89,7 +93,6 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainState extends State<MainPage> {
-  bool isLogin = false;
 
   int _currentIdx = 0;
 
@@ -116,39 +119,54 @@ class _MainState extends State<MainPage> {
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ??
         MediaQuery.sizeOf(context).height - 120;
-    return SafeArea(
-        child: PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (bool didPop, Object? result) async {
-        if (didPop) {
-          return;
-        }
-        if (context.mounted) {
-          setState(() {
-            _currentIdx = 0;
-          });
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state.state == UserAuthState.loginCompletedState) {
+          final token = context
+              .read<UserProvider>()
+              .token ?? '';
+          final userId = context
+              .read<UserProvider>()
+              .user!
+              .id ?? '';
+          context.read<AppBloc>().add(
+              RequestUserApplicationsEvent(context, token, userId));
         }
       },
-      child: Container(
-        decoration: BoxDecoration(color: Colors.white),
-        child: Stack(children: [
-          SizedBox(
-            height: hei - 20,
-            child: _pageList[_currentIdx],
-          ),
-          Positioned(
-            bottom: 0,
-            child: CustomBottomBar(
-              currentIndex: _currentIdx,
-              onTap: (idx) {
-                setState(() {
-                  _currentIdx = idx;
-                });
-              },
+      child: SafeArea(
+          child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, Object? result) async {
+          if (didPop) {
+            return;
+          }
+          if (context.mounted) {
+            setState(() {
+              _currentIdx = 0;
+            });
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(color: Colors.white),
+          child: Stack(children: [
+            SizedBox(
+              height: hei - 20,
+              child: _pageList[_currentIdx],
             ),
-          )
-        ]),
-      ),
-    ));
+            Positioned(
+              bottom: 0,
+              child: CustomBottomBar(
+                currentIndex: _currentIdx,
+                onTap: (idx) {
+                  setState(() {
+                    _currentIdx = idx;
+                  });
+                },
+              ),
+            )
+          ]),
+        ),
+      ))
+    );
   }
 }

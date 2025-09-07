@@ -1,8 +1,9 @@
 
 class Host {
-  static const String baseDevUrl = 'http://192.168.45.100:3000';
+  // static const String baseDevUrl = 'http://192.168.45.100:3000';
   // static const String baseDevUrl = 'http://172.30.1.100:3000';
   // static const String baseDevUrl = 'http://testusserver.ddns.net:3000';
+  static const String baseDevUrl = 'http://dev.testusserver.xyz';
 }
 
 class AuthApi {
@@ -37,12 +38,13 @@ class PostApi {
 
 class ApplicationApi {
   // static const String findByPostId = '/api/v1/application/findByPostId';
-  // static const String findByUserId = '/api/v1/application/findByUserId';
+  static const String findByUserId = '/api/v1/application/findByUserId';
   // static const String findByUserNickname = '/api/v1/application/findByUserNickname';
   // static const String findPostListByUserId = '/api/v1/application/findPostListByUserId';
   // static const String getAppUserListInPost = '/api/v1/application/getAllUserListInPost';
-  static const String applications = '/api/v1/application/applications'; // 테스터 신청
-  static const String update = '/api/v1/application/update'; // 테스터 신청 수정
+  static const String application = '/api/v1/application/apply'; // 테스터 신청
+  static const String update = '/api/v1/application/update';
+  static const String cancel = '/api/v1/application/cancelAppUser';// 테스터 신청 수정
   static const String acceptUser = '/api/v1/application/acceptUser';
   static const String rejectUser = '/api/v1/application/rejectUser';
   // static const String getAppPostList = '/api/v1/application/getAppPostList';

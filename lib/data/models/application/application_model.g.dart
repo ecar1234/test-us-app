@@ -8,7 +8,7 @@ part of 'application_model.dart';
 
 ApplicationModel _$ApplicationModelFromJson(Map<String, dynamic> json) =>
     ApplicationModel(
-      appId: json['appId'] as String?,
+      id: (json['id'] as num?)?.toInt(),
       platform:
           $enumDecodeNullable(_$ApplicationPlatformEnumMap, json['platform']),
       status: $enumDecodeNullable(_$ApplicationStatusEnumMap, json['status']),
@@ -19,28 +19,29 @@ ApplicationModel _$ApplicationModelFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['updatedAt'] as String),
       postId: json['postId'] as String?,
-      appUserId: json['appUserId'] as String?,
+      applicantId: json['applicantId'] as String?,
     );
 
 Map<String, dynamic> _$ApplicationModelToJson(ApplicationModel instance) =>
     <String, dynamic>{
-      'appId': instance.appId,
+      'id': instance.id,
       'platform': _$ApplicationPlatformEnumMap[instance.platform],
       'status': _$ApplicationStatusEnumMap[instance.status],
       'appliedAt': instance.appliedAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
       'postId': instance.postId,
-      'appUserId': instance.appUserId,
+      'applicantId': instance.applicantId,
     };
 
 const _$ApplicationPlatformEnumMap = {
-  ApplicationPlatform.pending: 'PENDING',
-  ApplicationPlatform.accepted: 'ACCEPTED',
-  ApplicationPlatform.rejected: 'REJECTED',
+  ApplicationPlatform.web: 'web',
+  ApplicationPlatform.ios: 'ios',
+  ApplicationPlatform.android: 'android',
 };
 
 const _$ApplicationStatusEnumMap = {
-  ApplicationStatus.active: 'ACTIVE',
-  ApplicationStatus.end: 'END',
-  ApplicationStatus.expired: 'EXPIRED',
+  ApplicationStatus.pending: 'pending',
+  ApplicationStatus.accepted: 'accepted',
+  ApplicationStatus.rejected: 'rejected',
+  ApplicationStatus.cancel: 'cancel',
 };

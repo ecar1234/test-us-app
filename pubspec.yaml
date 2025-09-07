@@ -25,6 +25,8 @@ dependencies:
   flex_color_scheme: ^8.2.0
   google_fonts: ^6.2.1
   shared_preferences: ^2.5.3
+  material_symbol_icons: ^0.0.1
+  material_symbols_icons: ^4.2867.0
 
 dev_dependencies:
   flutter_test:

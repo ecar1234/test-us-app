@@ -45,3 +45,7 @@ class RequestPostCreateEvent extends DataEvent {
 class RequestCompleteEvent extends DataEvent {
   RequestCompleteEvent();
 }
+
+class ReloadPostEvent extends DataEvent {
+  ReloadPostEvent();
+}

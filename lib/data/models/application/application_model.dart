@@ -3,41 +3,43 @@ import 'package:json_annotation/json_annotation.dart';
 part 'application_model.g.dart';
 
 enum ApplicationPlatform {
-  @JsonValue('PENDING')
-  pending,
-  @JsonValue('ACCEPTED')
-  accepted,
-  @JsonValue('REJECTED')
-  rejected,
+  @JsonValue('web')
+  web,
+  @JsonValue('ios')
+  ios,
+  @JsonValue('android')
+  android,
 }
 
 enum ApplicationStatus {
-  @JsonValue('ACTIVE')
-  active,
-  @JsonValue('END')
-  end,
-  @JsonValue('EXPIRED')
-  expired
+  @JsonValue('pending')
+  pending,
+  @JsonValue('accepted')
+  accepted,
+  @JsonValue('rejected')
+  rejected,
+  @JsonValue('cancel')
+  cancel
 }
 
 @JsonSerializable()
 class ApplicationModel {
-  String? appId;
+  int? id;
   ApplicationPlatform? platform;
   ApplicationStatus? status;
   DateTime? appliedAt;
   DateTime? updatedAt;
   String? postId;
-  String? appUserId;
+  String? applicantId;
 
   ApplicationModel({
-    this.appId,
+    this.id,
     this.platform,
     this.status,
     this.appliedAt,
     this.updatedAt,
     this.postId,
-    this.appUserId,
+    this.applicantId,
   });
 
   factory ApplicationModel.fromJson(Map<String, dynamic> json) => _$ApplicationModelFromJson(json);

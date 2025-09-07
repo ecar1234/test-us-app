@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import '../login_page.dart';
 import '../post_create_page.dart';
@@ -129,8 +130,10 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                         });
                         widget.onTap(_selectedIndex);
                       },
-                      icon: Icon(Icons.money,
-                          color: _selectedIndex == 3 ? Colors.blue : null))
+                      icon: Icon(Symbols.crown,
+                          weight: 600,
+                          fill: 1,
+                          color: _selectedIndex == 3 ? Colors.amber : null))
                 ],
               ),
             )
