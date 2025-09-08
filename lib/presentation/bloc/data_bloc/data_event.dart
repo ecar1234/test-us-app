@@ -22,6 +22,12 @@ class RequestPostDataEvent extends DataEvent {
   RequestPostDataEvent(this.context, this.page);
 }
 
+class GetPostDetailEvent extends DataEvent {
+  BuildContext context;
+  String postId;
+  String token;
+  GetPostDetailEvent(this.context, this.postId, this.token);
+}
 class RequestPostUpdateEvent extends DataEvent {
   BuildContext context;
   PostEntity post;

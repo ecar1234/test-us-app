@@ -31,6 +31,12 @@ class DataBloc extends Bloc<DataEvent, DataState> {
       logger.i("data state : beforeDataLoadState");
     });
 
+    on<GetPostDetailEvent>((event, emit) async {
+      emit(DataState(state: DataLoadState.dataLoadState));
+      final res = await event.context.read<PostProvider>().getPostById(event.token, event.postId);
+      emit(DataState(state: DataLoadState.getPostByIdCompletedState, post: res));
+    });
+
     on<RequestPostCreateEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
       final res = await event.context.read<PostProvider>().createPost(event.token, event.post);

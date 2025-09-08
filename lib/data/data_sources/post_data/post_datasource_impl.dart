@@ -33,24 +33,26 @@ class PostDataSourceImpl implements PostDataSource {
   }
 
   @override
-  Future<List<PostModel>> getPostsInitData() async {
+  Future<Map<String, List<PostModel>>> getPostsInitData() async {
     final res = await netDriver.requestGetJson("", PostApi.getInitPosts);
 
-    // List<PostModel> posts = [];
-    List<PostModel> favoritePosts = [];
-
     if (res['status'] == 200) {
-      favoritePosts = (res['favoritePosts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
-      return favoritePosts;
+    List<PostModel> favoritePosts = (res['favoritePosts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
+    List<PostModel> posts = (res['posts'] as List).map<PostModel>((e) => PostModel.fromJson(e)).toList();
+      return {'favoritePosts': favoritePosts, 'posts': posts};
     } else {
       throw Exception('Error');
     }
   }
 
   @override
-  Future<PostModel> getPostById(String id) {
-    // TODO: implement getPostById
-    throw UnimplementedError();
+  Future<PostModel> getPostById(String token, String id) async {
+    final res = await netDriver.requestGetJson(token, PostApi.getPostById, parma: id);
+    if (res['status'] == 200) {
+      return PostModel.fromJson(res['post']);
+    } else {
+      throw Exception('Error');
+    }
   }
 
   @override

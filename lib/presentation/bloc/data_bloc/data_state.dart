@@ -12,6 +12,7 @@ enum DataLoadState {
   postDataLoadCompletedState,
   postUpdateCompletedState,
   postDeleteCompletedState,
+  getPostByIdCompletedState,
   errorState,
 }
 

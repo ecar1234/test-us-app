@@ -45,7 +45,11 @@ class PostEntity {
       applications: model.applications,
       platform: model.platform,
       contents: model.contents,
-      status: model.status
+      status: model.status,
+      period: model.period,
+      views: model.views,
+      createdAt: model.createdAt,
+      updatedAt: model.updatedAt,
     );
   }
   static PostModel toPostModel(PostEntity entity){
@@ -61,7 +65,9 @@ class PostEntity {
       applications: entity.applications,
       platform: entity.platform,
       contents: entity.contents,
-      status: entity.status
+      status: entity.status,
+      period: entity.period,
+      views: entity.views,
     );
   }
 }

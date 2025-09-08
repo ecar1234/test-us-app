@@ -6,10 +6,12 @@ class PostUseCase {
   final PostRepository repository;
   PostUseCase(this.repository);
 
-  Future<List<List<PostEntity>>> getPostInitData() async {
-    final favorite = await repository.getPostInitData();
-    final post = await repository.getPostPagination(1);
-    final res = [favorite, post];
+  Future<Map<String, List<PostEntity>>> getPostInitData() async {
+    final initData = await repository.getPostInitData();
+    return { 'favoritePosts': initData['favoritePosts']!, 'posts': initData['posts']! };
+  }
+  Future<PostEntity> getPostById(String token, String id) async {
+    final res = await repository.getPostById(token, id);
     return res;
   }
   Future<List<PostEntity>> getWebPosts(int page) async {
@@ -32,10 +34,10 @@ class PostUseCase {
     final res = await repository.createPost(token, post);
     return res;
   }
-  Future<PostEntity> getPostById(String id) async {
-    final res = await repository.getPostById(id);
-    return res;
-  }
+  // Future<PostEntity> getPostById(String id) async {
+  //   final res = await repository.getPostById(id);
+  //   return res;
+  // }
   Future<List<PostEntity>> getPostByTitle(String title) async {
     final res = await repository.getPostByTitle(title);
     return res;

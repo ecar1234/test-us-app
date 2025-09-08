@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 // import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
@@ -31,13 +32,17 @@ class _PostCreatePageState extends State<PostCreatePage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController subtitleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
+  TextEditingController periodController = TextEditingController(text: "7");
 
-  final _categoryList = ['WEB', 'IOS', 'ANDROID'];
+  final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
+
+  // final _categoryList = ['WEB', 'IOS', 'ANDROID'];
   List<String> _selectedCategory = [];
 
   bool _webCheck = false;
   bool _iosCheck = false;
   bool _androidCheck = false;
+  bool _gameCheck = false;
 
   @override
   void initState() {
@@ -57,6 +62,9 @@ class _PostCreatePageState extends State<PostCreatePage> {
       if (_selectedCategory.contains('ANDROID')) {
         _androidCheck = true;
       }
+      if (_selectedCategory.contains('GAME')) {
+        _gameCheck = true;
+      }
     }
   }
 
@@ -71,9 +79,8 @@ class _PostCreatePageState extends State<PostCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
     return BlocBuilder<DataBloc, DataState>(
-      builder:(context, state) {
+      builder: (context, state) {
         return GestureDetector(
             onTap: () {
               FocusScope.of(context).unfocus();
@@ -90,174 +97,20 @@ class _PostCreatePageState extends State<PostCreatePage> {
                       child: Column(
                         children: [
                           // 서비스 명
-                          SizedBox(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  child: Text(
-                                    "서비스 네임",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 60,
-                                  child: TextField(
-                                    controller: titleController,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          const Gap(10),
-                          // 서비스 요약
-                          SizedBox(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  child: Text(
-                                    "서비스 설명",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 80,
-                                  child: TextField(
-                                    controller: subtitleController,
-                                    maxLines: 1,
-                                    maxLength: 30,
-                                    // decoration: InputDecoration(
-                                    //   counterText: "30",
-                                    // ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          const Gap(10),
-                          // 카테고리
-                          SizedBox(
-                              width: MediaQuery.sizeOf(context).width - 40,
-                              height: 100,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                      child: Text(
-                                    "플랫폼",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  )),
-                                  const Gap(10),
-                                  SizedBox(
-                                      height: 50,
-                                      child: ListView.separated(
-                                          scrollDirection: Axis.horizontal,
-                                          itemBuilder: (context, idx) {
-                                            return SizedBox(
-                                              width: (MediaQuery.sizeOf(context)
-                                                          .width -
-                                                      40) /
-                                                  3,
-                                              child: Row(
-                                                children: [
-                                                  Checkbox(
-                                                      value: idx == 0
-                                                          ? _webCheck
-                                                          : (idx == 1
-                                                              ? _iosCheck
-                                                              : _androidCheck),
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          if (idx == 0) {
-                                                            if (_iosCheck ||
-                                                                _androidCheck) {
-                                                              Get.snackbar("알림",
-                                                                  "Mobile 서비스가 이미 선택 되었있습니다.");
-                                                              return;
-                                                            }
-                                                            _selectedCategory.add(
-                                                                _categoryList[
-                                                                    idx]);
-                                                            _webCheck = value!;
-                                                          } else if (idx == 1) {
-                                                            if (_webCheck) {
-                                                              Get.snackbar("알림",
-                                                                  "Web 서비스가 이미 선택 되었있습니다.");
-                                                              return;
-                                                            }
-                                                            _selectedCategory.add(
-                                                                _categoryList[
-                                                                    idx]);
-                                                            _iosCheck = value!;
-                                                          } else {
-                                                            if (_webCheck) {
-                                                              Get.snackbar("알림",
-                                                                  "Web 서비스가 이미 선택 되었있습니다.");
-                                                              return;
-                                                            }
-                                                            _selectedCategory.add(
-                                                                _categoryList[
-                                                                    idx]);
-                                                            _androidCheck =
-                                                                value!;
-                                                          }
-                                                        });
-                                                      },
-                                                      // checkColor: Colors.green,
-                                                      fillColor:
-                                                          WidgetStateProperty
-                                                              .resolveWith(
-                                                                  (state) {
-                                                        if (state.contains(
-                                                            WidgetState
-                                                                .selected)) {
-                                                          return Colors.blue;
-                                                        }
-                                                        return Colors.white;
-                                                      })),
-                                                  Text(_categoryList[idx]),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                          separatorBuilder: (context, idx) =>
-                                              const Gap(1),
-                                          itemCount: _categoryList.length))
-                                ],
-                              )),
-                          const Gap(10),
-                          // 서비스 설명
-                          SizedBox(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  child: Text(
-                                    "서비스 설명",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: hei * 0.4,
-                                  child: TextField(
-                                    controller: contentController,
-                                    minLines: 20,
-                                    maxLines: 20,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
+                          _titleSection(),
                           const Gap(20),
+                          // 서비스 요약
+                          _subtitleSection(),
+                          const Gap(20),
+                          // 게시 기간
+                          _periodSection(),
+                          const Gap(20),
+                          // 카테고리
+                          _categorySection(),
+                          const Gap(20),
+                          // 서비스 설명
+                          _contentSection(),
+                          const Gap(40),
                           // 버튼
                           SizedBox(
                             height: 50,
@@ -270,19 +123,24 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                     width: 150,
                                     child: ElevatedButton(
                                       onPressed: () {
+                                        if(titleController.text.isEmpty || subtitleController.text.isEmpty || contentController.text.isEmpty){
+                                          Get.snackbar("알림", "모든 항목을 입력해주세요.");
+                                          return;
+                                        }
+                                        if(_selectedCategory.isEmpty){
+                                          Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                                          return;
+                                        }
                                         final post = PostEntity(
                                           title: titleController.text,
                                           subtitle: subtitleController.text,
                                           contents: contentController.text,
                                           platform: _selectedCategory,
                                         );
-                                        Get.to(
-                                            () => PostDetailPage(post: post));
+                                        Get.to(() => PostDetailPage(post: post));
                                       },
                                       style: ElevatedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10))),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                                       child: Text("미리보기"),
                                     )),
                                 const Gap(20),
@@ -292,39 +150,38 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                       width: 150,
                                       child: ElevatedButton(
                                         onPressed: () async {
+                                          if(titleController.text.isEmpty || subtitleController.text.isEmpty || contentController.text.isEmpty){
+                                            Get.snackbar("알림", "모든 항목을 입력해주세요.");
+                                            return;
+                                          }
+                                          if(_selectedCategory.isEmpty){
+                                            Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                                            return;
+                                          }
                                           final post = PostEntity(
-                                              title: titleController.text,
-                                              subtitle: subtitleController.text,
-                                              contents: contentController.text,
-                                              platform: _selectedCategory,
-                                              author: context
-                                                  .read<UserProvider>()
-                                                  .user,
-                                              period: 7,
+                                            title: titleController.text,
+                                            subtitle: subtitleController.text,
+                                            contents: contentController.text,
+                                            platform: _selectedCategory,
+                                            author: context.read<UserProvider>().user,
+                                            period: 7,
                                           );
-                                          final token = context
-                                              .read<UserProvider>()
-                                              .token!;
+                                          final token = context.read<UserProvider>().token!;
                                           try {
-                                            context.read<DataBloc>().add(
-                                                RequestPostCreateEvent(
-                                                    context, post, token));
+                                            context.read<DataBloc>().add(RequestPostCreateEvent(context, post, token));
 
                                             if (state.state == DataLoadState.postCreateCompletedState) {
                                               if (context.mounted) {
                                                 showDialog(
                                                   context: context,
-                                                  builder:
-                                                      (BuildContext context) {
+                                                  builder: (BuildContext context) {
                                                     return AlertDialog(
                                                       title: Text("게시 성공"),
-                                                      content: Text(
-                                                          "모집글 등록에 성공하였습니다."),
+                                                      content: Text("모집글 등록에 성공하였습니다."),
                                                       actions: [
                                                         TextButton(
                                                             onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
+                                                              Navigator.pop(context);
                                                             },
                                                             child: Text("확인"))
                                                       ],
@@ -346,9 +203,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                           }
                                         },
                                         style: ElevatedButton.styleFrom(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10))),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                                         child: Text("등록"),
                                       ))
                                 else
@@ -365,17 +220,10 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                               platform: _selectedCategory,
                                               status: widget.post!.status,
                                               period: widget.post!.period,
-                                              author: context
-                                                  .read<UserProvider>()
-                                                  .user);
-                                          final token = context
-                                                  .read<UserProvider>()
-                                                  .token ??
-                                              "";
+                                              author: context.read<UserProvider>().user);
+                                          final token = context.read<UserProvider>().token ?? "";
                                           try {
-                                            context.read<DataBloc>().add(
-                                                RequestPostUpdateEvent(
-                                                    context, token, post));
+                                            context.read<DataBloc>().add(RequestPostUpdateEvent(context, token, post));
                                           } on Exception catch (e) {
                                             // TODO
                                             logger.e(e);
@@ -385,20 +233,329 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                           Get.back();
                                         },
                                         style: ElevatedButton.styleFrom(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10))),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                                         child: Text("수정하기"),
                                       ))
                               ],
                             ),
-                          )
+                          ),
+                          const Gap(40)
                         ],
                       ),
                     ),
                   )),
             ));
       },
+    );
+  }
+
+  Widget _titleSection() {
+    return SizedBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            child: Text(
+              "서비스 네임",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const Gap(10),
+          SizedBox(
+            height: 60,
+            child: TextField(
+              controller: titleController,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _subtitleSection() {
+    return SizedBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            child: Text(
+              "서비스 요약",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const Gap(10),
+          SizedBox(
+            height: 80,
+            child: TextField(
+              controller: subtitleController,
+              maxLines: 1,
+              maxLength: 30,
+              // decoration: InputDecoration(
+              //   counterText: "30",
+              // ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _periodSection() {
+    return SizedBox(
+      // height: 200,
+      width: MediaQuery.sizeOf(context).width - 40,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            child: Row(
+              children: [
+                SizedBox(
+                  child: Text(
+                    "모집 기간",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const Gap(10),
+                SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: Tooltip(
+                    key: tooltipkey,
+                    message: "모집기간은 광고시청(3일) 또는 인앱구매로 변경 가능 합니다.",
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    showDuration: const Duration(seconds: 3),
+                    child: IconButton(
+                      onPressed: () {
+                        tooltipkey.currentState?.ensureTooltipVisible();
+                      },
+                      style: IconButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                      ),
+                      icon: Icon(Icons.info_outline),
+
+                    )
+                  )
+                )
+              ],
+            ),
+          ),
+          const Gap(10),
+          SizedBox(
+            height: 60,
+            child: Row(
+              children: [
+                SizedBox(
+                  height: 50,
+                  width: 80,
+                  child: TextField(
+                    controller: periodController,
+                    readOnly: true,
+                    // enabled: false,
+                    decoration: InputDecoration(
+                      enabled: false
+                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+                const Gap(10),
+                SizedBox(
+                  child: Text("일", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                )
+              ],
+            ),
+          )
+        ],
+      )
+    );
+  }
+
+  Widget _categorySection() {
+    return SizedBox(
+        width: MediaQuery.sizeOf(context).width - 40,
+        // height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+                child: Text(
+              "플랫폼",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            )),
+            const Gap(10),
+            SizedBox(
+                child: GridView.count(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    crossAxisCount: 2,
+                    childAspectRatio: 3.5,
+                    children: [
+                  SizedBox(
+                      height: 30,
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: _webCheck,
+                            onChanged: (value) {
+                              setState(() {
+                                _webCheck = value!;
+                                if (_webCheck) {
+                                  _selectedCategory.add('WEB');
+                                  if (_iosCheck) {
+                                    _selectedCategory.remove('IOS');
+                                    _iosCheck = false;
+                                  }
+                                  if (_androidCheck) {
+                                    _selectedCategory.remove('Android');
+                                    _androidCheck = false;
+                                  }
+                                  if (_gameCheck) {
+                                    _selectedCategory.remove('GAME');
+                                    _gameCheck = false;
+                                  }
+                                } else {
+                                  _selectedCategory.remove('WEB');
+                                }
+                              });
+                            },
+                          ),
+                          Text(
+                            "WEB",
+                            style: TextStyle(fontSize: 14, fontWeight: _webCheck ? FontWeight.bold : FontWeight.normal),
+                          )
+                        ],
+                      )),
+                  SizedBox(
+                      height: 30,
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: _gameCheck,
+                            onChanged: (value) {
+                              setState(() {
+                                _gameCheck = value!;
+                                if (_gameCheck) {
+                                  _selectedCategory.add('GAME');
+                                  if (_webCheck) {
+                                    _selectedCategory.remove('WEB');
+                                    _webCheck = false;
+                                  }
+                                  if (_iosCheck) {
+                                    _selectedCategory.remove('IOS');
+                                    _iosCheck = false;
+                                  }
+                                  if (_androidCheck) {
+                                    _selectedCategory.remove('Android');
+                                    _androidCheck = false;
+                                  }
+                                } else {
+                                  _selectedCategory.remove('GAME');
+                                }
+                              });
+                            },
+                          ),
+                          Text(
+                            "GAME",
+                            style:
+                                TextStyle(fontSize: 14, fontWeight: _gameCheck ? FontWeight.bold : FontWeight.normal),
+                          )
+                        ],
+                      )),
+                  SizedBox(
+                      height: 30,
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: _iosCheck,
+                            onChanged: (value) {
+                              setState(() {
+                                _iosCheck = value!;
+                                if (_iosCheck) {
+                                  _selectedCategory.add('IOS');
+                                  if (_webCheck) {
+                                    _selectedCategory.remove('WEB');
+                                    _webCheck = false;
+                                  }
+                                  if (_gameCheck) {
+                                    _selectedCategory.remove('GAME');
+                                    _gameCheck = false;
+                                  }
+                                } else {
+                                  _selectedCategory.remove('IOS');
+                                }
+                              });
+                            },
+                          ),
+                          Text(
+                            "IOS",
+                            style: TextStyle(fontSize: 14, fontWeight: _iosCheck ? FontWeight.bold : FontWeight.normal),
+                          )
+                        ],
+                      )),
+                  SizedBox(
+                      height: 30,
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: _androidCheck,
+                            onChanged: (value) {
+                              setState(() {
+                                _androidCheck = value!;
+                                if (_androidCheck) {
+                                  _selectedCategory.add('Android');
+                                  if (_webCheck) {
+                                    _selectedCategory.remove('WEB');
+                                    _webCheck = false;
+                                  }
+                                  if (_gameCheck) {
+                                    _selectedCategory.remove('GAME');
+                                    _gameCheck = false;
+                                  }
+                                } else {
+                                  _selectedCategory.remove('Android');
+                                }
+                              });
+                            },
+                          ),
+                          Text(
+                            "Android",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: _androidCheck ? FontWeight.bold : FontWeight.normal),
+                          )
+                        ],
+                      )),
+                ]))
+          ],
+        ));
+  }
+
+  Widget _contentSection() {
+    final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
+    return SizedBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            child: Text(
+              "서비스 설명",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const Gap(10),
+          SizedBox(
+            height: hei * 0.5,
+            child: TextField(
+              controller: contentController,
+              minLines: 20,
+              maxLines: 20,
+            ),
+          )
+        ],
+      ),
     );
   }
 }

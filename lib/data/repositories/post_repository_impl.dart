@@ -25,16 +25,20 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<List<PostEntity>> getPostInitData() async {
+  Future<Map<String, List<PostEntity>>> getPostInitData() async {
     final res = await remote.getPostsInitData();
-    final favoritePosts = res.map((e) => PostEntity.toPostEntity(e)).toList();
-    return favoritePosts;
+    final List<PostEntity> favoritePosts = res['favoritePosts'] != null ?
+    res['favoritePosts']!.map((e) => PostEntity.toPostEntity(e)).toList() : [];
+    final List<PostEntity> posts = res['posts'] != null ?
+    res['posts']!.map((e) => PostEntity.toPostEntity(e)).toList() : [];
+
+    return {'favoritePosts': favoritePosts, 'posts': posts};
   }
 
   @override
-  Future<PostEntity> getPostById(String id) {
-    // TODO: implement getPostById
-    throw UnimplementedError();
+  Future<PostEntity> getPostById(String token, String id) async {
+    final res = await remote.getPostById(token, id);
+    return PostEntity.toPostEntity(res);
   }
 
   @override

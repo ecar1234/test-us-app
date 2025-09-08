@@ -40,6 +40,7 @@ class PostModel {
     this.status,
     this.period,
     this.applications,
+    this.views,
     this.createdAt,
     this.updatedAt,
   });

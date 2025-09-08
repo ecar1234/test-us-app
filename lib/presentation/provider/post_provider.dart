@@ -17,9 +17,14 @@ class PostProvider with ChangeNotifier {
 
   Future<void> getInitPosts() async {
     final res = await useCase.getPostInitData();
-    _posts = res[1];
-    _favoritePost = res[0];
+    _favoritePost = res['favoritePosts'];
+    _posts = res['posts'];
     notifyListeners();
+  }
+
+  Future<PostEntity> getPostById(String token, String id) async {
+    final res = await useCase.getPostById(token, id);
+    return res;
   }
 
   Future<void> getWebPosts({int page = 1}) async {
@@ -58,7 +63,7 @@ class PostProvider with ChangeNotifier {
       _posts!.add(data);
       notifyListeners();
       return true;
-    }else {
+    } else {
       return false;
     }
   }
