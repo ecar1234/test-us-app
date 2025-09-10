@@ -1,5 +1,6 @@
 
 
+import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
 
 abstract class PostRepository{
@@ -13,4 +14,7 @@ abstract class PostRepository{
   Future<Map<String, dynamic>> createPost(String token, PostEntity post);
   Future<Map<String, dynamic>> updatePost(String token, PostEntity post);
   Future<bool> deletePost(String token, String id);
+  Future<List<PostEntity>> registerPostImg(List<XFile> images);
+  Future<List<PostEntity>> updatePostImg(List<XFile> images, List<Map<String, dynamic>> oldImgInfo);
+  Future<List<PostEntity>> deletePostImg(Map<String, dynamic> imgInfo);
 }

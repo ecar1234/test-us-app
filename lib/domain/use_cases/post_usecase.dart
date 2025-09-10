@@ -1,4 +1,6 @@
 
+import 'package:image_picker/image_picker.dart';
+
 import '../entities/post_entity.dart';
 import '../repositories/post_repository.dart';
 
@@ -46,4 +48,9 @@ class PostUseCase {
     final res = await repository.getPostPagination(page);
     return res;
   }
+
+  Future<List<PostEntity>> registerPostImg(List<XFile> images) async {}
+  Future<List<PostEntity>> updatePostImg(List<XFile> images, List<Map<String, dynamic>> oldImgInfo) async {}
+  Future<List<PostEntity>> deletePostImg(Map<String, dynamic> imgInfo) async {}
+
 }

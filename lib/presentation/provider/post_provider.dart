@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../domain/use_cases/post_usecase.dart';
 
@@ -89,5 +90,15 @@ class PostProvider with ChangeNotifier {
     }
     notifyListeners();
     return res;
+  }
+
+  Future<void> registerPostImg(List<XFile> images) async {
+
+  }
+  Future<void> updatePostImg(List<XFile> images, List<Map<String, dynamic>> oldImgInfo) async {
+
+  }
+  Future<void> deletePostImg(Map<String, dynamic> imgInfo) async {
+
   }
 }

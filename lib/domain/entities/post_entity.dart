@@ -12,6 +12,7 @@ class PostEntity {
   PostStatus? status;
   int? period;
   int? views;
+  List<Map<String, dynamic>>? images;
   UserEntity? author;
   List<String>? applications;
   DateTime? createdAt;
@@ -28,6 +29,7 @@ class PostEntity {
     this.status,
     this.period,
     this.views,
+    this.images,
     this.createdAt,
     this.updatedAt,
   });
@@ -48,6 +50,7 @@ class PostEntity {
       status: model.status,
       period: model.period,
       views: model.views,
+      images: model.images,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
     );
@@ -68,6 +71,7 @@ class PostEntity {
       status: entity.status,
       period: entity.period,
       views: entity.views,
+      images: entity.images
     );
   }
 }

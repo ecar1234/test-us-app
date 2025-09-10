@@ -4,19 +4,15 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
-import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/post_detail_page.dart';
-import 'package:test_us_app/presentation/post_tester_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/setting_page.dart';
 
 import '../domain/entities/post_entity.dart';
 import '../services/common_height_provider.dart';
-import 'bloc/app_bloc/app_bloc.dart';
 import 'bloc/auth_bloc/auth_bloc.dart';
 import 'bloc/auth_bloc/auth_event.dart';
-import 'bloc/auth_bloc/auth_state.dart';
 import 'bloc/data_bloc/data_bloc.dart';
 import 'bloc/data_bloc/data_event.dart';
 import 'bloc/data_bloc/data_state.dart';
@@ -35,7 +31,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
-    final isLogin = context.watch<UserProvider>().isLogged!;
     return BlocBuilder<DataBloc, DataState>(
       builder: (context, state) {
         if (state.state == DataLoadState.postCreateCompletedState) {
@@ -47,35 +42,37 @@ class _HomePageState extends State<HomePage> {
                 title: const Text('Testus', style: TextStyle(fontWeight: FontWeight.bold)),
                 // 추후 로고 이미지로 변경
                 actions: [
-                  if (!isLogin)
-                    IconButton(
-                        onPressed: () {
-                          Get.to(() => LoginPage());
-                        },
-                        icon: const Icon(Icons.login))
-                  else
-                    IconButton(
-                        onPressed: () {
-                          Get.defaultDialog(
-                            title: '로그아웃',
-                            middleText: '로그아웃 하시겠습니까?',
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('취소')),
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    context.read<AuthBloc>().add(LogoutEvent(context));
-                                  },
-                                  child: const Text('확인')),
-                            ],
-                          );
-                          // context.read<AuthBloc>().add(LogoutEvent(context));
-                        },
-                        icon: const Icon(Icons.logout)),
+                  Selector<UserProvider, bool>(
+                    selector: (context, provider) => provider.isLogged ?? false,
+                    builder: (context, isLogin, child) => !isLogin
+                        ? IconButton(
+                            onPressed: () {
+                              Get.to(() => LoginPage());
+                            },
+                            icon: const Icon(Icons.login))
+                        : IconButton(
+                            onPressed: () {
+                              Get.defaultDialog(
+                                title: '로그아웃',
+                                middleText: '로그아웃 하시겠습니까?',
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('취소')),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        context.read<AuthBloc>().add(LogoutEvent(context));
+                                      },
+                                      child: const Text('확인')),
+                                ],
+                              );
+                              // context.read<AuthBloc>().add(LogoutEvent(context));
+                            },
+                            icon: const Icon(Icons.logout)),
+                  ),
                   IconButton(
                       onPressed: () {
                         Get.to(() => SettingPage());
@@ -313,12 +310,12 @@ class _HomePageState extends State<HomePage> {
                               context.read<DataBloc>().add(GetPostDetailEvent(context, post[idx].id!, token));
                               Get.to(() => PostDetailPage(post: post[idx]));
                             },
-                            child: Container(
+                            child: SizedBox(
                               height: 210,
                               width: 160,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
-                              ),
+                              // decoration: BoxDecoration(
+                              //   color: Theme.of(context).colorScheme.surface,
+                              // ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -366,59 +363,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-// Widget _webServiceList() {
-//   return Column(
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       Container(
-//         padding: EdgeInsets.symmetric(horizontal: 20),
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             Text('웹 서비스',
-//                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-//             TextButton(
-//                 onPressed: () {
-//                   // context
-//                   //     .read<DataBloc>()
-//                   //     .add(RequestPostDataEvent(context, 'web', 1));
-//                   Get.to(() => const PostTesterPage());
-//                 },
-//                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
-//                 child: Text("더보기"))
-//           ],
-//         ),
-//       ),
-//       Selector<PostProvider, List<PostEntity>>(
-//         selector: (context, provider) => provider.posts ?? [],
-//         builder: (context, webPost, child) => SizedBox(
-//             height: 150,
-//             width: MediaQuery.sizeOf(context).width,
-//             // padding: EdgeInsets.all(10),
-//             // decoration: BoxDecoration(
-//             //     border: Border.all()
-//             // ),
-//             child: webPost.isEmpty
-//                 ? const Center(child: Text("웹 서비스 게시글이 아직 없습니다."))
-//                 : ListView.separated(
-//                     shrinkWrap: true,
-//                     padding: EdgeInsets.only(left: 20),
-//                     scrollDirection: Axis.horizontal,
-//                     itemBuilder: (context, idx) {
-//                       return Container(
-//                         height: 120,
-//                         width: 150,
-//                         decoration: BoxDecoration(
-//                           color: Theme.of(context).colorScheme.surface,
-//                         ),
-//                         child: Text("$idx"),
-//                       );
-//                     },
-//                     separatorBuilder: (context, idx) => const Gap(10),
-//                     itemCount: 4)),
-//       ),
-//     ],
-//   );
-// }
 }

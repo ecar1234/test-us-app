@@ -1,5 +1,6 @@
 
 
+import 'package:cross_file/src/types/interface.dart';
 import 'package:test_us_app/data/models/post/post_model.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
 
@@ -69,5 +70,23 @@ class PostRepositoryImpl implements PostRepository {
   Future<List<PostEntity>> getPostPagination(int page) async {
     final res = await remote.getPostsPagination(page);
     return res.map((e) => PostEntity.toPostEntity(e)).toList();
+  }
+
+  @override
+  Future<List<PostEntity>> deletePostImg(Map<String, dynamic> imgInfo) {
+    // TODO: implement deletePostImg
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<PostEntity>> registerPostImg(List<XFile> images) {
+    // TODO: implement registerPostImg
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<PostEntity>> updatePostImg(List<XFile> images, List<Map<String, dynamic>> oldImgInfo) {
+    // TODO: implement updatePostImg
+    throw UnimplementedError();
   }
 }

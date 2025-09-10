@@ -52,11 +52,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
           return element.id == _post!.id;
         });
         context.read<DataBloc>().add(RequestCompleteEvent());
-      } else if(state.state == DataLoadState.getPostByIdCompletedState){
-        _post  = state.post;
+      } else if (state.state == DataLoadState.getPostByIdCompletedState) {
+        _post = state.post;
         context.read<DataBloc>().add(RequestCompleteEvent());
-      }
-      else if (state.state == DataLoadState.errorState) {
+      } else if (state.state == DataLoadState.errorState) {
         Get.snackbar("에러", "알 수 없는 문제로 수정 실패 했습니다.");
       }
       final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
@@ -190,7 +189,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         minHeight: hei * 0.4,
                       ),
                       child: SizedBox(
-                        // height: constraints.maxHeight * 0.5,
+                          // height: constraints.maxHeight * 0.5,
                           child: Text(widget.post!.contents!)),
                     ),
                     const Gap(40),
@@ -263,7 +262,84 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   height: 50,
                   child: ElevatedButton(
                       onPressed: () {
+                        showModalBottomSheet(
+                            context: context,
+                            barrierColor: null,
+                            builder: (context) {
+                              bool isIos = false;
+                              bool isAndroid = false;
 
+                              final prevApp =
+                              context.read<ApplicationProvider>().applications!.firstWhere((element) {
+                                return element.postId == _post!.id;
+                              });
+                              if(prevApp.platform == ApplicationPlatform.ios) isIos = true;
+                              if(prevApp.platform == ApplicationPlatform.android) isAndroid = true;
+
+                              return StatefulBuilder(
+                                builder: (context, state) => Container(
+                                    height: 300,
+                                    width: MediaQuery.sizeOf(context).width,
+                                    padding: EdgeInsets.all(20),
+                                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                      SizedBox(
+                                          child: Text('테스트 진행 할 플랫폼을 선택해 주세요.',
+                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                                      const Gap(20),
+                                      SizedBox(
+                                          child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            child: Row(children: [
+                                              Checkbox(
+                                                  value: isIos,
+                                                  onChanged: (value) {
+                                                    state(() {
+                                                      isIos = value!;
+                                                      isAndroid = false;
+                                                    });
+                                                  }),
+                                              Text("IOS")
+                                            ]),
+                                          ),
+                                          SizedBox(
+                                            child: Row(children: [
+                                              Checkbox(
+                                                  value: isAndroid,
+                                                  onChanged: (value) {
+                                                    state(() {
+                                                      isAndroid = value!;
+                                                      isIos = false;
+                                                    });
+                                                  }),
+                                              Text("Android")
+                                            ]),
+                                          )
+                                        ],
+                                      )),
+                                      const Gap(20),
+                                      SizedBox(
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            final token = context.read<UserProvider>().token ?? '';
+                                            final userId = context.read<UserProvider>().user!.id;
+                                            final app = ApplicationEntity(
+                                                id: prevApp.id,
+                                                platform:
+                                                    isAndroid ? ApplicationPlatform.android : ApplicationPlatform.ios,
+                                                status: ApplicationStatus.pending,
+                                                postId: _post!.id,
+                                                applicantId: userId);
+                                            context.read<AppBloc>().add(RequestApplyUpdate(context, token, app));
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text("신청하기"),
+                                        ),
+                                      ),
+                                    ])),
+                              );
+                            });
                       },
                       style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),

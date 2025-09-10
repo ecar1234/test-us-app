@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/post_create_page.dart';
 import 'package:test_us_app/presentation/post_detail_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider.dart';
+import 'package:test_us_app/presentation/provider/user_provider.dart';
 
 import '../domain/entities/post_entity.dart';
 import '../services/common_height_provider.dart';
@@ -29,8 +30,9 @@ class _PostTesterPageState extends State<PostTesterPage> {
     return BlocBuilder<DataBloc, DataState>(builder: (context, state) {
       if (state.state == DataLoadState.dataLoadState) {
         return SizedBox(child: Center(child: CircularProgressIndicator()));
-      }else if(state.state == DataLoadState.postCreateCompletedState || state.state == DataLoadState.postDeleteCompletedState ||
-          state.state == DataLoadState.postUpdateCompletedState){
+      } else if (state.state == DataLoadState.postCreateCompletedState ||
+          state.state == DataLoadState.postDeleteCompletedState ||
+          state.state == DataLoadState.postUpdateCompletedState) {
         context.read<DataBloc>().add(RequestCompleteEvent());
       }
 
@@ -39,115 +41,116 @@ class _PostTesterPageState extends State<PostTesterPage> {
         appBar: AppBar(
           title: Text("테스터 모집"),
         ),
-        body: Container(
-            width: MediaQuery.sizeOf(context).width,
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child:
-            // platform == 'web' ? _webPost() :
-            _testerPost()
+        body: SingleChildScrollView(
+          child: Container(
+              width: MediaQuery.sizeOf(context).width,
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: _testerPost()),
         ),
       ));
     });
   }
 
-  Widget _webPost() {
-    return Selector<PostProvider, List<PostEntity>>(
-        selector: (context, provider) => provider.posts??[],
-        builder: (context, webPost, child) {
-          return SizedBox(
-            width: MediaQuery.sizeOf(context).width - 40,
-            child: Expanded(
-              child: GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemBuilder: (context, idx) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
-                    child: Text("$idx"),
-                  );
-                },
-                itemCount: webPost.length,
-              ),
-            )
-          );
-        });
-  }
+  // Widget _webPost() {
+  //   return Selector<PostProvider, List<PostEntity>>(
+  //       selector: (context, provider) => provider.posts??[],
+  //       builder: (context, webPost, child) {
+  //         return SizedBox(
+  //           width: MediaQuery.sizeOf(context).width - 40,
+  //           child: Expanded(
+  //             child: GridView.builder(
+  //               shrinkWrap: true,
+  //               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //                 crossAxisCount: 2,
+  //                 crossAxisSpacing: 10,
+  //                 mainAxisSpacing: 10,
+  //               ),
+  //               itemBuilder: (context, idx) {
+  //                 return Container(
+  //                   decoration: BoxDecoration(
+  //                     color: Theme.of(context).colorScheme.surface,
+  //                   ),
+  //                   child: Text("$idx"),
+  //                 );
+  //               },
+  //               itemCount: webPost.length,
+  //             ),
+  //           )
+  //         );
+  //       });
+  // }
 
   Widget _testerPost() {
     return Selector<PostProvider, List<PostEntity>>(
-        selector: (context, provider) => provider.posts??[],
+        selector: (context, provider) => provider.posts ?? [],
         builder: (context, posts, child) {
           final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
           return SizedBox(
               width: MediaQuery.sizeOf(context).width - 40,
               height: hei - 40,
-              child: posts.isEmpty ?
-                  Center(child: Text("게시글이 아직 없습니다."))
-                  : GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 30,
-                  childAspectRatio: 1.2,
-                ),
-                itemBuilder: (context, idx) {
-                  return GestureDetector(
-                    onTap: () {
-                      Get.to(PostDetailPage(post: posts[idx]));
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                      child: SizedBox(
-                        child: Column(
-                          children: [
-                            Flexible(
-                              flex: 2,
-                              child: Container(
-                                height: 200,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surface,
-                                  border: Border.all()
-                                ),
-                                child: Center(child: Text("Main Image")),
-                              )
-                            ),
-                            const Gap(10),
-                            Flexible(
-                              flex: 1,
-                              child: Container(
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surface,
-                                ),
+              child: posts.isEmpty
+                  ? Center(child: Text("테스터 모집이 아직 없습니다."))
+                  : Column(
+                    children: [
+                      const Gap(30),
+                      GridView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 30,
+                              mainAxisExtent: 300),
+                          itemBuilder: (context, idx) {
+                            return GestureDetector(
+                              onTap: () {
+                                final token = context.read<UserProvider>().token ?? "";
+                                context.read<DataBloc>().add(GetPostDetailEvent(context, posts[idx].id!, token));
+                                Get.to(PostDetailPage(post: posts[idx]));
+                              },
+                              child: SizedBox(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [
-                                    Text("${posts[idx].title}"),
-                                    Text("${posts[idx].subtitle}"),
-                                    Text("${posts[idx].author!.nickname}")
+                                    Flexible(
+                                        flex: 1,
+                                        child: Container(
+                                          height: 150,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),color: Colors.green),
+                                          child: Center(child: Text("Main Image")),
+                                        )),
+                                    const Gap(4),
+                                    Flexible(
+                                        flex: 1,
+                                        child: SizedBox(
+                                          height: 150,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Text("${posts[idx].title}",
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                              const Gap(4),
+                                              Text("${posts[idx].subtitle}",
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
+                                              const Gap(4),
+                                              Text("${posts[idx].author!.nickname}")
+                                            ],
+                                          ),
+                                        )),
                                   ],
                                 ),
-                              )
-                            ),
-                          ],
+                              ),
+                            );
+                          },
+                          itemCount: posts.length,
                         ),
-                      )
-                    ),
-                  );
-                },
-                itemCount: posts.length,
-              )
-          );
+                    ],
+                  ));
         });
   }
 }

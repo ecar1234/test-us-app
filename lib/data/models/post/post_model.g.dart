@@ -22,13 +22,17 @@ PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
       applications: (json['applications'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+      views: (json['views'] as num?)?.toInt(),
+      images: (json['images'] as List<dynamic>?)
+          ?.map((e) => e as Map<String, dynamic>)
+          .toList(),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
-    )..views = (json['views'] as num?)?.toInt();
+    );
 
 Map<String, dynamic> _$PostModelToJson(PostModel instance) => <String, dynamic>{
       'id': instance.id,
@@ -40,6 +44,7 @@ Map<String, dynamic> _$PostModelToJson(PostModel instance) => <String, dynamic>{
       'period': instance.period,
       'author': instance.author,
       'views': instance.views,
+      'images': instance.images,
       'applications': instance.applications,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),

@@ -1,4 +1,5 @@
 
+import 'package:cross_file/src/types/interface.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/post_data/post_datasource.dart';
@@ -99,5 +100,23 @@ class PostDataSourceImpl implements PostDataSource {
     }else {
       throw Exception('Error');
     }
+  }
+
+  @override
+  Future<Map<String, dynamic>> deletePostImg(Map<String, dynamic> imgInfo) {
+    // TODO: implement deletePostImg
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Map<String, dynamic>> registerPostImg(List<XFile> images) {
+    // TODO: implement registerPostImg
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Map<String, dynamic>> updatePostImg(List<XFile> images, List<Map<String, dynamic>> oldImgInfo) {
+    // TODO: implement updatePostImg
+    throw UnimplementedError();
   }
 }

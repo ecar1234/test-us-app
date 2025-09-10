@@ -26,6 +26,7 @@ class PostModel {
   int? period;
   UserModel? author;
   int? views;
+  List<Map<String, dynamic>>? images;
   List<String>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -41,6 +42,7 @@ class PostModel {
     this.period,
     this.applications,
     this.views,
+    this.images,
     this.createdAt,
     this.updatedAt,
   });
