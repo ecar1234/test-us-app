@@ -1,5 +1,5 @@
 
-import 'package:cross_file/src/types/interface.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/post_data/post_datasource.dart';
@@ -13,10 +13,10 @@ class PostDataSourceImpl implements PostDataSource {
   PostDataSourceImpl(this.netDriver);
 
   @override
-  Future<Map<String, dynamic>> createPost(String token, PostModel post) async {
+  Future<PostModel> createPost(String token, PostModel post) async {
     final res = await netDriver.requestPostJson(token, PostApi.create, post.toJson());
     if (res['status'] == 200) {
-      return res;
+      return PostModel.fromJson(res['post']);
     } else {
       throw Exception('Error');
     }
@@ -63,10 +63,10 @@ class PostDataSourceImpl implements PostDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> updatePost(String token, PostModel post) async {
+  Future<PostModel> updatePost(String token, PostModel post) async {
     final res = await netDriver.requestPutJson(token, PostApi.update, post.toJson());
     if (res['status'] == 200) {
-      return {'status': true, 'post': res['post']};
+      return PostModel.fromJson(res['post']);
     } else {
       throw Exception('Error');
     }
@@ -103,19 +103,23 @@ class PostDataSourceImpl implements PostDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> deletePostImg(Map<String, dynamic> imgInfo) {
+  Future<Map<String, dynamic>> deletePostImg(String token, Map<String, dynamic> imgInfo) async {
     // TODO: implement deletePostImg
     throw UnimplementedError();
   }
 
   @override
-  Future<Map<String, dynamic>> registerPostImg(List<XFile> images) {
-    // TODO: implement registerPostImg
-    throw UnimplementedError();
+  Future<List<Map<String, dynamic>>> registerPostImg(String token, List<XFile> images, String postId) async {
+    final res = await netDriver.requestPostFormData(token, PostApi.registerPostImg, images, postId);
+    if(res['status'] == 200){
+      return (res['images'] as List).map<Map<String, dynamic>>((e) => {'id': e['id'], 'url': e['url']}).toList();
+    }else {
+      throw Exception('Error');
+    }
   }
 
   @override
-  Future<Map<String, dynamic>> updatePostImg(List<XFile> images, List<Map<String, dynamic>> oldImgInfo) {
+  Future<List<Map<String, dynamic>>> updatePostImg(String token, List<XFile> images, List<Map<String, dynamic>> oldImgInfo) {
     // TODO: implement updatePostImg
     throw UnimplementedError();
   }

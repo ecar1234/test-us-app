@@ -17,6 +17,13 @@ class UserProvider with ChangeNotifier {
   bool? get isLogged => _isLogged;
 
   Future<void> autoLogin(String token, UserEntity user) async {
+    if(token.isEmpty || token == "") {
+      _token = null;
+      _user = null;
+      _isLogged = false;
+      notifyListeners();
+      return;
+    }
     _token = token;
     _user = user;
     _isLogged = true;

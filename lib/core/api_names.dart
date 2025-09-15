@@ -34,6 +34,8 @@ class PostApi {
   static const String getWebPosts = '/api/v1/post/getWebPostsPagination';
   static const String getMobilePosts = '/api/v1/post/getMobilePostsPagination';
   static const String getPostsPagination = '/api/v1/post/getPostsPagination';
+  static const String registerPostImg = '/api/v1/images/uploads';
+
 }
 
 class ApplicationApi {

@@ -39,21 +39,21 @@ class DataBloc extends Bloc<DataEvent, DataState> {
 
     on<RequestPostCreateEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
-      final res = await event.context.read<PostProvider>().createPost(event.token, event.post);
-      if (!res) {
+      try {
+        if(event.context.mounted){
+          final post = await event.context.read<PostProvider>().createPost(event.token, event.post);
+          emit(DataState(state: DataLoadState.postCreateCompletedState, post: post));
+        }
+      } on Exception catch (e) {
+        // TODO
         emit(DataState(state: DataLoadState.errorState));
-        return;
+        logger.e(e);
       }
-      emit(DataState(state: DataLoadState.postCreateCompletedState));
     });
 
     on<RequestPostUpdateEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
-      final res = await event.context.read<PostProvider>().updatePost(event.token, event.post);
-      if (!res) {
-        emit(DataState(state: DataLoadState.errorState));
-        return;
-      }
+      await event.context.read<PostProvider>().updatePost(event.token, event.post);
       emit(DataState(state: DataLoadState.postUpdateCompletedState));
       logger.i("data state : postUpdateCompletedState");
       // emit(DataState(state: DataLoadState.postDataLoadCompletedState));
@@ -67,6 +67,16 @@ class DataBloc extends Bloc<DataEvent, DataState> {
       } else {
         emit(DataState(state: DataLoadState.errorState));
       }
+    });
+    on<RequestPostImgRegisterEvent>((event, emit) async {
+      emit(DataState(state: DataLoadState.dataLoadState));
+      final res = await event.context.read<PostProvider>().registerPostImg(event.token, event.images!, event.postId);
+      if (res.isEmpty) {
+        emit(DataState(state: DataLoadState.errorState));
+        return;
+      }
+      emit(DataState(state: DataLoadState.postImgRegisterCompletedState, images: res));
+      logger.i("data state : postImgRegisterCompletedState");
     });
 
     on<RequestCompleteEvent>((event, emit) {

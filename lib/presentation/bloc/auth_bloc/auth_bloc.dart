@@ -3,6 +3,7 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
+import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../../data/sharedPreferences/auth_preference.dart';
 import '../../provider/user_provider.dart';
@@ -16,6 +17,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
     on<TokenCheckEvent>((event, emit) async {
       final token = await pref.getToken();
       if(token.isEmpty){
+        if(event.context.mounted){
+          event.context.read<UserProvider>().autoLogin("", UserEntity());
+        }
         emit(AuthState(state: UserAuthState.beforeLoginState));
         logger.d('token is empty');
         return;

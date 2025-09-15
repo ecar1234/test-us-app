@@ -1,4 +1,3 @@
-
 import 'package:image_picker/image_picker.dart';
 
 import '../entities/post_entity.dart';
@@ -6,36 +5,44 @@ import '../repositories/post_repository.dart';
 
 class PostUseCase {
   final PostRepository repository;
+
   PostUseCase(this.repository);
 
   Future<Map<String, List<PostEntity>>> getPostInitData() async {
     final initData = await repository.getPostInitData();
-    return { 'favoritePosts': initData['favoritePosts']!, 'posts': initData['posts']! };
+    return {'favoritePosts': initData['favoritePosts']!, 'posts': initData['posts']!};
   }
+
   Future<PostEntity> getPostById(String token, String id) async {
     final res = await repository.getPostById(token, id);
     return res;
   }
+
   Future<List<PostEntity>> getWebPosts(int page) async {
     final res = await repository.getWebPosts(page);
     return res;
   }
+
   Future<List<PostEntity>> getMobilePosts(int page) async {
     final res = await repository.getMobilePosts(page);
     return res;
   }
-  Future<Map<String, dynamic>> updatePost(String token, PostEntity post) async {
+
+  Future<PostEntity> updatePost(String token, PostEntity post) async {
     final res = await repository.updatePost(token, post);
     return res;
   }
+
   Future<bool> deletePost(String token, String id) async {
     final res = await repository.deletePost(token, id);
     return res;
   }
-  Future<Map<String, dynamic>> createPost(String token, PostEntity post) async {
+
+  Future<PostEntity> createPost(String token, PostEntity post) async {
     final res = await repository.createPost(token, post);
     return res;
   }
+
   // Future<PostEntity> getPostById(String id) async {
   //   final res = await repository.getPostById(id);
   //   return res;
@@ -44,13 +51,24 @@ class PostUseCase {
     final res = await repository.getPostByTitle(title);
     return res;
   }
+
   Future<List<PostEntity>> getPostPagination(int page) async {
     final res = await repository.getPostPagination(page);
     return res;
   }
 
-  Future<List<PostEntity>> registerPostImg(List<XFile> images) async {}
-  Future<List<PostEntity>> updatePostImg(List<XFile> images, List<Map<String, dynamic>> oldImgInfo) async {}
-  Future<List<PostEntity>> deletePostImg(Map<String, dynamic> imgInfo) async {}
+  Future<List<Map<String, dynamic>>> registerPostImg(String token, List<XFile> images, String postId) async {
+    final res = await repository.registerPostImg(token, images, postId);
+    return res;
+  }
 
+  Future<List<Map<String, dynamic>>> updatePostImg(String token, List<XFile> images, List<Map<String, dynamic>> oldImgInfo) async {
+    final res = await repository.updatePostImg(token, images, oldImgInfo);
+    return res;
+  }
+
+  Future<bool> deletePostImg(String token, Map<String, dynamic> imgInfo) async {
+    final res = await repository.deletePostImg(token, imgInfo);
+    return res;
+  }
 }

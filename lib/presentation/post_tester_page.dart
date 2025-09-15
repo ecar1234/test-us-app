@@ -91,22 +91,19 @@ class _PostTesterPageState extends State<PostTesterPage> {
               child: posts.isEmpty
                   ? Center(child: Text("테스터 모집이 아직 없습니다."))
                   : Column(
-                    children: [
-                      const Gap(30),
-                      GridView.builder(
+                      children: [
+                        const Gap(30),
+                        GridView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 30,
-                              mainAxisExtent: 300),
+                              crossAxisCount: 2, crossAxisSpacing: 30, mainAxisSpacing: 30, mainAxisExtent: 300),
                           itemBuilder: (context, idx) {
                             return GestureDetector(
                               onTap: () {
                                 final token = context.read<UserProvider>().token ?? "";
                                 context.read<DataBloc>().add(GetPostDetailEvent(context, posts[idx].id!, token));
-                                Get.to(PostDetailPage(post: posts[idx]));
+                                Get.to(() => PostDetailPage(post: posts[idx]));
                               },
                               child: SizedBox(
                                 child: Column(
@@ -116,14 +113,28 @@ class _PostTesterPageState extends State<PostTesterPage> {
                                         child: Container(
                                           height: 150,
                                           decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),color: Colors.green),
-                                          child: Center(child: Text("Main Image")),
+                                              borderRadius: BorderRadius.circular(10),
+                                              border: posts[idx].images!.isEmpty ? Border.all() : null),
+                                          child: posts[idx].images!.isEmpty
+                                              ? SizedBox(
+                                                  child: Center(
+                                                    child: Text('이미지가 없습니다.'),
+                                                  ),
+                                                )
+                                              : ClipRRect(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Image.network(
+                                                    posts[idx].images![0]['url'],
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
                                         )),
                                     const Gap(4),
                                     Flexible(
                                         flex: 1,
                                         child: SizedBox(
                                           height: 150,
+                                          width: double.infinity,
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             // mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -149,8 +160,8 @@ class _PostTesterPageState extends State<PostTesterPage> {
                           },
                           itemCount: posts.length,
                         ),
-                    ],
-                  ));
+                      ],
+                    ));
         });
   }
 }

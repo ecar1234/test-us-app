@@ -1,6 +1,6 @@
 
 
-import 'package:cross_file/src/types/interface.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/data/models/post/post_model.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
 
@@ -12,11 +12,9 @@ class PostRepositoryImpl implements PostRepository {
   PostRepositoryImpl(this.remote);
 
   @override
-  Future<Map<String, dynamic>> createPost(String token, PostEntity post) async {
+  Future<PostEntity> createPost(String token, PostEntity post) async {
     final res = await remote.createPost(token, PostEntity.toPostModel(post));
-    PostModel postModel = PostModel.fromJson(res['post']);
-    res['post'] = PostEntity.toPostEntity(postModel);
-    return res;
+    return PostEntity.toPostEntity(res);
   }
 
   @override
@@ -49,10 +47,9 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> updatePost(String token, PostEntity post) async {
+  Future<PostEntity> updatePost(String token, PostEntity post) async {
     final res = await remote.updatePost(token, PostEntity.toPostModel(post));
-    res['post'] = PostEntity.toPostEntity(res['post']);
-    return res;
+    return PostEntity.toPostEntity(res);
   }
 
   @override
@@ -73,19 +70,19 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<List<PostEntity>> deletePostImg(Map<String, dynamic> imgInfo) {
+  Future<bool> deletePostImg(String token, Map<String, dynamic> imgInfo) {
     // TODO: implement deletePostImg
     throw UnimplementedError();
   }
 
   @override
-  Future<List<PostEntity>> registerPostImg(List<XFile> images) {
-    // TODO: implement registerPostImg
-    throw UnimplementedError();
+  Future<List<Map<String, dynamic>>> registerPostImg(String token, List<XFile> images, String postId) async {
+    final res = await remote.registerPostImg(token, images, postId);
+    return res;
   }
 
   @override
-  Future<List<PostEntity>> updatePostImg(List<XFile> images, List<Map<String, dynamic>> oldImgInfo) {
+  Future<List<Map<String, dynamic>>> updatePostImg(String token, List<XFile> images, List<Map<String, dynamic>> oldImgInfo) {
     // TODO: implement updatePostImg
     throw UnimplementedError();
   }

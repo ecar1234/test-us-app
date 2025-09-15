@@ -1,13 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
-// import 'package:hive/hive.dart';
-import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
 import 'package:test_us_app/presentation/bloc/data_bloc/data_bloc.dart';
 import 'package:test_us_app/presentation/post_detail_page.dart';
@@ -29,6 +29,9 @@ class PostCreatePage extends StatefulWidget {
 
 class _PostCreatePageState extends State<PostCreatePage> {
   final logger = Logger();
+  final picker = ImagePicker();
+  List<XFile> selectedImages = [];
+
   TextEditingController titleController = TextEditingController();
   TextEditingController subtitleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
@@ -102,6 +105,9 @@ class _PostCreatePageState extends State<PostCreatePage> {
                           // 서비스 요약
                           _subtitleSection(),
                           const Gap(20),
+                          // 이미지 추가
+                          _addImageSection(),
+                          const Gap(20),
                           // 게시 기간
                           _periodSection(),
                           const Gap(20),
@@ -123,11 +129,13 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                     width: 150,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        if(titleController.text.isEmpty || subtitleController.text.isEmpty || contentController.text.isEmpty){
+                                        if (titleController.text.isEmpty ||
+                                            subtitleController.text.isEmpty ||
+                                            contentController.text.isEmpty) {
                                           Get.snackbar("알림", "모든 항목을 입력해주세요.");
                                           return;
                                         }
-                                        if(_selectedCategory.isEmpty){
+                                        if (_selectedCategory.isEmpty) {
                                           Get.snackbar("알림", "플랫폼을 선택해주세요.");
                                           return;
                                         }
@@ -136,6 +144,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                           subtitle: subtitleController.text,
                                           contents: contentController.text,
                                           platform: _selectedCategory,
+                                          images: selectedImages.map((e) => {'id': null, 'url': e.path}).toList(),
                                         );
                                         Get.to(() => PostDetailPage(post: post));
                                       },
@@ -148,63 +157,79 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                   SizedBox(
                                       height: 50,
                                       width: 150,
-                                      child: ElevatedButton(
-                                        onPressed: () async {
-                                          if(titleController.text.isEmpty || subtitleController.text.isEmpty || contentController.text.isEmpty){
-                                            Get.snackbar("알림", "모든 항목을 입력해주세요.");
-                                            return;
-                                          }
-                                          if(_selectedCategory.isEmpty){
-                                            Get.snackbar("알림", "플랫폼을 선택해주세요.");
-                                            return;
-                                          }
-                                          final post = PostEntity(
-                                            title: titleController.text,
-                                            subtitle: subtitleController.text,
-                                            contents: contentController.text,
-                                            platform: _selectedCategory,
-                                            author: context.read<UserProvider>().user,
-                                            period: 7,
-                                          );
+                                      child: BlocConsumer<DataBloc, DataState>(
+                                        listener: (context, state) {
                                           final token = context.read<UserProvider>().token!;
-                                          try {
-                                            context.read<DataBloc>().add(RequestPostCreateEvent(context, post, token));
-
-                                            if (state.state == DataLoadState.postCreateCompletedState) {
-                                              if (context.mounted) {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return AlertDialog(
-                                                      title: Text("게시 성공"),
-                                                      content: Text("모집글 등록에 성공하였습니다."),
-                                                      actions: [
-                                                        TextButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(context);
-                                                            },
-                                                            child: Text("확인"))
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-                                                return;
-                                              }
+                                          if (state.state == DataLoadState.postCreateCompletedState &&
+                                              selectedImages.isNotEmpty) {
+                                            final postId = state.post?.id ?? '';
+                                            if (context.mounted) {
+                                              context.read<DataBloc>().add(
+                                                  RequestPostImgRegisterEvent(context, token, selectedImages, postId));
                                             }
-                                            Navigator.pop(context);
-                                          } on Exception catch (e) {
-                                            // TODO
-                                            logger.e(e);
-                                            Get.snackbar('알림', '등록 실패');
-                                            return;
                                           }
-                                          if (context.mounted) {
-                                            Get.back();
+                                          if (state.state == DataLoadState.postCreateCompletedState) {
+                                            if (context.mounted) {
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: Text("게시 성공"),
+                                                    content: Text("모집글 등록에 성공하였습니다."),
+                                                    actions: [
+                                                      TextButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(context);
+                                                          },
+                                                          child: Text("확인"))
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                              return;
+                                            }
                                           }
+                                          Navigator.pop(context);
                                         },
-                                        style: ElevatedButton.styleFrom(
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                        child: Text("등록"),
+                                        builder: (context, state) => ElevatedButton(
+                                          onPressed: () async {
+                                            if (titleController.text.isEmpty ||
+                                                subtitleController.text.isEmpty ||
+                                                contentController.text.isEmpty) {
+                                              Get.snackbar("알림", "모든 항목을 입력해주세요.");
+                                              return;
+                                            }
+                                            if (_selectedCategory.isEmpty) {
+                                              Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                                              return;
+                                            }
+                                            final post = PostEntity(
+                                              title: titleController.text,
+                                              subtitle: subtitleController.text,
+                                              contents: contentController.text,
+                                              platform: _selectedCategory,
+                                              author: context.read<UserProvider>().user,
+                                              period: 7,
+                                            );
+                                            final token = context.read<UserProvider>().token!;
+                                            try {
+                                              context
+                                                  .read<DataBloc>()
+                                                  .add(RequestPostCreateEvent(context, post, token));
+                                            } on Exception catch (e) {
+                                              // TODO
+                                              logger.e(e);
+                                              Get.snackbar('알림', '등록 실패');
+                                              return;
+                                            }
+                                            // if (context.mounted) {
+                                            //   Get.back();
+                                            // }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                                          child: Text("등록"),
+                                        ),
                                       ))
                                 else
                                   SizedBox(
@@ -300,78 +325,168 @@ class _PostCreatePageState extends State<PostCreatePage> {
     );
   }
 
-  Widget _periodSection() {
+  Widget _addImageSection() {
     return SizedBox(
-      // height: 200,
       width: MediaQuery.sizeOf(context).width - 40,
+      height: 180,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           SizedBox(
+            height: 50,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                  child: Text(
-                    "모집 기간",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Gap(10),
+                    child: Text(
+                  "서비스 이미지 추가 (${selectedImages.length} / 4)",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                )),
                 SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: Tooltip(
-                    key: tooltipkey,
-                    message: "모집기간은 광고시청(3일) 또는 인앱구매로 변경 가능 합니다.",
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    showDuration: const Duration(seconds: 3),
-                    child: IconButton(
-                      onPressed: () {
-                        tooltipkey.currentState?.ensureTooltipVisible();
+                    width: 100,
+                    height: 40,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final images = await picker.pickMultiImage(imageQuality: 100, limit: 4);
+                        if (images.isEmpty) {
+                          return;
+                        }
+                        setState(() {
+                          selectedImages = images;
+                        });
                       },
-                      style: IconButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                      ),
-                      icon: Icon(Icons.info_outline),
-
-                    )
-                  )
-                )
+                      style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      child: Text('추가'),
+                    ))
               ],
             ),
           ),
-          const Gap(10),
           SizedBox(
-            height: 60,
-            child: Row(
-              children: [
-                SizedBox(
-                  height: 50,
-                  width: 80,
-                  child: TextField(
-                    controller: periodController,
-                    readOnly: true,
-                    // enabled: false,
-                    decoration: InputDecoration(
-                      enabled: false
-                    ),
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.right,
-                  ),
-                ),
-                const Gap(10),
-                SizedBox(
-                  child: Text("일", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-                )
-              ],
-            ),
-          )
+              height: 120,
+              width: MediaQuery.sizeOf(context).width - 40,
+              child: selectedImages.isEmpty
+                  ? SizedBox(
+                      child: Center(
+                        child: Text('서비스 이미지를 추가해보세요.'),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      itemBuilder: (context, idx) {
+                        if (idx >= selectedImages.length) return SizedBox.shrink();
+                        return SizedBox(
+                          height: 110,
+                          width: 110,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Stack(children: [
+                              Image.file(
+                                File(selectedImages[idx].path),
+                                height: double.infinity,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                              Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedImages.removeAt(idx);
+                                        });
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.black.withValues(alpha: 0.5),
+                                        ),
+                                        child: Center(
+                                          child: Icon(Icons.close),
+                                        ),
+                                      ))),
+                            ]),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, idx) => const Gap(10),
+                      itemCount: 4))
         ],
-      )
+      ),
     );
+  }
+
+  Widget _periodSection() {
+    return SizedBox(
+        // height: 200,
+        width: MediaQuery.sizeOf(context).width - 40,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              child: Row(
+                children: [
+                  SizedBox(
+                    child: Text(
+                      "모집 기간",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const Gap(10),
+                  SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: Tooltip(
+                          key: tooltipkey,
+                          message: "모집기간은 광고시청(3일) 또는 인앱구매로 변경 가능 합니다.",
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          showDuration: const Duration(seconds: 3),
+                          child: IconButton(
+                            onPressed: () {
+                              tooltipkey.currentState?.ensureTooltipVisible();
+                            },
+                            style: IconButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                            ),
+                            icon: Icon(Icons.info_outline),
+                          )))
+                ],
+              ),
+            ),
+            const Gap(10),
+            SizedBox(
+              height: 60,
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 50,
+                    width: 80,
+                    child: TextField(
+                      controller: periodController,
+                      readOnly: true,
+                      // enabled: false,
+                      decoration: InputDecoration(enabled: false),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
+                  const Gap(10),
+                  SizedBox(child: Text("일", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))
+                ],
+              ),
+            )
+          ],
+        ));
   }
 
   Widget _categorySection() {

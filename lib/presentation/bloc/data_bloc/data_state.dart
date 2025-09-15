@@ -13,11 +13,16 @@ enum DataLoadState {
   postUpdateCompletedState,
   postDeleteCompletedState,
   getPostByIdCompletedState,
+  postImgRegisterCompletedState,
+  postImgUpdateCompletedState,
+  postImgDeleteCompletedState,
   errorState,
 }
 
 class DataState {
   DataLoadState state;
   PostEntity? post;
-  DataState({this.state = DataLoadState.serviceStartState, this.post});
+  List<Map<String, dynamic>>? images;
+
+  DataState({this.state = DataLoadState.serviceStartState, this.post, this.images});
 }

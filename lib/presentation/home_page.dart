@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
     return BlocBuilder<DataBloc, DataState>(
       builder: (context, state) {
-        if (state.state == DataLoadState.postCreateCompletedState) {
+        if (state.state == DataLoadState.postImgRegisterCompletedState) {
           context.read<DataBloc>().add(RequestCompleteEvent());
         }
         return SafeArea(
@@ -97,11 +97,11 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               children: [
                                 const Gap(10),
-                                _mainButtonSection(),
+                                _mainButtonSection(context),
                                 const Gap(20),
-                                _favoritePostList(),
+                                _favoritePostList(context),
                                 const Gap(20),
-                                _testerList(),
+                                _testerList(context),
                                 // const Gap(20),
                                 // _webServiceList(),
                               ],
@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _mainButtonSection() {
+  Widget _mainButtonSection(BuildContext context) {
     return SizedBox(
       height: 100,
       width: MediaQuery.sizeOf(context).width,
@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _favoritePostList() {
+  Widget _favoritePostList(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -231,9 +231,23 @@ class _HomePageState extends State<HomePage> {
                                     width: constraints.maxWidth,
                                     height: constraints.maxHeight * 0.55,
                                     decoration: BoxDecoration(
-                                      color: Colors.green,
+                                      // color: Colors.green,
+                                      border: favoritePost[idx].images!.isEmpty ? Border.all() : null,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
+                                    child: favoritePost[idx].images!.isEmpty
+                                        ? SizedBox(
+                                            child: Center(
+                                              child: Text('이미지가 없습니다.'),
+                                            ),
+                                          )
+                                        : ClipRRect(
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Image.network(
+                                              favoritePost[idx].images![0]['url'],
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
                                   );
                                 }),
                               ),
@@ -267,7 +281,7 @@ class _HomePageState extends State<HomePage> {
     ]);
   }
 
-  Widget _testerList() {
+  Widget _testerList(BuildContext context) {
     return BlocBuilder<DataBloc, DataState>(
       builder: (context, state) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,7 +305,7 @@ class _HomePageState extends State<HomePage> {
           Selector<PostProvider, List<PostEntity>>(
             selector: (context, provider) => provider.posts ?? [],
             builder: (context, post, child) => SizedBox(
-                height: 220,
+                height: 230,
                 width: MediaQuery.sizeOf(context).width,
                 // padding: EdgeInsets.all(10),
                 // decoration: BoxDecoration(
@@ -311,7 +325,7 @@ class _HomePageState extends State<HomePage> {
                               Get.to(() => PostDetailPage(post: post[idx]));
                             },
                             child: SizedBox(
-                              height: 210,
+                              height: 230,
                               width: 160,
                               // decoration: BoxDecoration(
                               //   color: Theme.of(context).colorScheme.surface,
@@ -326,9 +340,22 @@ class _HomePageState extends State<HomePage> {
                                         width: constraints.maxWidth,
                                         height: constraints.maxHeight * 0.55,
                                         decoration: BoxDecoration(
-                                          color: Colors.green,
+                                          border: post[idx].images!.isEmpty ? Border.all() : null,
                                           borderRadius: BorderRadius.circular(10),
                                         ),
+                                        child: post[idx].images!.isEmpty
+                                            ? SizedBox(
+                                                child: Center(
+                                                  child: Text('이미지가 없습니다.'),
+                                                ),
+                                              )
+                                            : ClipRRect(
+                                                borderRadius: BorderRadius.circular(10),
+                                                child: Image.network(
+                                                  post[idx].images![0]['url'],
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
                                       );
                                     }),
                                   ),
@@ -340,7 +367,42 @@ class _HomePageState extends State<HomePage> {
                                         fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
                                     maxLines: 2,
                                   )),
-                                  const Gap(10),
+                                  const Gap(5),
+                                  if (post[idx].platform!.length > 1)
+                                    SizedBox(
+                                        child: Row(
+                                      children: [
+                                        Text(
+                                          post[idx].platform![0],
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.grey.shade600,
+                                              overflow: TextOverflow.ellipsis),
+                                        ),
+                                        const Gap(10),
+                                        Text(
+                                          post[idx].platform![1],
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.grey.shade600,
+                                              overflow: TextOverflow.ellipsis),
+                                        ),
+                                      ],
+                                    ))
+                                  else
+                                    SizedBox(
+                                      child: Text(
+                                        post[idx].platform![0],
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.grey.shade600,
+                                            overflow: TextOverflow.ellipsis),
+                                      ),
+                                    ),
+                                  const Gap(5),
                                   SizedBox(
                                       child: Text(
                                     "${post[idx].author!.nickname}",
