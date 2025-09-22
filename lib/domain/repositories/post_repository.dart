@@ -3,6 +3,8 @@
 import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
 
+import '../entities/image_entity.dart';
+
 abstract class PostRepository{
   Future<Map<String, List<PostEntity>>> getPostInitData();
   Future<List<PostEntity>> getWebPosts(int page);
@@ -14,7 +16,7 @@ abstract class PostRepository{
   Future<PostEntity> createPost(String token, PostEntity post);
   Future<PostEntity> updatePost(String token, PostEntity post);
   Future<bool> deletePost(String token, String id);
-  Future<List<Map<String, dynamic>>> registerPostImg(String token, List<XFile> images, String postId);
-  Future<List<Map<String, dynamic>>> updatePostImg(String token, List<XFile> images, List<Map<String, dynamic>> oldImgInfo);
-  Future<bool> deletePostImg(String token, Map<String, dynamic> imgInfo);
+  Future<PostEntity> registerPostImg(String token, List<XFile> images, String postId);
+  Future<PostEntity> updatePostImg(String token, List<ImageEntity> deleteImages, List<XFile> images, String postId);
+  Future<bool> deletePostImg(String token, int id);
 }

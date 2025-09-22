@@ -1,9 +1,11 @@
 
 
 import 'package:image_picker/image_picker.dart';
+import 'package:test_us_app/data/models/post/image_model.dart';
 import 'package:test_us_app/data/models/post/post_model.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
 
+import '../../domain/entities/image_entity.dart';
 import '../../domain/repositories/post_repository.dart';
 import '../data_sources/post_data/post_datasource.dart';
 
@@ -70,20 +72,21 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<bool> deletePostImg(String token, Map<String, dynamic> imgInfo) {
-    // TODO: implement deletePostImg
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<Map<String, dynamic>>> registerPostImg(String token, List<XFile> images, String postId) async {
-    final res = await remote.registerPostImg(token, images, postId);
+  Future<bool> deletePostImg(String token, int id) async {
+    final res = await remote.deletePostImg(token, id);
     return res;
   }
 
   @override
-  Future<List<Map<String, dynamic>>> updatePostImg(String token, List<XFile> images, List<Map<String, dynamic>> oldImgInfo) {
-    // TODO: implement updatePostImg
-    throw UnimplementedError();
+  Future<PostEntity> registerPostImg(String token, List<XFile> images, String postId) async {
+    final res = await remote.registerPostImg(token, images, postId);
+    return PostEntity.toPostEntity(res);
+  }
+
+  @override
+  Future<PostEntity> updatePostImg(String token, List<ImageEntity> deleteImages, List<XFile> images, String postId) async {
+    final deleteData = deleteImages.map((e) => ImageEntity.toImageModel(e)).toList();
+    final res = await remote.updatePostImg(token, deleteData, images, postId);
+    return PostEntity.toPostEntity(res);
   }
 }

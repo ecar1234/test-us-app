@@ -244,7 +244,7 @@ class _HomePageState extends State<HomePage> {
                                         : ClipRRect(
                                             borderRadius: BorderRadius.circular(10),
                                             child: Image.network(
-                                              favoritePost[idx].images![0]['url'],
+                                              favoritePost[idx].images![0].url ?? '',
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -283,6 +283,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _testerList(BuildContext context) {
     return BlocBuilder<DataBloc, DataState>(
+
       builder: (context, state) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -352,7 +353,7 @@ class _HomePageState extends State<HomePage> {
                                             : ClipRRect(
                                                 borderRadius: BorderRadius.circular(10),
                                                 child: Image.network(
-                                                  post[idx].images![0]['url'],
+                                                  post[idx].images![0].url ?? '',
                                                   fit: BoxFit.cover,
                                                 ),
                                               ),

@@ -54,7 +54,7 @@ class DataBloc extends Bloc<DataEvent, DataState> {
     on<RequestPostUpdateEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
       await event.context.read<PostProvider>().updatePost(event.token, event.post);
-      emit(DataState(state: DataLoadState.postUpdateCompletedState));
+      emit(DataState(state: DataLoadState.postUpdateCompletedState, post: event.post));
       logger.i("data state : postUpdateCompletedState");
       // emit(DataState(state: DataLoadState.postDataLoadCompletedState));
     });
@@ -70,23 +70,39 @@ class DataBloc extends Bloc<DataEvent, DataState> {
     });
     on<RequestPostImgRegisterEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
-      final res = await event.context.read<PostProvider>().registerPostImg(event.token, event.images!, event.postId);
-      if (res.isEmpty) {
-        emit(DataState(state: DataLoadState.errorState));
-        return;
-      }
-      emit(DataState(state: DataLoadState.postImgRegisterCompletedState, images: res));
+      final newPost = await event.context.read<PostProvider>().registerPostImg(event.token, event.images!, event.postId);
+
+      emit(DataState(state: DataLoadState.postImgRegisterCompletedState, post: newPost));
       logger.i("data state : postImgRegisterCompletedState");
     });
 
-    on<RequestCompleteEvent>((event, emit) {
+    on<RequestPostImgUpdateEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
+      final newPost = await event.context.read<PostProvider>().updatePostImg(event.token, event.deleteImages, event.images!, event.postId);
+      emit(DataState(state: DataLoadState.postImgUpdateCompletedState, post: newPost));
+      logger.i("data state : postImgUpdateCompletedState");
+    });
+
+    on<RequestPostImgDeleteEvent>((event, emit) async {
+      emit(DataState(state: DataLoadState.dataLoadState));
+      final res = await event.context.read<PostProvider>().deletePostImg(event.token, event.id);
+      if(res){
+        emit(DataState(state: DataLoadState.postImgDeleteCompletedState));
+      }else{
+        emit(DataState(state: DataLoadState.errorState));
+      }
+
+    });
+
+    on<RequestCompleteEvent>((event, emit) {
+      // emit(DataState(state: DataLoadState.dataLoadState));
       emit(DataState(state: DataLoadState.postDataLoadCompletedState));
       logger.i("data state : postDataLoadCompletedState");
     });
 
     on<ReloadPostEvent>((event, emit) {
       emit(DataState(state: DataLoadState.postUpdateCompletedState));
+      logger.i("data state : postDataLoadCompletedState");
     });
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -6,6 +7,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../login_page.dart';
 import '../post_create_page.dart';
 import '../provider/user_provider.dart';
+import 'login_dialogs.dart';
 
 class CustomBottomBar extends StatefulWidget {
   final int currentIndex;
@@ -91,17 +93,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                         onPressed: () {
                           final isLogin = context.read<UserProvider>().isLogged??false;
                           if(!isLogin) {
-                            Get.defaultDialog(
-                              title: "로그인이 필요해요",
-                              middleText: "로그인 하시겠습니까?",
-                              textConfirm: "로그인",
-                              textCancel: "확인",
-                              onConfirm: () {
-                                Get.back();
-                                Get.to(() => LoginPage());
-                              },
-                              onCancel: () => Get.back(),
-                            );
+                            showDialog(context: context, builder: (context) => const LoginDialog());
                             return;
                           }
                           Get.to(() => PostCreatePage());

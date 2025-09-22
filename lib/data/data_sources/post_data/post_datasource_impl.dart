@@ -6,6 +6,7 @@ import 'package:test_us_app/data/data_sources/post_data/post_datasource.dart';
 import 'package:test_us_app/data/models/post/post_model.dart';
 
 import '../../../core/net_driver.dart';
+import '../../models/post/image_model.dart';
 
 class PostDataSourceImpl implements PostDataSource {
   final logger = Logger();
@@ -103,24 +104,40 @@ class PostDataSourceImpl implements PostDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> deletePostImg(String token, Map<String, dynamic> imgInfo) async {
-    // TODO: implement deletePostImg
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<Map<String, dynamic>>> registerPostImg(String token, List<XFile> images, String postId) async {
-    final res = await netDriver.requestPostFormData(token, PostApi.registerPostImg, images, postId);
+  Future<bool> deletePostImg(String token, int id) async {
+    final data = {"id": id};
+    final res = await netDriver.requestPostJson(token, PostApi.deletePostImg, data);
     if(res['status'] == 200){
-      return (res['images'] as List).map<Map<String, dynamic>>((e) => {'id': e['id'], 'url': e['url']}).toList();
+      return res['result'];
     }else {
       throw Exception('Error');
     }
   }
 
   @override
-  Future<List<Map<String, dynamic>>> updatePostImg(String token, List<XFile> images, List<Map<String, dynamic>> oldImgInfo) {
-    // TODO: implement updatePostImg
-    throw UnimplementedError();
+  Future<PostModel> registerPostImg(String token, List<XFile> images, String postId) async {
+    final res = await netDriver.requestImagesRegisterFormData(token, PostApi.registerPostImg, images, postId);
+    if(res['status'] == 200){
+      return PostModel.fromJson(res['post']);
+    }else {
+      throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<PostModel> updatePostImg(String token, List<ImageModel> deleteImages, List<XFile> images, String postId) async {
+    try {
+      final deleteData = deleteImages.map((e) => e.toJson()).toList();
+      final res = await netDriver.requestImagesUpdateFormData(token, PostApi.updatePostImg, deleteData, images, postId);
+      if(res['status'] == 200){
+        return PostModel.fromJson(res['post']);
+      }else {
+        throw Exception('Error');
+      }
+    } on Exception catch (e) {
+      // TODO
+      logger.e(e);
+      rethrow;
+    }
   }
 }

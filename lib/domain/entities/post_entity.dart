@@ -1,7 +1,9 @@
 import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
+import '../../data/models/post/image_model.dart';
 import '../../data/models/post/post_model.dart';
+import 'image_entity.dart';
 
 class PostEntity {
   String? id;
@@ -12,7 +14,7 @@ class PostEntity {
   PostStatus? status;
   int? period;
   int? views;
-  List<Map<String, dynamic>>? images;
+  List<ImageEntity>? images;
   UserEntity? author;
   List<String>? applications;
   DateTime? createdAt;
@@ -39,6 +41,7 @@ class PostEntity {
       id: model.author!.userId,
       nickname: model.author!.nickname,
     );
+    final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
     return PostEntity(
       id: model.id,
       title: model.title,
@@ -50,7 +53,7 @@ class PostEntity {
       status: model.status,
       period: model.period,
       views: model.views,
-      images: model.images,
+      images: images,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
     );
@@ -60,6 +63,7 @@ class PostEntity {
       userId: entity.author!.id,
       nickname: entity.author!.nickname,
     );
+    final List<ImageModel> images = entity.images != null ? entity.images!.map((e) => ImageEntity.toImageModel(e)).toList() : [];
     return PostModel(
       id: entity.id,
       title: entity.title,
@@ -71,7 +75,7 @@ class PostEntity {
       status: entity.status,
       period: entity.period,
       views: entity.views,
-      images: entity.images
+      images: images
     );
   }
 }

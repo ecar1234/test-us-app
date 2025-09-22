@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:test_us_app/domain/entities/image_entity.dart';
 
 import '../../../domain/entities/post_entity.dart';
 
@@ -58,7 +59,19 @@ class RequestPostImgRegisterEvent extends DataEvent {
 }
 
 class RequestPostImgUpdateEvent extends DataEvent {
+  BuildContext context;
+  String token;
+  List<ImageEntity> deleteImages;
+  List<XFile>? images;
+  String postId;
+  RequestPostImgUpdateEvent(this.context, this.token, this.deleteImages , this.images, this.postId);
+}
 
+class RequestPostImgDeleteEvent extends DataEvent {
+  BuildContext context;
+  String token;
+  int id;
+  RequestPostImgDeleteEvent(this.context, this.token, this.id);
 }
 
 class RequestCompleteEvent extends DataEvent {

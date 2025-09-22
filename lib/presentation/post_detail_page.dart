@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -19,6 +20,9 @@ import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
+import 'package:test_us_app/utils/linkfy_util.dart';
+import 'package:test_us_app/utils/play_store_linkify_util.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../domain/entities/post_entity.dart';
 import '../domain/entities/user_entity.dart';
@@ -26,6 +30,7 @@ import 'bloc/app_bloc/app_bloc.dart';
 import 'bloc/data_bloc/data_bloc.dart';
 import 'bloc/data_bloc/data_event.dart';
 import 'bloc/data_bloc/data_state.dart';
+import 'components/login_dialogs.dart';
 
 class PostDetailPage extends StatefulWidget {
   final PostEntity? post;
@@ -50,23 +55,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DataBloc, DataState>(builder: (context, state) {
-      if (state.state == DataLoadState.postUpdateCompletedState) {
-        _post = context.read<PostProvider>().posts!.firstWhere((element) {
-          return element.id == _post!.id;
-        });
-        context.read<DataBloc>().add(RequestCompleteEvent());
-      } else if (state.state == DataLoadState.getPostByIdCompletedState) {
+    return BlocConsumer<DataBloc, DataState>(listener: (context, state) {
+      if (state.state == DataLoadState.postImgRegisterCompletedState ||
+          state.state == DataLoadState.postImgUpdateCompletedState) {
+        _post = state.post;
+        // context.read<DataBloc>().add(RequestCompleteEvent());
+      }
+      if (state.state == DataLoadState.getPostByIdCompletedState) {
         _post = state.post;
         context.read<DataBloc>().add(RequestCompleteEvent());
       } else if (state.state == DataLoadState.errorState) {
         Get.snackbar("에러", "알 수 없는 문제로 수정 실패 했습니다.");
       }
+    }, builder: (context, state) {
       final userId = context.read<UserProvider>().isLogged ?? false ? context.read<UserProvider>().user!.id : "";
       final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
-      final isAuthor = widget.post != null &&
-          widget.post!.author != null &&
-          widget.post!.author!.id == userId;
+      final isAuthor = widget.post != null && widget.post!.author != null && widget.post!.author!.id == userId;
       return SafeArea(
           child: Scaffold(
         body: CustomScrollView(
@@ -92,7 +96,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           },
                           onSelected: (value) async {
                             if (value == 1) {
-                              Get.to(PostCreatePage(post: _post));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return PostCreatePage(post: _post);
+                              }));
                             } else if (value == 2) {
                               Get.defaultDialog(title: "삭제", middleText: "삭제하시겠습니까?", actions: [
                                 ElevatedButton(
@@ -129,19 +135,25 @@ class _PostDetailPageState extends State<PostDetailPage> {
                             ),
                           )
                         : CarouselSlider(
-                  items: _post!.images!.map((e) {
-                    if(e['id'] == null){
-                      return Image.file(File(e['url']),fit: BoxFit.cover, height: double.infinity, width: double.infinity,);
-                    } else {
-                      return Image.network(e['url'], fit: BoxFit.fill, height: double.infinity, width: double.infinity);
-                    }
-                  }).toList(),
-                  options: CarouselOptions(
-                    autoPlay: false,
-                    viewportFraction: 1.0,
-                    height: 250,
-                  ),
-                ))),
+                            items: _post!.images!.map((e) {
+                              if (e.id == null) {
+                                return Image.file(
+                                  File(e.url!),
+                                  fit: BoxFit.cover,
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                );
+                              } else {
+                                return Image.network(e.url!,
+                                    fit: BoxFit.fill, height: double.infinity, width: double.infinity);
+                              }
+                            }).toList(),
+                            options: CarouselOptions(
+                              autoPlay: false,
+                              viewportFraction: 1.0,
+                              height: 250,
+                            ),
+                          ))),
             // test code
             // if (_post == null)
             //   SliverList(
@@ -177,19 +189,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     SizedBox(
                       child: Row(
                         children: [
-                          if(isAuthor)
+                          if (isAuthor)
                             SizedBox(
-                                  child: Text(
-                                  '${_post!.author!.nickname}',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ))
-                          else if(widget.post != null && widget.post!.author == null)
-                          SizedBox(
-                                  child: Text(
-                                    '${context.read<UserProvider>().user!.nickname}',
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                )
+                                child: Text(
+                              '${_post!.author!.nickname}',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ))
+                          else if (widget.post != null && widget.post!.author == null)
+                            SizedBox(
+                              child: Text(
+                                '${context.read<UserProvider>().user!.nickname}',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            )
                           else
                             SizedBox(
                               child: Text(
@@ -222,16 +234,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     const Gap(30),
                     ConstrainedBox(
                       constraints: BoxConstraints(
-                        minHeight: hei * 0.4,
+                        minHeight: hei * 0.35,
                       ),
                       child: SizedBox(
                           // height: constraints.maxHeight * 0.5,
-                          child: Text(widget.post!.contents!)),
+                          child: Linkify(
+                        text: _post!.contents!,
+                        linkifiers: [
+                          WwwLinkifier(),
+                          PlayStoreLinkifier()
+                        ],
+                        linkStyle: const TextStyle(color: Colors.blue),
+                        onOpen: _linkOpen,
+                      )),
                     ),
                     const Gap(40),
-                     if(_post != null && _post!.author != null
-                         && _post!.author!.id != userId)
-                     _applicationSection()
+                    if (_post != null && _post!.author != null && _post!.author!.id != userId) _applicationSection()
                   ],
                 ),
               ),
@@ -251,7 +269,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     // 현재 유저와 해당 post에 대한 신청 정보 찾기
     final app = applications.firstWhere(
-          (e) => e.postId == _post!.id && e.applicantId == user.id,
+      (e) => e.postId == _post!.id && e.applicantId == user.id,
       orElse: () => ApplicationEntity(),
     );
 
@@ -314,7 +332,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               bool isAndroid = false;
 
                               final prevApp = context.read<ApplicationProvider>().applications!.firstWhere((element) {
-                                return element.postId == _post!.id && element.applicantId == context.read<UserProvider>().user!.id;
+                                return element.postId == _post!.id &&
+                                    element.applicantId == context.read<UserProvider>().user!.id;
                               });
                               if (prevApp.platform == ApplicationPlatform.ios) {
                                 isIos = true;
@@ -417,58 +436,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
               final token = context.read<UserProvider>().token ?? '';
               final userId = isLogged ? context.read<UserProvider>().user!.id : '';
 
-              if(!isLogged){
-                showDialog(context: context, builder: (context) => Dialog(
-                  child: Container(
-                    padding: EdgeInsets.all(20),
-                    height: 200,
-                    width: MediaQuery.sizeOf(context).width,
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 100,
-                            child: Center(child: Text('로그인이 필요합니다.'))),
-                        SizedBox(
-                          height: 50,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 50,
-                                width: 100,
-                                child: ElevatedButton(
-                                  onPressed: (){
-                                    Navigator.pop(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10))),
-                                  child: Text('확인'),
-                                )
-                              ),
-                              const Gap(20),
-                              SizedBox(
-                                height: 50,
-                                  width: 100,
-                                  child: ElevatedButton(
-                                    onPressed: (){
-                                      Navigator.pop(context);
-                                      Get.to(() => LoginPage());
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10))),
-                                    child: Text('로그인'),
-                                  )
-                              )
-                            ],
-                          ),
-                        )
-
-                      ],
-                    ),
-                  ),
-                ));
+              if (!isLogged) {
+                showDialog(context: context, builder: (context) => LoginDialog());
                 return;
               }
 
@@ -533,7 +502,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               SizedBox(
                                 child: ElevatedButton(
                                   onPressed: () async {
-                                    final application = context.read<ApplicationProvider>().applications!.firstWhere((element) {
+                                    final application =
+                                        context.read<ApplicationProvider>().applications!.firstWhere((element) {
                                       return element.postId == _post!.id && element.applicantId == userId;
                                     }, orElse: () => ApplicationEntity());
                                     if (application.id != null && application.status == ApplicationStatus.cancel) {
@@ -590,5 +560,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
             )
           ],
         ));
+  }
+
+  Future<void> _linkOpen(LinkableElement link) async {
+    final uri = Uri.parse(link.url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }else {
+      Get.snackbar('알림', '존재하지 않는 주소입니다.');
+    }
   }
 }

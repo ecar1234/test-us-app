@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../user/user_model.dart';
+import 'image_model.dart';
 
 part 'post_model.g.dart';
 
@@ -26,7 +27,7 @@ class PostModel {
   int? period;
   UserModel? author;
   int? views;
-  List<Map<String, dynamic>>? images;
+  List<ImageModel>? images;
   List<String>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;

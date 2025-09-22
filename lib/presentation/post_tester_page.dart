@@ -30,9 +30,8 @@ class _PostTesterPageState extends State<PostTesterPage> {
     return BlocBuilder<DataBloc, DataState>(builder: (context, state) {
       if (state.state == DataLoadState.dataLoadState) {
         return SizedBox(child: Center(child: CircularProgressIndicator()));
-      } else if (state.state == DataLoadState.postCreateCompletedState ||
-          state.state == DataLoadState.postDeleteCompletedState ||
-          state.state == DataLoadState.postUpdateCompletedState) {
+      } else if (state.state == DataLoadState.postImgRegisterCompletedState ||
+          state.state == DataLoadState.postImgDeleteCompletedState) {
         context.read<DataBloc>().add(RequestCompleteEvent());
       }
 
@@ -124,7 +123,7 @@ class _PostTesterPageState extends State<PostTesterPage> {
                                               : ClipRRect(
                                                   borderRadius: BorderRadius.circular(10),
                                                   child: Image.network(
-                                                    posts[idx].images![0]['url'],
+                                                    posts[idx].images![0].url!,
                                                     fit: BoxFit.cover,
                                                   ),
                                                 ),

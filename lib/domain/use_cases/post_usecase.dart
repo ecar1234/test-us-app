@@ -1,5 +1,6 @@
 import 'package:image_picker/image_picker.dart';
 
+import '../entities/image_entity.dart';
 import '../entities/post_entity.dart';
 import '../repositories/post_repository.dart';
 
@@ -57,18 +58,18 @@ class PostUseCase {
     return res;
   }
 
-  Future<List<Map<String, dynamic>>> registerPostImg(String token, List<XFile> images, String postId) async {
+  Future<PostEntity> registerPostImg(String token, List<XFile> images, String postId) async {
     final res = await repository.registerPostImg(token, images, postId);
     return res;
   }
 
-  Future<List<Map<String, dynamic>>> updatePostImg(String token, List<XFile> images, List<Map<String, dynamic>> oldImgInfo) async {
-    final res = await repository.updatePostImg(token, images, oldImgInfo);
+  Future<PostEntity> updatePostImg(String token, List<ImageEntity> deleteImages, List<XFile> images, String postId) async {
+    final res = await repository.updatePostImg(token, deleteImages, images, postId);
     return res;
   }
 
-  Future<bool> deletePostImg(String token, Map<String, dynamic> imgInfo) async {
-    final res = await repository.deletePostImg(token, imgInfo);
+  Future<bool> deletePostImg(String token, int id) async {
+    final res = await repository.deletePostImg(token, id);
     return res;
   }
 }

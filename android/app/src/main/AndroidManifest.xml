@@ -36,6 +36,14 @@
          https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- ✅ 갤러리/이미지 선택 관련 (Android 13 이상 분리됨) -->
+    <!-- Android 13 (API 33) 이상 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- Android 12 (API 32) 이하 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>

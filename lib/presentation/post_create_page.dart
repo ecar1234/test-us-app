@@ -11,10 +11,10 @@ import 'package:logger/logger.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
 import 'package:test_us_app/presentation/bloc/data_bloc/data_bloc.dart';
 import 'package:test_us_app/presentation/post_detail_page.dart';
-import 'package:test_us_app/presentation/provider/post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
+import '../domain/entities/image_entity.dart';
 import 'bloc/data_bloc/data_event.dart';
 import 'bloc/data_bloc/data_state.dart';
 
@@ -30,14 +30,16 @@ class PostCreatePage extends StatefulWidget {
 class _PostCreatePageState extends State<PostCreatePage> {
   final logger = Logger();
   final picker = ImagePicker();
-  List<XFile> selectedImages = [];
+  List<XFile> _selectedImages = [];
+  List<ImageEntity> _existedImages = [];
+  final List<ImageEntity> _deleteImages = [];
 
   TextEditingController titleController = TextEditingController();
   TextEditingController subtitleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
   TextEditingController periodController = TextEditingController(text: "7");
 
-  final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
+  final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
   // final _categoryList = ['WEB', 'IOS', 'ANDROID'];
   List<String> _selectedCategory = [];
@@ -62,12 +64,25 @@ class _PostCreatePageState extends State<PostCreatePage> {
       if (_selectedCategory.contains('IOS')) {
         _iosCheck = true;
       }
-      if (_selectedCategory.contains('ANDROID')) {
+      if (_selectedCategory.contains('Android')) {
         _androidCheck = true;
       }
       if (_selectedCategory.contains('GAME')) {
         _gameCheck = true;
       }
+      if (widget.post!.images != null && widget.post!.images!.isNotEmpty) {
+        _existedImages = widget.post!.images!;
+      }
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant PostCreatePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.post?.images != oldWidget.post?.images) {
+      setState(() {
+        _existedImages = widget.post!.images!;
+      });
     }
   }
 
@@ -82,196 +97,51 @@ class _PostCreatePageState extends State<PostCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DataBloc, DataState>(
-      builder: (context, state) {
-        return GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-            },
-            child: SafeArea(
-              child: Scaffold(
-                  appBar: AppBar(
-                    title: Text("테스터 모집"),
-                  ),
-                  body: SingleChildScrollView(
-                    child: Container(
-                      width: MediaQuery.sizeOf(context).width,
-                      padding: EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          // 서비스 명
-                          _titleSection(),
-                          const Gap(20),
-                          // 서비스 요약
-                          _subtitleSection(),
-                          const Gap(20),
-                          // 이미지 추가
-                          _addImageSection(),
-                          const Gap(20),
-                          // 게시 기간
-                          _periodSection(),
-                          const Gap(20),
-                          // 카테고리
-                          _categorySection(),
-                          const Gap(20),
-                          // 서비스 설명
-                          _contentSection(),
-                          const Gap(40),
-                          // 버튼
-                          SizedBox(
-                            height: 50,
-                            width: MediaQuery.sizeOf(context).width - 40,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                    height: 50,
-                                    width: 150,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        if (titleController.text.isEmpty ||
-                                            subtitleController.text.isEmpty ||
-                                            contentController.text.isEmpty) {
-                                          Get.snackbar("알림", "모든 항목을 입력해주세요.");
-                                          return;
-                                        }
-                                        if (_selectedCategory.isEmpty) {
-                                          Get.snackbar("알림", "플랫폼을 선택해주세요.");
-                                          return;
-                                        }
-                                        final post = PostEntity(
-                                          title: titleController.text,
-                                          subtitle: subtitleController.text,
-                                          contents: contentController.text,
-                                          platform: _selectedCategory,
-                                          images: selectedImages.map((e) => {'id': null, 'url': e.path}).toList(),
-                                        );
-                                        Get.to(() => PostDetailPage(post: post));
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                      child: Text("미리보기"),
-                                    )),
-                                const Gap(20),
-                                if (widget.post == null)
-                                  SizedBox(
-                                      height: 50,
-                                      width: 150,
-                                      child: BlocConsumer<DataBloc, DataState>(
-                                        listener: (context, state) {
-                                          final token = context.read<UserProvider>().token!;
-                                          if (state.state == DataLoadState.postCreateCompletedState &&
-                                              selectedImages.isNotEmpty) {
-                                            final postId = state.post?.id ?? '';
-                                            if (context.mounted) {
-                                              context.read<DataBloc>().add(
-                                                  RequestPostImgRegisterEvent(context, token, selectedImages, postId));
-                                            }
-                                          }
-                                          if (state.state == DataLoadState.postCreateCompletedState) {
-                                            if (context.mounted) {
-                                              showDialog(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return AlertDialog(
-                                                    title: Text("게시 성공"),
-                                                    content: Text("모집글 등록에 성공하였습니다."),
-                                                    actions: [
-                                                      TextButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(context);
-                                                          },
-                                                          child: Text("확인"))
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                              return;
-                                            }
-                                          }
-                                          Navigator.pop(context);
-                                        },
-                                        builder: (context, state) => ElevatedButton(
-                                          onPressed: () async {
-                                            if (titleController.text.isEmpty ||
-                                                subtitleController.text.isEmpty ||
-                                                contentController.text.isEmpty) {
-                                              Get.snackbar("알림", "모든 항목을 입력해주세요.");
-                                              return;
-                                            }
-                                            if (_selectedCategory.isEmpty) {
-                                              Get.snackbar("알림", "플랫폼을 선택해주세요.");
-                                              return;
-                                            }
-                                            final post = PostEntity(
-                                              title: titleController.text,
-                                              subtitle: subtitleController.text,
-                                              contents: contentController.text,
-                                              platform: _selectedCategory,
-                                              author: context.read<UserProvider>().user,
-                                              period: 7,
-                                            );
-                                            final token = context.read<UserProvider>().token!;
-                                            try {
-                                              context
-                                                  .read<DataBloc>()
-                                                  .add(RequestPostCreateEvent(context, post, token));
-                                            } on Exception catch (e) {
-                                              // TODO
-                                              logger.e(e);
-                                              Get.snackbar('알림', '등록 실패');
-                                              return;
-                                            }
-                                            // if (context.mounted) {
-                                            //   Get.back();
-                                            // }
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                          child: Text("등록"),
-                                        ),
-                                      ))
-                                else
-                                  SizedBox(
-                                      height: 50,
-                                      width: 150,
-                                      child: ElevatedButton(
-                                        onPressed: () async {
-                                          final post = PostEntity(
-                                              id: widget.post!.id,
-                                              title: titleController.text,
-                                              subtitle: subtitleController.text,
-                                              contents: contentController.text,
-                                              platform: _selectedCategory,
-                                              status: widget.post!.status,
-                                              period: widget.post!.period,
-                                              author: context.read<UserProvider>().user);
-                                          final token = context.read<UserProvider>().token ?? "";
-                                          try {
-                                            context.read<DataBloc>().add(RequestPostUpdateEvent(context, token, post));
-                                          } on Exception catch (e) {
-                                            // TODO
-                                            logger.e(e);
-                                            Get.snackbar('알림', '수정 실패');
-                                          }
-
-                                          Get.back();
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                        child: Text("수정하기"),
-                                      ))
-                              ],
-                            ),
-                          ),
-                          const Gap(40)
-                        ],
-                      ),
-                    ),
+    return GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: SafeArea(
+          child: Scaffold(
+              appBar: AppBar(
+                  title: Text("테스터 모집"),
+                  leading: CloseButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   )),
-            ));
-      },
-    );
+              body: SingleChildScrollView(
+                child: Container(
+                  width: MediaQuery.sizeOf(context).width,
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      // 서비스 명
+                      _titleSection(),
+                      const Gap(20),
+                      // 서비스 요약
+                      _subtitleSection(),
+                      const Gap(20),
+                      // 이미지 추가
+                      _addImageSection(),
+                      const Gap(20),
+                      // 게시 기간
+                      _periodSection(),
+                      const Gap(20),
+                      // 카테고리
+                      _categorySection(),
+                      const Gap(20),
+                      // 서비스 설명
+                      _contentSection(),
+                      const Gap(40),
+                      // 버튼
+                      _buttonSection(context),
+                      const Gap(40)
+                    ],
+                  ),
+                ),
+              )),
+        ));
   }
 
   Widget _titleSection() {
@@ -340,22 +210,61 @@ class _PostCreatePageState extends State<PostCreatePage> {
               children: [
                 SizedBox(
                     child: Text(
-                  "서비스 이미지 추가 (${selectedImages.length} / 4)",
+                  "서비스 이미지 추가 (${_existedImages.length + _selectedImages.length} / 4)",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 )),
                 SizedBox(
                     width: 100,
                     height: 40,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        final images = await picker.pickMultiImage(imageQuality: 100, limit: 4);
-                        if (images.isEmpty) {
-                          return;
-                        }
-                        setState(() {
-                          selectedImages = images;
-                        });
-                      },
+                      onPressed: _existedImages.length == 3
+                          ? () async {
+                              final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
+                              if (image == null) {
+                                return;
+                              } else if (File(image.path).lengthSync() / (1024 * 1024) > 5) {
+                                Get.snackbar('알림', '5MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                                return;
+                              } else if (_existedImages.length + _selectedImages.length >= 4) {
+                                Get.snackbar('알림', '최대 4개의 이미지를 선택할 수 있습니다.');
+                                return;
+                              } else {
+                                setState(() {
+                                  _selectedImages.add(image);
+                                });
+                              }
+                            }
+                          : () async {
+                              final images = await picker
+                                  .pickMultiImage(
+                                      imageQuality: 100,
+                                      limit: _existedImages.isNotEmpty ? 4 - _existedImages.length : 4)
+                                  .onError((e, state) {
+                                Get.snackbar('알림', '이미지 선택에 실패했습니다.');
+                                return [];
+                              });
+                              if (images.isEmpty) {
+                                return;
+                              } else if (images.length + _existedImages.length > 4) {
+                                Get.snackbar('알림', '최대 4개의 이미지를 선택할 수 있습니다.');
+                                return;
+                              } else {
+                                final sizeList = images.map((e) => File(e.path).lengthSync() / (1024 * 1024)).toList();
+                                if (sizeList.any((element) => element > 5)) {
+                                  Get.snackbar('알림', '5MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                                  return;
+                                }
+                              }
+                              if (_selectedImages.isEmpty) {
+                                setState(() {
+                                  _selectedImages = images;
+                                });
+                              } else {
+                                setState(() {
+                                  _selectedImages.addAll(images);
+                                });
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
@@ -367,7 +276,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
           SizedBox(
               height: 120,
               width: MediaQuery.sizeOf(context).width - 40,
-              child: selectedImages.isEmpty
+              child: _selectedImages.isEmpty && _existedImages.isEmpty
                   ? SizedBox(
                       child: Center(
                         child: Text('서비스 이미지를 추가해보세요.'),
@@ -379,39 +288,66 @@ class _PostCreatePageState extends State<PostCreatePage> {
                       shrinkWrap: true,
                       physics: BouncingScrollPhysics(),
                       itemBuilder: (context, idx) {
-                        if (idx >= selectedImages.length) return SizedBox.shrink();
+                        if (idx >= _selectedImages.length + _existedImages.length) return SizedBox.shrink();
                         return SizedBox(
                           height: 110,
                           width: 110,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: Stack(children: [
-                              Image.file(
-                                File(selectedImages[idx].path),
-                                height: double.infinity,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
+                              if (idx < _existedImages.length)
+                                Image.network(
+                                  _existedImages[idx].url!,
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                )
+                              else
+                                Image.file(
+                                  File(_selectedImages[idx - _existedImages.length].path),
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              BlocListener<DataBloc, DataState>(
+                                listener: (context, state) {
+                                  if (state.state == DataLoadState.postImgDeleteCompletedState) {
+                                    setState(() {
+                                      _existedImages.removeAt(idx);
+                                    });
+                                    // context.read<DataBloc>().add(ReloadPostEvent());
+                                  }
+                                },
+                                child: Positioned(
+                                    top: 4,
+                                    right: 4,
+                                    child: GestureDetector(
+                                        onTap: () {
+                                          if (idx < _existedImages.length) {
+                                            setState(() {
+                                              _deleteImages.add(_existedImages[idx]);
+                                            });
+                                            setState(() {
+                                              _existedImages.removeAt(idx);
+                                            });
+                                          } else {
+                                            setState(() {
+                                              _selectedImages.removeAt(idx - _existedImages.length);
+                                            });
+                                          }
+                                        },
+                                        child: Container(
+                                          height: 30,
+                                          width: 30,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.black.withValues(alpha: 0.5),
+                                          ),
+                                          child: Center(
+                                            child: Icon(Icons.close),
+                                          ),
+                                        ))),
                               ),
-                              Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          selectedImages.removeAt(idx);
-                                        });
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        width: 30,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.black.withValues(alpha: 0.5),
-                                        ),
-                                        child: Center(
-                                          child: Icon(Icons.close),
-                                        ),
-                                      ))),
                             ]),
                           ),
                         );
@@ -444,7 +380,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
                       height: 20,
                       width: 20,
                       child: Tooltip(
-                          key: tooltipkey,
+                          key: tooltipKey,
                           message: "모집기간은 광고시청(3일) 또는 인앱구매로 변경 가능 합니다.",
                           decoration: BoxDecoration(
                             color: Colors.grey,
@@ -453,7 +389,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
                           showDuration: const Duration(seconds: 3),
                           child: IconButton(
                             onPressed: () {
-                              tooltipkey.currentState?.ensureTooltipVisible();
+                              tooltipKey.currentState?.ensureTooltipVisible();
                             },
                             style: IconButton.styleFrom(
                               padding: EdgeInsets.zero,
@@ -671,6 +607,166 @@ class _PostCreatePageState extends State<PostCreatePage> {
           )
         ],
       ),
+    );
+  }
+
+  Widget _buttonSection(BuildContext context) {
+    final token = context.read<UserProvider>().token ?? '';
+    return BlocListener<DataBloc, DataState>(
+      listener: (context, state) async {
+        if (state.state == DataLoadState.postCreateCompletedState) {
+          context.read<DataBloc>().add(RequestPostImgRegisterEvent(context, token, _selectedImages, state.post!.id!));
+        } else if (state.state == DataLoadState.postUpdateCompletedState) {
+          if(state.post != null){
+            context
+                .read<DataBloc>()
+                .add(RequestPostImgUpdateEvent(context, token, _deleteImages, _selectedImages, state.post!.id!));
+          }
+        } else if (state.state == DataLoadState.postImgRegisterCompletedState ||
+            state.state == DataLoadState.postImgUpdateCompletedState) {
+          await _alertDialog(context);
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        }
+      },
+      // listenWhen: (prev, current) {
+      //   return current.state == DataLoadState.postCreateCompletedState ||
+      //       current.state == DataLoadState.postUpdateCompletedState ||
+      //       current.state == DataLoadState.postImgRegisterCompletedState ||
+      //       current.state == DataLoadState.postImgUpdateCompletedState;
+      // },
+      child: SizedBox(
+        height: 50,
+        width: MediaQuery.sizeOf(context).width - 40,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+                height: 50,
+                width: 150,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (titleController.text.isEmpty ||
+                        subtitleController.text.isEmpty ||
+                        contentController.text.isEmpty) {
+                      Get.snackbar("알림", "모든 항목을 입력해주세요.");
+                      return;
+                    }
+                    if (_selectedCategory.isEmpty) {
+                      Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                      return;
+                    }
+                    final post = PostEntity(
+                      title: titleController.text,
+                      subtitle: subtitleController.text,
+                      contents: contentController.text,
+                      platform: _selectedCategory,
+                      images: _selectedImages.map((e) => ImageEntity(url: e.path)).toList(),
+                    );
+                    Get.to(() => PostDetailPage(post: post));
+                  },
+                  style:
+                      ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                  child: Text("미리보기"),
+                )),
+            const Gap(20),
+            if (widget.post == null)
+              SizedBox(
+                height: 50,
+                width: 150,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (titleController.text.isEmpty ||
+                        subtitleController.text.isEmpty ||
+                        contentController.text.isEmpty) {
+                      Get.snackbar("알림", "모든 항목을 입력해주세요.");
+                      return;
+                    }
+                    if (_selectedCategory.isEmpty) {
+                      Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                      return;
+                    }
+                    final post = PostEntity(
+                      title: titleController.text,
+                      subtitle: subtitleController.text,
+                      contents: contentController.text,
+                      platform: _selectedCategory,
+                      author: context.read<UserProvider>().user,
+                      period: 7,
+                    );
+                    final token = context.read<UserProvider>().token!;
+                    try {
+                      context.read<DataBloc>().add(RequestPostCreateEvent(context, post, token));
+                    } on Exception catch (e) {
+                      // TODO
+                      logger.e(e);
+                      Get.snackbar('알림', '등록 실패');
+                      return;
+                    }
+                    // if (context.mounted) {
+                    //   Get.back();
+                    // }
+                  },
+                  style:
+                      ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                  child: Text("등록"),
+                ),
+              )
+            else
+              SizedBox(
+                height: 50,
+                width: 150,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final post = PostEntity(
+                        id: widget.post!.id,
+                        title: titleController.text,
+                        subtitle: subtitleController.text,
+                        contents: contentController.text,
+                        platform: _selectedCategory,
+                        status: widget.post!.status,
+                        period: widget.post!.period,
+                        author: context.read<UserProvider>().user);
+                    final token = context.read<UserProvider>().token ?? "";
+                    try {
+                      context.read<DataBloc>().add(RequestPostUpdateEvent(context, token, post));
+                    } on Exception catch (e) {
+                      // TODO
+                      logger.e(e);
+                      Get.snackbar('알림', '수정 실패');
+                    }
+
+                    // Get.back();
+                  },
+                  style:
+                      ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                  child: Text("수정하기"),
+                ),
+              )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _alertDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("게시 성공"),
+          content: Text("모집글 등록에 성공하였습니다."),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  context.read<DataBloc>().add(ReloadPostEvent());
+                  Navigator.pop(context);
+                },
+                child: Text("확인"))
+          ],
+        );
+      },
     );
   }
 }

@@ -24,7 +24,7 @@ PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
           .toList(),
       views: (json['views'] as num?)?.toInt(),
       images: (json['images'] as List<dynamic>?)
-          ?.map((e) => e as Map<String, dynamic>)
+          ?.map((e) => ImageModel.fromJson(e as Map<String, dynamic>))
           .toList(),
       createdAt: json['createdAt'] == null
           ? null

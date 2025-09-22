@@ -2,6 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <!-- ✅ 인터넷 요청 허용 (https 기본 지원, http는 예외 설정 필요) -->
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
+    <!-- ✅ 갤러리/사진 접근 권한 -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>앱에서 사진을 선택하기 위해 갤러리 접근 권한이 필요합니다.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

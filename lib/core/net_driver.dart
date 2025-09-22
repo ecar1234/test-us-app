@@ -92,7 +92,7 @@ class NetDriver {
     }
   }
 
-  Future<Map<String, dynamic>> requestPostFormData(String token, String url, List<XFile> data, String postId) async {
+  Future<Map<String, dynamic>> requestImagesRegisterFormData(String token, String url, List<XFile> data, String postId) async {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
     if(token != "" || token != ''){
       dio.options.headers['Authorization'] = 'Bearer $token';
@@ -129,4 +129,51 @@ class NetDriver {
       return res.data;
     }
   }
+  Future<Map<String, dynamic>> requestImagesUpdateFormData(String token, String url, List<Map<String, dynamic>> deleteImages, List<XFile> data, String postId) async {
+    dio.options.headers['Content-Type'] = 'multipart/form-data';
+    if(token != "" || token != ''){
+      dio.options.headers['Authorization'] = 'Bearer $token';
+    }
+    final api = '$baseUrl$url';
+
+    final files = <MultipartFile>[];
+
+    if(data.isNotEmpty){
+      for (final image in data) {
+        final fileName = basename(image.path);
+        final mimeType = lookupMimeType(image.path) ?? 'application/octet-stream';
+        files.add(
+          await MultipartFile.fromFile(
+            image.path,
+            filename: fileName,
+            contentType: MediaType.parse(mimeType),
+          ),
+        );
+      }
+    }
+    final Map<String, dynamic> formData = {
+      'postId': postId,
+    };
+    if(deleteImages.isNotEmpty){
+      formData['deleteImages'] = deleteImages;
+    }
+    if(data.isNotEmpty){
+      formData['images'] = files;
+    }
+    final form = FormData.fromMap(formData);
+
+    final res = await dio.put(api, data: form, options: Options(
+      validateStatus: (status) {
+        return status != null && status < 500;
+      }
+    ));
+
+    if(res.statusCode == 200) {
+      return res.data;
+    } else {
+      logger.e("${res.statusCode} : ${res.statusMessage}s");
+      return res.data;
+    }
+  }
+
 }

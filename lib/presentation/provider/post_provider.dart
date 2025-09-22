@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../domain/entities/image_entity.dart';
 import '../../domain/use_cases/post_usecase.dart';
 
 class PostProvider with ChangeNotifier {
@@ -62,17 +63,18 @@ class PostProvider with ChangeNotifier {
     return res;
   }
 
-  Future<void> updatePost(String token, PostEntity post) async {
+  Future<PostEntity> updatePost(String token, PostEntity post) async {
     final res = await useCase.updatePost(token, post);
     if (_posts!.any((element) => element.id == post.id)) {
-     final idx =  _posts!.indexWhere((e) {
+      final idx = _posts!.indexWhere((e) {
         return e.id == post.id;
       });
       _posts![idx] = res;
-    }else {
+    } else {
       _posts!.add(res);
     }
     notifyListeners();
+    return res;
   }
 
   Future<bool> deletePost(String token, String id) async {
@@ -84,19 +86,32 @@ class PostProvider with ChangeNotifier {
     return res;
   }
 
-  Future<List<Map<String, dynamic>>> registerPostImg(String token, List<XFile> images, String postId) async {
+  Future<PostEntity> registerPostImg(String token, List<XFile> images, String postId) async {
     final res = await useCase.registerPostImg(token, images, postId);
+    if(_posts!.any((element) => element.id == postId)){
+      final idx = _posts!.indexWhere((e) {
+        return e.id == postId;
+      });
+      _posts![idx] = res;
+      notifyListeners();
+    }
     return res;
   }
 
-  Future<List<Map<String, dynamic>>> updatePostImg(
-      String token, List<XFile> images, List<Map<String, dynamic>> oldImgInfo) async {
-    final res = await useCase.updatePostImg(token, images, oldImgInfo);
+  Future<PostEntity> updatePostImg(String token, List<ImageEntity> deleteImages, List<XFile> images, String postId) async {
+    final res = await useCase.updatePostImg(token, deleteImages, images, postId);
+    if(_posts!.any((element) => element.id == postId)){
+      final idx = _posts!.indexWhere((e) {
+        return e.id == postId;
+      });
+      _posts![idx] = res;
+      notifyListeners();
+    }
     return res;
   }
 
-  Future<bool> deletePostImg(String token, Map<String, dynamic> imgInfo) async {
-    final res = await useCase.deletePostImg(token, imgInfo);
+  Future<bool> deletePostImg(String token, int id) async {
+    final res = await useCase.deletePostImg(token, id);
     return res;
   }
 }
