@@ -1,5 +1,7 @@
 
 
+import 'dart:async';
+
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/core/net_driver.dart';
 import 'package:test_us_app/data/models/application/application_model.dart';
@@ -38,8 +40,10 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
   @override
   Future<List<ApplicationModel>> getUserApplication(String token, String userId) async {
     final res = await netDriver.requestGetJson(token, ApplicationApi.findByUserId, parma: userId);
-    if(res['status'] == 200){
-      return (res['applications'] as List).map<ApplicationModel>((e) => ApplicationModel.fromJson(e)).toList();
+    if(res['status'] == 202){
+      // return (res['applications'] as List).map<ApplicationModel>((e) => ApplicationModel.fromJson(e)).toList();
+      final applications = _startPolling(res['jobId'], token);
+      return applications;
     }else {
       throw Exception('Error');
     }
@@ -68,5 +72,17 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
     }else {
       throw Exception('Error');
     }
+  }
+
+  Future<List<ApplicationModel>> _startPolling(String jobId, String token){
+    final controller = Completer<List<ApplicationModel>>();
+    Timer.periodic(Duration(seconds: 1), (timer) async {
+      final res = await netDriver.requestGetJson(token, JobApi.jobGetApplications, parma: jobId);
+      if(res['status'] == 200) {
+        final applications = (res['applications'] as List).map<ApplicationModel>((e) => ApplicationModel.fromJson(e)).toList();
+        controller.complete(applications);
+        timer.cancel();
+      }});
+    return controller.future;
   }
 }

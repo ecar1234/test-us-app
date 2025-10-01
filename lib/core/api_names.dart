@@ -37,7 +37,6 @@ class PostApi {
   static const String registerPostImg = '/api/v1/images/uploads';
   static const String updatePostImg = '/api/v1/images/update';
   static const String deletePostImg = '/api/v1/images/delete';
-
 }
 
 class ApplicationApi {
@@ -57,3 +56,8 @@ class ApplicationApi {
 class ReviewApi {}
 
 class MessageApi {}
+
+class JobApi {
+  static const String jobGetApplications = '/api/v1/jobState/jobApplicationsById';
+  static const String jobGetInitPosts = '/api/v1/jobState/jobInitPosts';
+}

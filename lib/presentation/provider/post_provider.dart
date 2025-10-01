@@ -17,11 +17,12 @@ class PostProvider with ChangeNotifier {
 
   List<PostEntity>? get posts => _posts;
 
-  Future<void> getInitPosts() async {
+  Future<List<PostEntity>?> getInitPosts() async {
     final res = await useCase.getPostInitData();
     _favoritePost = res['favoritePosts'];
     _posts = res['posts'];
     notifyListeners();
+    return res['posts'];
   }
 
   Future<PostEntity> getPostById(String token, String id) async {
@@ -110,8 +111,8 @@ class PostProvider with ChangeNotifier {
     return res;
   }
 
-  Future<bool> deletePostImg(String token, int id) async {
-    final res = await useCase.deletePostImg(token, id);
+  Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages) async {
+    final res = await useCase.deletePostImg(token, deleteImages);
     return res;
   }
 }

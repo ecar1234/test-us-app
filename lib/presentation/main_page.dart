@@ -38,50 +38,61 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
 
   Future<void> _loadSetting() async {
     GetIt.I.get<ResponsiveHeightProvider>().setHeight(context);
+    context.read<DataBloc>().add(ServiceStartEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-
-    return BlocBuilder<DataBloc, DataState>(builder: (context, state) {
-      if (state.state == DataLoadState.serviceStartState) {
-        context.read<DataBloc>().add(RequestInitDataEvent(context));
-        context.read<AuthBloc>().add(TokenCheckEvent(context));
-      }
-      return GetMaterialApp(
-        theme: FlexThemeData.light(
+    return BlocListener<DataBloc, DataState>(
+        listener: (context, state) {
+          if (state.state == DataLoadState.serviceStartState) {
+            context.read<DataBloc>().add(RequestInitDataEvent(context));
+          } else if (state.state == DataLoadState.initDataLoadCompletedState) {
+            context.read<AuthBloc>().add(TokenCheckEvent(context));
+          }
+        },
+        child: BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state.state == UserAuthState.loginCompletedState) {
+              final token = context.read<UserProvider>().token ?? "";
+              final userId = context.read<UserProvider>().user!.id ?? "";
+              context.read<AppBloc>().add(RequestUserApplicationsEvent(context, token, userId));
+            }
+          },
+          child: GetMaterialApp(
+            theme: FlexThemeData.light(
+                    scheme: FlexScheme.ebonyClay,
+                    surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+                    blendLevel: 9,
+                    subThemesData: const FlexSubThemesData(
+                        blendOnLevel: 10,
+                        blendOnColors: false,
+                        inputDecoratorRadius: 10,
+                        inputCursorSchemeColor: SchemeColor.black,
+                        inputDecoratorIsFilled: false),
+                    useMaterial3: true,
+                    swapLegacyOnMaterial3: true,
+                    fontFamily: GoogleFonts.notoSans().fontFamily)
+                .copyWith(
+                    inputDecorationTheme: InputDecorationTheme(
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            )),
+            darkTheme: FlexThemeData.dark(
                 scheme: FlexScheme.ebonyClay,
                 surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-                blendLevel: 9,
+                blendLevel: 15,
                 subThemesData: const FlexSubThemesData(
-                    blendOnLevel: 10,
-                    blendOnColors: false,
+                    blendOnLevel: 20,
                     inputDecoratorRadius: 10,
                     inputCursorSchemeColor: SchemeColor.black,
                     inputDecoratorIsFilled: false),
                 useMaterial3: true,
-                swapLegacyOnMaterial3: true,
-                fontFamily: GoogleFonts.notoSans().fontFamily)
-            .copyWith(
-                inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        )),
-        darkTheme: FlexThemeData.dark(
-            scheme: FlexScheme.ebonyClay,
-            surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-            blendLevel: 15,
-            subThemesData: const FlexSubThemesData(
-                blendOnLevel: 20,
-                inputDecoratorRadius: 10,
-                inputCursorSchemeColor: SchemeColor.black,
-                inputDecoratorIsFilled: false),
-            useMaterial3: true,
-            swapLegacyOnMaterial3: true),
-        themeMode: ThemeMode.light,
-        debugShowCheckedModeBanner: false,
-        home: const MainPage(),
-      );
-    });
+                swapLegacyOnMaterial3: true),
+            themeMode: ThemeMode.light,
+            debugShowCheckedModeBanner: false,
+            home: const MainPage(),
+          ),
+        ));
   }
 }
 
@@ -93,10 +104,9 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainState extends State<MainPage> {
-
   int _currentIdx = 0;
 
-  late List<Widget>_pageList = [];
+  late List<Widget> _pageList = [];
 
   @override
   void initState() {
@@ -115,58 +125,43 @@ class _MainState extends State<MainPage> {
       const PurchasePage(),
     ];
   }
+
   @override
   Widget build(BuildContext context) {
-    final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ??
-        MediaQuery.sizeOf(context).height - 120;
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state.state == UserAuthState.loginCompletedState) {
-          final token = context
-              .read<UserProvider>()
-              .token ?? '';
-          final userId = context
-              .read<UserProvider>()
-              .user!
-              .id ?? '';
-          context.read<AppBloc>().add(
-              RequestUserApplicationsEvent(context, token, userId));
+    final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
+    return SafeArea(
+        child: PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) {
+          return;
+        }
+        if (context.mounted) {
+          setState(() {
+            _currentIdx = 0;
+          });
         }
       },
-      child: SafeArea(
-          child: PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (bool didPop, Object? result) async {
-          if (didPop) {
-            return;
-          }
-          if (context.mounted) {
-            setState(() {
-              _currentIdx = 0;
-            });
-          }
-        },
-        child: Container(
-          decoration: BoxDecoration(color: Colors.white),
-          child: Stack(children: [
-            SizedBox(
-              height: hei - 20,
-              child: _pageList[_currentIdx],
+      child: Container(
+        decoration: BoxDecoration(color: Colors.white),
+        child: Stack(children: [
+          SizedBox(
+            height: hei - 20,
+            child: _pageList[_currentIdx],
+          ),
+          Positioned(
+            bottom: 0,
+            child: CustomBottomBar(
+              currentIndex: _currentIdx,
+              onTap: (idx) {
+                setState(() {
+                  _currentIdx = idx;
+                });
+              },
             ),
-            Positioned(
-              bottom: 0,
-              child: CustomBottomBar(
-                currentIndex: _currentIdx,
-                onTap: (idx) {
-                  setState(() {
-                    _currentIdx = idx;
-                  });
-                },
-              ),
-            )
-          ]),
-        ),
-      ))
-    );
+          )
+        ]),
+      ),
+    ));
   }
 }

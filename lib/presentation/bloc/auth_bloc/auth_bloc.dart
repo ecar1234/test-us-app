@@ -30,7 +30,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
           event.context.read<UserProvider>().autoLogin(token, user);
         }
         emit(AuthState(state: UserAuthState.loginCompletedState));
-        logger.d('token is not empty');
+        logger.d('status : login completed');
       }
     });
     on<LoginEvent>((event, emit) async {
@@ -38,7 +38,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
       emit(AuthState(state: UserAuthState.loginCompletedState));
     });
     on<LoginCompletedEvent>((event, emit) {
-
       emit(AuthState(state: UserAuthState.loginCompletedState));
     });
     on<LogoutEvent>((event, emit) async {
@@ -47,6 +46,5 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
       await pref.removeUserInfo();
       emit(AuthState(state: UserAuthState.beforeLoginState));
     });
-    // add(TokenCheckEvent());
   }
 }

@@ -72,8 +72,9 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<bool> deletePostImg(String token, int id) async {
-    final res = await remote.deletePostImg(token, id);
+  Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages) async {
+    final deleteData = deleteImages.map((e) => {'id': e.id, 'url': e.url}).toList();
+    final res = await remote.deletePostImg(token, deleteData);
     return res;
   }
 

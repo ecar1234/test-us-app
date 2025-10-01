@@ -8,6 +8,10 @@ import '../../../domain/entities/post_entity.dart';
 
 class DataEvent {}
 
+class ServiceStartEvent extends DataEvent {
+  ServiceStartEvent();
+}
+
 class RequestUserInfoEvent extends DataEvent {
   BuildContext context;
   RequestUserInfoEvent(this.context);
@@ -38,9 +42,9 @@ class RequestPostUpdateEvent extends DataEvent {
 }
 class RequestPostDeleteEvent extends DataEvent {
   BuildContext context;
-  String postId;
+  PostEntity post;
   String token;
-  RequestPostDeleteEvent(this.context, this.token, this.postId);
+  RequestPostDeleteEvent(this.context, this.token, this.post);
 }
 
 class RequestPostCreateEvent extends DataEvent {
@@ -70,8 +74,8 @@ class RequestPostImgUpdateEvent extends DataEvent {
 class RequestPostImgDeleteEvent extends DataEvent {
   BuildContext context;
   String token;
-  int id;
-  RequestPostImgDeleteEvent(this.context, this.token, this.id);
+  List<ImageEntity> deleteImages;
+  RequestPostImgDeleteEvent(this.context, this.token, this.deleteImages);
 }
 
 class RequestCompleteEvent extends DataEvent {

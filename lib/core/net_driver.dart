@@ -7,23 +7,23 @@ import 'package:path/path.dart';
 
 class NetDriver {
   final String? baseUrl;
+
   NetDriver(this.baseUrl);
+
   final logger = Logger();
   final dio = Dio();
 
-  Future<Map<String, dynamic>> requestGetJson(String token, String url,
-      {String? parma = ""}) async {
+  Future<Map<String, dynamic>> requestGetJson(String token, String url, {String? parma = ""}) async {
     dio.options.headers['Content-Type'] = 'application/json';
-    if(token != "" || token != ''){
+    if (token != "" || token != '') {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url/$parma';
-    final res = await dio.get(api, options: Options(
-      validateStatus: (status) {
-        return status != null && status < 500;
-      }
-    ));
-    if(res.statusCode == 200) {
+    logger.d(api);
+    final res = await dio.get(api, options: Options(validateStatus: (status) {
+      return status != null && status < 500;
+    }));
+    if (res.statusCode == 200 || res.statusCode == 202) {
       return res.data;
     } else {
       logger.e("${res.statusCode} : ${res.statusMessage}s");
@@ -31,20 +31,19 @@ class NetDriver {
       return res.data;
     }
   }
+
   Future<Map<String, dynamic>> requestPostJson(String token, String url, Map<String, dynamic> data) async {
     dio.options.headers['Content-Type'] = 'application/json';
-    if(token != "" || token != ''){
+    if (token != "" || token != '') {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
-    
+
     try {
-      final res = await dio.post(api, data: data, options: Options(
-        validateStatus: (status) {
-          return status != null && status < 500;
-        }
-      ));
-      if(res.statusCode == 200) {
+      final res = await dio.post(api, data: data, options: Options(validateStatus: (status) {
+        return status != null && status < 500;
+      }));
+      if (res.statusCode == 200) {
         return res.data;
       } else {
         logger.e("${res.statusCode} : ${res.statusMessage}");
@@ -55,19 +54,18 @@ class NetDriver {
       return e.response?.data;
     }
   }
+
   Future<Map<String, dynamic>> requestPutJson(String token, String url, Map<String, dynamic> data) async {
     dio.options.headers['Content-Type'] = 'application/json';
-    if(token != "" || token != ''){
+    if (token != "" || token != '') {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
     try {
-      final res = await dio.put(api, data: data, options: Options(
-        validateStatus: (status) {
-          return status != null && status < 500;
-        }
-      ));
-      if(res.statusCode == 200) {
+      final res = await dio.put(api, data: data, options: Options(validateStatus: (status) {
+        return status != null && status < 500;
+      }));
+      if (res.statusCode == 200) {
         return res.data;
       } else {
         logger.e("${res.statusCode} : ${res.statusMessage}s");
@@ -79,12 +77,13 @@ class NetDriver {
       return {};
     }
   }
+
   Future<Map<String, dynamic>> requestDeleteJson(String token, String url) async {
     dio.options.headers['Content-Type'] = 'application/json';
     // dio.options.headers['Authorization'] = 'Bearer $token';
     final api = '$baseUrl$url';
     final res = await dio.delete(api);
-    if(res.statusCode == 200) {
+    if (res.statusCode == 200) {
       return res.data;
     } else {
       logger.e("${res.statusCode} : ${res.statusMessage}s");
@@ -92,9 +91,10 @@ class NetDriver {
     }
   }
 
-  Future<Map<String, dynamic>> requestImagesRegisterFormData(String token, String url, List<XFile> data, String postId) async {
+  Future<Map<String, dynamic>> requestImagesRegisterFormData(
+      String token, String url, List<XFile> data, String postId) async {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
-    if(token != "" || token != ''){
+    if (token != "" || token != '') {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
@@ -116,29 +116,29 @@ class NetDriver {
       'postId': postId,
       'images': files,
     });
-    final res = await dio.post(api, data: form, options: Options(
-      validateStatus: (status) {
-        return status != null && status < 500;
-      }
-    ));
+    final res = await dio.post(api, data: form, options: Options(validateStatus: (status) {
+      return status != null && status < 500;
+    }));
 
-    if(res.statusCode == 200) {
+    if (res.statusCode == 200) {
       return res.data;
     } else {
       logger.e("${res.statusCode} : ${res.statusMessage}s");
       return res.data;
     }
   }
-  Future<Map<String, dynamic>> requestImagesUpdateFormData(String token, String url, List<Map<String, dynamic>> deleteImages, List<XFile> data, String postId) async {
+
+  Future<Map<String, dynamic>> requestImagesUpdateFormData(
+      String token, String url, List<Map<String, dynamic>> deleteImages, List<XFile> data, String postId) async {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
-    if(token != "" || token != ''){
+    if (token != "" || token != '') {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
 
     final files = <MultipartFile>[];
 
-    if(data.isNotEmpty){
+    if (data.isNotEmpty) {
       for (final image in data) {
         final fileName = basename(image.path);
         final mimeType = lookupMimeType(image.path) ?? 'application/octet-stream';
@@ -154,21 +154,20 @@ class NetDriver {
     final Map<String, dynamic> formData = {
       'postId': postId,
     };
-    if(deleteImages.isNotEmpty){
+    if (deleteImages.isNotEmpty) {
       formData['deleteImages'] = deleteImages;
     }
-    if(data.isNotEmpty){
+    if (files.isNotEmpty) {
       formData['images'] = files;
     }
+
     final form = FormData.fromMap(formData);
 
-    final res = await dio.put(api, data: form, options: Options(
-      validateStatus: (status) {
-        return status != null && status < 500;
-      }
-    ));
+    final res = await dio.put(api, data: form, options: Options(validateStatus: (status) {
+      return status != null && status < 500;
+    }));
 
-    if(res.statusCode == 200) {
+    if (res.statusCode == 200) {
       return res.data;
     } else {
       logger.e("${res.statusCode} : ${res.statusMessage}s");
@@ -176,4 +175,25 @@ class NetDriver {
     }
   }
 
+  Future<Map<String, dynamic>> requestImagesDeleteFormData(
+      String token, String url, List<Map<String, dynamic>> data) async {
+    dio.options.headers['Content-Type'] = 'multipart/form-data';
+    if (token != "" || token != '') {
+      dio.options.headers['Authorization'] = 'Bearer $token';
+    }
+    final api = '$baseUrl$url';
+    final form = FormData.fromMap({
+      'deleteImages': data,
+    });
+    final res = await dio.delete(api, data: form, options: Options(validateStatus: (status) {
+      return status != null && status < 500;
+    }));
+
+    if (res.statusCode == 200) {
+      return res.data;
+    } else {
+      logger.e("${res.statusCode} : ${res.statusMessage}s");
+      return res.data;
+    }
+  }
 }

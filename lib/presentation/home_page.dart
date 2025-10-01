@@ -31,12 +31,15 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
-    return BlocBuilder<DataBloc, DataState>(
-      builder: (context, state) {
-        if (state.state == DataLoadState.postImgRegisterCompletedState) {
-          context.read<DataBloc>().add(RequestCompleteEvent());
-        }
-        return SafeArea(
+    return BlocListener<DataBloc, DataState>(
+        listener: (context, state) {
+          if (state.state == DataLoadState.postImgRegisterCompletedState ||
+              state.state == DataLoadState.postImgUpdateCompletedState ||
+              state.state == DataLoadState.postImgDeleteCompletedState) {
+            context.read<DataBloc>().add(RequestCompleteEvent());
+          }
+        },
+        child: SafeArea(
           child: Scaffold(
               appBar: AppBar(
                 title: const Text('Testus', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -119,9 +122,7 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ))),
-        );
-      },
-    );
+        ));
   }
 
   Widget _mainButtonSection(BuildContext context) {
@@ -283,7 +284,6 @@ class _HomePageState extends State<HomePage> {
 
   Widget _testerList(BuildContext context) {
     return BlocBuilder<DataBloc, DataState>(
-
       builder: (context, state) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

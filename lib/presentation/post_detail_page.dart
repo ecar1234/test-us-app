@@ -44,7 +44,8 @@ class PostDetailPage extends StatefulWidget {
 class _PostDetailPageState extends State<PostDetailPage> {
   final logger = Logger();
   late PostEntity? _post;
-  late List<XFile>? _images;
+
+  // late List<XFile>? _images;
 
   @override
   void initState() {
@@ -86,44 +87,60 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 ),
                 actions: [
                   isAuthor
-                      ? PopupMenuButton(
-                          icon: Icon(Icons.more_vert_rounded),
-                          itemBuilder: (BuildContext context) {
-                            return [
-                              PopupMenuItem(value: 1, child: Text("수정하기")),
-                              PopupMenuItem(value: 2, child: Text("삭제하기"))
-                            ];
-                          },
-                          onSelected: (value) async {
-                            if (value == 1) {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                return PostCreatePage(post: _post);
-                              }));
-                            } else if (value == 2) {
-                              Get.defaultDialog(title: "삭제", middleText: "삭제하시겠습니까?", actions: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Get.back();
-                                  },
-                                  child: Text("취소"),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    final token = context.read<UserProvider>().token ?? "";
-                                    try {
-                                      context.read<DataBloc>().add(RequestPostDeleteEvent(context, token, _post!.id!));
-                                      Get.back();
-                                    } on Exception catch (e) {
-                                      // TODO
-                                      Get.snackbar('알림', '삭제 실패');
-                                    }
-                                    Get.back();
-                                  },
-                                  child: Text("확인"),
-                                )
-                              ]);
+                      ? BlocListener<DataBloc, DataState>(
+                          listener: (context, state) {
+                            final token = context.read<UserProvider>().token ?? "";
+                            if(state.state == DataLoadState.postDeleteCompletedState){
+                              if(_post!.images != null && _post!.images!.isNotEmpty){
+                                context
+                                    .read<DataBloc>()
+                                    .add(RequestPostImgDeleteEvent(context, token, _post!.images!));
+                              }else {
+                                context.read<DataBloc>().add(RequestCompleteEvent());
+                                Navigator.pop(context);
+                              }
+                            }else if(state.state == DataLoadState.postImgDeleteCompletedState){
+                              Navigator.pop(context);
                             }
                           },
+                          child: PopupMenuButton(
+                            icon: Icon(Icons.more_vert_rounded),
+                            itemBuilder: (BuildContext context) {
+                              return [
+                                PopupMenuItem(value: 1, child: Text("수정하기")),
+                                PopupMenuItem(value: 2, child: Text("삭제하기"))
+                              ];
+                            },
+                            onSelected: (value) async {
+                              if (value == 1) {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                  return PostCreatePage(post: _post);
+                                }));
+                              } else if (value == 2) {
+                                Get.defaultDialog(title: "삭제", middleText: "삭제하시겠습니까?", actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Get.back();
+                                    },
+                                    child: Text("취소"),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      final token = context.read<UserProvider>().token ?? "";
+                                      try {
+                                        context.read<DataBloc>().add(RequestPostDeleteEvent(context, token, _post!));
+                                      } on Exception catch (e) {
+                                        // TODO
+                                        Get.snackbar('알림', '삭제 실패');
+                                      }
+                                      Get.back();
+                                    },
+                                    child: Text("확인"),
+                                  )
+                                ]);
+                              }
+                            },
+                          ),
                         )
                       : SizedBox()
                 ],
@@ -240,10 +257,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           // height: constraints.maxHeight * 0.5,
                           child: Linkify(
                         text: _post!.contents!,
-                        linkifiers: [
-                          WwwLinkifier(),
-                          PlayStoreLinkifier()
-                        ],
+                        linkifiers: [WwwLinkifier(), PlayStoreLinkifier()],
                         linkStyle: const TextStyle(color: Colors.blue),
                         onOpen: _linkOpen,
                       )),
@@ -566,7 +580,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     final uri = Uri.parse(link.url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }else {
+    } else {
       Get.snackbar('알림', '존재하지 않는 주소입니다.');
     }
   }

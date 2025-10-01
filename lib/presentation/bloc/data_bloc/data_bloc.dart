@@ -15,11 +15,21 @@ class DataBloc extends Bloc<DataEvent, DataState> {
     //   event.context.read<UserProvider>().;
     //
     // });
-    on<RequestInitDataEvent>((event, emit) {
+    on<ServiceStartEvent>((event, emit) {
+      emit(DataState(state: DataLoadState.serviceStartState));
+      logger.i("data state : serviceStartState");
+    });
+
+    on<RequestInitDataEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
-      event.context.read<PostProvider>().getInitPosts();
-      emit(DataState(state: DataLoadState.initDataLoadCompletedState));
-      logger.i("data state : initDataLoadCompletedState");
+      final posts = await event.context.read<PostProvider>().getInitPosts();
+      if(posts != null){
+        emit(DataState(state: DataLoadState.initDataLoadCompletedState));
+        logger.i("data state : initDataLoadCompletedState");
+      }else {
+        emit(DataState(state: DataLoadState.errorState));
+        logger.i("data state : errorState");
+      }
     });
 
     on<RequestPostDataEvent>((event, emit) async {
@@ -61,13 +71,16 @@ class DataBloc extends Bloc<DataEvent, DataState> {
 
     on<RequestPostDeleteEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
-      final res = await event.context.read<PostProvider>().deletePost(event.token, event.postId);
-      if (res) {
-        emit(DataState(state: DataLoadState.postDeleteCompletedState));
-      } else {
-        emit(DataState(state: DataLoadState.errorState));
+      if(event.context.mounted){
+        final res = await event.context.read<PostProvider>().deletePost(event.token, event.post.id!);
+        if (res) {
+          emit(DataState(state: DataLoadState.postDeleteCompletedState));
+        } else {
+          emit(DataState(state: DataLoadState.errorState));
+        }
       }
     });
+
     on<RequestPostImgRegisterEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
       final newPost = await event.context.read<PostProvider>().registerPostImg(event.token, event.images!, event.postId);
@@ -85,7 +98,7 @@ class DataBloc extends Bloc<DataEvent, DataState> {
 
     on<RequestPostImgDeleteEvent>((event, emit) async {
       emit(DataState(state: DataLoadState.dataLoadState));
-      final res = await event.context.read<PostProvider>().deletePostImg(event.token, event.id);
+      final res = await event.context.read<PostProvider>().deletePostImg(event.token, event.deleteImages);
       if(res){
         emit(DataState(state: DataLoadState.postImgDeleteCompletedState));
       }else{

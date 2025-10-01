@@ -18,5 +18,5 @@ abstract class PostRepository{
   Future<bool> deletePost(String token, String id);
   Future<PostEntity> registerPostImg(String token, List<XFile> images, String postId);
   Future<PostEntity> updatePostImg(String token, List<ImageEntity> deleteImages, List<XFile> images, String postId);
-  Future<bool> deletePostImg(String token, int id);
+  Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages);
 }

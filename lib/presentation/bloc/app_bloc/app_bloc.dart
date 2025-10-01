@@ -1,12 +1,14 @@
 
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 
 import 'app_event.dart';
 import 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState>{
+  final logger = Logger();
   AppBloc(): super(AppState()) {
     on<RequestApplyEvent>((event, emit) async {
       emit(AppState(state: UserAppState.loadingState));
@@ -38,6 +40,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       emit(AppState(state: UserAppState.loadingState));
       await event.context.read<ApplicationProvider>().getMyApplications(event.token, event.userId);
       emit(AppState(state: UserAppState.userApplicationLoadCompletedState));
+      logger.i("application state : userApplicationLoadCompletedState");
     });
 
     on<RequestCompletedEvent>((event, emit) {

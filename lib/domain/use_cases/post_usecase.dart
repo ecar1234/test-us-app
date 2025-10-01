@@ -68,8 +68,8 @@ class PostUseCase {
     return res;
   }
 
-  Future<bool> deletePostImg(String token, int id) async {
-    final res = await repository.deletePostImg(token, id);
+  Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages) async {
+    final res = await repository.deletePostImg(token, deleteImages);
     return res;
   }
 }

@@ -17,5 +17,5 @@ abstract class PostDataSource {
   Future<bool> deletePost(String token, String id);
   Future<PostModel> registerPostImg(String token, List<XFile> images, String postId);
   Future<PostModel> updatePostImg(String token, List<ImageModel> deleteImages, List<XFile> images, String postId);
-  Future<bool> deletePostImg(String token, int id);
+  Future<bool> deletePostImg(String token, List<Map<String, dynamic>> deleteImages);
 }

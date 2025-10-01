@@ -622,7 +622,8 @@ class _PostCreatePageState extends State<PostCreatePage> {
                 .read<DataBloc>()
                 .add(RequestPostImgUpdateEvent(context, token, _deleteImages, _selectedImages, state.post!.id!));
           }
-        } else if (state.state == DataLoadState.postImgRegisterCompletedState ||
+        }
+        if (state.state == DataLoadState.postImgRegisterCompletedState ||
             state.state == DataLoadState.postImgUpdateCompletedState) {
           await _alertDialog(context);
           if (context.mounted) {
@@ -630,12 +631,6 @@ class _PostCreatePageState extends State<PostCreatePage> {
           }
         }
       },
-      // listenWhen: (prev, current) {
-      //   return current.state == DataLoadState.postCreateCompletedState ||
-      //       current.state == DataLoadState.postUpdateCompletedState ||
-      //       current.state == DataLoadState.postImgRegisterCompletedState ||
-      //       current.state == DataLoadState.postImgUpdateCompletedState;
-      // },
       child: SizedBox(
         height: 50,
         width: MediaQuery.sizeOf(context).width - 40,
@@ -685,6 +680,10 @@ class _PostCreatePageState extends State<PostCreatePage> {
                     }
                     if (_selectedCategory.isEmpty) {
                       Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                      return;
+                    }
+                    if(_selectedImages.isEmpty){
+                      Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
                       return;
                     }
                     final post = PostEntity(
