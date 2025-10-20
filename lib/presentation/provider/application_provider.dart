@@ -12,38 +12,33 @@ class ApplicationProvider with ChangeNotifier{
   List<ApplicationEntity>? _applications;
   List<ApplicationEntity>? get applications => _applications;
 
-  Future<PostEntity> requestApply(String token, ApplicationEntity app) async {
-    final res = await useCase.requestApply(token, app);
+  void requestApply(ApplicationEntity app)  {
+    // final res = await useCase.requestApply(token, app);
     if(_applications == null){
-      _applications = [res['application']];
+      _applications = [app];
     }else {
-      _applications!.add(res['application']);
+      _applications!.add(app);
     }
     notifyListeners();
-    return res['post'];
   }
-  Future<PostEntity> cancelApplication(String token, int appId) async {
-    final res = await useCase.cancelApply(token, appId);
-    if(_applications!.any((element) => element.id == appId)){
-      final idx = _applications!.indexWhere((e) {
-        return e.id == res['application'].id;
-      });
-      _applications![idx] = res['application'];
-    }
-    notifyListeners();
-    return res['post'];
-  }
-
-  Future<PostEntity> requestUpdateApplication(String token, ApplicationEntity app) async {
-    final res = await useCase.updateApplication(token, app);
+  void cancelApplication(ApplicationEntity app)  {
     if(_applications!.any((element) => element.id == app.id)){
       final idx = _applications!.indexWhere((e) {
-        return e.id == res['application'].id;
+        return e.id == app.id;
       });
-      _applications![idx] = res['application'];
+      _applications![idx] = app;
     }
     notifyListeners();
-    return res['post'];
+  }
+
+  void requestUpdateApplication(ApplicationEntity app) {
+    if(_applications!.any((element) => element.id == app.id)){
+      final idx = _applications!.indexWhere((e) {
+        return e.id == app.id;
+      });
+      _applications![idx] = app;
+    }
+    notifyListeners();
   }
 
   Future<void> getMyApplications(String token, String userId) async {

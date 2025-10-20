@@ -19,13 +19,8 @@ class PostUseCase {
     return res;
   }
 
-  Future<List<PostEntity>> getWebPosts(int page) async {
-    final res = await repository.getWebPosts(page);
-    return res;
-  }
-
-  Future<List<PostEntity>> getMobilePosts(int page) async {
-    final res = await repository.getMobilePosts(page);
+  Future<List<PostEntity>> getUserRecruitmentPosts(String token, String userId) async {
+    final res = await repository.getUserRecruitmentPosts(token, userId);
     return res;
   }
 

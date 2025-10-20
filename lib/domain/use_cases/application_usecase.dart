@@ -24,13 +24,13 @@ class ApplicationUseCase {
     return res;
   }
 
-  Future<PostEntity> completeApplication(String token, ApplicationEntity app) async {
-    final res = await repository.completeApplications(token, app);
+  Future<PostEntity> completeApplication(String token, String userId, String postId) async {
+    final res = await repository.completeApplications(token, userId, postId);
     return res;
   }
 
-  Future<PostEntity> rejectApplication(String token, ApplicationEntity app) async {
-    final res = await repository.applicationReject(token, app);
+  Future<PostEntity> rejectApplication(String token, String userId, String postId) async {
+    final res = await repository.applicationReject(token, userId, postId);
     return res;
   }
 

@@ -12,70 +12,71 @@ class ServiceStartEvent extends DataEvent {
   ServiceStartEvent();
 }
 
-class RequestUserInfoEvent extends DataEvent {
-  BuildContext context;
-  RequestUserInfoEvent(this.context);
-}
-
+// class RequestUserInfoEvent extends DataEvent {
+//   BuildContext context;
+//   RequestUserInfoEvent(this.context);
+// }
+//
 class RequestInitDataEvent extends DataEvent {
-  BuildContext context;
-  RequestInitDataEvent(this.context);
+  RequestInitDataEvent();
 }
-
+//
+class RequestRecruitmentPaginationEvent extends DataEvent {
+  RequestRecruitmentPaginationEvent();
+}
+//
 class RequestPostDataEvent extends DataEvent {
-  BuildContext context;
-  int page;
-  RequestPostDataEvent(this.context, this.page);
-}
-
-class GetPostDetailEvent extends DataEvent {
-  BuildContext context;
-  String postId;
-  String token;
-  GetPostDetailEvent(this.context, this.postId, this.token);
+  final String token;
+  final String postId;
+  RequestPostDataEvent(this.token, this.postId);
 }
 class RequestPostUpdateEvent extends DataEvent {
-  BuildContext context;
-  PostEntity post;
-  String token;
-  RequestPostUpdateEvent(this.context, this.token, this.post);
+  final String token;
+  final PostEntity post;
+  RequestPostUpdateEvent(this.token, this.post);
 }
-class RequestPostDeleteEvent extends DataEvent {
-  BuildContext context;
-  PostEntity post;
-  String token;
-  RequestPostDeleteEvent(this.context, this.token, this.post);
-}
-
+//
 class RequestPostCreateEvent extends DataEvent {
-  BuildContext context;
   String token;
   PostEntity post;
-  RequestPostCreateEvent(this.context, this.post, this.token);
+  RequestPostCreateEvent(this.token, this.post);
 }
-
+//
+class RequestPostDeleteEvent extends DataEvent {
+  final String token;
+  final PostEntity post;
+  RequestPostDeleteEvent(this.token, this.post);
+}
+//
 class RequestPostImgRegisterEvent extends DataEvent {
-  BuildContext context;
-  String token;
-  List<XFile>? images;
-  String postId;
-  RequestPostImgRegisterEvent(this.context, this.token, this.images, this.postId);
+  final String token;
+  final List<XFile> images;
+  final String postId;
+  RequestPostImgRegisterEvent(this.token, this.images, this.postId);
 }
 
 class RequestPostImgUpdateEvent extends DataEvent {
-  BuildContext context;
-  String token;
-  List<ImageEntity> deleteImages;
-  List<XFile>? images;
-  String postId;
-  RequestPostImgUpdateEvent(this.context, this.token, this.deleteImages , this.images, this.postId);
+  final String token;
+  final List<ImageEntity> deleteImages;
+  final List<XFile> images;
+  final String postId;
+  RequestPostImgUpdateEvent(this.token, this.deleteImages, this.images, this.postId);
 }
-
+//
 class RequestPostImgDeleteEvent extends DataEvent {
-  BuildContext context;
-  String token;
-  List<ImageEntity> deleteImages;
-  RequestPostImgDeleteEvent(this.context, this.token, this.deleteImages);
+  final String token;
+  final List<ImageEntity> images;
+  RequestPostImgDeleteEvent(this.token, this.images);
+}
+//
+class RequestUserRecruitmentPosts extends DataEvent {
+  final String token;
+  final String userId;
+  RequestUserRecruitmentPosts(this.token, this.userId);
+}
+//
+class PostDataLoadEvent extends DataEvent {
+  PostDataLoadEvent();
 }
 
 class RequestCompleteEvent extends DataEvent {
@@ -84,4 +85,8 @@ class RequestCompleteEvent extends DataEvent {
 
 class ReloadPostEvent extends DataEvent {
   ReloadPostEvent();
+}
+
+class DataLoadErrorEvent extends DataEvent {
+  DataLoadErrorEvent();
 }

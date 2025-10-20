@@ -1,8 +1,5 @@
 
-
-import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
-import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/domain/repositories/application_repo.dart';
 
 import '../../domain/entities/application_entity.dart';
@@ -13,9 +10,9 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   ApplicationRepositoryImpl(this.remote);
 
   @override
-  Future<PostEntity> applicationReject(String token, ApplicationEntity application) async {
-    // TODO: implement applicationReject
-    throw UnimplementedError();
+  Future<PostEntity> applicationReject(String token, String userId, String postId) async {
+    final res = await remote.applicationReject(token, userId, postId);
+    return PostEntity.toPostEntity(res);
   }
 
   @override
@@ -26,9 +23,9 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   }
 
   @override
-  Future<PostEntity> completeApplications(String token, ApplicationEntity application) async {
-    // TODO: implement completeApplications
-    throw UnimplementedError();
+  Future<PostEntity> completeApplications(String token, String userId, String postId) async {
+    final res = await remote.completeApplications(token, userId, postId);
+    return PostEntity.toPostEntity(res);
   }
 
   @override

@@ -1,11 +1,14 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:test_us_app/data/models/user/user_model.dart';
+
+import '../application/application_model.dart';
 
 part 'review_model.g.dart';
 
 enum ReviewType {
   @JsonValue('PRODUCT_RATING')
   productRating,
-  @JsonValue('ATTITUDE_RATING')
+  @JsonValue('PARTICIPANT_ATTITUDE_RATING')
   attitudeRating,
 }
 
@@ -13,21 +16,21 @@ enum ReviewType {
 class ReviewModel {
   String? reviewId;
   int? rating;
-  String? content;
+  String? comment;
   ReviewType? reviewType;
-  String? applicationId;
-  String? reviewerUserId;
-  String? reviewedUserId;
+  ApplicationModel? application;
+  UserModel? reviewer;
+  UserModel? reviewed;
   DateTime? createdAt;
 
   ReviewModel({
     this.reviewId,
     this.rating,
-    this.content,
+    this.comment,
     this.reviewType,
-    this.applicationId,
-    this.reviewerUserId,
-    this.reviewedUserId,
+    this.application,
+    this.reviewer,
+    this.reviewed,
     this.createdAt,
   });
 

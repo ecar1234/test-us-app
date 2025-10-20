@@ -9,6 +9,8 @@ enum ApplicationPlatform {
   ios,
   @JsonValue('android')
   android,
+  @JsonValue('game')
+  game
 }
 
 enum ApplicationStatus {

@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../application/application_model.dart';
 import '../user/user_model.dart';
 import 'image_model.dart';
 
@@ -28,7 +29,7 @@ class PostModel {
   UserModel? author;
   int? views;
   List<ImageModel>? images;
-  List<String>? applications;
+  List<ApplicationModel>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
 

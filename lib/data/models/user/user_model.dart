@@ -1,4 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
+
+import '../application/application_model.dart';
 part 'user_model.g.dart';
 
 enum UserType {
@@ -43,6 +45,7 @@ class UserModel {
   UserRole? role;
   String? userName;
   DateTime? birth;
+  List<ApplicationModel>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -55,6 +58,7 @@ class UserModel {
     this.role,
     this.userName,
     this.birth,
+    this.applications,
     this.createdAt,
     this.updatedAt,
   });

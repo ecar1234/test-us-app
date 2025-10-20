@@ -6,6 +6,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/login_page.dart';
+import 'package:test_us_app/presentation/my_pages/my_recruitment_page.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
@@ -19,7 +20,7 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  List<String> menu = ['쪽지관리', '팔로우 관리', '나의 서비스', '신청 서비스'];
+  List<String> menu = ['메시지 관리', '팔로우 관리', '테스터 모집 관리', '테스트 신청 관리', '나의 서비스 관리'];
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +100,7 @@ class _UserPageState extends State<UserPage> {
                 const Gap(20),
                 // info section
                 Container(
-                    height: hei * 0.12,
+                    height: hei * 0.15,
                     width: MediaQuery.sizeOf(context).width,
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     // decoration: BoxDecoration(
@@ -220,7 +221,7 @@ class _UserPageState extends State<UserPage> {
                 const Gap(20),
                 // menu section
                 Container(
-                    height: 250,
+                    // height: (menu.length * 40) + 50,
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     // decoration: BoxDecoration(
                     //   border: Border.all(),
@@ -242,43 +243,40 @@ class _UserPageState extends State<UserPage> {
                             ]),
                         child: Selector<UserProvider, bool>(
                           selector: (context ,provider) => provider.isLogged ?? false,
-                          builder:(context, isLogged, child) =>  Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ListView.separated(
-                                shrinkWrap: true,
-                                itemBuilder: (context, idx) {
-                                  return GestureDetector(
-                                    onTap: (){
-                                      isLogged  ? debugPrint(menu[idx]) : showDialog(context: context, builder: (context) => const LoginDialog());
-                                    },
-                                    child: SizedBox(
-                                        height: 40,
-                                        width: double.infinity,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            SizedBox(child: Icon(_getIcon(idx))),
-                                            const Gap(10),
-                                            SizedBox(
-                                              width: (MediaQuery.sizeOf(context).width - 80) * 0.85,
-                                              child: Text(
-                                                menu[idx],
-                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                                              ),
-                                            ),
-                                          ],
-                                        )),
-                                  );
+                          builder:(context, isLogged, child) =>  ListView.separated(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, idx) {
+                              return GestureDetector(
+                                onTap: (){
+                                  isLogged  ? _pageNavigator(idx) :
+                                  showDialog(context: context, builder: (context) => const LoginDialog());
                                 },
-                                separatorBuilder: (context, idx) {
-                                  return Divider(
-                                    color: Colors.grey.shade100,
-                                  );
-                                },
-                                itemCount: menu.length,
-                              ),
-                            ],
+                                child: SizedBox(
+                                    height: 40,
+                                    width: double.infinity,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(child: Icon(_getIcon(idx))),
+                                        const Gap(10),
+                                        SizedBox(
+                                          width: (MediaQuery.sizeOf(context).width - 80) * 0.85,
+                                          child: Text(
+                                            menu[idx],
+                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                              );
+                            },
+                            separatorBuilder: (context, idx) {
+                              return Divider(
+                                color: Colors.grey.shade100,
+                              );
+                            },
+                            itemCount: menu.length,
                           ),
                         )))
               ],
@@ -297,8 +295,31 @@ class _UserPageState extends State<UserPage> {
         return Symbols.electrical_services;
       case 3:
         return Symbols.crop_free;
+      case 4:
+        return Symbols.linked_services;
       default:
         return Symbols.design_services;
+    }
+  }
+
+  void _pageNavigator(int idx){
+    switch (idx) {
+      case 0:
+        debugPrint(menu[idx]);
+        break;
+      case 1:
+        debugPrint(menu[idx]);
+        break;
+      case 2:
+        Get.to(() => const MyRecruitmentPage());
+        break;
+      case 3:
+        debugPrint(menu[idx]);
+        break;
+      case 4:
+        debugPrint(menu[idx]);
+        break;
+      default:
     }
   }
 }

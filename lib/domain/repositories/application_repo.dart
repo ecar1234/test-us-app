@@ -7,7 +7,7 @@ abstract class ApplicationRepository {
   Future<Map<String, dynamic>> requestApply(String token, ApplicationEntity application);
   Future<Map<String, dynamic>> applyCancel(String token, int appId);
   Future<Map<String, dynamic>> updateApplication(String token, ApplicationEntity application);
-  Future<PostEntity> applicationReject(String token, ApplicationEntity application);
-  Future<PostEntity> completeApplications(String token, ApplicationEntity application);
+  Future<PostEntity> applicationReject(String token, String userId, String postId);
+  Future<PostEntity> completeApplications(String token, String userId, String postId);
   Future<List<ApplicationEntity>> getUserApplication(String token, String userId);
 }

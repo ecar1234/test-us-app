@@ -14,9 +14,14 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
   ApplicationDataSourceImpl(this.netDriver);
 
   @override
-  Future<PostModel> applicationReject(String token, ApplicationModel application) {
-    // TODO: implement applicationReject
-    throw UnimplementedError();
+  Future<PostModel> applicationReject(String token, String userId, String postId) async {
+    final res = await netDriver.requestPutJson(token, ApplicationApi.rejectUser, {'userId': userId, 'postId': postId});
+    if(res['status'] == 200){
+      final post = PostModel.fromJson(res['updatePost']);
+      return post;
+    }else {
+      throw Exception('Error');
+    }
   }
 
   @override
@@ -32,14 +37,19 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
   }
 
   @override
-  Future<PostModel> completeApplications(String token, ApplicationModel application) {
-    // TODO: implement completeApplications
-    throw UnimplementedError();
+  Future<PostModel> completeApplications(String token, String userId, String postId) async {
+    final res = await netDriver.requestPutJson(token, ApplicationApi.acceptUser, {'userId': userId, 'postId': postId});
+    if(res['status'] == 200){
+      final post = PostModel.fromJson(res['updatePost']);
+      return post;
+    }else {
+      throw Exception('Error');
+    }
   }
 
   @override
   Future<List<ApplicationModel>> getUserApplication(String token, String userId) async {
-    final res = await netDriver.requestGetJson(token, ApplicationApi.findByUserId, parma: userId);
+    final res = await netDriver.requestGetJson(token, ApplicationApi.findByUserId, param: userId);
     if(res['status'] == 202){
       // return (res['applications'] as List).map<ApplicationModel>((e) => ApplicationModel.fromJson(e)).toList();
       final applications = _startPolling(res['jobId'], token);
@@ -77,7 +87,7 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
   Future<List<ApplicationModel>> _startPolling(String jobId, String token){
     final controller = Completer<List<ApplicationModel>>();
     Timer.periodic(Duration(seconds: 1), (timer) async {
-      final res = await netDriver.requestGetJson(token, JobApi.jobGetApplications, parma: jobId);
+      final res = await netDriver.requestGetJson(token, JobApi.jobGetApplications, param: jobId);
       if(res['status'] == 200) {
         final applications = (res['applications'] as List).map<ApplicationModel>((e) => ApplicationModel.fromJson(e)).toList();
         controller.complete(applications);

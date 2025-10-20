@@ -20,7 +20,7 @@ PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
       status: $enumDecodeNullable(_$PostStatusEnumMap, json['status']),
       period: (json['period'] as num?)?.toInt(),
       applications: (json['applications'] as List<dynamic>?)
-          ?.map((e) => e as String)
+          ?.map((e) => ApplicationModel.fromJson(e as Map<String, dynamic>))
           .toList(),
       views: (json['views'] as num?)?.toInt(),
       images: (json['images'] as List<dynamic>?)

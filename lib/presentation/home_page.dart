@@ -4,11 +4,13 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
-import 'package:test_us_app/presentation/post_detail_page.dart';
+
 import 'package:test_us_app/presentation/provider/post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/setting_page.dart';
+import 'package:test_us_app/presentation/tester_post_pages/post_detail_page.dart';
 
+import '../data/sharedPreferences/auth_preference.dart';
 import '../domain/entities/post_entity.dart';
 import '../services/common_height_provider.dart';
 import 'bloc/auth_bloc/auth_bloc.dart';
@@ -28,6 +30,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final pref = AuthPreference.instance;
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
@@ -65,9 +68,10 @@ class _HomePageState extends State<HomePage> {
                                       },
                                       child: const Text('취소')),
                                   TextButton(
-                                      onPressed: () {
+                                      onPressed: () async {
                                         Navigator.pop(context);
-                                        context.read<AuthBloc>().add(LogoutEvent(context));
+                                        context.read<UserProvider>().logout();
+                                        context.read<AuthBloc>().add(LogoutEvent());
                                       },
                                       child: const Text('확인')),
                                 ],
@@ -211,10 +215,11 @@ class _HomePageState extends State<HomePage> {
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, idx) {
                       return GestureDetector(
-                        onTap: () {
-                          final token = context.read<UserProvider>().token ?? "";
-                          context.read<DataBloc>().add(GetPostDetailEvent(context, favoritePost[idx].id!, token));
-                          Get.to(() => PostDetailPage(post: favoritePost[idx]));
+                        onTap: () async {
+                          // final token = context.read<UserProvider>().token ?? "";
+                          // final res = await context.read<PostProvider>().getPostById(token, favoritePost[idx].id!);
+                          // if(context.mounted) context.read<DataBloc>().add(RequestPostDataEvent(res));
+                          Get.to(() => PostDetailPage(postId: favoritePost[idx].id!));
                         },
                         child: SizedBox(
                           height: 210,
@@ -294,8 +299,10 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Text('테스터 모집', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 TextButton(
-                    onPressed: () {
-                      context.read<DataBloc>().add(RequestPostDataEvent(context, 1));
+                    onPressed: () async {
+                      context.read<DataBloc>().add(PostDataLoadEvent());
+                      await context.read<PostProvider>().getPostPagination(page: 1);
+                      if(context.mounted) context.read<DataBloc>().add(RequestRecruitmentPaginationEvent());
                       widget.onTap(1);
                     },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
@@ -316,21 +323,19 @@ class _HomePageState extends State<HomePage> {
                     ? const Center(child: Text("테스터 모집이 아직 없습니다."))
                     : ListView.separated(
                         shrinkWrap: true,
-                        padding: EdgeInsets.only(left: 20),
+                        padding: EdgeInsets.only(left: 20, right: 20),
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, idx) {
                           return GestureDetector(
-                            onTap: () {
-                              final token = context.read<UserProvider>().token ?? "";
-                              context.read<DataBloc>().add(GetPostDetailEvent(context, post[idx].id!, token));
-                              Get.to(() => PostDetailPage(post: post[idx]));
+                            onTap: () async {
+                              // final token = context.read<UserProvider>().token ?? "";
+                              // final res = await context.read<PostProvider>().getPostById(token, post[idx].id!);
+                              // if(context.mounted) context.read<DataBloc>().add(RequestPostDataEvent(res));
+                              Get.to(() => PostDetailPage(postId: post[idx].id!));
                             },
                             child: SizedBox(
                               height: 230,
                               width: 160,
-                              // decoration: BoxDecoration(
-                              //   color: Theme.of(context).colorScheme.surface,
-                              // ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [

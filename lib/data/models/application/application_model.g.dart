@@ -37,6 +37,7 @@ const _$ApplicationPlatformEnumMap = {
   ApplicationPlatform.web: 'web',
   ApplicationPlatform.ios: 'ios',
   ApplicationPlatform.android: 'android',
+  ApplicationPlatform.game: 'game',
 };
 
 const _$ApplicationStatusEnumMap = {

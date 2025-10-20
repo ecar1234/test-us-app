@@ -7,8 +7,7 @@ import '../entities/image_entity.dart';
 
 abstract class PostRepository{
   Future<Map<String, List<PostEntity>>> getPostInitData();
-  Future<List<PostEntity>> getWebPosts(int page);
-  Future<List<PostEntity>> getMobilePosts(int page);
+  Future<List<PostEntity>> getUserRecruitmentPosts(String token, String userId);
   Future<List<PostEntity>> getPostPagination(int page);
   // Future<List<PostEntity>> getPostByPlatform(int page);
   Future<PostEntity> getPostById(String token, String id);

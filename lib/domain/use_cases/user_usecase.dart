@@ -3,6 +3,7 @@ import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../data/sharedPreferences/auth_preference.dart';
+import '../entities/review_entity.dart';
 import '../repositories/user_repository.dart';
 
 class UserUseCase {
@@ -31,8 +32,12 @@ class UserUseCase {
     return res;
   }
 
-  Future<UserEntity> getUserById(String id) async {
-    final res = await repository.getUserById(id);
+  Future<UserEntity> getUserById(String token, String id) async {
+    final res = await repository.getUserById(token, id);
+    return res;
+  }
+  Future<List<Map<String, dynamic>>> getUsersByIds(String token, List<String> ids) async {
+    final res = await repository.getUsersByIds(token, ids);
     return res;
   }
 

@@ -43,6 +43,15 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
+  Future<List<PostEntity>> getUserRecruitmentPosts(String token, String userId) async {
+    final res = await remote.getUserRecruitmentPosts(token, userId);
+    if(res.isEmpty){
+      return [];
+    }
+    return res.map((e) => PostEntity.toPostEntity(e)).toList();
+  }
+
+  @override
   Future<List<PostEntity>> getPostByTitle(String title) {
     // TODO: implement getPostByTitle
     throw UnimplementedError();
@@ -54,28 +63,11 @@ class PostRepositoryImpl implements PostRepository {
     return PostEntity.toPostEntity(res);
   }
 
-  @override
-  Future<List<PostEntity>> getWebPosts(int page) async {
-    final res = await remote.getWebPosts(page);
-    return res.map((e) => PostEntity.toPostEntity(e)).toList();
-  }
 
-  @override
-  Future<List<PostEntity>> getMobilePosts(int page) async {
-    final res = await remote.getMobilePosts(page);
-    return res.map((e) => PostEntity.toPostEntity(e)).toList();
-  }
   @override
   Future<List<PostEntity>> getPostPagination(int page) async {
     final res = await remote.getPostsPagination(page);
     return res.map((e) => PostEntity.toPostEntity(e)).toList();
-  }
-
-  @override
-  Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages) async {
-    final deleteData = deleteImages.map((e) => {'id': e.id, 'url': e.url}).toList();
-    final res = await remote.deletePostImg(token, deleteData);
-    return res;
   }
 
   @override
@@ -89,5 +81,12 @@ class PostRepositoryImpl implements PostRepository {
     final deleteData = deleteImages.map((e) => ImageEntity.toImageModel(e)).toList();
     final res = await remote.updatePostImg(token, deleteData, images, postId);
     return PostEntity.toPostEntity(res);
+  }
+
+  @override
+  Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages) async {
+    final deleteData = deleteImages.map((e) => {'id': e.id, 'url': e.url}).toList();
+    final res = await remote.deletePostImg(token, deleteData);
+    return res;
   }
 }

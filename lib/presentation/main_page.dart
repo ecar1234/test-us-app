@@ -3,14 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
-import 'package:test_us_app/presentation/post_tester_page.dart';
+import 'package:test_us_app/presentation/provider/application_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/purchase_page.dart';
+import 'package:test_us_app/presentation/tester_post_pages/post_tester_page.dart';
 import 'package:test_us_app/presentation/user_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../data/sharedPreferences/auth_preference.dart';
+import '../domain/entities/user_entity.dart';
 import 'bloc/app_bloc/app_bloc.dart';
 import 'bloc/app_bloc/app_event.dart';
 import 'bloc/auth_bloc/auth_bloc.dart';
@@ -29,6 +34,8 @@ class MetaDataSetting extends StatefulWidget {
 }
 
 class _MetaDataSettingState extends State<MetaDataSetting> {
+  final pref = AuthPreference.instance;
+  final logger = Logger();
   @override
   void initState() {
     // TODO: implement initState
@@ -44,19 +51,22 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<DataBloc, DataState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.state == DataLoadState.serviceStartState) {
-            context.read<DataBloc>().add(RequestInitDataEvent(context));
+            await context.read<PostProvider>().getInitPosts();
+            if(context.mounted) context.read<DataBloc>().add(RequestInitDataEvent());
           } else if (state.state == DataLoadState.initDataLoadCompletedState) {
-            context.read<AuthBloc>().add(TokenCheckEvent(context));
+            context.read<AuthBloc>().add(TokenCheckEvent());
           }
         },
         child: BlocListener<AuthBloc, AuthState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state.state == UserAuthState.loginCompletedState) {
-              final token = context.read<UserProvider>().token ?? "";
-              final userId = context.read<UserProvider>().user!.id ?? "";
-              context.read<AppBloc>().add(RequestUserApplicationsEvent(context, token, userId));
+              await context.read<UserProvider>().autoLogin(state.token!, state.user!);
+              if(context.mounted){
+                final token = context.read<UserProvider>().token ?? "";
+                context.read<ApplicationProvider>().getMyApplications(token, state.user!.id!);
+              }
             }
           },
           child: GetMaterialApp(

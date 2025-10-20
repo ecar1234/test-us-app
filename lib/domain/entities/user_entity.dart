@@ -1,6 +1,7 @@
 
 
 import '../../data/models/user/user_model.dart';
+import 'application_entity.dart';
 
 class UserEntity {
   String? id;
@@ -11,6 +12,7 @@ class UserEntity {
   UserRole? role;
   String? userName;
   DateTime? birth;
+  List<ApplicationEntity>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -23,11 +25,13 @@ class UserEntity {
     this.role,
     this.userName,
     this.birth,
+    this.applications,
     this.createdAt,
     this.updatedAt,
   });
 
   static UserEntity toEntity(UserModel model) {
+    final applications = model.applications?.map((e) => ApplicationEntity.toEntity(e)).toList();
     return UserEntity(
         id: model.userId,
         email: model.email,
@@ -37,12 +41,14 @@ class UserEntity {
         role: model.role,
         userName: model.userName,
         birth: model.birth,
+        applications: applications,
         createdAt: model.createdAt,
         updatedAt: model.updatedAt
     );
   }
 
   static UserModel toModel(UserEntity entity) {
+    final applications = entity.applications?.map((e) => ApplicationEntity.toModel(e)).toList();
     return UserModel(
       userId: entity.id,
       email: entity.email,
@@ -52,6 +58,7 @@ class UserEntity {
       role: entity.role,
       userName: entity.userName,
       birth: entity.birth,
+      applications: applications,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt
     );

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-import '../login_page.dart';
-import '../post_create_page.dart';
 import '../provider/user_provider.dart';
+import '../tester_post_pages/post_create_page.dart';
 import 'login_dialogs.dart';
 
 class CustomBottomBar extends StatefulWidget {

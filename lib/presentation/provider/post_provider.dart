@@ -12,10 +12,11 @@ class PostProvider with ChangeNotifier {
 
   List<PostEntity>? _posts;
   List<PostEntity>? _favoritePost;
-
-  List<PostEntity>? get favoritePost => _favoritePost;
+  List<PostEntity>? _recruitmentPosts;
 
   List<PostEntity>? get posts => _posts;
+  List<PostEntity>? get favoritePost => _favoritePost;
+  List<PostEntity>? get recruitmentPosts => _recruitmentPosts;
 
   Future<List<PostEntity>?> getInitPosts() async {
     final res = await useCase.getPostInitData();
@@ -30,19 +31,12 @@ class PostProvider with ChangeNotifier {
     return res;
   }
 
-  // Future<void> getWebPosts({int page = 1}) async {
-  //   final res = await useCase.getWebPosts(page);
-  //   // _webPost.clear();
-  //   // _webPost.addAll(res);
-  //   notifyListeners();
-  // }
-  //
-  // Future<void> getMobilePosts({int page = 1}) async {
-  //   final res = await useCase.getMobilePosts(page);
-  //   // _mobilePost.clear();
-  //   // _mobilePost.addAll(res);
-  //   notifyListeners();
-  // }
+  Future<List<PostEntity>?> getUserRecruitmentPosts(String token, String userId) async {
+    final res = await useCase.getUserRecruitmentPosts(token, userId);
+    _recruitmentPosts = res;
+    notifyListeners();
+    return res;
+  }
 
   Future<void> getPostPagination({int page = 1}) async {
     final res = await useCase.getPostPagination(page);
@@ -57,25 +51,21 @@ class PostProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<PostEntity> createPost(String token, PostEntity post) async {
-    final res = await useCase.createPost(token, post);
-    _posts!.add(res);
+  void createPost(PostEntity post) async {
+    _posts!.add(post);
     notifyListeners();
-    return res;
   }
 
-  Future<PostEntity> updatePost(String token, PostEntity post) async {
-    final res = await useCase.updatePost(token, post);
+  void updatePost(PostEntity post) async {
     if (_posts!.any((element) => element.id == post.id)) {
       final idx = _posts!.indexWhere((e) {
         return e.id == post.id;
       });
-      _posts![idx] = res;
+      _posts![idx] = post;
     } else {
-      _posts!.add(res);
+      _posts!.add(post);
     }
     notifyListeners();
-    return res;
   }
 
   Future<bool> deletePost(String token, String id) async {
@@ -111,8 +101,8 @@ class PostProvider with ChangeNotifier {
     return res;
   }
 
-  Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages) async {
-    final res = await useCase.deletePostImg(token, deleteImages);
-    return res;
-  }
+  // Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages) async {
+  //   final res = await useCase.deletePostImg(token, deleteImages);
+  //   return res;
+  // }
 }

@@ -15,6 +15,7 @@ class AuthApi {
 class UserApi {
   static const String update = '/api/v1/user/update';
   static const String getUserById = '/api/v1/user/getUserById';
+  static const String getUsersByIds = '/api/v1/user/getUsersByIds';
   static const String getUserByEmail = '/api/v1/user/getUserByEmail';
   static const String getUserByNickname = '/api/v1/user/getUserByNickname';
   static const String updatePassword = '/api/v1/user/changePassword';
@@ -37,6 +38,7 @@ class PostApi {
   static const String registerPostImg = '/api/v1/images/uploads';
   static const String updatePostImg = '/api/v1/images/update';
   static const String deletePostImg = '/api/v1/images/delete';
+  static const String getUserRecruitmentPosts = '/api/v1/post/getUserRecruitmentPosts';
 }
 
 class ApplicationApi {
@@ -53,7 +55,13 @@ class ApplicationApi {
   // static const String getAppPostList = '/api/v1/application/getAppPostList';
 }
 
-class ReviewApi {}
+class ReviewApi {
+  static const String create = '/api/v1/review/create';
+  static const String update = '/api/v1/review/update';
+  static const String delete = '/api/v1/review/delete';
+  static const String getReviewsById = '/api/v1/review/getReviewsById';
+  static const String gatUsersReviewAverage = '/api/v1/review/getUserReviewAverage';
+}
 
 class MessageApi {}
 

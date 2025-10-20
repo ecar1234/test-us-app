@@ -1,11 +1,12 @@
-
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../domain/use_cases/user_usecase.dart';
 
 class UserProvider with ChangeNotifier {
   final UserUseCase useCase;
+  final logger = Logger();
   UserProvider(this.useCase);
 
   UserEntity? _user;
@@ -13,11 +14,13 @@ class UserProvider with ChangeNotifier {
   bool? _isLogged;
 
   String? get token => _token;
+
   UserEntity? get user => _user;
+
   bool? get isLogged => _isLogged;
 
   Future<void> autoLogin(String token, UserEntity user) async {
-    if(token.isEmpty || token == "") {
+    if (token.isEmpty || token == "") {
       _token = null;
       _user = null;
       _isLogged = false;
@@ -30,17 +33,19 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<int> login(String email, String password) async {
-    final res = await useCase.login(email, password);
-    if(res['user'].id == null){
-      return 401;
-    }else {
+  Future<void> login(String email, String password) async {
+    try {
+      final res = await useCase.login(email, password);
+
       _user = res['user'] as UserEntity;
       _token = res['token'] as String;
       _isLogged = true;
+    } on Exception catch (e) {
+      // TODO
+      logger.e(e);
     }
+
     notifyListeners();
-    return 200;
   }
 
   Future<int> signup(UserEntity userInfo) async {
@@ -64,11 +69,17 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getUserById(String id) async {
-    _user = await useCase.getUserById(id);
+  Future<UserEntity> getUserById(String token, String id) async {
+    final res = await useCase.getUserById(token, id);
+    _user = res;
     notifyListeners();
+    return res;
   }
 
+  // Future<List<UserEntity>> getUsersByIds(String token, List<String> ids) async {
+  //   final res = await useCase.getUsersByIds(token, ids);
+  //   return res;
+  // }
 
   Future<bool> isNicknameAvailable(String nickname) async {
     return await useCase.isNicknameAvailable(nickname);
@@ -80,12 +91,9 @@ class UserProvider with ChangeNotifier {
 
   Future<bool> isPasswordValid(String password) async {
     return await useCase.isPasswordValid(password);
-
   }
 
   Future<bool> updatePassword(String newPassword) async {
     return await useCase.updatePassword(newPassword);
-
   }
-
 }

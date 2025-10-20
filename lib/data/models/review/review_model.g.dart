@@ -9,11 +9,18 @@ part of 'review_model.dart';
 ReviewModel _$ReviewModelFromJson(Map<String, dynamic> json) => ReviewModel(
       reviewId: json['reviewId'] as String?,
       rating: (json['rating'] as num?)?.toInt(),
-      content: json['content'] as String?,
+      comment: json['comment'] as String?,
       reviewType: $enumDecodeNullable(_$ReviewTypeEnumMap, json['reviewType']),
-      applicationId: json['applicationId'] as String?,
-      reviewerUserId: json['reviewerUserId'] as String?,
-      reviewedUserId: json['reviewedUserId'] as String?,
+      application: json['application'] == null
+          ? null
+          : ApplicationModel.fromJson(
+              json['application'] as Map<String, dynamic>),
+      reviewer: json['reviewer'] == null
+          ? null
+          : UserModel.fromJson(json['reviewer'] as Map<String, dynamic>),
+      reviewed: json['reviewed'] == null
+          ? null
+          : UserModel.fromJson(json['reviewed'] as Map<String, dynamic>),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -23,15 +30,15 @@ Map<String, dynamic> _$ReviewModelToJson(ReviewModel instance) =>
     <String, dynamic>{
       'reviewId': instance.reviewId,
       'rating': instance.rating,
-      'content': instance.content,
+      'comment': instance.comment,
       'reviewType': _$ReviewTypeEnumMap[instance.reviewType],
-      'applicationId': instance.applicationId,
-      'reviewerUserId': instance.reviewerUserId,
-      'reviewedUserId': instance.reviewedUserId,
+      'application': instance.application,
+      'reviewer': instance.reviewer,
+      'reviewed': instance.reviewed,
       'createdAt': instance.createdAt?.toIso8601String(),
     };
 
 const _$ReviewTypeEnumMap = {
   ReviewType.productRating: 'PRODUCT_RATING',
-  ReviewType.attitudeRating: 'ATTITUDE_RATING',
+  ReviewType.attitudeRating: 'PARTICIPANT_ATTITUDE_RATING',
 };

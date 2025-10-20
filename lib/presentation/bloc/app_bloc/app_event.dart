@@ -1,40 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
+import 'package:test_us_app/domain/entities/post_entity.dart';
 
 class AppEvent{}
 
-class RequestApplyEvent extends AppEvent {
-  final BuildContext context;
+class RequestApplyEvent extends AppEvent{
   final String token;
-  final ApplicationEntity app;
-  RequestApplyEvent(this.context, this.token, this.app);
+  final ApplicationEntity application;
+  RequestApplyEvent(this.token, this.application);
 }
 
-class RequestApplyUpdate extends AppEvent {
-  final BuildContext context;
+class RequestUpdateApplicationEvent extends AppEvent{
   final String token;
-  final ApplicationEntity app;
-  RequestApplyUpdate(this.context, this.token, this.app);
+  final ApplicationEntity application;
+  RequestUpdateApplicationEvent(this.token, this.application);
 }
 
-class RequestApplyCancelEvent extends AppEvent {
-  BuildContext context;
-  String token;
-  int appId;
-  RequestApplyCancelEvent(this.context, this.token, this.appId);
+class RequestCancelEvent extends AppEvent {
+  final String token;
+  final int appId;
+  RequestCancelEvent(this.token, this.appId);
 }
 
-class ApplyRejectEvent extends AppEvent {}
-
-class ApplyCompleteEvent extends AppEvent {}
-
-class RequestUserApplicationsEvent extends AppEvent {
-  BuildContext context;
-  String token;
-  String userId;
-  RequestUserApplicationsEvent(this.context, this.token, this.userId);
+class RequestCompleteApplicationEvent extends AppEvent {
+  final String token;
+  final String userId;
+  final String postId;
+  RequestCompleteApplicationEvent(this.token, this.userId, this.postId);
 }
 
+class RequestRejectApplicationEvent extends AppEvent {
+  final String token;
+  final String userId;
+  final String postId;
+  RequestRejectApplicationEvent(this.token, this.userId, this.postId);
+}
+
+class ApplicationDataLoadEvent extends AppEvent {
+  ApplicationDataLoadEvent();
+}
 class RequestCompletedEvent extends AppEvent {
   RequestCompletedEvent();
+}
+
+class RequestErrorEvent extends AppEvent {
+  RequestErrorEvent();
 }

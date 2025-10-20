@@ -9,14 +9,17 @@ import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
 import 'package:test_us_app/domain/entities/post_entity.dart';
+import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/bloc/data_bloc/data_bloc.dart';
-import 'package:test_us_app/presentation/post_detail_page.dart';
+
 import 'package:test_us_app/presentation/provider/user_provider.dart';
+import 'package:test_us_app/presentation/tester_post_pages/post_detail_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
-import '../domain/entities/image_entity.dart';
-import 'bloc/data_bloc/data_event.dart';
-import 'bloc/data_bloc/data_state.dart';
+import '../../domain/entities/image_entity.dart';
+import '../bloc/data_bloc/data_event.dart';
+import '../bloc/data_bloc/data_state.dart';
+import '../provider/post_provider.dart';
 
 class PostCreatePage extends StatefulWidget {
   final PostEntity? post;
@@ -615,20 +618,20 @@ class _PostCreatePageState extends State<PostCreatePage> {
     return BlocListener<DataBloc, DataState>(
       listener: (context, state) async {
         if (state.state == DataLoadState.postCreateCompletedState) {
-          context.read<DataBloc>().add(RequestPostImgRegisterEvent(context, token, _selectedImages, state.post!.id!));
+          context.read<DataBloc>().add(RequestPostImgRegisterEvent(token, _selectedImages, state.post!.id!));
         } else if (state.state == DataLoadState.postUpdateCompletedState) {
-          if(state.post != null){
-            context
-                .read<DataBloc>()
-                .add(RequestPostImgUpdateEvent(context, token, _deleteImages, _selectedImages, state.post!.id!));
-          }
+          context
+              .read<DataBloc>()
+              .add(RequestPostImgUpdateEvent(token, _deleteImages, _selectedImages, state.post!.id!));
         }
-        if (state.state == DataLoadState.postImgRegisterCompletedState ||
-            state.state == DataLoadState.postImgUpdateCompletedState) {
-          await _alertDialog(context);
-          if (context.mounted) {
-            Navigator.pop(context);
-          }
+        if (state.state == DataLoadState.postImgRegisterCompletedState) {
+          if (context.mounted) context.read<PostProvider>().createPost(state.post!);
+          if (context.mounted) await _alertDialog(context, '등록');
+          if (context.mounted) Navigator.pop(context);
+        } else if (state.state == DataLoadState.postImgUpdateCompletedState) {
+          if (context.mounted) context.read<PostProvider>().updatePost(state.post!);
+          if (context.mounted) await _alertDialog(context, '수정');
+          if (context.mounted) Navigator.pop(context);
         }
       },
       child: SizedBox(
@@ -682,10 +685,12 @@ class _PostCreatePageState extends State<PostCreatePage> {
                       Get.snackbar("알림", "플랫폼을 선택해주세요.");
                       return;
                     }
-                    if(_selectedImages.isEmpty){
+                    if (_selectedImages.isEmpty) {
                       Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
                       return;
                     }
+
+                    context.read<DataBloc>().add(PostDataLoadEvent());
                     final post = PostEntity(
                       title: titleController.text,
                       subtitle: subtitleController.text,
@@ -696,7 +701,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
                     );
                     final token = context.read<UserProvider>().token!;
                     try {
-                      context.read<DataBloc>().add(RequestPostCreateEvent(context, post, token));
+                      context.read<DataBloc>().add(RequestPostCreateEvent(token, post));
                     } on Exception catch (e) {
                       // TODO
                       logger.e(e);
@@ -729,7 +734,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
                         author: context.read<UserProvider>().user);
                     final token = context.read<UserProvider>().token ?? "";
                     try {
-                      context.read<DataBloc>().add(RequestPostUpdateEvent(context, token, post));
+                      context.read<DataBloc>().add(RequestPostUpdateEvent(token, post));
                     } on Exception catch (e) {
                       // TODO
                       logger.e(e);
@@ -749,13 +754,13 @@ class _PostCreatePageState extends State<PostCreatePage> {
     );
   }
 
-  Future<void> _alertDialog(BuildContext context) {
+  Future<void> _alertDialog(BuildContext context, String content) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("게시 성공"),
-          content: Text("모집글 등록에 성공하였습니다."),
+          content: Text("테스터 모집글을 $content 했습니다.."),
           actions: [
             TextButton(
                 onPressed: () {

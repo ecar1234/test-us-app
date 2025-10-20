@@ -3,6 +3,7 @@
 import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
+import '../../domain/entities/review_entity.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../data_sources/user_data/user_data_source.dart';
 
@@ -18,8 +19,8 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<UserEntity> getUserById(String id) async {
-    final res = await remote.getUserById(id);
+  Future<UserEntity> getUserById(String token, String id) async {
+    final res = await remote.getUserById(token, id);
     return UserEntity.toEntity(res);
   }
 
@@ -62,5 +63,12 @@ class UserRepositoryImpl implements UserRepository {
     return await remote.updatePassword(newPassword);
   }
 
-
+  @override
+  Future<List<Map<String, dynamic>>> getUsersByIds(String token, List<String> ids) async {
+    final res = await remote.getUsersByIds(token, ids);
+    for (var element in res) {
+      element['user'] = UserEntity.toEntity(element['user']);
+    }
+    return res;
+  }
 }

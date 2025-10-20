@@ -13,13 +13,13 @@ class NetDriver {
   final logger = Logger();
   final dio = Dio();
 
-  Future<Map<String, dynamic>> requestGetJson(String token, String url, {String? parma = ""}) async {
+  Future<Map<String, dynamic>> requestGetJson(String token, String url, {String? param = ""}) async {
     dio.options.headers['Content-Type'] = 'application/json';
     if (token != "" || token != '') {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
-    final api = '$baseUrl$url/$parma';
-    logger.d(api);
+    final api = '$baseUrl$url/$param';
+    // logger.d(api);
     final res = await dio.get(api, options: Options(validateStatus: (status) {
       return status != null && status < 500;
     }));
