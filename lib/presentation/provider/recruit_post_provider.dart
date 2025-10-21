@@ -3,12 +3,12 @@ import 'package:test_us_app/domain/entities/post_entity.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../domain/entities/image_entity.dart';
-import '../../domain/use_cases/post_usecase.dart';
+import '../../domain/use_cases/recruit_post_usecase.dart';
 
-class PostProvider with ChangeNotifier {
-  final PostUseCase useCase;
+class RecruitPostProvider with ChangeNotifier {
+  final RecruitPostUseCase useCase;
 
-  PostProvider(this.useCase);
+  RecruitPostProvider(this.useCase);
 
   List<PostEntity>? _posts;
   List<PostEntity>? _favoritePost;
@@ -77,29 +77,29 @@ class PostProvider with ChangeNotifier {
     return res;
   }
 
-  Future<PostEntity> registerPostImg(String token, List<XFile> images, String postId) async {
-    final res = await useCase.registerPostImg(token, images, postId);
-    if(_posts!.any((element) => element.id == postId)){
-      final idx = _posts!.indexWhere((e) {
-        return e.id == postId;
-      });
-      _posts![idx] = res;
-      notifyListeners();
-    }
-    return res;
-  }
-
-  Future<PostEntity> updatePostImg(String token, List<ImageEntity> deleteImages, List<XFile> images, String postId) async {
-    final res = await useCase.updatePostImg(token, deleteImages, images, postId);
-    if(_posts!.any((element) => element.id == postId)){
-      final idx = _posts!.indexWhere((e) {
-        return e.id == postId;
-      });
-      _posts![idx] = res;
-      notifyListeners();
-    }
-    return res;
-  }
+  // Future<PostEntity> registerPostImg(String token, List<XFile> images, String postId) async {
+  //   final res = await useCase.registerPostImg(token, images, postId);
+  //   if(_posts!.any((element) => element.id == postId)){
+  //     final idx = _posts!.indexWhere((e) {
+  //       return e.id == postId;
+  //     });
+  //     _posts![idx] = res;
+  //     notifyListeners();
+  //   }
+  //   return res;
+  // }
+  //
+  // Future<PostEntity> updatePostImg(String token, List<ImageEntity> deleteImages, List<XFile> images, String postId) async {
+  //   final res = await useCase.updatePostImg(token, deleteImages, images, postId);
+  //   if(_posts!.any((element) => element.id == postId)){
+  //     final idx = _posts!.indexWhere((e) {
+  //       return e.id == postId;
+  //     });
+  //     _posts![idx] = res;
+  //     notifyListeners();
+  //   }
+  //   return res;
+  // }
 
   // Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages) async {
   //   final res = await useCase.deletePostImg(token, deleteImages);

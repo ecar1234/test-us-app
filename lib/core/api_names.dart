@@ -25,6 +25,12 @@ class UserApi {
   static const String isPasswordValid = '/api/v1/user/isPasswordValid';
 }
 
+class ImageApi {
+  static const String registerPostImg = '/api/v1/images/uploads';
+  static const String updatePostImg = '/api/v1/images/update';
+  static const String deletePostImg = '/api/v1/images/delete';
+}
+
 class PostApi {
   static const String create = '/api/v1/post/create';
   static const String update = '/api/v1/post/update';
@@ -32,12 +38,9 @@ class PostApi {
   static const String getPostById = '/api/v1/post/getPostById';
   static const String getPostsByTitle = '/api/v1/post/getPostsByTitle';
   static const String getInitPosts = '/api/v1/post/getInitPosts';
-  static const String getWebPosts = '/api/v1/post/getWebPostsPagination';
-  static const String getMobilePosts = '/api/v1/post/getMobilePostsPagination';
+  // static const String getWebPosts = '/api/v1/post/getWebPostsPagination';
+  // static const String getMobilePosts = '/api/v1/post/getMobilePostsPagination';
   static const String getPostsPagination = '/api/v1/post/getPostsPagination';
-  static const String registerPostImg = '/api/v1/images/uploads';
-  static const String updatePostImg = '/api/v1/images/update';
-  static const String deletePostImg = '/api/v1/images/delete';
   static const String getUserRecruitmentPosts = '/api/v1/post/getUserRecruitmentPosts';
 }
 

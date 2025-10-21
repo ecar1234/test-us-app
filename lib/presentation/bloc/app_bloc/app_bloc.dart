@@ -3,7 +3,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/domain/use_cases/application_usecase.dart';
-import 'package:test_us_app/domain/use_cases/post_usecase.dart';
+import 'package:test_us_app/domain/use_cases/recruit_post_usecase.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 
 import '../../../data/sharedPreferences/auth_preference.dart';
@@ -13,7 +13,7 @@ import 'app_state.dart';
 class AppBloc extends Bloc<AppEvent, AppState>{
   final pref = AuthPreference.instance;
   final logger = Logger();
-  AppBloc(ApplicationUseCase applicationUseCase, PostUseCase postUseCase): super(AppState()) {
+  AppBloc(ApplicationUseCase applicationUseCase, RecruitPostUseCase recruitPostUseCase): super(AppState()) {
 
     // on<ApplyRejectEvent>((event, emit) {
     //   emit(AppState(state: UserAppState.requestCompletedState));

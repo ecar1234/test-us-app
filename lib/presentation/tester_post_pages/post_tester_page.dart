@@ -4,15 +4,14 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
-import 'package:test_us_app/presentation/provider/post_provider.dart';
-import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/tester_post_pages/post_detail_page.dart';
 
 import '../../domain/entities/post_entity.dart';
 import '../../services/common_height_provider.dart';
-import '../bloc/data_bloc/data_bloc.dart';
-import '../bloc/data_bloc/data_event.dart';
-import '../bloc/data_bloc/data_state.dart';
+import '../bloc/recruit_post_bloc/recruit_post_bloc.dart';
+import '../bloc/recruit_post_bloc/recruit_post_event.dart';
+import '../bloc/recruit_post_bloc/recruit_post_state.dart';
+import '../provider/recruit_post_provider.dart';
 
 class PostTesterPage extends StatefulWidget {
   const PostTesterPage({super.key});
@@ -26,12 +25,12 @@ class _PostTesterPageState extends State<PostTesterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DataBloc, DataState>(builder: (context, state) {
-      if (state.state == DataLoadState.dataLoadState) {
+    return BlocBuilder<RecruitPostBloc, RecruitPostState>(builder: (context, state) {
+      if (state.state == RecruitPostLoadState.dataLoadState) {
         return SizedBox(child: Center(child: CircularProgressIndicator()));
-      } else if (state.state == DataLoadState.postImgRegisterCompletedState ||
-          state.state == DataLoadState.postImgDeleteCompletedState) {
-        context.read<DataBloc>().add(RequestCompleteEvent());
+      } else if (state.state == RecruitPostLoadState.postImgRegisterCompletedState ||
+          state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
+        context.read<RecruitPostBloc>().add(RequestCompleteEvent());
       }
 
       return SafeArea(
@@ -50,7 +49,7 @@ class _PostTesterPageState extends State<PostTesterPage> {
   }
 
   Widget _testerPost() {
-    return Selector<PostProvider, List<PostEntity>>(
+    return Selector<RecruitPostProvider, List<PostEntity>>(
         selector: (context, provider) => provider.posts ?? [],
         builder: (context, posts, child) {
           final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;

@@ -13,6 +13,8 @@ import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
+import 'package:test_us_app/presentation/bloc/recruit_post_bloc/recruit_post_bloc.dart';
+import 'package:test_us_app/presentation/bloc/recruit_post_bloc/recruit_post_state.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/tester_post_pages/post_create_page.dart';
@@ -24,11 +26,11 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/post_entity.dart';
 import '../../domain/entities/user_entity.dart';
 import '../bloc/app_bloc/app_bloc.dart';
-import '../bloc/data_bloc/data_bloc.dart';
-import '../bloc/data_bloc/data_event.dart';
-import '../bloc/data_bloc/data_state.dart';
+import '../bloc/image_bloc/image_bloc.dart';
+import '../bloc/image_bloc/image_event.dart';
+import '../bloc/recruit_post_bloc/recruit_post_event.dart';
 import '../components/login_dialogs.dart';
-import '../provider/post_provider.dart';
+import '../provider/recruit_post_provider.dart';
 
 class PostDetailPage extends StatefulWidget {
   final PostEntity? post;
@@ -52,34 +54,38 @@ class _PostDetailPageState extends State<PostDetailPage> {
     super.initState();
     if (widget.post == null && widget.postId != null) {
       final token = context.read<UserProvider>().token ?? '';
-      context.read<DataBloc>().add(RequestPostDataEvent(token, widget.postId!));
+      context.read<RecruitPostBloc>().add(RequestPostDataEvent(token, widget.postId!));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<DataBloc, DataState>(listener: (context, state) {
-      if (state.state == DataLoadState.postImgRegisterCompletedState ||
-          state.state == DataLoadState.postImgUpdateCompletedState) {
+
+    //TODO: 포스트와 이미지의 불리로 인하여 Consumer의 역학을 다시 점검 해야함.
+    return BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
+      //TODO : 이미지의 상태 변화로 인한 부분으로 post의 state 사용을 수정해야 함.
+      if (state.state == RecruitPostLoadState.postImgRegisterCompletedState ||
+          state.state == RecruitPostLoadState.postImgUpdateCompletedState) {
         // setState(() {
         //   _post = state.post;
         // });
         // // context.read<DataBloc>().add(RequestCompleteEvent());
       }
-      if(state.state == DataLoadState.getPostByIdCompletedState){
+      if(state.state == RecruitPostLoadState.getPostByIdCompletedState){
 
       }
-      if (state.state == DataLoadState.postDeleteCompletedState) {
+      if (state.state == RecruitPostLoadState.postDeleteCompletedState) {
         if (state.images != null && state.images!.isNotEmpty) {
           final token = context.read<UserProvider>().token ?? '';
-          context.read<DataBloc>().add(RequestPostImgDeleteEvent(token, state.post!.images!));
+          context.read<ImageBloc>().add(RequestPostImgDeleteEvent(token, state.post!.images!));
         } else {
-          context.read<DataBloc>().add(RequestCompleteEvent());
+          context.read<RecruitPostBloc>().add(RequestCompleteEvent());
           Navigator.pop(context);
         }
       }
-      else if (state.state == DataLoadState.postImgDeleteCompletedState) {
-        context.read<DataBloc>().add(RequestCompleteEvent());
+      // TODO: 이미지 삭제관련 로직으로 변경해야함.
+      else if (state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
+        context.read<RecruitPostBloc>().add(RequestCompleteEvent());
         Navigator.pop(context);
       }
     }, builder: (context, state) {
@@ -87,7 +93,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       if(widget.post != null){
         return _postInfoBuilder(widget.post!, hei);
       }
-      if (state.state == DataLoadState.dataLoadState) {
+      if (state.state == RecruitPostLoadState.dataLoadState) {
         return Scaffold(
           body: SizedBox(
             width: MediaQuery.sizeOf(context).width,
@@ -98,7 +104,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           ),
         );
       }
-      if(state.state == DataLoadState.getPostByIdCompletedState){
+      if(state.state == RecruitPostLoadState.getPostByIdCompletedState){
         return _postInfoBuilder(state.post!, hei);
       }
       return Scaffold(
@@ -131,9 +137,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   ),
                   actions: [
                     isAuthor
-                        ? BlocListener<DataBloc, DataState>(
+                        ? BlocListener<RecruitPostBloc, RecruitPostState>(
                       listener: (context, state) async {
-                        final token = context.read<UserProvider>().token ?? "";
+                        // final token = context.read<UserProvider>().token ?? "";
 
                       },
                       child: PopupMenuButton(
@@ -161,7 +167,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                 onPressed: () async {
                                   final token = context.read<UserProvider>().token ?? "";
                                   try {
-                                    context.read<DataBloc>().add(RequestPostDeleteEvent(token, post));
+                                    context.read<RecruitPostBloc>().add(RequestPostDeleteEvent(token, post));
                                   } on Exception catch (e) {
                                     // TODO
                                     Get.snackbar('알림', '삭제 실패');
@@ -347,8 +353,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   Widget _afterApplicationSection(PostEntity post) {
     return BlocBuilder<AppBloc, AppState>(builder: (context, state) {
+      // TODO: post가 업데이트 되는 부분의 로직은 복잡하고 불필요해 보임. 로직 수정 필요.
       if (state.state == UserAppState.requestCompletedState) {
-        context.read<DataBloc>().add(ReloadPostEvent());
+        context.read<RecruitPostBloc>().add(ReloadPostEvent());
         context.read<AppBloc>().add(RequestCompletedEvent());
       }
       return SizedBox(
@@ -481,8 +488,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   Widget _beforeApplicationSection(PostEntity post) {
     return BlocBuilder<AppBloc, AppState>(builder: (context, state) {
+      // TODO: post가 업데이트 되는 부분의 로직은 복잡하고 불필요해 보임. 로직 수정 필요.
       if (state.state == UserAppState.requestCompletedState) {
-        context.read<DataBloc>().add(ReloadPostEvent());
+        context.read<RecruitPostBloc>().add(ReloadPostEvent());
         context.read<AppBloc>().add(RequestCompletedEvent());
       }
       return Center(

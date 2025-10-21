@@ -8,7 +8,7 @@ import 'package:logger/logger.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
-import 'package:test_us_app/presentation/provider/post_provider.dart';
+import 'package:test_us_app/presentation/provider/recruit_post_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
 import '../../data/models/application/application_model.dart';
@@ -40,7 +40,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
     // TODO: implement initState
     super.initState();
     _applications =
-        context.read<PostProvider>().posts!.firstWhere((element) => element.id == widget.postId).applications!;
+        context.read<RecruitPostProvider>().posts!.firstWhere((element) => element.id == widget.postId).applications!;
 
     final applicantIds = _applications.map((app) => app.applicantId!).toList();
     final token = context.read<UserProvider>().token ?? '';
@@ -416,9 +416,9 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                           child: BlocConsumer<AppBloc, AppState>(
                             listener: (context, state) {
                               if (state.state == UserAppState.applicationCompletedState) {
-                                context.read<PostProvider>().updatePost(state.newPost!);
+                                context.read<RecruitPostProvider>().updatePost(state.newPost!);
                               }else if(state.state == UserAppState.applicationRejectCompletedState){
-                                context.read<PostProvider>().updatePost(state.newPost!);
+                                context.read<RecruitPostProvider>().updatePost(state.newPost!);
                                 // Get.back();
                               }
                             },

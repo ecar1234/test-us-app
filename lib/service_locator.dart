@@ -4,25 +4,30 @@ import 'package:get_it/get_it.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/application_data/application_datasource.dart';
 import 'package:test_us_app/data/data_sources/application_data/application_datasource_impl.dart';
-import 'package:test_us_app/data/data_sources/post_data/post_datasource.dart';
-import 'package:test_us_app/data/data_sources/post_data/post_datasource_impl.dart';
+import 'package:test_us_app/data/data_sources/post_data/recruit_post_datasource.dart';
+import 'package:test_us_app/data/data_sources/post_data/recruit_post_datasource_impl.dart';
 import 'package:test_us_app/data/data_sources/review_data/review_data_source.dart';
 import 'package:test_us_app/data/data_sources/review_data/review_data_source_impl.dart';
 import 'package:test_us_app/data/data_sources/user_data/user_data_source.dart';
 import 'package:test_us_app/data/data_sources/user_data/user_data_source_impl.dart';
-import 'package:test_us_app/data/repositories/post_repository_impl.dart';
+import 'package:test_us_app/data/repositories/recruit_post_repository_impl.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
 import 'core/net_driver.dart';
+import 'data/data_sources/image_data/image_data_source.dart';
+import 'data/data_sources/image_data/image_data_source_impl.dart';
 import 'data/repositories/application_repository_impl.dart';
+import 'data/repositories/image_repository_impl.dart';
 import 'data/repositories/review_repository_impl.dart';
 import 'data/repositories/user_repository_impl.dart';
 import 'domain/repositories/application_repo.dart';
-import 'domain/repositories/post_repository.dart';
+import 'domain/repositories/image_repository.dart';
+import 'domain/repositories/recruit_post_repository.dart';
 import 'domain/repositories/review_repository.dart';
 import 'domain/repositories/user_repository.dart';
 import 'domain/use_cases/application_usecase.dart';
-import 'domain/use_cases/post_usecase.dart';
+import 'domain/use_cases/image_usecase.dart';
+import 'domain/use_cases/recruit_post_usecase.dart';
 import 'domain/use_cases/review_usecase.dart';
 import 'domain/use_cases/user_usecase.dart';
 
@@ -34,21 +39,27 @@ Future<void> serviceLocator() async {
 
   // data
   getIt.registerLazySingleton<UserDataSource>(() => UserDataSourceImpl(getIt<NetDriver>()));
-  getIt.registerLazySingleton<PostDataSource>(() => PostDataSourceImpl(getIt<NetDriver>()));
+  getIt.registerLazySingleton<RecruitPostDatasource>(() => RecruitPostDatasourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<ApplicationDataSource>(() => ApplicationDataSourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<ReviewDataSource>(() => ReviewDataSourceImpl(getIt<NetDriver>()));
+  getIt.registerLazySingleton<ImageDataSource>(() => ImageDataSourceImpl(getIt<NetDriver>()));
+
 
   // domain
   getIt.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(getIt<UserDataSource>()));
-  getIt.registerLazySingleton<PostRepository>(() => PostRepositoryImpl(getIt<PostDataSource>()));
+  getIt.registerLazySingleton<RecruitPostRepository>(() => RecruitPostRepositoryImpl(getIt<RecruitPostDatasource>()));
   getIt.registerLazySingleton<ApplicationRepository>(() => ApplicationRepositoryImpl(getIt<ApplicationDataSource>()));
   getIt.registerLazySingleton<ReviewRepository>(() => ReviewRepositoryImpl(getIt<ReviewDataSource>()));
+  getIt.registerLazySingleton<ImageRepository>(() => ImageRepositoryImpl(getIt<ImageDataSource>()));
+
 
   // use case
   getIt.registerLazySingleton<UserUseCase>(() => UserUseCase(getIt<UserRepository>()));
-  getIt.registerLazySingleton<PostUseCase>(() => PostUseCase(getIt<PostRepository>()));
+  getIt.registerLazySingleton<RecruitPostUseCase>(() => RecruitPostUseCase(getIt<RecruitPostRepository>()));
   getIt.registerLazySingleton<ApplicationUseCase>(() => ApplicationUseCase(getIt<ApplicationRepository>()));
   getIt.registerLazySingleton<ReviewUseCase>(() => ReviewUseCase(getIt<ReviewRepository>()));
+  getIt.registerLazySingleton<ImageUseCase>(() => ImageUseCase(getIt<ImageRepository>()));
+
 
 
 }

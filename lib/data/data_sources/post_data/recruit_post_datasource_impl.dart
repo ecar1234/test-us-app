@@ -4,17 +4,17 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
-import 'package:test_us_app/data/data_sources/post_data/post_datasource.dart';
+import 'package:test_us_app/data/data_sources/post_data/recruit_post_datasource.dart';
 import 'package:test_us_app/data/models/post/post_model.dart';
 
 import '../../../core/net_driver.dart';
 import '../../models/post/image_model.dart';
 
-class PostDataSourceImpl implements PostDataSource {
+class RecruitPostDatasourceImpl implements RecruitPostDatasource {
   final logger = Logger();
   final NetDriver netDriver;
 
-  PostDataSourceImpl(this.netDriver);
+  RecruitPostDatasourceImpl(this.netDriver);
 
   @override
   Future<Map<String, List<PostModel>>> getPostsInitData() async {
@@ -98,44 +98,6 @@ class PostDataSourceImpl implements PostDataSource {
   Future<List<PostModel>> getPostByTitle(String title) {
     // TODO: implement getPostByTitle
     throw UnimplementedError();
-  }
-
-  @override
-  Future<PostModel> registerPostImg(String token, List<XFile> images, String postId) async {
-    final res = await netDriver.requestImagesRegisterFormData(token, PostApi.registerPostImg, images, postId);
-    if (res['status'] == 200) {
-      return PostModel.fromJson(res['post']);
-    } else {
-      throw Exception('Error');
-    }
-  }
-
-  @override
-  Future<PostModel> updatePostImg(
-      String token, List<ImageModel> deleteImages, List<XFile> images, String postId) async {
-    try {
-      final deleteData = deleteImages.map((e) => e.toJson()).toList();
-      final res = await netDriver.requestImagesUpdateFormData(token, PostApi.updatePostImg, deleteData, images, postId);
-      if (res['status'] == 200) {
-        return PostModel.fromJson(res['post']);
-      } else {
-        throw Exception('Error');
-      }
-    } on Exception catch (e) {
-      // TODO
-      logger.e(e);
-      rethrow;
-    }
-  }
-
-  @override
-  Future<bool> deletePostImg(String token, List<Map<String, dynamic>> deleteImages) async {
-    final res = await netDriver.requestImagesDeleteFormData(token, PostApi.deletePostImg, deleteImages);
-    if (res['status'] == 200) {
-      return res['result'];
-    } else {
-      throw Exception('Error');
-    }
   }
 
   Future<Map<String, List<PostModel>>> _startPolling(String jobId, String token) {

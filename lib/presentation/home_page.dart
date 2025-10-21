@@ -4,8 +4,9 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/presentation/bloc/recruit_post_bloc/recruit_post_state.dart';
 
-import 'package:test_us_app/presentation/provider/post_provider.dart';
+import 'package:test_us_app/presentation/provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/setting_page.dart';
 import 'package:test_us_app/presentation/tester_post_pages/post_detail_page.dart';
@@ -15,9 +16,8 @@ import '../domain/entities/post_entity.dart';
 import '../services/common_height_provider.dart';
 import 'bloc/auth_bloc/auth_bloc.dart';
 import 'bloc/auth_bloc/auth_event.dart';
-import 'bloc/data_bloc/data_bloc.dart';
-import 'bloc/data_bloc/data_event.dart';
-import 'bloc/data_bloc/data_state.dart';
+import 'bloc/recruit_post_bloc/recruit_post_bloc.dart';
+import 'bloc/recruit_post_bloc/recruit_post_event.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -34,12 +34,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
-    return BlocListener<DataBloc, DataState>(
+    return BlocListener<RecruitPostBloc, RecruitPostState>(
         listener: (context, state) {
-          if (state.state == DataLoadState.postImgRegisterCompletedState ||
-              state.state == DataLoadState.postImgUpdateCompletedState ||
-              state.state == DataLoadState.postImgDeleteCompletedState) {
-            context.read<DataBloc>().add(RequestCompleteEvent());
+          if (state.state == RecruitPostLoadState.postImgRegisterCompletedState ||
+              state.state == RecruitPostLoadState.postImgUpdateCompletedState ||
+              state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
+            context.read<RecruitPostBloc>().add(RequestCompleteEvent());
           }
         },
         child: SafeArea(
@@ -198,7 +198,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      Selector<PostProvider, List<PostEntity>>(
+      Selector<RecruitPostProvider, List<PostEntity>>(
         selector: (context, provider) => provider.favoritePost ?? [],
         builder: (context, favoritePost, child) => SizedBox(
             height: 220,
@@ -288,7 +288,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _testerList(BuildContext context) {
-    return BlocBuilder<DataBloc, DataState>(
+    return BlocBuilder<RecruitPostBloc, RecruitPostState>(
       builder: (context, state) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -300,9 +300,9 @@ class _HomePageState extends State<HomePage> {
                 Text('테스터 모집', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 TextButton(
                     onPressed: () async {
-                      context.read<DataBloc>().add(PostDataLoadEvent());
-                      await context.read<PostProvider>().getPostPagination(page: 1);
-                      if(context.mounted) context.read<DataBloc>().add(RequestRecruitmentPaginationEvent());
+                      context.read<RecruitPostBloc>().add(PostDataLoadEvent());
+                      await context.read<RecruitPostProvider>().getPostPagination(page: 1);
+                      if(context.mounted) context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent());
                       widget.onTap(1);
                     },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
@@ -310,7 +310,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Selector<PostProvider, List<PostEntity>>(
+          Selector<RecruitPostProvider, List<PostEntity>>(
             selector: (context, provider) => provider.posts ?? [],
             builder: (context, post, child) => SizedBox(
                 height: 230,

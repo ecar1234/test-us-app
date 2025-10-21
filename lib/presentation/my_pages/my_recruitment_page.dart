@@ -4,14 +4,14 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:test_us_app/domain/entities/post_entity.dart';
-import 'package:test_us_app/presentation/bloc/data_bloc/data_event.dart';
 import 'package:test_us_app/presentation/my_pages/application_management_page.dart';
 
 import '../../data/models/application/application_model.dart';
 import '../../data/models/post/post_model.dart';
 import '../../services/common_height_provider.dart';
-import '../bloc/data_bloc/data_bloc.dart';
-import '../bloc/data_bloc/data_state.dart';
+import '../bloc/recruit_post_bloc/recruit_post_bloc.dart';
+import '../bloc/recruit_post_bloc/recruit_post_event.dart';
+import '../bloc/recruit_post_bloc/recruit_post_state.dart';
 import '../provider/user_provider.dart';
 import '../tester_post_pages/post_detail_page.dart';
 
@@ -32,7 +32,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
   Future<void> _requestRecruitmentPosts() async {
     final token = context.read<UserProvider>().token ?? '';
     final userId = context.read<UserProvider>().user!.id ?? '';
-    context.read<DataBloc>().add(RequestUserRecruitmentPosts(token, userId));
+    context.read<RecruitPostBloc>().add(RequestUserRecruitmentPosts(token, userId));
   }
 
   @override
@@ -44,13 +44,13 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
       appBar: AppBar(
         title: Text("테스터 모집 관리"),
       ),
-      body: BlocConsumer<DataBloc, DataState>(listener: (context, state) {
-        if (state.state == DataLoadState.getUserRecruitmentPostsCompletedState) {
+      body: BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
+        if (state.state == RecruitPostLoadState.getUserRecruitmentPostsCompletedState) {
           // posts = state.posts!;
           // context.read<DataBloc>().add(RequestCompleteEvent());
         }
       }, builder: (context, state) {
-        if (state.state == DataLoadState.dataLoadState) {
+        if (state.state == RecruitPostLoadState.dataLoadState) {
           return SizedBox(
             width: MediaQuery.sizeOf(context).width,
             height: hei,

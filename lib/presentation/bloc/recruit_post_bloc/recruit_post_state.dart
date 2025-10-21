@@ -2,7 +2,7 @@
 
 import 'package:test_us_app/domain/entities/post_entity.dart';
 
-enum DataLoadState {
+enum RecruitPostLoadState {
   serviceStartState,
   beforeDataLoadState,
   dataLoadState,
@@ -20,11 +20,11 @@ enum DataLoadState {
   errorState,
 }
 
-class DataState {
-  DataLoadState state;
+class RecruitPostState {
+  RecruitPostLoadState state;
   PostEntity? post;
   List<PostEntity>? posts;
   List<Map<String, dynamic>>? images;
 
-  DataState({this.state = DataLoadState.serviceStartState, this.post, this.images, this.posts});
+  RecruitPostState({this.state = RecruitPostLoadState.serviceStartState, this.post, this.images, this.posts});
 }

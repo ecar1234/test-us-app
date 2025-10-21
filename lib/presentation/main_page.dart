@@ -6,7 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
-import 'package:test_us_app/presentation/provider/post_provider.dart';
+import 'package:test_us_app/presentation/provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/purchase_page.dart';
 import 'package:test_us_app/presentation/tester_post_pages/post_tester_page.dart';
@@ -15,14 +15,11 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../data/sharedPreferences/auth_preference.dart';
-import '../domain/entities/user_entity.dart';
-import 'bloc/app_bloc/app_bloc.dart';
-import 'bloc/app_bloc/app_event.dart';
 import 'bloc/auth_bloc/auth_bloc.dart';
 import 'bloc/auth_bloc/auth_state.dart';
-import 'bloc/data_bloc/data_bloc.dart';
-import 'bloc/data_bloc/data_event.dart';
-import 'bloc/data_bloc/data_state.dart';
+import 'bloc/recruit_post_bloc/recruit_post_bloc.dart';
+import 'bloc/recruit_post_bloc/recruit_post_event.dart';
+import 'bloc/recruit_post_bloc/recruit_post_state.dart';
 import 'components/custom_bottom_bar.dart';
 import 'home_page.dart';
 
@@ -45,17 +42,17 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
 
   Future<void> _loadSetting() async {
     GetIt.I.get<ResponsiveHeightProvider>().setHeight(context);
-    context.read<DataBloc>().add(ServiceStartEvent());
+    context.read<RecruitPostBloc>().add(ServiceStartEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<DataBloc, DataState>(
+    return BlocListener<RecruitPostBloc, RecruitPostState>(
         listener: (context, state) async {
-          if (state.state == DataLoadState.serviceStartState) {
-            await context.read<PostProvider>().getInitPosts();
-            if(context.mounted) context.read<DataBloc>().add(RequestInitDataEvent());
-          } else if (state.state == DataLoadState.initDataLoadCompletedState) {
+          if (state.state == RecruitPostLoadState.serviceStartState) {
+            await context.read<RecruitPostProvider>().getInitPosts();
+            if(context.mounted) context.read<RecruitPostBloc>().add(RequestInitDataEvent());
+          } else if (state.state == RecruitPostLoadState.initDataLoadCompletedState) {
             context.read<AuthBloc>().add(TokenCheckEvent());
           }
         },
