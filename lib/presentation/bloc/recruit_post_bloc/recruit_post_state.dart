@@ -1,6 +1,6 @@
 
 
-import 'package:test_us_app/domain/entities/post_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
 enum RecruitPostLoadState {
   serviceStartState,
@@ -14,16 +14,13 @@ enum RecruitPostLoadState {
   postDeleteCompletedState,
   getPostByIdCompletedState,
   getUserRecruitmentPostsCompletedState,
-  postImgRegisterCompletedState,
-  postImgUpdateCompletedState,
-  postImgDeleteCompletedState,
   errorState,
 }
 
 class RecruitPostState {
   RecruitPostLoadState state;
-  PostEntity? post;
-  List<PostEntity>? posts;
+  RecruitPostEntity? post;
+  List<RecruitPostEntity>? posts;
   List<Map<String, dynamic>>? images;
 
   RecruitPostState({this.state = RecruitPostLoadState.serviceStartState, this.post, this.images, this.posts});

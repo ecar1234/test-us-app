@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test_us_app/domain/entities/post_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../domain/entities/image_entity.dart';
@@ -10,15 +10,15 @@ class RecruitPostProvider with ChangeNotifier {
 
   RecruitPostProvider(this.useCase);
 
-  List<PostEntity>? _posts;
-  List<PostEntity>? _favoritePost;
-  List<PostEntity>? _recruitmentPosts;
+  List<RecruitPostEntity>? _posts;
+  List<RecruitPostEntity>? _favoritePost;
+  List<RecruitPostEntity>? _recruitmentPosts;
 
-  List<PostEntity>? get posts => _posts;
-  List<PostEntity>? get favoritePost => _favoritePost;
-  List<PostEntity>? get recruitmentPosts => _recruitmentPosts;
+  List<RecruitPostEntity>? get posts => _posts;
+  List<RecruitPostEntity>? get favoritePost => _favoritePost;
+  List<RecruitPostEntity>? get recruitmentPosts => _recruitmentPosts;
 
-  Future<List<PostEntity>?> getInitPosts() async {
+  Future<List<RecruitPostEntity>?> getInitPosts() async {
     final res = await useCase.getPostInitData();
     _favoritePost = res['favoritePosts'];
     _posts = res['posts'];
@@ -26,12 +26,12 @@ class RecruitPostProvider with ChangeNotifier {
     return res['posts'];
   }
 
-  Future<PostEntity> getPostById(String token, String id) async {
+  Future<RecruitPostEntity> getPostById(String token, String id) async {
     final res = await useCase.getPostById(token, id);
     return res;
   }
 
-  Future<List<PostEntity>?> getUserRecruitmentPosts(String token, String userId) async {
+  Future<List<RecruitPostEntity>?> getUserRecruitmentPosts(String token, String userId) async {
     final res = await useCase.getUserRecruitmentPosts(token, userId);
     _recruitmentPosts = res;
     notifyListeners();
@@ -51,12 +51,12 @@ class RecruitPostProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void createPost(PostEntity post) async {
+  void createPost(RecruitPostEntity post) async {
     _posts!.add(post);
     notifyListeners();
   }
 
-  void updatePost(PostEntity post) async {
+  void updatePost(RecruitPostEntity post) async {
     if (_posts!.any((element) => element.id == post.id)) {
       final idx = _posts!.indexWhere((e) {
         return e.id == post.id;

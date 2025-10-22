@@ -2,12 +2,12 @@ import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../data/models/application/application_model.dart';
-import '../../data/models/post/image_model.dart';
-import '../../data/models/post/post_model.dart';
+import '../../data/models/image/image_model.dart';
+import '../../data/models/post/recruit_post_model.dart';
 import 'application_entity.dart';
 import 'image_entity.dart';
 
-class PostEntity {
+class RecruitPostEntity {
   String? id;
   String? title;
   String? subtitle;
@@ -22,7 +22,7 @@ class PostEntity {
   DateTime? createdAt;
   DateTime? updatedAt;
 
-  PostEntity({
+  RecruitPostEntity({
     this.id,
     this.title,
     this.subtitle,
@@ -38,14 +38,14 @@ class PostEntity {
     this.updatedAt,
   });
 
-  static PostEntity toPostEntity(PostModel model){
+  static RecruitPostEntity toPostEntity(RecruitPostModel model){
     final user = UserEntity(
       id: model.author!.userId,
       nickname: model.author!.nickname,
     );
     final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
     final applications = model.applications!.map((e) => ApplicationEntity.toEntity(e)).toList();
-    return PostEntity(
+    return RecruitPostEntity(
       id: model.id,
       title: model.title,
       subtitle: model.subtitle,
@@ -61,14 +61,14 @@ class PostEntity {
       updatedAt: model.updatedAt,
     );
   }
-  static PostModel toPostModel(PostEntity entity){
+  static RecruitPostModel toPostModel(RecruitPostEntity entity){
     final user = UserModel(
       userId: entity.author!.id,
       nickname: entity.author!.nickname,
     );
     final List<ImageModel> images = entity.images != null ? entity.images!.map((e) => ImageEntity.toImageModel(e)).toList() : [];
     final List<ApplicationModel> applications = entity.applications != null ? entity.applications!.map((e) => ApplicationEntity.toModel(e)).toList() : [];
-    return PostModel(
+    return RecruitPostModel(
       id: entity.id,
       title: entity.title,
       subtitle: entity.subtitle,

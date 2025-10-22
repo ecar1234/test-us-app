@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/domain/entities/image_entity.dart';
 
-import '../../../domain/entities/post_entity.dart';
+import '../../../domain/entities/recruit_post_entity.dart';
 
 class RecruitPostEvent {}
 
@@ -32,19 +32,19 @@ class RequestPostDataEvent extends RecruitPostEvent {
 }
 class RequestPostUpdateEvent extends RecruitPostEvent {
   final String token;
-  final PostEntity post;
+  final RecruitPostEntity post;
   RequestPostUpdateEvent(this.token, this.post);
 }
 //
 class RequestPostCreateEvent extends RecruitPostEvent {
   String token;
-  PostEntity post;
+  RecruitPostEntity post;
   RequestPostCreateEvent(this.token, this.post);
 }
 //
 class RequestPostDeleteEvent extends RecruitPostEvent {
   final String token;
-  final PostEntity post;
+  final RecruitPostEntity post;
   RequestPostDeleteEvent(this.token, this.post);
 }
 //

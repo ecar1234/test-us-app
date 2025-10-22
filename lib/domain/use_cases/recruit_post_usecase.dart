@@ -1,7 +1,7 @@
 import 'package:image_picker/image_picker.dart';
 
 import '../entities/image_entity.dart';
-import '../entities/post_entity.dart';
+import '../entities/recruit_post_entity.dart';
 import '../repositories/recruit_post_repository.dart';
 
 class RecruitPostUseCase {
@@ -9,22 +9,22 @@ class RecruitPostUseCase {
 
   RecruitPostUseCase(this.repository);
 
-  Future<Map<String, List<PostEntity>>> getPostInitData() async {
+  Future<Map<String, List<RecruitPostEntity>>> getPostInitData() async {
     final initData = await repository.getPostInitData();
     return {'favoritePosts': initData['favoritePosts']!, 'posts': initData['posts']!};
   }
 
-  Future<PostEntity> getPostById(String token, String id) async {
+  Future<RecruitPostEntity> getPostById(String token, String id) async {
     final res = await repository.getPostById(token, id);
     return res;
   }
 
-  Future<List<PostEntity>> getUserRecruitmentPosts(String token, String userId) async {
+  Future<List<RecruitPostEntity>> getUserRecruitmentPosts(String token, String userId) async {
     final res = await repository.getUserRecruitmentPosts(token, userId);
     return res;
   }
 
-  Future<PostEntity> updatePost(String token, PostEntity post) async {
+  Future<RecruitPostEntity> updatePost(String token, RecruitPostEntity post) async {
     final res = await repository.updatePost(token, post);
     return res;
   }
@@ -34,7 +34,7 @@ class RecruitPostUseCase {
     return res;
   }
 
-  Future<PostEntity> createPost(String token, PostEntity post) async {
+  Future<RecruitPostEntity> createPost(String token, RecruitPostEntity post) async {
     final res = await repository.createPost(token, post);
     return res;
   }
@@ -43,12 +43,12 @@ class RecruitPostUseCase {
   //   final res = await repository.getPostById(id);
   //   return res;
   // }
-  Future<List<PostEntity>> getPostByTitle(String title) async {
+  Future<List<RecruitPostEntity>> getPostByTitle(String title) async {
     final res = await repository.getPostByTitle(title);
     return res;
   }
 
-  Future<List<PostEntity>> getPostPagination(int page) async {
+  Future<List<RecruitPostEntity>> getPostPagination(int page) async {
     final res = await repository.getPostPagination(page);
     return res;
   }

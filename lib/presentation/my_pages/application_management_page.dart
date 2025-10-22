@@ -13,7 +13,7 @@ import 'package:test_us_app/services/common_height_provider.dart';
 
 import '../../data/models/application/application_model.dart';
 import '../../data/models/user/user_model.dart';
-import '../../domain/entities/post_entity.dart';
+import '../../domain/entities/recruit_post_entity.dart';
 import '../bloc/app_bloc/app_bloc.dart';
 import '../bloc/app_bloc/app_state.dart';
 import '../bloc/user_bloc/user_bloc.dart';
@@ -284,7 +284,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                     children: [
                       Flexible(
                           flex: 7,
-                          child: BlocSelector<AppBloc, AppState, PostEntity?>(
+                          child: BlocSelector<AppBloc, AppState, RecruitPostEntity?>(
                               selector: (state) => state.newPost,
                               builder: (context, post) {
                                 // ApplicationStatus appState = _applications[idx].status!;

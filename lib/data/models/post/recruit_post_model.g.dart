@@ -1,12 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'post_model.dart';
+part of 'recruit_post_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
+RecruitPostModel _$RecruitPostModelFromJson(Map<String, dynamic> json) =>
+    RecruitPostModel(
       id: json['id'] as String?,
       author: json['author'] == null
           ? null
@@ -34,7 +35,8 @@ PostModel _$PostModelFromJson(Map<String, dynamic> json) => PostModel(
           : DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$PostModelToJson(PostModel instance) => <String, dynamic>{
+Map<String, dynamic> _$RecruitPostModelToJson(RecruitPostModel instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'subtitle': instance.subtitle,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
-import 'package:test_us_app/domain/entities/post_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
 class AppEvent{}
 

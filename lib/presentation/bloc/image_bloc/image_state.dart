@@ -1,17 +1,19 @@
 
 
-import 'package:test_us_app/domain/entities/post_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
 enum ImageLoadState {
   beforeImageUploadState,
   imageUploadingState,
   imageUploadCompletedState,
+  imageUpdateCompletedState,
+  imageDeleteCompletedState,
   imageUploadFailedState,
   imageUploadErrorState,
 }
 
 class ImageState {
   ImageLoadState state;
-  PostEntity? post;
+  RecruitPostEntity? post;
   ImageState({this.state = ImageLoadState.beforeImageUploadState, this.post});
 }

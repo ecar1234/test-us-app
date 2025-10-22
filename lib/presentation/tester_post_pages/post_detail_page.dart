@@ -23,7 +23,7 @@ import 'package:test_us_app/utils/linkfy_util.dart';
 import 'package:test_us_app/utils/play_store_linkify_util.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../domain/entities/post_entity.dart';
+import '../../domain/entities/recruit_post_entity.dart';
 import '../../domain/entities/user_entity.dart';
 import '../bloc/app_bloc/app_bloc.dart';
 import '../bloc/image_bloc/image_bloc.dart';
@@ -33,7 +33,7 @@ import '../components/login_dialogs.dart';
 import '../provider/recruit_post_provider.dart';
 
 class PostDetailPage extends StatefulWidget {
-  final PostEntity? post;
+  final RecruitPostEntity? post;
   final String? postId;
 
   const PostDetailPage({super.key, this.post, this.postId});
@@ -44,10 +44,6 @@ class PostDetailPage extends StatefulWidget {
 
 class _PostDetailPageState extends State<PostDetailPage> {
   final logger = Logger();
-  // late PostEntity? _post;
-
-  // late List<XFile>? _images;
-
   @override
   void initState() {
     // TODO: implement initState
@@ -63,31 +59,32 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     //TODO: 포스트와 이미지의 불리로 인하여 Consumer의 역학을 다시 점검 해야함.
     return BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
-      //TODO : 이미지의 상태 변화로 인한 부분으로 post의 state 사용을 수정해야 함.
-      if (state.state == RecruitPostLoadState.postImgRegisterCompletedState ||
-          state.state == RecruitPostLoadState.postImgUpdateCompletedState) {
-        // setState(() {
-        //   _post = state.post;
-        // });
-        // // context.read<DataBloc>().add(RequestCompleteEvent());
-      }
+      // TODO : 이미지의 상태 변화로 인한 부분으로 post의 state 사용을 수정해야 함.
+      // if (state.state == RecruitPostLoadState.postImgRegisterCompletedState ||
+      //     state.state == RecruitPostLoadState.postImgUpdateCompletedState) {
+      //   // setState(() {
+      //   //   _post = state.post;
+      //   // });
+      //   // // context.read<DataBloc>().add(RequestCompleteEvent());
+      // }
       if(state.state == RecruitPostLoadState.getPostByIdCompletedState){
 
       }
-      if (state.state == RecruitPostLoadState.postDeleteCompletedState) {
-        if (state.images != null && state.images!.isNotEmpty) {
-          final token = context.read<UserProvider>().token ?? '';
-          context.read<ImageBloc>().add(RequestPostImgDeleteEvent(token, state.post!.images!));
-        } else {
-          context.read<RecruitPostBloc>().add(RequestCompleteEvent());
-          Navigator.pop(context);
-        }
-      }
-      // TODO: 이미지 삭제관련 로직으로 변경해야함.
-      else if (state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
-        context.read<RecruitPostBloc>().add(RequestCompleteEvent());
-        Navigator.pop(context);
-      }
+      // TODO: 이미지 삭제관련 로직으로 변경해야함.??
+      //
+      // if (state.state == RecruitPostLoadState.postDeleteCompletedState) {
+      //   if (state.images != null && state.images!.isNotEmpty) {
+      //     final token = context.read<UserProvider>().token ?? '';
+      //     context.read<ImageBloc>().add(RequestPostImgDeleteEvent(token, state.post!.images!));
+      //   } else {
+      //     context.read<RecruitPostBloc>().add(RequestCompleteEvent());
+      //     Navigator.pop(context);
+      //   }
+      // }
+      // else if (state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
+      //   context.read<RecruitPostBloc>().add(RequestCompleteEvent());
+      //   Navigator.pop(context);
+      // }
     }, builder: (context, state) {
       final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
       if(widget.post != null){
@@ -119,7 +116,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     });
   }
 
-  Widget _postInfoBuilder(PostEntity post, double hei){
+  Widget _postInfoBuilder(RecruitPostEntity post, double hei){
     final userId = context.read<UserProvider>().isLogged ?? false ? context.read<UserProvider>().user!.id : "";
     final isAuthor = post.author != null && post.author!.id == userId;
     return SafeArea(
@@ -334,7 +331,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         ));
   }
 
-  Widget _applicationSection(bool isLogged, PostEntity post, ApplicationEntity application) {
+  Widget _applicationSection(bool isLogged, RecruitPostEntity post, ApplicationEntity application) {
     if (!isLogged) return _beforeApplicationSection(post);
 
     // 신청 내역이 없는 경우
@@ -351,7 +348,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
   }
 
-  Widget _afterApplicationSection(PostEntity post) {
+  Widget _afterApplicationSection(RecruitPostEntity post) {
     return BlocBuilder<AppBloc, AppState>(builder: (context, state) {
       // TODO: post가 업데이트 되는 부분의 로직은 복잡하고 불필요해 보임. 로직 수정 필요.
       if (state.state == UserAppState.requestCompletedState) {
@@ -486,7 +483,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     });
   }
 
-  Widget _beforeApplicationSection(PostEntity post) {
+  Widget _beforeApplicationSection(RecruitPostEntity post) {
     return BlocBuilder<AppBloc, AppState>(builder: (context, state) {
       // TODO: post가 업데이트 되는 부분의 로직은 복잡하고 불필요해 보임. 로직 수정 필요.
       if (state.state == UserAppState.requestCompletedState) {

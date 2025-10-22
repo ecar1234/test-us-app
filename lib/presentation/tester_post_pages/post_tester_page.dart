@@ -6,7 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/tester_post_pages/post_detail_page.dart';
 
-import '../../domain/entities/post_entity.dart';
+import '../../domain/entities/recruit_post_entity.dart';
 import '../../services/common_height_provider.dart';
 import '../bloc/recruit_post_bloc/recruit_post_bloc.dart';
 import '../bloc/recruit_post_bloc/recruit_post_event.dart';
@@ -28,10 +28,11 @@ class _PostTesterPageState extends State<PostTesterPage> {
     return BlocBuilder<RecruitPostBloc, RecruitPostState>(builder: (context, state) {
       if (state.state == RecruitPostLoadState.dataLoadState) {
         return SizedBox(child: Center(child: CircularProgressIndicator()));
-      } else if (state.state == RecruitPostLoadState.postImgRegisterCompletedState ||
-          state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
-        context.read<RecruitPostBloc>().add(RequestCompleteEvent());
       }
+      // else if (state.state == RecruitPostLoadState.postImgRegisterCompletedState ||
+      //     state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
+      //   context.read<RecruitPostBloc>().add(RequestCompleteEvent());
+      // }
 
       return SafeArea(
           child: Scaffold(
@@ -49,7 +50,7 @@ class _PostTesterPageState extends State<PostTesterPage> {
   }
 
   Widget _testerPost() {
-    return Selector<RecruitPostProvider, List<PostEntity>>(
+    return Selector<RecruitPostProvider, List<RecruitPostEntity>>(
         selector: (context, provider) => provider.posts ?? [],
         builder: (context, posts, child) {
           final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;

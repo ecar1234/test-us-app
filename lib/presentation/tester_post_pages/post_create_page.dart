@@ -8,7 +8,7 @@ import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
-import 'package:test_us_app/domain/entities/post_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 
 import 'package:test_us_app/presentation/provider/user_provider.dart';
@@ -18,13 +18,14 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import '../../domain/entities/image_entity.dart';
 import '../bloc/image_bloc/image_bloc.dart';
 import '../bloc/image_bloc/image_event.dart';
+import '../bloc/image_bloc/image_state.dart';
 import '../bloc/recruit_post_bloc/recruit_post_bloc.dart';
 import '../bloc/recruit_post_bloc/recruit_post_event.dart';
 import '../bloc/recruit_post_bloc/recruit_post_state.dart';
 import '../provider/recruit_post_provider.dart';
 
 class PostCreatePage extends StatefulWidget {
-  final PostEntity? post;
+  final RecruitPostEntity? post;
 
   const PostCreatePage({super.key, this.post});
 
@@ -110,11 +111,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
           child: Scaffold(
               appBar: AppBar(
                   title: Text("테스터 모집"),
-                  leading: CloseButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  )),
+              ),
               body: SingleChildScrollView(
                 child: Container(
                   width: MediaQuery.sizeOf(context).width,
@@ -315,9 +312,9 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                   fit: BoxFit.cover,
                                 ),
                               //TODO: post로직 이미지 로직으로 변경 필요.
-                              BlocListener<RecruitPostBloc, RecruitPostState>(
+                              BlocListener<ImageBloc, ImageState>(
                                 listener: (context, state) {
-                                  if (state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
+                                  if (state.state == ImageLoadState.imageDeleteCompletedState) {
                                     setState(() {
                                       _existedImages.removeAt(idx);
                                     });
@@ -619,25 +616,30 @@ class _PostCreatePageState extends State<PostCreatePage> {
   Widget _buttonSection(BuildContext context) {
     final token = context.read<UserProvider>().token ?? '';
     //TODO: post로직 이미지 로직으로 변경 필요.
-    return BlocListener<RecruitPostBloc, RecruitPostState>(
-      listener: (context, state) async {
-        if (state.state == RecruitPostLoadState.postCreateCompletedState) {
-          context.read<ImageBloc>().add(RequestPostImgRegisterEvent(token, _selectedImages, state.post!.id!));
-        } else if (state.state == RecruitPostLoadState.postUpdateCompletedState) {
-          context
-              .read<ImageBloc>()
-              .add(RequestPostImgUpdateEvent(token, _deleteImages, _selectedImages, state.post!.id!));
-        }
-        if (state.state == RecruitPostLoadState.postImgRegisterCompletedState) {
-          if (context.mounted) context.read<RecruitPostProvider>().createPost(state.post!);
-          if (context.mounted) await _alertDialog(context, '등록');
-          if (context.mounted) Navigator.pop(context);
-        } else if (state.state == RecruitPostLoadState.postImgUpdateCompletedState) {
-          if (context.mounted) context.read<RecruitPostProvider>().updatePost(state.post!);
-          if (context.mounted) await _alertDialog(context, '수정');
-          if (context.mounted) Navigator.pop(context);
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<RecruitPostBloc, RecruitPostState>(listener: (context, state) async {
+          if (state.state == RecruitPostLoadState.postCreateCompletedState) {
+            context.read<ImageBloc>().add(RequestPostImgRegisterEvent(token, _selectedImages, state.post!.id!));
+          } else if (state.state == RecruitPostLoadState.postUpdateCompletedState) {
+            context
+                .read<ImageBloc>()
+                .add(RequestPostImgUpdateEvent(token, _deleteImages, _selectedImages, state.post!.id!));
+          }
+        }),
+        BlocListener<ImageBloc, ImageState>(listener: (context, state) async {
+          final provider = context.read<RecruitPostProvider>();
+          if (state.state == ImageLoadState.imageUploadCompletedState) {
+            provider.createPost(state.post!);
+            await _alertDialog(context, '등록');
+            if (context.mounted) Navigator.pop(context);
+          } else if (state.state == ImageLoadState.beforeImageUploadState) {
+            provider.updatePost(state.post!);
+            await _alertDialog(context, '수정');
+            if (context.mounted) Navigator.pop(context);
+          }
+        })
+      ],
       child: SizedBox(
         height: 50,
         width: MediaQuery.sizeOf(context).width - 40,
@@ -659,7 +661,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
                       Get.snackbar("알림", "플랫폼을 선택해주세요.");
                       return;
                     }
-                    final post = PostEntity(
+                    final post = RecruitPostEntity(
                       title: titleController.text,
                       subtitle: subtitleController.text,
                       contents: contentController.text,
@@ -695,7 +697,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
                     }
 
                     context.read<RecruitPostBloc>().add(PostDataLoadEvent());
-                    final post = PostEntity(
+                    final post = RecruitPostEntity(
                       title: titleController.text,
                       subtitle: subtitleController.text,
                       contents: contentController.text,
@@ -727,7 +729,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
                 width: 150,
                 child: ElevatedButton(
                   onPressed: () async {
-                    final post = PostEntity(
+                    final post = RecruitPostEntity(
                         id: widget.post!.id,
                         title: titleController.text,
                         subtitle: subtitleController.text,
@@ -740,7 +742,6 @@ class _PostCreatePageState extends State<PostCreatePage> {
                     try {
                       context.read<RecruitPostBloc>().add(RequestPostUpdateEvent(token, post));
                     } on Exception catch (e) {
-                      // TODO
                       logger.e(e);
                       Get.snackbar('알림', '수정 실패');
                     }

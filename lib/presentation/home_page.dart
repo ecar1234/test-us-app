@@ -12,7 +12,7 @@ import 'package:test_us_app/presentation/setting_page.dart';
 import 'package:test_us_app/presentation/tester_post_pages/post_detail_page.dart';
 
 import '../data/sharedPreferences/auth_preference.dart';
-import '../domain/entities/post_entity.dart';
+import '../domain/entities/recruit_post_entity.dart';
 import '../services/common_height_provider.dart';
 import 'bloc/auth_bloc/auth_bloc.dart';
 import 'bloc/auth_bloc/auth_event.dart';
@@ -34,99 +34,91 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
-    return BlocListener<RecruitPostBloc, RecruitPostState>(
-        listener: (context, state) {
-          if (state.state == RecruitPostLoadState.postImgRegisterCompletedState ||
-              state.state == RecruitPostLoadState.postImgUpdateCompletedState ||
-              state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
-            context.read<RecruitPostBloc>().add(RequestCompleteEvent());
-          }
-        },
-        child: SafeArea(
-          child: Scaffold(
-              appBar: AppBar(
-                title: const Text('Testus', style: TextStyle(fontWeight: FontWeight.bold)),
-                // 추후 로고 이미지로 변경
-                actions: [
-                  Selector<UserProvider, bool>(
-                    selector: (context, provider) => provider.isLogged ?? false,
-                    builder: (context, isLogin, child) => !isLogin
-                        ? IconButton(
-                            onPressed: () {
-                              Get.to(() => LoginPage());
-                            },
-                            icon: const Icon(Icons.login))
-                        : IconButton(
-                            onPressed: () {
-                              Get.defaultDialog(
-                                title: '로그아웃',
-                                middleText: '로그아웃 하시겠습니까?',
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('취소')),
-                                  TextButton(
-                                      onPressed: () async {
-                                        Navigator.pop(context);
-                                        context.read<UserProvider>().logout();
-                                        context.read<AuthBloc>().add(LogoutEvent());
-                                      },
-                                      child: const Text('확인')),
-                                ],
-                              );
-                              // context.read<AuthBloc>().add(LogoutEvent(context));
-                            },
-                            icon: const Icon(Icons.logout)),
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        Get.to(() => SettingPage());
-                      },
-                      icon: const Icon(Icons.settings)),
-                ],
+    return SafeArea(
+      child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Testus', style: TextStyle(fontWeight: FontWeight.bold)),
+            // 추후 로고 이미지로 변경
+            actions: [
+              Selector<UserProvider, bool>(
+                selector: (context, provider) => provider.isLogged ?? false,
+                builder: (context, isLogin, child) => !isLogin
+                    ? IconButton(
+                        onPressed: () {
+                          Get.to(() => LoginPage());
+                        },
+                        icon: const Icon(Icons.login))
+                    : IconButton(
+                        onPressed: () {
+                          Get.defaultDialog(
+                            title: '로그아웃',
+                            middleText: '로그아웃 하시겠습니까?',
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('취소')),
+                              TextButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    context.read<UserProvider>().logout();
+                                    context.read<AuthBloc>().add(LogoutEvent());
+                                  },
+                                  child: const Text('확인')),
+                            ],
+                          );
+                          // context.read<AuthBloc>().add(LogoutEvent(context));
+                        },
+                        icon: const Icon(Icons.logout)),
               ),
-              body: SizedBox(
-                  height: hei,
-                  width: MediaQuery.sizeOf(context).width,
-                  // padding: EdgeInsets.only(top: 10),
-                  // decoration: BoxDecoration(
-                  //   border: Border.all()
-                  // ),
-                  child: SizedBox(
-                    height: hei - 20,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                const Gap(10),
-                                _mainButtonSection(context),
-                                const Gap(20),
-                                _favoritePostList(context),
-                                const Gap(20),
-                                _testerList(context),
-                                // const Gap(20),
-                                // _webServiceList(),
-                              ],
-                            ),
-                          ),
+              IconButton(
+                  onPressed: () {
+                    Get.to(() => SettingPage());
+                  },
+                  icon: const Icon(Icons.settings)),
+            ],
+          ),
+          body: SizedBox(
+              height: hei,
+              width: MediaQuery.sizeOf(context).width,
+              // padding: EdgeInsets.only(top: 10),
+              // decoration: BoxDecoration(
+              //   border: Border.all()
+              // ),
+              child: SizedBox(
+                height: hei - 20,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            const Gap(10),
+                            _mainButtonSection(context),
+                            const Gap(20),
+                            _favoritePostList(context),
+                            const Gap(20),
+                            _testerList(context),
+                            // const Gap(20),
+                            // _webServiceList(),
+                          ],
                         ),
-                        // CustomBottomBar(
-                        //   currentIndex: 0,
-                        //   onTap: (idx) {
-                        //     setState(() {
-                        //       _currentIdx = idx;
-                        //     });
-                        //   },
-                        // )
-                      ],
+                      ),
                     ),
-                  ))),
-        ));
+                    // CustomBottomBar(
+                    //   currentIndex: 0,
+                    //   onTap: (idx) {
+                    //     setState(() {
+                    //       _currentIdx = idx;
+                    //     });
+                    //   },
+                    // )
+                  ],
+                ),
+              ))),
+    );
   }
 
   Widget _mainButtonSection(BuildContext context) {
@@ -198,7 +190,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      Selector<RecruitPostProvider, List<PostEntity>>(
+      Selector<RecruitPostProvider, List<RecruitPostEntity>>(
         selector: (context, provider) => provider.favoritePost ?? [],
         builder: (context, favoritePost, child) => SizedBox(
             height: 220,
@@ -310,7 +302,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Selector<RecruitPostProvider, List<PostEntity>>(
+          Selector<RecruitPostProvider, List<RecruitPostEntity>>(
             selector: (context, provider) => provider.posts ?? [],
             builder: (context, post, child) => SizedBox(
                 height: 230,

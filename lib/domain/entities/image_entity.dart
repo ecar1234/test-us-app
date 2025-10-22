@@ -1,6 +1,6 @@
 
 
-import '../../data/models/post/image_model.dart';
+import '../../data/models/image/image_model.dart';
 
 class ImageEntity {
   int? id;

@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
-import 'package:test_us_app/domain/entities/post_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/presentation/my_pages/application_management_page.dart';
 
 import '../../data/models/application/application_model.dart';
-import '../../data/models/post/post_model.dart';
+import '../../data/models/post/recruit_post_model.dart';
 import '../../services/common_height_provider.dart';
 import '../bloc/recruit_post_bloc/recruit_post_bloc.dart';
 import '../bloc/recruit_post_bloc/recruit_post_event.dart';
@@ -38,7 +38,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
-    List<PostEntity> posts = [];
+    List<RecruitPostEntity> posts = [];
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
@@ -88,7 +88,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
     ));
   }
 
-  Widget _postsInfoBuilder(List<PostEntity> posts, double hei) {
+  Widget _postsInfoBuilder(List<RecruitPostEntity> posts, double hei) {
     return SizedBox(
       width: MediaQuery.sizeOf(context).width,
       child: Container(
@@ -195,7 +195,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
               itemCount: posts.length)),
     );
   }
-  int _getApplicantLength(PostEntity post) {
+  int _getApplicantLength(RecruitPostEntity post) {
     int length = 0;
     if (post.applications != null) {
       for (final application in post.applications!) {

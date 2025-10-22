@@ -32,16 +32,27 @@ class ImageApi {
 }
 
 class PostApi {
-  static const String create = '/api/v1/post/create';
-  static const String update = '/api/v1/post/update';
-  static const String delete = '/api/v1/post/delete';
-  static const String getPostById = '/api/v1/post/getPostById';
-  static const String getPostsByTitle = '/api/v1/post/getPostsByTitle';
   static const String getInitPosts = '/api/v1/post/getInitPosts';
-  // static const String getWebPosts = '/api/v1/post/getWebPostsPagination';
-  // static const String getMobilePosts = '/api/v1/post/getMobilePostsPagination';
-  static const String getPostsPagination = '/api/v1/post/getPostsPagination';
+}
+
+class RecruitPostApi {
+  static const String create = '/api/v1/post/createRecruitPost';
+  static const String update = '/api/v1/post/updateRecruitPost';
+  static const String delete = '/api/v1/post/deleteRecruitPost';
+  static const String getPostById = '/api/v1/post/getRecruitPostById';
+  static const String getPostsByTitle = '/api/v1/post/getRecruitPostByTitle';
+  static const String getPostsPagination = '/api/v1/post/getRecruitPostPagination';
   static const String getUserRecruitmentPosts = '/api/v1/post/getUserRecruitmentPosts';
+}
+
+class PromotionApi {
+  static const String create = '/api/v1/post/createPromotionPost';
+  static const String update = '/api/v1/post/updatePromotionPost';
+  static const String delete = '/api/v1/post/deletePromotionPost';
+  static const String getPostById = '/api/v1/post/getPromotionPostById';
+  static const String getPostsByTitle = '/api/v1/post/getPromotionPostByTitle';
+  static const String getPostsPagination = '/api/v1/post/getPromotionPostPagination';
+  static const String getUserRecruitmentPosts = '/api/v1/post/getUserPromotionPosts';
 }
 
 class ApplicationApi {

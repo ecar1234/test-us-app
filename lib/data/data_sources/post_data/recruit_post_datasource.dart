@@ -2,17 +2,17 @@
 
 import 'package:image_picker/image_picker.dart';
 
-import '../../models/post/image_model.dart';
-import '../../models/post/post_model.dart';
+import '../../models/image/image_model.dart';
+import '../../models/post/recruit_post_model.dart';
 
 abstract class RecruitPostDatasource {
-  Future<Map<String, List<PostModel>>> getPostsInitData();
-  Future<List<PostModel>> getUserRecruitmentPosts(String token, String userId);
-  Future<List<PostModel>> getPostsPagination(int page);
-  Future<PostModel> getPostById(String token, String id);
-  Future<List<PostModel>> getPostByTitle(String title);
-  Future<PostModel> createPost(String token, PostModel post);
-  Future<PostModel> updatePost(String token, PostModel post);
+  Future<Map<String, List<dynamic>>> getPostsInitData();
+  Future<List<RecruitPostModel>> getUserRecruitmentPosts(String token, String userId);
+  Future<List<RecruitPostModel>> getPostsPagination(int page);
+  Future<RecruitPostModel> getPostById(String token, String id);
+  Future<List<RecruitPostModel>> getPostByTitle(String title);
+  Future<RecruitPostModel> createPost(String token, RecruitPostModel post);
+  Future<RecruitPostModel> updatePost(String token, RecruitPostModel post);
   Future<bool> deletePost(String token, String id);
 
 }

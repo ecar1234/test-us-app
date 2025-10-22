@@ -1,7 +1,7 @@
 
 
 import 'package:test_us_app/domain/entities/application_entity.dart';
-import 'package:test_us_app/domain/entities/post_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
 import '../repositories/application_repo.dart';
 
@@ -24,12 +24,12 @@ class ApplicationUseCase {
     return res;
   }
 
-  Future<PostEntity> completeApplication(String token, String userId, String postId) async {
+  Future<RecruitPostEntity> completeApplication(String token, String userId, String postId) async {
     final res = await repository.completeApplications(token, userId, postId);
     return res;
   }
 
-  Future<PostEntity> rejectApplication(String token, String userId, String postId) async {
+  Future<RecruitPostEntity> rejectApplication(String token, String userId, String postId) async {
     final res = await repository.applicationReject(token, userId, postId);
     return res;
   }

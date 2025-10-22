@@ -1,5 +1,5 @@
 
-import 'package:test_us_app/domain/entities/post_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/domain/repositories/application_repo.dart';
 
 import '../../domain/entities/application_entity.dart';
@@ -10,22 +10,22 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   ApplicationRepositoryImpl(this.remote);
 
   @override
-  Future<PostEntity> applicationReject(String token, String userId, String postId) async {
+  Future<RecruitPostEntity> applicationReject(String token, String userId, String postId) async {
     final res = await remote.applicationReject(token, userId, postId);
-    return PostEntity.toPostEntity(res);
+    return RecruitPostEntity.toPostEntity(res);
   }
 
   @override
   Future<Map<String, dynamic>> applyCancel(String token, int appId) async {
     final res = await remote.applyCancel(token, appId);
     return {'application': ApplicationEntity.toEntity(res['application']),
-      'post': PostEntity.toPostEntity(res['post'])};
+      'post': RecruitPostEntity.toPostEntity(res['post'])};
   }
 
   @override
-  Future<PostEntity> completeApplications(String token, String userId, String postId) async {
+  Future<RecruitPostEntity> completeApplications(String token, String userId, String postId) async {
     final res = await remote.completeApplications(token, userId, postId);
-    return PostEntity.toPostEntity(res);
+    return RecruitPostEntity.toPostEntity(res);
   }
 
   @override
@@ -38,14 +38,14 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   Future<Map<String, dynamic>> requestApply(String token, ApplicationEntity application) async {
     final appData = ApplicationEntity.toModel(application);
     final res = await remote.requestApply(token, appData);
-    return {'application': ApplicationEntity.toEntity(res['application']), 'post': PostEntity.toPostEntity(res['post'])};
+    return {'application': ApplicationEntity.toEntity(res['application']), 'post': RecruitPostEntity.toPostEntity(res['post'])};
   }
 
   @override
   Future<Map<String, dynamic>> updateApplication(String token, ApplicationEntity application) async {
     final appData = ApplicationEntity.toModel(application);
     final res = await remote.updateApplication(token, appData);
-    return {'application': ApplicationEntity.toEntity(res['application']), 'post': PostEntity.toPostEntity(res['post'])};
+    return {'application': ApplicationEntity.toEntity(res['application']), 'post': RecruitPostEntity.toPostEntity(res['post'])};
   }
 
 }

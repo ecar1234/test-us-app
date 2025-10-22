@@ -2,9 +2,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../application/application_model.dart';
 import '../user/user_model.dart';
-import 'image_model.dart';
+import '../image/image_model.dart';
 
-part 'post_model.g.dart';
+part 'recruit_post_model.g.dart';
 
 enum PostStatus {
   @JsonValue('active')
@@ -18,7 +18,7 @@ enum PostStatus {
 }
 
 @JsonSerializable()
-class PostModel {
+class RecruitPostModel {
   String? id;
   String? title;
   String? subtitle;
@@ -33,7 +33,7 @@ class PostModel {
   DateTime? createdAt;
   DateTime? updatedAt;
 
-  PostModel({
+  RecruitPostModel({
     this.id,
     this.author,
     this.title,
@@ -49,7 +49,7 @@ class PostModel {
     this.updatedAt,
   });
 
-  factory PostModel.fromJson(Map<String, dynamic> json) => _$PostModelFromJson(json);
+  factory RecruitPostModel.fromJson(Map<String, dynamic> json) => _$RecruitPostModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$PostModelToJson(this);
+  Map<String, dynamic> toJson() => _$RecruitPostModelToJson(this);
 }
