@@ -4,7 +4,6 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
-import 'package:test_us_app/presentation/bloc/recruit_post_bloc/recruit_post_state.dart';
 
 import 'package:test_us_app/presentation/provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
@@ -16,8 +15,9 @@ import '../domain/entities/recruit_post_entity.dart';
 import '../services/common_height_provider.dart';
 import 'bloc/auth_bloc/auth_bloc.dart';
 import 'bloc/auth_bloc/auth_event.dart';
-import 'bloc/recruit_post_bloc/recruit_post_bloc.dart';
-import 'bloc/recruit_post_bloc/recruit_post_event.dart';
+import 'bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import 'bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import 'bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {

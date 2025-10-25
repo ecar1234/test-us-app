@@ -19,9 +19,9 @@ import '../../domain/entities/image_entity.dart';
 import '../bloc/image_bloc/image_bloc.dart';
 import '../bloc/image_bloc/image_event.dart';
 import '../bloc/image_bloc/image_state.dart';
-import '../bloc/recruit_post_bloc/recruit_post_bloc.dart';
-import '../bloc/recruit_post_bloc/recruit_post_event.dart';
-import '../bloc/recruit_post_bloc/recruit_post_state.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../provider/recruit_post_provider.dart';
 
 class PostCreatePage extends StatefulWidget {

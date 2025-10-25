@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/post_data/recruit_post_datasource.dart';
+import 'package:test_us_app/data/models/post/promotion_post_model.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 
 import '../../../core/net_driver.dart';
@@ -108,9 +109,15 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
         // TODO: Promotion: Model 추가 필요
         // TODO: Favorite: model의 타입에 따른 데이터 가공
 
-        final favorite = (res['favoritePosts'] as List).map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();
+        final favorite = (res['favoritePosts'] as List).map((e) {
+          if(e['domain'] == null){
+            return RecruitPostModel.fromJson(e);
+          }else {
+            return PromotionPostModel.fromJson(e);
+          }
+        }).toList();
         final recruit = (res['recruitPosts'] as List).map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();
-        final promotion = (res['promotionPosts'] as List).map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();
+        final promotion = (res['promotionPosts'] as List).map<PromotionPostModel>((e) => PromotionPostModel.fromJson(e)).toList();
 
         final result = {'favoritePosts': favorite, 'recruitPosts': recruit, 'promotionPosts': promotion};
         controller.complete(result);

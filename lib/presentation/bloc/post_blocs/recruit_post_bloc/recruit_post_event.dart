@@ -4,7 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/domain/entities/image_entity.dart';
 
-import '../../../domain/entities/recruit_post_entity.dart';
+import '../../../../domain/entities/recruit_post_entity.dart';
+
 
 class RecruitPostEvent {}
 

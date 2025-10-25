@@ -9,9 +9,9 @@ import 'package:test_us_app/presentation/my_pages/application_management_page.da
 import '../../data/models/application/application_model.dart';
 import '../../data/models/post/recruit_post_model.dart';
 import '../../services/common_height_provider.dart';
-import '../bloc/recruit_post_bloc/recruit_post_bloc.dart';
-import '../bloc/recruit_post_bloc/recruit_post_event.dart';
-import '../bloc/recruit_post_bloc/recruit_post_state.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../provider/user_provider.dart';
 import '../tester_post_pages/post_detail_page.dart';
 

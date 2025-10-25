@@ -5,7 +5,7 @@ import 'package:test_us_app/domain/use_cases/image_usecase.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/image_bloc/image_bloc.dart';
-import 'package:test_us_app/presentation/bloc/recruit_post_bloc/recruit_post_bloc.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:test_us_app/presentation/main_page.dart';

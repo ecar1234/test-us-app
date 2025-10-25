@@ -1,11 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/domain/use_cases/recruit_post_usecase.dart';
-import 'package:test_us_app/presentation/bloc/recruit_post_bloc/recruit_post_state.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 
-
-import '../../provider/recruit_post_provider.dart';
-import '../../provider/user_provider.dart';
 import 'recruit_post_event.dart';
 
 class RecruitPostBloc extends Bloc<RecruitPostEvent, RecruitPostState> {

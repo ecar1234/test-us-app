@@ -17,9 +17,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../data/sharedPreferences/auth_preference.dart';
 import 'bloc/auth_bloc/auth_bloc.dart';
 import 'bloc/auth_bloc/auth_state.dart';
-import 'bloc/recruit_post_bloc/recruit_post_bloc.dart';
-import 'bloc/recruit_post_bloc/recruit_post_event.dart';
-import 'bloc/recruit_post_bloc/recruit_post_state.dart';
+import 'bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import 'bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import 'bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import 'components/custom_bottom_bar.dart';
 import 'home_page.dart';
 
