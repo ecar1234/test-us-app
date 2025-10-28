@@ -8,7 +8,7 @@ import 'package:logger/logger.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
-import 'package:test_us_app/presentation/provider/recruit_post_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
 import '../../data/models/application/application_model.dart';

@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../post/tester_post_pages/recruit_post_create_page.dart';
 import '../provider/user_provider.dart';
-import '../tester_post_pages/post_create_page.dart';
 import 'login_dialogs.dart';
 
 class CustomBottomBar extends StatefulWidget {

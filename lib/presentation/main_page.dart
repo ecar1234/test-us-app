@@ -6,10 +6,12 @@ import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
-import 'package:test_us_app/presentation/provider/recruit_post_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/favorite_post_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/promotion_post_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/purchase_page.dart';
-import 'package:test_us_app/presentation/tester_post_pages/post_tester_page.dart';
+import 'package:test_us_app/presentation/post/tester_post_pages/recruit_post_main_page.dart';
 import 'package:test_us_app/presentation/user_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,10 +39,12 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.microtask(() => _loadSetting());
+    Future.microtask(() async {
+      await _init();
+    });
   }
 
-  Future<void> _loadSetting() async {
+  Future<void> _init() async {
     GetIt.I.get<ResponsiveHeightProvider>().setHeight(context);
     context.read<RecruitPostBloc>().add(ServiceStartEvent());
   }
@@ -49,11 +53,12 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
   Widget build(BuildContext context) {
     return BlocListener<RecruitPostBloc, RecruitPostState>(
         listener: (context, state) async {
-          if (state.state == RecruitPostLoadState.serviceStartState) {
-            await context.read<RecruitPostProvider>().getInitPosts();
-            if(context.mounted) context.read<RecruitPostBloc>().add(RequestInitDataEvent());
-          } else if (state.state == RecruitPostLoadState.initDataLoadCompletedState) {
+
+          if(state is InitPostsLoadCompletedState){
             context.read<AuthBloc>().add(TokenCheckEvent());
+            context.read<RecruitPostProvider>().getInitPosts(state.recruitPosts);
+            context.read<FavoritePostProvider>().getInitFavoritePosts(state.favoritePosts);
+            context.read<PromotionPostProvider>().getInitPromotionPosts(state.promotionPosts);
           }
         },
         child: BlocListener<AuthBloc, AuthState>(

@@ -32,15 +32,18 @@ class RequestPostDataEvent extends RecruitPostEvent {
   RequestPostDataEvent(this.token, this.postId);
 }
 class RequestPostUpdateEvent extends RecruitPostEvent {
-  final String token;
-  final RecruitPostEntity post;
-  RequestPostUpdateEvent(this.token, this.post);
+  String token;
+  RecruitPostEntity post;
+  List<XFile> selectedImages;
+  List<ImageEntity> deletedImages;
+  RequestPostUpdateEvent(this.token, this.post, this.selectedImages, this.deletedImages);
 }
 //
 class RequestPostCreateEvent extends RecruitPostEvent {
   String token;
   RecruitPostEntity post;
-  RequestPostCreateEvent(this.token, this.post);
+  List<XFile> selectedImages;
+  RequestPostCreateEvent(this.token, this.post, this.selectedImages);
 }
 //
 class RequestPostDeleteEvent extends RecruitPostEvent {

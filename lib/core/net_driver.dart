@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart';
+
+import '../data/models/image/image_model.dart';
+import '../data/models/post/promotion_post_model.dart';
+import '../data/models/post/recruit_post_model.dart';
 
 class NetDriver {
   final String? baseUrl;
@@ -91,8 +97,8 @@ class NetDriver {
     }
   }
 
-  Future<Map<String, dynamic>> requestImagesRegisterFormData(
-      String token, String url, List<XFile> data, String postId) async {
+  Future<Map<String, dynamic>> requestRegisterFormData(
+      String token, String url, List<XFile> data, Map<String, dynamic> post) async {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
     if (token != "" || token != '') {
       dio.options.headers['Authorization'] = 'Bearer $token';
@@ -112,10 +118,12 @@ class NetDriver {
         ),
       );
     }
+
     final form = FormData.fromMap({
-      'postId': postId,
+      'post': jsonEncode(post),
       'images': files,
     });
+
     final res = await dio.post(api, data: form, options: Options(validateStatus: (status) {
       return status != null && status < 500;
     }));
@@ -128,8 +136,8 @@ class NetDriver {
     }
   }
 
-  Future<Map<String, dynamic>> requestImagesUpdateFormData(
-      String token, String url, List<Map<String, dynamic>> deleteImages, List<XFile> data, String postId) async {
+  Future<Map<String, dynamic>> requestUpdateFormData(
+      String token, String url, Map<String, dynamic> post, List<XFile> data, List<Map<String, dynamic>> deleteImages) async {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
     if (token != "" || token != '') {
       dio.options.headers['Authorization'] = 'Bearer $token';
@@ -152,11 +160,9 @@ class NetDriver {
       }
     }
     final Map<String, dynamic> formData = {
-      'postId': postId,
+      'post': jsonEncode(post),
     };
-    if (deleteImages.isNotEmpty) {
-      formData['deleteImages'] = deleteImages;
-    }
+      formData['deleteImages'] = jsonEncode(deleteImages);
     if (files.isNotEmpty) {
       formData['images'] = files;
     }

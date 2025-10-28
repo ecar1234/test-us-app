@@ -13,24 +13,23 @@ import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
+import 'package:test_us_app/presentation/post/tester_post_pages/recruit_post_create_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
-import 'package:test_us_app/presentation/tester_post_pages/post_create_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/linkfy_util.dart';
 import 'package:test_us_app/utils/play_store_linkify_util.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../domain/entities/recruit_post_entity.dart';
-import '../../domain/entities/user_entity.dart';
-import '../bloc/app_bloc/app_bloc.dart';
-import '../bloc/image_bloc/image_bloc.dart';
-import '../bloc/image_bloc/image_event.dart';
-import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
-import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
-import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
-import '../components/login_dialogs.dart';
-import '../provider/recruit_post_provider.dart';
+import '../../../domain/entities/recruit_post_entity.dart';
+import '../../../domain/entities/user_entity.dart';
+import '../../bloc/app_bloc/app_bloc.dart';
+import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../../components/login_dialogs.dart';
+
 
 class PostDetailPage extends StatefulWidget {
   final RecruitPostEntity? post;
@@ -59,32 +58,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     //TODO: 포스트와 이미지의 불리로 인하여 Consumer의 역학을 다시 점검 해야함.
     return BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
-      // TODO : 이미지의 상태 변화로 인한 부분으로 post의 state 사용을 수정해야 함.
-      // if (state.state == RecruitPostLoadState.postImgRegisterCompletedState ||
-      //     state.state == RecruitPostLoadState.postImgUpdateCompletedState) {
-      //   // setState(() {
-      //   //   _post = state.post;
-      //   // });
-      //   // // context.read<DataBloc>().add(RequestCompleteEvent());
-      // }
+      final provider = context.read<RecruitPostProvider>();
       if(state.state == RecruitPostLoadState.getPostByIdCompletedState){
 
+      }else if(state.state == RecruitPostLoadState.postDeleteCompletedState){
+        provider.deletePost(state.post!.id!);
+        Navigator.pop(context);
+      }else if(state.state == RecruitPostLoadState.postUpdateCompletedState){
+        provider.updatePost(state.post!);
       }
-      // TODO: 이미지 삭제관련 로직으로 변경해야함.??
-      //
-      // if (state.state == RecruitPostLoadState.postDeleteCompletedState) {
-      //   if (state.images != null && state.images!.isNotEmpty) {
-      //     final token = context.read<UserProvider>().token ?? '';
-      //     context.read<ImageBloc>().add(RequestPostImgDeleteEvent(token, state.post!.images!));
-      //   } else {
-      //     context.read<RecruitPostBloc>().add(RequestCompleteEvent());
-      //     Navigator.pop(context);
-      //   }
-      // }
-      // else if (state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
-      //   context.read<RecruitPostBloc>().add(RequestCompleteEvent());
-      //   Navigator.pop(context);
-      // }
     }, builder: (context, state) {
       final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
       if(widget.post != null){
@@ -101,7 +83,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
           ),
         );
       }
-      if(state.state == RecruitPostLoadState.getPostByIdCompletedState){
+      if(state.state == RecruitPostLoadState.getPostByIdCompletedState
+          || state.state == RecruitPostLoadState.postUpdateCompletedState){
         return _postInfoBuilder(state.post!, hei);
       }
       return Scaffold(
@@ -136,8 +119,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     isAuthor
                         ? BlocListener<RecruitPostBloc, RecruitPostState>(
                       listener: (context, state) async {
-                        // final token = context.read<UserProvider>().token ?? "";
-
+                        if(state.state == RecruitPostLoadState.postDeleteCompletedState){
+                          context.read<RecruitPostProvider>().deletePost(state.post!.id!);
+                          Navigator.pop(context);
+                        }else if(state.state == RecruitPostLoadState.failedState){
+                          Get.snackbar('알림', '다시 시도해 주세요. 문제가 지속되면 관리자에게 문의 해주세요.');
+                          return;
+                        }
                       },
                       child: PopupMenuButton(
                         icon: Icon(Icons.more_vert_rounded),

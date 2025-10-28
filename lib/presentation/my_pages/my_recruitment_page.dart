@@ -12,8 +12,8 @@ import '../../services/common_height_provider.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../post/tester_post_pages/recruit_post_detail_page.dart';
 import '../provider/user_provider.dart';
-import '../tester_post_pages/post_detail_page.dart';
 
 class MyRecruitmentPage extends StatefulWidget {
   const MyRecruitmentPage({super.key});

@@ -4,11 +4,12 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/favorite_post_provider.dart';
 
-import 'package:test_us_app/presentation/provider/recruit_post_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/setting_page.dart';
-import 'package:test_us_app/presentation/tester_post_pages/post_detail_page.dart';
+import 'package:test_us_app/presentation/post/tester_post_pages/recruit_post_detail_page.dart';
 
 import '../data/sharedPreferences/auth_preference.dart';
 import '../domain/entities/recruit_post_entity.dart';
@@ -31,6 +32,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final pref = AuthPreference.instance;
+
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
@@ -190,7 +192,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      Selector<RecruitPostProvider, List<RecruitPostEntity>>(
+      Selector<FavoritePostProvider, List<dynamic>>(
         selector: (context, provider) => provider.favoritePost ?? [],
         builder: (context, favoritePost, child) => SizedBox(
             height: 220,
@@ -280,8 +282,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _testerList(BuildContext context) {
-    return BlocBuilder<RecruitPostBloc, RecruitPostState>(
-      builder: (context, state) => Column(
+    return BlocBuilder<RecruitPostBloc, RecruitPostState>(builder: (context, state) {
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
@@ -294,7 +296,7 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () async {
                       context.read<RecruitPostBloc>().add(PostDataLoadEvent());
                       await context.read<RecruitPostProvider>().getPostPagination(page: 1);
-                      if(context.mounted) context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent());
+                      if (context.mounted) context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent());
                       widget.onTap(1);
                     },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
@@ -302,75 +304,101 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Selector<RecruitPostProvider, List<RecruitPostEntity>>(
-            selector: (context, provider) => provider.posts ?? [],
-            builder: (context, post, child) => SizedBox(
-                height: 230,
-                width: MediaQuery.sizeOf(context).width,
-                // padding: EdgeInsets.all(10),
-                // decoration: BoxDecoration(
-                //     border: Border.all()
-                // ),
-                child: post.isEmpty
-                    ? const Center(child: Text("테스터 모집이 아직 없습니다."))
-                    : ListView.separated(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.only(left: 20, right: 20),
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, idx) {
-                          return GestureDetector(
-                            onTap: () async {
-                              // final token = context.read<UserProvider>().token ?? "";
-                              // final res = await context.read<PostProvider>().getPostById(token, post[idx].id!);
-                              // if(context.mounted) context.read<DataBloc>().add(RequestPostDataEvent(res));
-                              Get.to(() => PostDetailPage(postId: post[idx].id!));
-                            },
-                            child: SizedBox(
-                              height: 230,
-                              width: 160,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ConstrainedBox(
-                                    constraints: BoxConstraints(maxHeight: 210, maxWidth: 180),
-                                    child: LayoutBuilder(builder: (context, constraints) {
-                                      return Container(
-                                        width: constraints.maxWidth,
-                                        height: constraints.maxHeight * 0.55,
-                                        decoration: BoxDecoration(
-                                          border: post[idx].images!.isEmpty ? Border.all() : null,
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: post[idx].images!.isEmpty
-                                            ? SizedBox(
-                                                child: Center(
-                                                  child: Text('이미지가 없습니다.'),
+          if (state.state == RecruitPostLoadState.dataLoadState)
+            SizedBox(
+              height: 200,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else
+            Selector<RecruitPostProvider, List<RecruitPostEntity>>(
+              selector: (context, provider) => provider.recruitmentPosts ?? [],
+              builder: (context, post, child) => SizedBox(
+                  height: 230,
+                  width: MediaQuery.sizeOf(context).width,
+                  // padding: EdgeInsets.all(10),
+                  // decoration: BoxDecoration(
+                  //     border: Border.all()
+                  // ),
+                  child: post.isEmpty
+                      ? const Center(child: Text("테스터 모집이 아직 없습니다."))
+                      : ListView.separated(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.only(left: 20, right: 20),
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, idx) {
+                            return GestureDetector(
+                              onTap: () async {
+                                Get.to(() => PostDetailPage(postId: post[idx].id!));
+                              },
+                              child: SizedBox(
+                                height: 230,
+                                width: 160,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(maxHeight: 210, maxWidth: 180),
+                                      child: LayoutBuilder(builder: (context, constraints) {
+                                        return Container(
+                                          width: constraints.maxWidth,
+                                          height: constraints.maxHeight * 0.55,
+                                          decoration: BoxDecoration(
+                                            border: post[idx].images!.isEmpty ? Border.all() : null,
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: post[idx].images!.isEmpty
+                                              ? SizedBox(
+                                                  child: Center(
+                                                    child: Text('이미지가 없습니다.'),
+                                                  ),
+                                                )
+                                              : ClipRRect(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Image.network(
+                                                    post[idx].images![0].url ?? '',
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              )
-                                            : ClipRRect(
-                                                borderRadius: BorderRadius.circular(10),
-                                                child: Image.network(
-                                                  post[idx].images![0].url ?? '',
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                      );
-                                    }),
-                                  ),
-                                  const Gap(10),
-                                  SizedBox(
-                                      child: Text(
-                                    "${post[idx].title}",
-                                    style: TextStyle(
-                                        fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
-                                    maxLines: 2,
-                                  )),
-                                  const Gap(5),
-                                  if (post[idx].platform!.length > 1)
+                                        );
+                                      }),
+                                    ),
+                                    const Gap(10),
                                     SizedBox(
-                                        child: Row(
-                                      children: [
-                                        Text(
+                                        child: Text(
+                                      "${post[idx].title}",
+                                      style: TextStyle(
+                                          fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
+                                      maxLines: 2,
+                                    )),
+                                    const Gap(5),
+                                    if (post[idx].platform!.length > 1)
+                                      SizedBox(
+                                          child: Row(
+                                        children: [
+                                          Text(
+                                            post[idx].platform![0],
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.grey.shade600,
+                                                overflow: TextOverflow.ellipsis),
+                                          ),
+                                          const Gap(10),
+                                          Text(
+                                            post[idx].platform![1],
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.grey.shade600,
+                                                overflow: TextOverflow.ellipsis),
+                                          ),
+                                        ],
+                                      ))
+                                    else
+                                      SizedBox(
+                                        child: Text(
                                           post[idx].platform![0],
                                           style: TextStyle(
                                               fontSize: 14,
@@ -378,49 +406,28 @@ class _HomePageState extends State<HomePage> {
                                               color: Colors.grey.shade600,
                                               overflow: TextOverflow.ellipsis),
                                         ),
-                                        const Gap(10),
-                                        Text(
-                                          post[idx].platform![1],
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.grey.shade600,
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ))
-                                  else
-                                    SizedBox(
-                                      child: Text(
-                                        post[idx].platform![0],
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.normal,
-                                            color: Colors.grey.shade600,
-                                            overflow: TextOverflow.ellipsis),
                                       ),
-                                    ),
-                                  const Gap(5),
-                                  SizedBox(
-                                      child: Text(
-                                    "${post[idx].author!.nickname}",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.grey.shade600,
-                                        overflow: TextOverflow.ellipsis),
-                                    maxLines: 1,
-                                  )),
-                                ],
+                                    const Gap(5),
+                                    SizedBox(
+                                        child: Text(
+                                      "${post[idx].author!.nickname}",
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.grey.shade600,
+                                          overflow: TextOverflow.ellipsis),
+                                      maxLines: 1,
+                                    )),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        separatorBuilder: (context, idx) => const Gap(10),
-                        itemCount: post.length)),
-          ),
+                            );
+                          },
+                          separatorBuilder: (context, idx) => const Gap(10),
+                          itemCount: post.length > 10 ? 10 : post.length)),
+            ),
         ],
-      ),
-    );
+      );
+    });
   }
 }

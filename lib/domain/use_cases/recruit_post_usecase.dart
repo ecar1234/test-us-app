@@ -9,9 +9,9 @@ class RecruitPostUseCase {
 
   RecruitPostUseCase(this.repository);
 
-  Future<Map<String, List<RecruitPostEntity>>> getPostInitData() async {
+  Future<Map<String, dynamic>> getPostInitData() async {
     final initData = await repository.getPostInitData();
-    return {'favoritePosts': initData['favoritePosts']!, 'posts': initData['posts']!};
+    return {'favoritePosts': initData['favoritePosts'], 'recruitPosts': initData['recruitPosts'], 'promotionPosts': initData['promotionPosts']};
   }
 
   Future<RecruitPostEntity> getPostById(String token, String id) async {
@@ -24,8 +24,8 @@ class RecruitPostUseCase {
     return res;
   }
 
-  Future<RecruitPostEntity> updatePost(String token, RecruitPostEntity post) async {
-    final res = await repository.updatePost(token, post);
+  Future<RecruitPostEntity> updatePost(String token, RecruitPostEntity post, List<XFile> images, List<ImageEntity> oldImages) async {
+    final res = await repository.updatePost(token, post, images, oldImages);
     return res;
   }
 
@@ -34,8 +34,8 @@ class RecruitPostUseCase {
     return res;
   }
 
-  Future<RecruitPostEntity> createPost(String token, RecruitPostEntity post) async {
-    final res = await repository.createPost(token, post);
+  Future<RecruitPostEntity> createPost(String token, RecruitPostEntity post, List<XFile> images) async {
+    final res = await repository.createPost(token, post, images);
     return res;
   }
 

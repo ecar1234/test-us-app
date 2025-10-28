@@ -7,28 +7,28 @@ import '../../domain/entities/image_entity.dart';
 import '../../domain/entities/recruit_post_entity.dart';
 import '../../domain/repositories/image_repository.dart';
 
-class ImageRepositoryImpl implements ImageRepository {
-  final ImageDataSource remote;
-  ImageRepositoryImpl(this.remote);
+// class ImageRepositoryImpl implements ImageRepository {
+//   final ImageDataSource remote;
+//   ImageRepositoryImpl(this.remote);
 
-  @override
-  Future<RecruitPostEntity> registerPostImg(String token, List<XFile> images, String postId) async {
-    final res = await remote.registerPostImg(token, images, postId);
-    return RecruitPostEntity.toPostEntity(res);
-  }
+  // @override
+  // Future<RecruitPostEntity> registerPostImg(String token, List<XFile> images, String postId) async {
+  //   final res = await remote.registerPostImg(token, images, postId);
+  //   return RecruitPostEntity.toPostEntity(res);
+  // }
+  //
+  // @override
+  // Future<RecruitPostEntity> updatePostImg(String token, List<ImageEntity> deleteImages, List<XFile> images, String postId) async {
+  //   final deleteData = deleteImages.map((e) => ImageEntity.toImageModel(e)).toList();
+  //   final res = await remote.updatePostImg(token, deleteData, images, postId);
+  //   return RecruitPostEntity.toPostEntity(res);
+  // }
+  //
+  // @override
+  // Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages) async {
+  //   final deleteData = deleteImages.map((e) => {'id': e.id, 'url': e.url}).toList();
+  //   final res = await remote.deletePostImg(token, deleteData);
+  //   return res;
+  // }
 
-  @override
-  Future<RecruitPostEntity> updatePostImg(String token, List<ImageEntity> deleteImages, List<XFile> images, String postId) async {
-    final deleteData = deleteImages.map((e) => ImageEntity.toImageModel(e)).toList();
-    final res = await remote.updatePostImg(token, deleteData, images, postId);
-    return RecruitPostEntity.toPostEntity(res);
-  }
-
-  @override
-  Future<bool> deletePostImg(String token, List<ImageEntity> deleteImages) async {
-    final deleteData = deleteImages.map((e) => {'id': e.id, 'url': e.url}).toList();
-    final res = await remote.deletePostImg(token, deleteData);
-    return res;
-  }
-
-}
+// }

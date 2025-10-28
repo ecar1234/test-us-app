@@ -42,8 +42,8 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
   }
 
   @override
-  Future<RecruitPostModel> createPost(String token, RecruitPostModel post) async {
-    final res = await netDriver.requestPostJson(token, RecruitPostApi.create, post.toJson());
+  Future<RecruitPostModel> createPost(String token, RecruitPostModel post, List<XFile> images) async {
+    final res = await netDriver.requestRegisterFormData(token, PostApi.createRecruitPost, images, post.toJson());
     if (res['status'] == 200) {
       return RecruitPostModel.fromJson(res['post']);
     } else {
@@ -52,8 +52,9 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
   }
 
   @override
-  Future<RecruitPostModel> updatePost(String token, RecruitPostModel post) async {
-    final res = await netDriver.requestPutJson(token, RecruitPostApi.update, post.toJson());
+  Future<RecruitPostModel> updatePost(String token, RecruitPostModel post, List<XFile> images, List<ImageModel> oldModel) async {
+    final deleteImages = oldModel.map((e) => e.toJson()).toList();
+    final res = await netDriver.requestUpdateFormData(token, RecruitPostApi.update, post.toJson(), images, deleteImages);
     if (res['status'] == 200) {
       return RecruitPostModel.fromJson(res['post']);
     } else {
@@ -106,9 +107,6 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
     Timer.periodic(Duration(seconds: 2), (timer) async {
       final res = await netDriver.requestGetJson(token, JobApi.jobGetInitPosts, param: jobId);
       if (res['status'] == 200) {
-        // TODO: Promotion: Model 추가 필요
-        // TODO: Favorite: model의 타입에 따른 데이터 가공
-
         final favorite = (res['favoritePosts'] as List).map((e) {
           if(e['domain'] == null){
             return RecruitPostModel.fromJson(e);

@@ -1,21 +1,29 @@
-
-
 import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/data/models/image/image_model.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
+import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
 import '../../domain/entities/image_entity.dart';
 import '../../domain/repositories/recruit_post_repository.dart';
 import '../data_sources/post_data/recruit_post_datasource.dart';
+import '../models/post/promotion_post_model.dart';
 
 class RecruitPostRepositoryImpl implements RecruitPostRepository {
   final RecruitPostDatasource remote;
   RecruitPostRepositoryImpl(this.remote);
 
   @override
-  Future<RecruitPostEntity> createPost(String token, RecruitPostEntity post) async {
-    final res = await remote.createPost(token, RecruitPostEntity.toPostModel(post));
+  Future<RecruitPostEntity> createPost(String token, RecruitPostEntity post, List<XFile> images) async {
+    final res = await remote.createPost(token, RecruitPostEntity.toPostModel(post), images);
+    return RecruitPostEntity.toPostEntity(res);
+  }
+
+  @override
+  Future<RecruitPostEntity> updatePost(String token, RecruitPostEntity post, List<XFile> images, List<ImageEntity> oldImages) async {
+    final oldImagesModel = oldImages.map<ImageModel>((e) => ImageEntity.toImageModel(e)).toList();
+    final newPost = RecruitPostEntity.toPostModel(post);
+    final res = await remote.updatePost(token, newPost, images, oldImagesModel);
     return RecruitPostEntity.toPostEntity(res);
   }
 
@@ -26,14 +34,21 @@ class RecruitPostRepositoryImpl implements RecruitPostRepository {
   }
 
   @override
-  Future<Map<String, List<RecruitPostEntity>>> getPostInitData() async {
+  Future<Map<String, dynamic>> getPostInitData() async {
     final res = await remote.getPostsInitData();
-    final List<RecruitPostEntity> favoritePosts = res['favoritePosts'] != null ?
-    res['favoritePosts']!.map((e) => RecruitPostEntity.toPostEntity(e)).toList() : [];
-    final List<RecruitPostEntity> posts = res['posts'] != null ?
-    res['posts']!.map((e) => RecruitPostEntity.toPostEntity(e)).toList() : [];
+    final favoritePosts = res['favorite']!.map((e) {
+      if(e is RecruitPostModel) {
+        return RecruitPostEntity.toPostEntity(e);
+      }else {
+        return PromotionPostEntity.toEntity(e);
+      }
+    }).toList();
 
-    return {'favoritePosts': favoritePosts, 'posts': posts};
+    final recruitPosts = res['recruit']!.map<RecruitPostEntity>((e) => RecruitPostEntity.toPostEntity(e)).toList();
+    final promotionPosts = res['promotion']!.map<PromotionPostEntity>((e) => PromotionPostEntity.toEntity(e)).toList();
+
+
+    return { 'favoritePosts': favoritePosts, 'recruitPosts': recruitPosts, 'promotionPosts': promotionPosts };
   }
 
   @override
@@ -55,12 +70,6 @@ class RecruitPostRepositoryImpl implements RecruitPostRepository {
   Future<List<RecruitPostEntity>> getPostByTitle(String title) {
     // TODO: implement getPostByTitle
     throw UnimplementedError();
-  }
-
-  @override
-  Future<RecruitPostEntity> updatePost(String token, RecruitPostEntity post) async {
-    final res = await remote.updatePost(token, RecruitPostEntity.toPostModel(post));
-    return RecruitPostEntity.toPostEntity(res);
   }
 
 

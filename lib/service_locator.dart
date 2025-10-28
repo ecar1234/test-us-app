@@ -42,7 +42,7 @@ Future<void> serviceLocator() async {
   getIt.registerLazySingleton<RecruitPostDatasource>(() => RecruitPostDatasourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<ApplicationDataSource>(() => ApplicationDataSourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<ReviewDataSource>(() => ReviewDataSourceImpl(getIt<NetDriver>()));
-  getIt.registerLazySingleton<ImageDataSource>(() => ImageDataSourceImpl(getIt<NetDriver>()));
+  // getIt.registerLazySingleton<ImageDataSource>(() => ImageDataSourceImpl(getIt<NetDriver>()));
 
 
   // domain
@@ -50,7 +50,7 @@ Future<void> serviceLocator() async {
   getIt.registerLazySingleton<RecruitPostRepository>(() => RecruitPostRepositoryImpl(getIt<RecruitPostDatasource>()));
   getIt.registerLazySingleton<ApplicationRepository>(() => ApplicationRepositoryImpl(getIt<ApplicationDataSource>()));
   getIt.registerLazySingleton<ReviewRepository>(() => ReviewRepositoryImpl(getIt<ReviewDataSource>()));
-  getIt.registerLazySingleton<ImageRepository>(() => ImageRepositoryImpl(getIt<ImageDataSource>()));
+  // getIt.registerLazySingleton<ImageRepository>(() => ImageRepositoryImpl(getIt<ImageDataSource>()));
 
 
   // use case
