@@ -9,11 +9,6 @@ class RecruitPostUseCase {
 
   RecruitPostUseCase(this.repository);
 
-  Future<Map<String, dynamic>> getPostInitData() async {
-    final initData = await repository.getPostInitData();
-    return {'favoritePosts': initData['favoritePosts'], 'recruitPosts': initData['recruitPosts'], 'promotionPosts': initData['promotionPosts']};
-  }
-
   Future<RecruitPostEntity> getPostById(String token, String id) async {
     final res = await repository.getPostById(token, id);
     return res;

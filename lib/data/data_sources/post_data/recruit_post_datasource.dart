@@ -6,7 +6,6 @@ import '../../models/image/image_model.dart';
 import '../../models/post/recruit_post_model.dart';
 
 abstract class RecruitPostDatasource {
-  Future<Map<String, List<dynamic>>> getPostsInitData();
   Future<List<RecruitPostModel>> getUserRecruitmentPosts(String token, String userId);
   Future<List<RecruitPostModel>> getPostsPagination(int page);
   Future<RecruitPostModel> getPostById(String token, String id);

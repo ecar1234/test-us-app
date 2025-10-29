@@ -35,16 +35,20 @@ class RecruitPostProvider with ChangeNotifier {
     return res;
   }
 
-  Future<void> getPostPagination({int page = 1}) async {
-    final res = await useCase.getPostPagination(page);
-    // _mobilePost.clear();
-    // _mobilePost.addAll(res);
-    if (_recruitmentPosts == null) {
-      _recruitmentPosts = [];
-      _recruitmentPosts!.addAll(res);
-    } else {
-      _recruitmentPosts!.addAll(res);
+  Future<void> getPostPagination(List<RecruitPostEntity> posts, int page) async {
+    if(page == 1 && _recruitmentPosts == null){
+      _recruitmentPosts = posts;
+    }else if(page == 1 && _recruitmentPosts != null){
+      _recruitmentPosts = posts;
     }
+    if(page > 1){
+      _recruitmentPosts!.addAll(posts);
+    }
+    notifyListeners();
+  }
+
+  Future<void> refreshPosts() async {
+    _recruitmentPosts = null;
     notifyListeners();
   }
 

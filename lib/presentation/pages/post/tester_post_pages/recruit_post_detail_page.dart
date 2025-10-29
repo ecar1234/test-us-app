@@ -13,7 +13,7 @@ import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
-import 'package:test_us_app/presentation/post/tester_post_pages/recruit_post_create_page.dart';
+import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_create_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
@@ -22,13 +22,14 @@ import 'package:test_us_app/utils/linkfy_util.dart';
 import 'package:test_us_app/utils/play_store_linkify_util.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../domain/entities/recruit_post_entity.dart';
-import '../../../domain/entities/user_entity.dart';
-import '../../bloc/app_bloc/app_bloc.dart';
-import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
-import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
-import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
-import '../../components/login_dialogs.dart';
+import '../../../../domain/entities/recruit_post_entity.dart';
+import '../../../../domain/entities/user_entity.dart';
+import '../../../bloc/app_bloc/app_bloc.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../../../components/login_dialogs.dart';
+import '../../../provider/post_provider/base_post_provider.dart';
 
 
 class PostDetailPage extends StatefulWidget {
@@ -45,7 +46,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
   final logger = Logger();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if (widget.post == null && widget.postId != null) {
       final token = context.read<UserProvider>().token ?? '';
@@ -55,8 +55,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    //TODO: 포스트와 이미지의 불리로 인하여 Consumer의 역학을 다시 점검 해야함.
     return BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
       final provider = context.read<RecruitPostProvider>();
       if(state.state == RecruitPostLoadState.getPostByIdCompletedState){
@@ -121,6 +119,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       listener: (context, state) async {
                         if(state.state == RecruitPostLoadState.postDeleteCompletedState){
                           context.read<RecruitPostProvider>().deletePost(state.post!.id!);
+                          context.read<BasePostProvider>().deleteRecruitPost(state.post!.id!);
                           Navigator.pop(context);
                         }else if(state.state == RecruitPostLoadState.failedState){
                           Get.snackbar('알림', '다시 시도해 주세요. 문제가 지속되면 관리자에게 문의 해주세요.');
@@ -154,8 +153,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                   try {
                                     context.read<RecruitPostBloc>().add(RequestPostDeleteEvent(token, post));
                                   } on Exception catch (e) {
-                                    // TODO
                                     Get.snackbar('알림', '삭제 실패');
+                                    logger.e(e.toString());
                                     return;
                                   }
                                   Get.back();
@@ -338,7 +337,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   Widget _afterApplicationSection(RecruitPostEntity post) {
     return BlocBuilder<AppBloc, AppState>(builder: (context, state) {
-      // TODO: post가 업데이트 되는 부분의 로직은 복잡하고 불필요해 보임. 로직 수정 필요.
       if (state.state == UserAppState.requestCompletedState) {
         context.read<RecruitPostBloc>().add(ReloadPostEvent());
         context.read<AppBloc>().add(RequestCompletedEvent());
@@ -473,7 +471,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   Widget _beforeApplicationSection(RecruitPostEntity post) {
     return BlocBuilder<AppBloc, AppState>(builder: (context, state) {
-      // TODO: post가 업데이트 되는 부분의 로직은 복잡하고 불필요해 보임. 로직 수정 필요.
       if (state.state == UserAppState.requestCompletedState) {
         context.read<RecruitPostBloc>().add(ReloadPostEvent());
         context.read<AppBloc>().add(RequestCompletedEvent());

@@ -34,24 +34,6 @@ class RecruitPostRepositoryImpl implements RecruitPostRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> getPostInitData() async {
-    final res = await remote.getPostsInitData();
-    final favoritePosts = res['favorite']!.map((e) {
-      if(e is RecruitPostModel) {
-        return RecruitPostEntity.toPostEntity(e);
-      }else {
-        return PromotionPostEntity.toEntity(e);
-      }
-    }).toList();
-
-    final recruitPosts = res['recruit']!.map<RecruitPostEntity>((e) => RecruitPostEntity.toPostEntity(e)).toList();
-    final promotionPosts = res['promotion']!.map<PromotionPostEntity>((e) => PromotionPostEntity.toEntity(e)).toList();
-
-
-    return { 'favoritePosts': favoritePosts, 'recruitPosts': recruitPosts, 'promotionPosts': promotionPosts };
-  }
-
-  @override
   Future<RecruitPostEntity> getPostById(String token, String id) async {
     final res = await remote.getPostById(token, id);
     return RecruitPostEntity.toPostEntity(res);

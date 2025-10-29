@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../domain/use_cases/user_usecase.dart';
@@ -18,6 +20,9 @@ class UserProvider with ChangeNotifier {
   UserEntity? get user => _user;
 
   bool? get isLogged => _isLogged;
+
+
+
 
   Future<void> autoLogin(String token, UserEntity user) async {
     if (token.isEmpty || token == "") {
@@ -47,6 +52,8 @@ class UserProvider with ChangeNotifier {
 
     notifyListeners();
   }
+
+
 
   Future<int> signup(UserEntity userInfo) async {
     return await useCase.signup(userInfo);

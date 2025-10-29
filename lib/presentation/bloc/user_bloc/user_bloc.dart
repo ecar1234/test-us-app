@@ -9,6 +9,7 @@ import '../../provider/user_provider.dart';
 class UserBloc extends Bloc<UserEvent, UserState> {
   final logger = Logger();
   UserBloc(UserUseCase userUseCase) : super(UserState(UserDataState.serviceStartState)) {
+
     on<RequestUserDataEvent>((event, emit) async {
       emit(UserState(UserDataState.loadingState));
       try {

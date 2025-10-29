@@ -35,6 +35,7 @@ class PostApi {
   static const String getInitPosts = '/api/v1/post/getInitPosts';
   static const String createRecruitPost = '/api/v1/post/createRecruitPost';
   static const String createPromotionPost = '/api/v1/post/createPromotionPost';
+  static const String getUserInitData = '/api/v1/post/getUserInitPosts';
 }
 
 class RecruitPostApi {
@@ -43,7 +44,7 @@ class RecruitPostApi {
   static const String getPostById = '/api/v1/post/getRecruitPostById';
   static const String getPostsByTitle = '/api/v1/post/getRecruitPostByTitle';
   static const String getPostsPagination = '/api/v1/post/getRecruitPostPagination';
-  static const String getUserRecruitmentPosts = '/api/v1/post/getUserRecruitmentPosts';
+  static const String getUserRecruitmentPosts = '/api/v1/post/getUserRecruitPosts';
 }
 
 class PromotionApi {
@@ -82,4 +83,5 @@ class MessageApi {}
 class JobApi {
   static const String jobGetApplications = '/api/v1/jobState/jobApplicationsById';
   static const String jobGetInitPosts = '/api/v1/jobState/jobInitPosts';
+  static const String jobGetUserPosts = '/api/v1/jobState/jobInitUserPosts';
 }

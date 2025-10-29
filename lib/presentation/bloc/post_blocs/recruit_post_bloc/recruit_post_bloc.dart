@@ -12,31 +12,23 @@ class RecruitPostBloc extends Bloc<RecruitPostEvent, RecruitPostState> {
 
   RecruitPostBloc(RecruitPostUseCase postUseCase)
       : super(RecruitPostState(state: RecruitPostLoadState.serviceStartState)) {
-    on<ServiceStartEvent>((event, emit) {
-      emit(RecruitPostState(state: RecruitPostLoadState.serviceStartState));
-      add(RequestInitDataEvent());
-      logger.i("data state : serviceStartState");
-    });
+    // on<ServiceStartEvent>((event, emit) {
+    //   emit(RecruitPostState(state: RecruitPostLoadState.serviceStartState));
+    //   add(RequestInitDataEvent());
+    //   logger.i("data state : serviceStartState");
+    // });
 
-    on<RequestInitDataEvent>((event, emit) async {
+    //
+    on<RequestRecruitmentPaginationEvent>((event, emit) async {
       try {
-        emit(RecruitPostState(state: RecruitPostLoadState.dataLoadState));
-        logger.i("data state : dataLoadState");
-        final res = await postUseCase.getPostInitData();
-        final List<dynamic> favoritePosts = res['favoritePosts'];
-        final List<RecruitPostEntity> recruitPosts = res['recruitPosts'];
-        final List<PromotionPostEntity> promotionPosts = res['promotionPosts'];
-        emit(InitPostsLoadCompletedState(recruitPosts, promotionPosts, favoritePosts));
-        logger.i("data state : initDataLoadCompletedState");
+        final res = await postUseCase.getPostPagination(event.page);
+        emit(RecruitPostState(state: RecruitPostLoadState.recruitPostsLoadCompletedState, posts: res, page: event.page));
+        logger.i("data state : recruitPostsLoadCompletedState");
       } on Exception catch (e) {
+        // TODO
         emit(RecruitPostState(state: RecruitPostLoadState.errorState));
         logger.e("data state : errorState");
       }
-    });
-    //
-    on<RequestRecruitmentPaginationEvent>((event, emit) async {
-      emit(RecruitPostState(state: RecruitPostLoadState.postDataLoadCompletedState));
-      logger.i("data state : postDataLoadCompletedState");
       // emit(DataState(state: RecruitPostLoadState.beforeDataLoadState));
       // logger.i("data state : beforeDataLoadState");
     });
@@ -103,11 +95,17 @@ class RecruitPostBloc extends Bloc<RecruitPostEvent, RecruitPostState> {
     //
 
     on<RequestUserRecruitmentPosts>((event, emit) async {
-      emit(RecruitPostState(state: RecruitPostLoadState.dataLoadState));
-      logger.i("data state : dataLoadState");
-      final res = await postUseCase.getUserRecruitmentPosts(event.token, event.userId);
-      emit(RecruitPostState(state: RecruitPostLoadState.getUserRecruitmentPostsCompletedState, posts: res));
-      logger.i("data state : getUserRecruitmentPostsCompletedState");
+      try {
+        emit(RecruitPostState(state: RecruitPostLoadState.dataLoadState));
+        logger.i("data state : dataLoadState");
+        final res = await postUseCase.getUserRecruitmentPosts(event.token, event.userId);
+        emit(RecruitPostState(state: RecruitPostLoadState.getUserRecruitmentPostsCompletedState, posts: res));
+        logger.i("data state : getUserRecruitmentPostsCompletedState");
+      } on Exception catch (e) {
+        // TODO
+        emit(RecruitPostState(state: RecruitPostLoadState.errorState));
+        logger.e("data state : errorState");
+      }
     });
     //
 

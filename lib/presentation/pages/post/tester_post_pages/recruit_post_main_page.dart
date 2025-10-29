@@ -4,13 +4,13 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
-import 'package:test_us_app/presentation/post/tester_post_pages/recruit_post_detail_page.dart';
+import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
 
-import '../../../domain/entities/recruit_post_entity.dart';
-import '../../../services/common_height_provider.dart';
-import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
-import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
-import '../../provider/post_provider/recruit_post_provider.dart';
+import '../../../../domain/entities/recruit_post_entity.dart';
+import '../../../../services/common_height_provider.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../../../provider/post_provider/recruit_post_provider.dart';
 
 class PostTesterPage extends StatefulWidget {
   const PostTesterPage({super.key});

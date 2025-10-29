@@ -5,12 +5,14 @@ import 'package:get_it/get_it.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
-import 'package:test_us_app/presentation/login_page.dart';
-import 'package:test_us_app/presentation/my_pages/my_recruitment_page.dart';
+import 'package:test_us_app/presentation/pages/login_page.dart';
+import 'package:test_us_app/presentation/provider/application_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
-import 'components/login_dialogs.dart';
+import '../components/login_dialogs.dart';
+import 'my_pages/my_recruitment_page.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -143,7 +145,7 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(
                                         child: Text(
-                                          "0",
+                                          '${context.read<BasePostProvider>().userRecruitPosts?.length}',
                                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                                         ),
                                       ),
@@ -174,7 +176,7 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(
                                           child: Text(
-                                        "0",
+                                        '${context.read<BasePostProvider>().userPromotionPosts?.length}',
                                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                                       )),
                                       SizedBox(
@@ -204,7 +206,7 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(
                                         child: Text(
-                                          "0",
+                                          '${context.read<ApplicationProvider>().applications?.length}',
                                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                                         ),
                                       ),

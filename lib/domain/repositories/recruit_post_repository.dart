@@ -6,7 +6,6 @@ import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import '../entities/image_entity.dart';
 
 abstract class RecruitPostRepository{
-  Future<Map<String, dynamic>> getPostInitData();
   Future<List<RecruitPostEntity>> getUserRecruitmentPosts(String token, String userId);
   Future<List<RecruitPostEntity>> getPostPagination(int page);
   // Future<List<PostEntity>> getPostByPlatform(int page);

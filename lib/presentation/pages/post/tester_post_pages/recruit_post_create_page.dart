@@ -9,15 +9,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
-import 'package:test_us_app/presentation/post/tester_post_pages/recruit_post_detail_page.dart';
+import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
-import '../../../domain/entities/image_entity.dart';
-import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
-import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
-import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
-import '../../provider/post_provider/recruit_post_provider.dart';
+import '../../../../domain/entities/image_entity.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../../../provider/post_provider/recruit_post_provider.dart';
 
 class PostCreatePage extends StatefulWidget {
   final RecruitPostEntity? post;
@@ -52,7 +52,6 @@ class _PostCreatePageState extends State<PostCreatePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if (widget.post != null) {
       titleController.text = widget.post!.title!;
@@ -89,7 +88,6 @@ class _PostCreatePageState extends State<PostCreatePage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     titleController.dispose();
     subtitleController.dispose();
@@ -306,7 +304,6 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                 ),
-                              //TODO: post로직 이미지 로직으로 변경 필요.
                               BlocListener<RecruitPostBloc, RecruitPostState>(
                                 listener: (context, state) {
 
@@ -605,7 +602,6 @@ class _PostCreatePageState extends State<PostCreatePage> {
 
   Widget _buttonSection(BuildContext context) {
     final token = context.read<UserProvider>().token ?? '';
-    //TODO: post로직 이미지 로직으로 변경 필요.
     return BlocListener<RecruitPostBloc, RecruitPostState>(
         listener: (context, state) async {
           final provider = context.read<RecruitPostProvider>();
@@ -689,14 +685,10 @@ class _PostCreatePageState extends State<PostCreatePage> {
                         );
                         context.read<RecruitPostBloc>().add(RequestPostCreateEvent(token, post, _selectedImages));
                       } on Exception catch (e) {
-                        // TODO
                         logger.e(e);
                         Get.snackbar('알림', '등록 실패');
                         return;
                       }
-                      // if (context.mounted) {
-                      //   Get.back();
-                      // }
                     },
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),

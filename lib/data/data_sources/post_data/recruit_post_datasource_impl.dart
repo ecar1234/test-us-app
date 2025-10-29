@@ -18,19 +18,6 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
   RecruitPostDatasourceImpl(this.netDriver);
 
   @override
-  Future<Map<String, List<dynamic>>> getPostsInitData() async {
-    final res = await netDriver.requestGetJson("", PostApi.getInitPosts);
-
-    if (res['status'] == 202) {
-      final jobId = res['jobId'];
-      final data = await _startPolling(jobId, "");
-      return {'favorite': data['favoritePosts']!, 'recruit': data['recruitPosts']!, 'promotion': data['promotionPosts']!};
-    } else {
-      throw Exception('Error');
-    }
-  }
-
-  @override
   Future<List<RecruitPostModel>> getPostsPagination(int page) async {
     final res = await netDriver.requestGetJson(page.toString(), RecruitPostApi.getPostsPagination);
     if (res['status'] == 200) {
@@ -101,29 +88,4 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
     // TODO: implement getPostByTitle
     throw UnimplementedError();
   }
-
-  Future<Map<String, List<dynamic>>> _startPolling(String jobId, String token) {
-    final controller = Completer<Map<String, List<dynamic>>>();
-    Timer.periodic(Duration(seconds: 2), (timer) async {
-      final res = await netDriver.requestGetJson(token, JobApi.jobGetInitPosts, param: jobId);
-      if (res['status'] == 200) {
-        final favorite = (res['favoritePosts'] as List).map((e) {
-          if(e['domain'] == null){
-            return RecruitPostModel.fromJson(e);
-          }else {
-            return PromotionPostModel.fromJson(e);
-          }
-        }).toList();
-        final recruit = (res['recruitPosts'] as List).map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();
-        final promotion = (res['promotionPosts'] as List).map<PromotionPostModel>((e) => PromotionPostModel.fromJson(e)).toList();
-
-        final result = {'favoritePosts': favorite, 'recruitPosts': recruit, 'promotionPosts': promotion};
-        controller.complete(result);
-        timer.cancel();
-      }
-    });
-    return controller.future;
-  }
-
-
 }

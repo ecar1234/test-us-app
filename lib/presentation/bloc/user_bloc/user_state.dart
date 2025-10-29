@@ -3,6 +3,7 @@ import 'package:test_us_app/domain/entities/user_entity.dart';
 
 enum UserDataState {
   serviceStartState,
+  userInitDataLoadCompletedState,
   loadingState,
   getUsersInfoCompletedState,
   userDataLoadedState,
@@ -14,5 +15,6 @@ class UserState {
   UserEntity? user;
   List<UserEntity>? users;
   List<Map<String, dynamic>>? usersAddAverage;
+
   UserState(this.state, {this.user, this.users, this.usersAddAverage});
 }

@@ -4,21 +4,22 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
-import 'package:test_us_app/presentation/provider/post_provider/favorite_post_provider.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
+import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
+import 'package:test_us_app/presentation/pages/setting_page.dart';
+import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
-import 'package:test_us_app/presentation/setting_page.dart';
-import 'package:test_us_app/presentation/post/tester_post_pages/recruit_post_detail_page.dart';
 
-import '../data/sharedPreferences/auth_preference.dart';
-import '../domain/entities/recruit_post_entity.dart';
-import '../services/common_height_provider.dart';
-import 'bloc/auth_bloc/auth_bloc.dart';
-import 'bloc/auth_bloc/auth_event.dart';
-import 'bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
-import 'bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
-import 'bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../../data/sharedPreferences/auth_preference.dart';
+import '../../domain/entities/recruit_post_entity.dart';
+import '../../services/common_height_provider.dart';
+import '../bloc/auth_bloc/auth_bloc.dart';
+import '../bloc/auth_bloc/auth_event.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -192,7 +193,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      Selector<FavoritePostProvider, List<dynamic>>(
+      Selector<BasePostProvider, List<dynamic>>(
         selector: (context, provider) => provider.favoritePost ?? [],
         builder: (context, favoritePost, child) => SizedBox(
             height: 220,
@@ -282,7 +283,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _testerList(BuildContext context) {
-    return BlocBuilder<RecruitPostBloc, RecruitPostState>(builder: (context, state) {
+    return BlocBuilder<BasePostBloc, BasePostState>(builder: (context, state) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -294,9 +295,8 @@ class _HomePageState extends State<HomePage> {
                 Text('테스터 모집', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 TextButton(
                     onPressed: () async {
-                      context.read<RecruitPostBloc>().add(PostDataLoadEvent());
-                      await context.read<RecruitPostProvider>().getPostPagination(page: 1);
-                      if (context.mounted) context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent());
+                      // await context.read<RecruitPostProvider>().getPostPagination(page: 1);
+                      context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent(1));
                       widget.onTap(1);
                     },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
@@ -304,7 +304,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          if (state.state == RecruitPostLoadState.dataLoadState)
+          if (state.state == BasePostLoadState.initPostDataLoadingState)
             SizedBox(
               height: 200,
               child: Center(
@@ -312,8 +312,8 @@ class _HomePageState extends State<HomePage> {
               ),
             )
           else
-            Selector<RecruitPostProvider, List<RecruitPostEntity>>(
-              selector: (context, provider) => provider.recruitmentPosts ?? [],
+            Selector<BasePostProvider, List<RecruitPostEntity>>(
+              selector: (context, provider) => provider.recruitPosts?? [],
               builder: (context, post, child) => SizedBox(
                   height: 230,
                   width: MediaQuery.sizeOf(context).width,

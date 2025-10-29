@@ -3,6 +3,7 @@
 import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
+import '../../domain/entities/recruit_post_entity.dart';
 import '../../domain/entities/review_entity.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../data_sources/user_data/user_data_source.dart';

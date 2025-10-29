@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/user_data/user_data_source.dart';
+import 'package:test_us_app/data/models/post/promotion_post_model.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
 
 import '../../../core/net_driver.dart';
+import '../../models/post/recruit_post_model.dart';
 import '../../models/review/review_model.dart';
 
 class UserDataSourceImpl implements UserDataSource {

@@ -9,21 +9,9 @@ import '../../../../domain/entities/recruit_post_entity.dart';
 
 class RecruitPostEvent {}
 
-class ServiceStartEvent extends RecruitPostEvent {
-  ServiceStartEvent();
-}
-
-// class RequestUserInfoEvent extends DataEvent {
-//   BuildContext context;
-//   RequestUserInfoEvent(this.context);
-// }
-//
-class RequestInitDataEvent extends RecruitPostEvent {
-  RequestInitDataEvent();
-}
-//
 class RequestRecruitmentPaginationEvent extends RecruitPostEvent {
-  RequestRecruitmentPaginationEvent();
+  int page;
+  RequestRecruitmentPaginationEvent(this.page);
 }
 //
 class RequestPostDataEvent extends RecruitPostEvent {
