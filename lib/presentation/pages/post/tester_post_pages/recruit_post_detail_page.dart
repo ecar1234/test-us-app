@@ -56,14 +56,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
-      final provider = context.read<RecruitPostProvider>();
+      final provider = context.read<BasePostProvider>();
       if(state.state == RecruitPostLoadState.getPostByIdCompletedState){
 
       }else if(state.state == RecruitPostLoadState.postDeleteCompletedState){
-        provider.deletePost(state.post!.id!);
+        provider.deleteRecruitPost(state.post!.id!);
         Navigator.pop(context);
       }else if(state.state == RecruitPostLoadState.postUpdateCompletedState){
-        provider.updatePost(state.post!);
+        provider.updateRecruitPost(state.post!);
+        Navigator.pop(context);
       }
     }, builder: (context, state) {
       final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
@@ -115,18 +116,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   ),
                   actions: [
                     isAuthor
-                        ? BlocListener<RecruitPostBloc, RecruitPostState>(
-                      listener: (context, state) async {
-                        if(state.state == RecruitPostLoadState.postDeleteCompletedState){
-                          context.read<RecruitPostProvider>().deletePost(state.post!.id!);
-                          context.read<BasePostProvider>().deleteRecruitPost(state.post!.id!);
-                          Navigator.pop(context);
-                        }else if(state.state == RecruitPostLoadState.failedState){
-                          Get.snackbar('알림', '다시 시도해 주세요. 문제가 지속되면 관리자에게 문의 해주세요.');
-                          return;
-                        }
-                      },
-                      child: PopupMenuButton(
+                        ? PopupMenuButton(
                         icon: Icon(Icons.more_vert_rounded),
                         itemBuilder: (BuildContext context) {
                           return [
@@ -137,10 +127,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         onSelected: (value) async {
                           if (value == 1) {
                             Navigator.push(context, MaterialPageRoute(builder: (context) {
-                              return PostCreatePage(post: post);
+                              return RecruitPostCreatePage(post: post);
                             }));
                           } else if (value == 2) {
-                            Get.defaultDialog(title: "삭제", middleText: "삭제하시겠습니까?", actions: [
+                            Get.defaultDialog(title: "알림", middleText: "삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?", actions: [
                               ElevatedButton(
                                 onPressed: () {
                                   Get.back();
@@ -164,8 +154,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                             ]);
                           }
                         },
-                      ),
-                    )
+                      )
                         : SizedBox()
                   ],
                   flexibleSpace: FlexibleSpaceBar(
@@ -281,7 +270,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           // height: constraints.maxHeight * 0.5,
                             child: Linkify(
                               text: post.contents!,
-                              linkifiers: [WwwLinkifier(), PlayStoreLinkifier()],
+                              // linkifiers: [WwwLinkifier(), PlayStoreLinkifier()],
+                              linkifiers: [WwwLinkifier()],
                               linkStyle: const TextStyle(color: Colors.blue),
                               onOpen: _linkOpen,
                             )),

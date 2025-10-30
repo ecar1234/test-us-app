@@ -7,6 +7,7 @@ import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recru
 import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../pages/post/promotion_post_pages/promotion_post_create_page.dart';
 import '../pages/post/tester_post_pages/recruit_post_create_page.dart';
 import '../provider/post_provider/recruit_post_provider.dart';
 import '../provider/user_provider.dart';
@@ -80,7 +81,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                             color: _selectedIndex == 0 ? Colors.blue : null)),
                     IconButton(
                         onPressed: () async {
-                          context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent(1));
+                          // context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent(1, 20));
                           setState(() {
                             _selectedIndex = 1;
                           });
@@ -100,14 +101,32 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                     decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primary,
                         borderRadius: BorderRadius.circular(10)),
-                    child: IconButton(
-                        onPressed: () {
+                    child: PopupMenuButton(
+                      offset: Offset(-25, -110),
+                        itemBuilder: (context) {
+                          // final isLogin = context.read<UserProvider>().isLogged??false;
+                          // if(!isLogin) {
+                          //   showDialog(context: context, builder: (context) => const LoginDialog());
+                          //   return;
+                          // }
+                          // Get.to(() => PostCreatePage());
+                          return const [
+                            PopupMenuItem(value: 0, height: 40, child: Text('테스터 모집'),),
+                            PopupMenuItem(value: 1, height: 40, child: Text('서비스 홍보'),),
+                          ];
+                        },
+                        onSelected: (value) {
                           final isLogin = context.read<UserProvider>().isLogged??false;
                           if(!isLogin) {
                             showDialog(context: context, builder: (context) => const LoginDialog());
                             return;
                           }
-                          Get.to(() => PostCreatePage());
+                          if(value == 0){
+                            Get.to(() => RecruitPostCreatePage());
+                          }else if(value == 1){
+                            Get.to(() => PromotionPostCreatePage());
+                          }
+                          // Get.to(() => RecruitPostCreatePage)
                         },
                         icon: Icon(Icons.add, color: Colors.white)),
                   ),

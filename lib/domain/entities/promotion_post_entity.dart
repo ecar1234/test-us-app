@@ -1,10 +1,8 @@
-
-
 import 'package:test_us_app/data/models/post/promotion_post_model.dart';
-
-import '../../data/models/image/image_model.dart';
+import 'package:test_us_app/domain/entities/image_entity.dart';
+import 'package:test_us_app/domain/entities/user_entity.dart';
 import '../../data/models/post/recruit_post_model.dart';
-import '../../data/models/user/user_model.dart';
+
 
 class PromotionPostEntity {
   String? id;
@@ -14,9 +12,9 @@ class PromotionPostEntity {
   String? contents;
   PostStatus? status;
   int? period;
-  UserModel? author;
+  UserEntity? author;
   int? views;
-  List<ImageModel>? images;
+  List<ImageEntity>? images;
   List<String>? domain;
   DateTime? createdAt;
   DateTime? updatedAt;

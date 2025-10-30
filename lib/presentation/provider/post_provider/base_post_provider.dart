@@ -38,8 +38,36 @@ class BasePostProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Future<void> createRecruitPost(RecruitPostEntity post) async {
+    _recruitPosts = [post, ..._recruitPosts!];
+    notifyListeners();
+  }
+  Future<void> createPromotionPost(PromotionPostEntity post) async {
+    _promotionPosts = [post, ..._promotionPosts!];
+    notifyListeners();
+  }
+  Future<void> updateRecruitPost(RecruitPostEntity post) async {
+    final index = _recruitPosts?.indexWhere((element) => element.id == post.id);
+    if(index == null) return;
+     _recruitPosts!.removeAt(index);
+    _recruitPosts = [post, ..._recruitPosts!];
+    notifyListeners();
+  }
+  Future<void> updatePromotionPost(PromotionPostEntity post) async {
+    final index = _promotionPosts?.indexWhere((element) => element.id == post.id);
+    if(index == null) return;
+     _promotionPosts!.removeAt(index);
+    _promotionPosts = [post, ..._promotionPosts!];
+    notifyListeners();
+  }
   Future<void> deleteRecruitPost(String id) async {
-    _userRecruitPosts?.removeWhere((element) => element.id == id);
+    _recruitPosts = _recruitPosts?.where((element) => element.id != id).toList();
+    notifyListeners();
+
+  }
+  Future<void> deletePromotionPost(String id) async {
+    _promotionPosts = _promotionPosts?.where((element) => element.id != id).toList();
     notifyListeners();
   }
 }

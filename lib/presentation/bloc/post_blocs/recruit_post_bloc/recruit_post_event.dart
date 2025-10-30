@@ -11,7 +11,8 @@ class RecruitPostEvent {}
 
 class RequestRecruitmentPaginationEvent extends RecruitPostEvent {
   int page;
-  RequestRecruitmentPaginationEvent(this.page);
+  int size;
+  RequestRecruitmentPaginationEvent(this.page, this.size);
 }
 //
 class RequestPostDataEvent extends RecruitPostEvent {

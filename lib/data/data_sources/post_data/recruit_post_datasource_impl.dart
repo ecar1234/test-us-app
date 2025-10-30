@@ -18,8 +18,9 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
   RecruitPostDatasourceImpl(this.netDriver);
 
   @override
-  Future<List<RecruitPostModel>> getPostsPagination(int page) async {
-    final res = await netDriver.requestGetJson(page.toString(), RecruitPostApi.getPostsPagination);
+  Future<List<RecruitPostModel>> getPostsPagination(int page, int size) async {
+    final res = await netDriver.requestPostJson(page.toString(), RecruitPostApi.getPostsPagination,
+        {'size': size, 'page': page});
     if (res['status'] == 200) {
       // logger.d(res['posts']);
       return (res['posts'] as List).map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
+import 'package:test_us_app/presentation/pages/post/post_main_page.dart';
 import 'package:test_us_app/presentation/pages/setting_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 
@@ -18,6 +19,8 @@ import '../../domain/entities/recruit_post_entity.dart';
 import '../../services/common_height_provider.dart';
 import '../bloc/auth_bloc/auth_bloc.dart';
 import '../bloc/auth_bloc/auth_event.dart';
+import '../bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
+import '../bloc/post_blocs/promotion_bloc/promotion_event.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import 'login_page.dart';
@@ -296,8 +299,9 @@ class _HomePageState extends State<HomePage> {
                 TextButton(
                     onPressed: () async {
                       // await context.read<RecruitPostProvider>().getPostPagination(page: 1);
-                      context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent(1));
-                      widget.onTap(1);
+                      context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent(1, 10));
+                      // widget.onTap(1);
+                      Get.to(() => PostMainPage(type: 'recruit'));
                     },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
                     child: Text("전체 보기"))
@@ -314,14 +318,14 @@ class _HomePageState extends State<HomePage> {
           else
             Selector<BasePostProvider, List<RecruitPostEntity>>(
               selector: (context, provider) => provider.recruitPosts?? [],
-              builder: (context, post, child) => SizedBox(
+              builder: (context, posts, child) => SizedBox(
                   height: 230,
                   width: MediaQuery.sizeOf(context).width,
                   // padding: EdgeInsets.all(10),
                   // decoration: BoxDecoration(
                   //     border: Border.all()
                   // ),
-                  child: post.isEmpty
+                  child: posts.isEmpty
                       ? const Center(child: Text("테스터 모집이 아직 없습니다."))
                       : ListView.separated(
                           shrinkWrap: true,
@@ -330,7 +334,7 @@ class _HomePageState extends State<HomePage> {
                           itemBuilder: (context, idx) {
                             return GestureDetector(
                               onTap: () async {
-                                Get.to(() => PostDetailPage(postId: post[idx].id!));
+                                Get.to(() => PostDetailPage(postId: posts[idx].id!));
                               },
                               child: SizedBox(
                                 height: 230,
@@ -345,10 +349,10 @@ class _HomePageState extends State<HomePage> {
                                           width: constraints.maxWidth,
                                           height: constraints.maxHeight * 0.55,
                                           decoration: BoxDecoration(
-                                            border: post[idx].images!.isEmpty ? Border.all() : null,
+                                            border: posts[idx].images!.isEmpty ? Border.all() : null,
                                             borderRadius: BorderRadius.circular(10),
                                           ),
-                                          child: post[idx].images!.isEmpty
+                                          child: posts[idx].images!.isEmpty
                                               ? SizedBox(
                                                   child: Center(
                                                     child: Text('이미지가 없습니다.'),
@@ -357,7 +361,7 @@ class _HomePageState extends State<HomePage> {
                                               : ClipRRect(
                                                   borderRadius: BorderRadius.circular(10),
                                                   child: Image.network(
-                                                    post[idx].images![0].url ?? '',
+                                                    posts[idx].images![0].url ?? '',
                                                     fit: BoxFit.cover,
                                                   ),
                                                 ),
@@ -367,18 +371,18 @@ class _HomePageState extends State<HomePage> {
                                     const Gap(10),
                                     SizedBox(
                                         child: Text(
-                                      "${post[idx].title}",
+                                      "${posts[idx].title}",
                                       style: TextStyle(
                                           fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
                                       maxLines: 2,
                                     )),
                                     const Gap(5),
-                                    if (post[idx].platform!.length > 1)
+                                    if (posts[idx].platform!.length > 1)
                                       SizedBox(
                                           child: Row(
                                         children: [
                                           Text(
-                                            post[idx].platform![0],
+                                            posts[idx].platform![0],
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
@@ -387,7 +391,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           const Gap(10),
                                           Text(
-                                            post[idx].platform![1],
+                                            posts[idx].platform![1],
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
@@ -399,7 +403,7 @@ class _HomePageState extends State<HomePage> {
                                     else
                                       SizedBox(
                                         child: Text(
-                                          post[idx].platform![0],
+                                          posts[idx].platform![0],
                                           style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.normal,
@@ -410,7 +414,7 @@ class _HomePageState extends State<HomePage> {
                                     const Gap(5),
                                     SizedBox(
                                         child: Text(
-                                      "${post[idx].author!.nickname}",
+                                      "${posts[idx].author!.nickname}",
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.normal,
@@ -424,7 +428,156 @@ class _HomePageState extends State<HomePage> {
                             );
                           },
                           separatorBuilder: (context, idx) => const Gap(10),
-                          itemCount: post.length > 10 ? 10 : post.length)),
+                          itemCount: posts.length > 10 ? 10 : posts.length)),
+            ),
+        ],
+      );
+    });
+  }
+  Widget _promotionList(BuildContext context) {
+    return BlocBuilder<BasePostBloc, BasePostState>(builder: (context, state) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('서비스 홍보', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                TextButton(
+                    onPressed: () async {
+                      // await context.read<RecruitPostProvider>().getPostPagination(page: 1);
+                      context.read<PromotionBloc>().add(RequestPromotionPaginationEvent(1, 10));
+                      Get.to(() => PostMainPage(type: 'promotion'));
+                      // widget.onTap(1);
+                    },
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                    child: Text("전체 보기"))
+              ],
+            ),
+          ),
+          if (state.state == BasePostLoadState.initPostDataLoadingState)
+            SizedBox(
+              height: 200,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else
+            Selector<BasePostProvider, List<RecruitPostEntity>>(
+              selector: (context, provider) => provider.recruitPosts?? [],
+              builder: (context, posts, child) => SizedBox(
+                  height: 230,
+                  width: MediaQuery.sizeOf(context).width,
+                  // padding: EdgeInsets.all(10),
+                  // decoration: BoxDecoration(
+                  //     border: Border.all()
+                  // ),
+                  child: posts.isEmpty
+                      ? const Center(child: Text("테스터 모집이 아직 없습니다."))
+                      : ListView.separated(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.only(left: 20, right: 20),
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, idx) {
+                        return GestureDetector(
+                          onTap: () async {
+                            Get.to(() => PostDetailPage(postId: posts[idx].id!));
+                          },
+                          child: SizedBox(
+                            height: 230,
+                            width: 160,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(maxHeight: 210, maxWidth: 180),
+                                  child: LayoutBuilder(builder: (context, constraints) {
+                                    return Container(
+                                      width: constraints.maxWidth,
+                                      height: constraints.maxHeight * 0.55,
+                                      decoration: BoxDecoration(
+                                        border: posts[idx].images!.isEmpty ? Border.all() : null,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: posts[idx].images!.isEmpty
+                                          ? SizedBox(
+                                        child: Center(
+                                          child: Text('이미지가 없습니다.'),
+                                        ),
+                                      )
+                                          : ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          posts[idx].images![0].url ?? '',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                                const Gap(10),
+                                SizedBox(
+                                    child: Text(
+                                      "${posts[idx].title}",
+                                      style: TextStyle(
+                                          fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
+                                      maxLines: 2,
+                                    )),
+                                const Gap(5),
+                                if (posts[idx].platform!.length > 1)
+                                  SizedBox(
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            posts[idx].platform![0],
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.grey.shade600,
+                                                overflow: TextOverflow.ellipsis),
+                                          ),
+                                          const Gap(10),
+                                          Text(
+                                            posts[idx].platform![1],
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.grey.shade600,
+                                                overflow: TextOverflow.ellipsis),
+                                          ),
+                                        ],
+                                      ))
+                                else
+                                  SizedBox(
+                                    child: Text(
+                                      posts[idx].platform![0],
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.grey.shade600,
+                                          overflow: TextOverflow.ellipsis),
+                                    ),
+                                  ),
+                                const Gap(5),
+                                SizedBox(
+                                    child: Text(
+                                      "${posts[idx].author!.nickname}",
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.grey.shade600,
+                                          overflow: TextOverflow.ellipsis),
+                                      maxLines: 1,
+                                    )),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, idx) => const Gap(10),
+                      itemCount: posts.length > 10 ? 10 : posts.length)),
             ),
         ],
       );

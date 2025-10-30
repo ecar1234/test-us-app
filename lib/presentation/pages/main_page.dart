@@ -7,8 +7,9 @@ import 'package:logger/logger.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
-import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_main_page.dart';
+import 'package:test_us_app/presentation/pages/post/post_main_page.dart';
 import 'package:test_us_app/presentation/pages/purchase_page.dart';
+import 'package:test_us_app/presentation/pages/search_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/promotion_post_provider.dart';
@@ -149,7 +150,7 @@ class _MainState extends State<MainPage> {
           });
         },
       ),
-      const PostTesterPage(),
+      const SearchPage(),
       const UserPage(),
       const PurchasePage(),
     ];

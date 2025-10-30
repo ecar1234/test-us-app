@@ -43,8 +43,8 @@ class RecruitPostUseCase {
     return res;
   }
 
-  Future<List<RecruitPostEntity>> getPostPagination(int page) async {
-    final res = await repository.getPostPagination(page);
+  Future<List<RecruitPostEntity>> getPostPagination(int page, int size) async {
+    final res = await repository.getPostPagination(page, size);
     return res;
   }
 }

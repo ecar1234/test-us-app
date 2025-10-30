@@ -10,6 +10,7 @@ import 'package:logger/logger.dart';
 
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
+import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
@@ -19,16 +20,16 @@ import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../../../provider/post_provider/recruit_post_provider.dart';
 
-class PostCreatePage extends StatefulWidget {
+class RecruitPostCreatePage extends StatefulWidget {
   final RecruitPostEntity? post;
 
-  const PostCreatePage({super.key, this.post});
+  const RecruitPostCreatePage({super.key, this.post});
 
   @override
-  State<PostCreatePage> createState() => _PostCreatePageState();
+  State<RecruitPostCreatePage> createState() => _RecruitPostCreatePageState();
 }
 
-class _PostCreatePageState extends State<PostCreatePage> {
+class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
   final logger = Logger();
   final picker = ImagePicker();
   List<XFile> _selectedImages = [];
@@ -77,7 +78,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
   }
 
   @override
-  void didUpdateWidget(covariant PostCreatePage oldWidget) {
+  void didUpdateWidget(covariant RecruitPostCreatePage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.post?.images != oldWidget.post?.images) {
       setState(() {
@@ -304,11 +305,7 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                 ),
-                              BlocListener<RecruitPostBloc, RecruitPostState>(
-                                listener: (context, state) {
-
-                                },
-                                child: Positioned(
+                              Positioned(
                                     top: 4,
                                     right: 4,
                                     child: GestureDetector(
@@ -337,7 +334,6 @@ class _PostCreatePageState extends State<PostCreatePage> {
                                             child: Icon(Icons.close),
                                           ),
                                         ))),
-                              ),
                             ]),
                           ),
                         );
@@ -604,18 +600,20 @@ class _PostCreatePageState extends State<PostCreatePage> {
     final token = context.read<UserProvider>().token ?? '';
     return BlocListener<RecruitPostBloc, RecruitPostState>(
         listener: (context, state) async {
-          final provider = context.read<RecruitPostProvider>();
+          // NOTE: Recruit Post는 페이지 접속 시 새로 불러옴.
+          // NOTE: init post의 Recruit post에만 추가 필요. CRUD 모두 적용
+          final provider = context.read<BasePostProvider>();
           if (state.state == RecruitPostLoadState.postCreateCompletedState) {
-            provider.createPost(state.post!);
+            provider.createRecruitPost(state.post!);
             await _alertDialog(context, '등록');
           } else if (state.state == RecruitPostLoadState.postUpdateCompletedState) {
-            provider.updatePost(state.post!);
+            provider.updateRecruitPost(state.post!);
             await _alertDialog(context, '수정');
-          }else {
+          } else if(state.state == RecruitPostLoadState.errorState
+              || state.state == RecruitPostLoadState.failedState){
             Get.snackbar('알림', '등록 실패');
             return;
           }
-          if (context.mounted) Navigator.pop(context);
         },
         child: SizedBox(
           height: 50,
@@ -729,24 +727,26 @@ class _PostCreatePageState extends State<PostCreatePage> {
           ),
         ));
   }
+
+  Future<void> _alertDialog(BuildContext context, String content) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("게시 성공"),
+          content: Text("테스터 모집글을 $content 했습니다.."),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  if(context.mounted) Navigator.pop(context);
+                },
+                child: Text("확인"))
+          ],
+        );
+      },
+    );
+  }
 }
 
-Future<void> _alertDialog(BuildContext context, String content) {
-  return showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text("게시 성공"),
-        content: Text("테스터 모집글을 $content 했습니다.."),
-        actions: [
-          TextButton(
-              onPressed: () {
-                // context.read<RecruitPostBloc>().add(ReloadPostEvent());
-                Navigator.pop(context);
-              },
-              child: Text("확인"))
-        ],
-      );
-    },
-  );
-}
+
