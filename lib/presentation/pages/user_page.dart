@@ -145,7 +145,7 @@ class _UserPageState extends State<UserPage> {
                                       ),
                                       SizedBox(
                                         child: Text(
-                                          '${context.read<BasePostProvider>().userRecruitPosts?.length}',
+                                          '${context.read<BasePostProvider>().userRecruitPosts!.length}',
                                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                                         ),
                                       ),

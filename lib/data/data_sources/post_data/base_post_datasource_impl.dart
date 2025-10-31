@@ -60,6 +60,7 @@ class BasePostDataSourceImpl implements BasePostDataSource {
     });
     return controller.future;
   }
+
   Future<Map<String, dynamic>> _startGetUserPosts(String jobId, String token) {
     final controller = Completer<Map<String, List<dynamic>>>();
     Timer.periodic(Duration(seconds: 2), (timer) async {

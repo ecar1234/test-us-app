@@ -6,6 +6,7 @@ import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/image_bloc/image_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
@@ -20,6 +21,7 @@ import 'package:test_us_app/service_locator.dart';
 import 'package:provider/provider.dart';
 
 import 'domain/use_cases/base_post_usecase.dart';
+import 'domain/use_cases/promotion_post_usecase.dart';
 import 'domain/use_cases/recruit_post_usecase.dart';
 import 'domain/use_cases/review_usecase.dart';
 import 'domain/use_cases/user_usecase.dart';
@@ -41,6 +43,7 @@ Future<void> main() async {
         BlocProvider(create: (context) => UserBloc(getIt<UserUseCase>())),
         BlocProvider(create: (context) => BasePostBloc(getIt<BasePostUseCase>())),
         BlocProvider(create: (context) => RecruitPostBloc(getIt<RecruitPostUseCase>())),
+        BlocProvider(create: (context) => PromotionBloc(getIt<PromotionPostUseCase>())),
         BlocProvider(create: (context) => ImageBloc(getIt<ImageUseCase>())),
         BlocProvider(create: (context) => AppBloc(getIt<ApplicationUseCase>(), getIt<RecruitPostUseCase>())),
         BlocProvider(create: (context) => ReviewBloc(getIt<ReviewUseCase>())),

@@ -109,7 +109,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                         flex: 8,
                         child: GestureDetector(
                           onTap: () {
-                            Get.to(() => PostDetailPage(post: posts[idx]));
+                            Get.to(() => RecruitPostDetailPage(post: posts[idx]));
                           },
                           child: Container(
                             width: (MediaQuery.sizeOf(context).width - 50) * 0.8,

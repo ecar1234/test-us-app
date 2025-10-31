@@ -8,6 +8,7 @@ import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
+import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
 
 import '../../../../domain/entities/image_entity.dart';
 import '../../../../domain/entities/recruit_post_entity.dart';
@@ -598,102 +599,13 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       width: MediaQuery.sizeOf(context).width - 40,
                       child: Center(child: Text('플랫폼을 선택해 주세요.', style: TextStyle(fontSize: 16, color: Colors.grey)))),
                 if (_webCheck)
-                  SizedBox(
-                      height: 60,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(
-                                  child: Text("웹사이트", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
-                              const Gap(10),
-                              SizedBox(
-                                height: 50,
-                                width: 200,
-                                child: TextField(
-                                  controller: webUrlController,
-                                  // decoration: InputDecoration(enabled: false),
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Gap(10)
-                        ],
-                      )),
+                  _urlTextFiled(context, '웹사이트', webUrlController),
                 if (_gameCheck)
-                  SizedBox(
-                      height: 60,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(child: Text("URL", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
-                              const Gap(10),
-                              SizedBox(
-                                height: 50,
-                                width: 200,
-                                child: TextField(
-                                  controller: gameUrlController,
-                                  // decoration: InputDecoration(enabled: false),
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Gap(10)
-                        ],
-                      )),
+                  _urlTextFiled(context, 'URL', gameUrlController),
                 if (_iosCheck)
-                  SizedBox(
-                      height: 60,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(
-                                  child:
-                                      Text("App Store", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
-                              const Gap(10),
-                              SizedBox(
-                                height: 50,
-                                width: 200,
-                                child: TextField(
-                                  controller: iosUrlController,
-                                  // decoration: InputDecoration(enabled: false),
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Gap(10)
-                        ],
-                      )),
+                  _urlTextFiled(context, 'App Store', iosUrlController),
                 if (_androidCheck)
-                  SizedBox(
-                      height: 60,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(
-                                  child:
-                                      Text("Play Store", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
-                              const Gap(10),
-                              SizedBox(
-                                height: 50,
-                                width: 200,
-                                child: TextField(
-                                  controller: androidUrlController,
-                                  // decoration: InputDecoration(enabled: false),
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Gap(10)
-                        ],
-                      )),
+                  _urlTextFiled(context, 'Play Store', androidUrlController),
               ],
             ),
           )
@@ -766,14 +678,35 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }
-                      final post = RecruitPostEntity(
+                      if (_webCheck && webUrlController.text.isEmpty ||
+                          _gameCheck && gameUrlController.text.isEmpty ||
+                          _iosCheck && iosUrlController.text.isEmpty ||
+                          _androidCheck && androidUrlController.text.isEmpty) {
+                        Get.snackbar("알림", "URL을 입력해주세요.");
+                        return;
+                      }
+                      final domain = <String>[];
+                      if (_webCheck) {
+                        domain.add(webUrlController.text);
+                      } else if (_gameCheck) {
+                        domain.add(gameUrlController.text);
+                      } else {
+                        if (_iosCheck) {
+                          domain.add(iosUrlController.text);
+                        }
+                        if (_androidCheck) {
+                          domain.add(androidUrlController.text);
+                        }
+                      }
+                      final post = PromotionPostEntity(
                         title: titleController.text,
                         subtitle: subtitleController.text,
                         contents: contentController.text,
                         platform: _selectedCategory,
+                        domain: domain,
                         images: _selectedImages.map((e) => ImageEntity(url: e.path)).toList(),
                       );
-                      Get.to(() => PostDetailPage(post: post));
+                      Get.to(() => PromotionPostDetailPage(post: post));
                     },
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
@@ -916,6 +849,37 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
             ],
           ),
         ));
+  }
+
+  Widget _urlTextFiled(BuildContext context, String title, TextEditingController controller) {
+    return SizedBox(
+        height: 60,
+        width: MediaQuery.sizeOf(context).width - 40,
+        child: Column(children: [
+          Row(
+            children: [
+              Flexible(
+                flex: 2,
+                child: SizedBox(
+                    width: (MediaQuery.sizeOf(context).width - 40) * 0.2,
+                    child: Text("$title : ", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
+              ),
+              Flexible(
+                flex: 8,
+                child: SizedBox(
+                  height: 50,
+                  width: (MediaQuery.sizeOf(context).width - 40) * 0.8,
+                  child: TextField(
+                    controller: controller,
+                    // decoration: InputDecoration(enabled: false),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Gap(10)
+        ]));
   }
 
   Future<void> _alertDialog(BuildContext context, String content) {

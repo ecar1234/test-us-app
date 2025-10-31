@@ -6,6 +6,7 @@ enum PromotionPostLoadState {
   postLoadingState,
   postCreateCompletedState,
   postUpdateCompletedState,
+  getPostByIdCompletedState,
   errorState,
   failedState
 }

@@ -643,7 +643,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         platform: _selectedCategory,
                         images: _selectedImages.map((e) => ImageEntity(url: e.path)).toList(),
                       );
-                      Get.to(() => PostDetailPage(post: post));
+                      Get.to(() => RecruitPostDetailPage(post: post));
                     },
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),

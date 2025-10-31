@@ -33,12 +33,11 @@ class ImageApi {
 
 class PostApi {
   static const String getInitPosts = '/api/v1/post/getInitPosts';
-  static const String createRecruitPost = '/api/v1/post/createRecruitPost';
-  static const String createPromotionPost = '/api/v1/post/createPromotionPost';
   static const String getUserInitData = '/api/v1/post/getUserInitPosts';
 }
 
 class RecruitPostApi {
+  static const String createRecruitPost = '/api/v1/post/createRecruitPost';
   static const String update = '/api/v1/post/updateRecruitPost';
   static const String delete = '/api/v1/post/deleteRecruitPost';
   static const String getPostById = '/api/v1/post/getRecruitPostById';
@@ -48,6 +47,7 @@ class RecruitPostApi {
 }
 
 class PromotionApi {
+  static const String createPromotionPost = '/api/v1/post/createPromotionPost';
   static const String update = '/api/v1/post/updatePromotionPost';
   static const String delete = '/api/v1/post/deletePromotionPost';
   static const String getPostById = '/api/v1/post/getPromotionPostById';

@@ -19,19 +19,24 @@ import 'core/net_driver.dart';
 import 'data/data_sources/image_data/image_data_source.dart';
 import 'data/data_sources/image_data/image_data_source_impl.dart';
 import 'data/data_sources/post_data/base_post_datasource.dart';
+import 'data/data_sources/post_data/promotion_post_datasource.dart';
+import 'data/data_sources/post_data/promotion_post_datasource_impl.dart';
 import 'data/repositories/application_repository_impl.dart';
 import 'data/repositories/base_post_repository_impl.dart';
 import 'data/repositories/image_repository_impl.dart';
+import 'data/repositories/promotion_post_repository_impl.dart';
 import 'data/repositories/review_repository_impl.dart';
 import 'data/repositories/user_repository_impl.dart';
 import 'domain/repositories/application_repo.dart';
 import 'domain/repositories/base_post_repository.dart';
 import 'domain/repositories/image_repository.dart';
+import 'domain/repositories/promotion_post_repository.dart';
 import 'domain/repositories/recruit_post_repository.dart';
 import 'domain/repositories/review_repository.dart';
 import 'domain/repositories/user_repository.dart';
 import 'domain/use_cases/application_usecase.dart';
 import 'domain/use_cases/image_usecase.dart';
+import 'domain/use_cases/promotion_post_usecase.dart';
 import 'domain/use_cases/recruit_post_usecase.dart';
 import 'domain/use_cases/review_usecase.dart';
 import 'domain/use_cases/user_usecase.dart';
@@ -44,31 +49,35 @@ Future<void> serviceLocator() async {
 
   // data
   getIt.registerLazySingleton<UserDataSource>(() => UserDataSourceImpl(getIt<NetDriver>()));
-  getIt.registerLazySingleton<RecruitPostDatasource>(() => RecruitPostDatasourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<ApplicationDataSource>(() => ApplicationDataSourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<ReviewDataSource>(() => ReviewDataSourceImpl(getIt<NetDriver>()));
   // getIt.registerLazySingleton<ImageDataSource>(() => ImageDataSourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<BasePostDataSource>(() => BasePostDataSourceImpl(getIt<NetDriver>()));
+  getIt.registerLazySingleton<RecruitPostDatasource>(() => RecruitPostDatasourceImpl(getIt<NetDriver>()));
+  getIt.registerLazySingleton<PromotionPostDataSource>(() => PromotionPostDataSourceImpl(getIt<NetDriver>()));
+
 
 
 
   // domain
   getIt.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(getIt<UserDataSource>()));
-  getIt.registerLazySingleton<RecruitPostRepository>(() => RecruitPostRepositoryImpl(getIt<RecruitPostDatasource>()));
   getIt.registerLazySingleton<ApplicationRepository>(() => ApplicationRepositoryImpl(getIt<ApplicationDataSource>()));
   getIt.registerLazySingleton<ReviewRepository>(() => ReviewRepositoryImpl(getIt<ReviewDataSource>()));
   // getIt.registerLazySingleton<ImageRepository>(() => ImageRepositoryImpl(getIt<ImageDataSource>()));
   getIt.registerLazySingleton<BasePostRepository>(() => BasePostRepositoryImpl(getIt<BasePostDataSource>()));
+  getIt.registerLazySingleton<RecruitPostRepository>(() => RecruitPostRepositoryImpl(getIt<RecruitPostDatasource>()));
+  getIt.registerLazySingleton<PromotionPostRepository>(() => PromotionPostRepositoryImpl(getIt<PromotionPostDataSource>()));
 
 
 
   // use case
   getIt.registerLazySingleton<UserUseCase>(() => UserUseCase(getIt<UserRepository>()));
-  getIt.registerLazySingleton<RecruitPostUseCase>(() => RecruitPostUseCase(getIt<RecruitPostRepository>()));
   getIt.registerLazySingleton<ApplicationUseCase>(() => ApplicationUseCase(getIt<ApplicationRepository>()));
   getIt.registerLazySingleton<ReviewUseCase>(() => ReviewUseCase(getIt<ReviewRepository>()));
   getIt.registerLazySingleton<ImageUseCase>(() => ImageUseCase(getIt<ImageRepository>()));
   getIt.registerLazySingleton<BasePostUseCase>(() => BasePostUseCase(getIt<BasePostRepository>()));
+  getIt.registerLazySingleton<RecruitPostUseCase>(() => RecruitPostUseCase(getIt<RecruitPostRepository>()));
+  getIt.registerLazySingleton<PromotionPostUseCase>(() => PromotionPostUseCase(getIt<PromotionPostRepository>()));
 
 
 

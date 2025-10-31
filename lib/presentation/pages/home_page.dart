@@ -4,8 +4,10 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
+import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
 import 'package:test_us_app/presentation/pages/post/post_main_page.dart';
 import 'package:test_us_app/presentation/pages/setting_page.dart';
@@ -107,8 +109,8 @@ class _HomePageState extends State<HomePage> {
                             _favoritePostList(context),
                             const Gap(20),
                             _testerList(context),
-                            // const Gap(20),
-                            // _webServiceList(),
+                            const Gap(20),
+                            _promotionList(context),
                           ],
                         ),
                       ),
@@ -141,7 +143,9 @@ class _HomePageState extends State<HomePage> {
               height: 80,
               width: (MediaQuery.sizeOf(context).width - 80) / 4,
               child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(() => PostMainPage(type: 'recruit'));
+                  },
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                   child: Center(
@@ -152,7 +156,9 @@ class _HomePageState extends State<HomePage> {
               height: 80,
               width: (MediaQuery.sizeOf(context).width - 80) / 4,
               child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(() => PostMainPage(type: 'promotion'));
+                  },
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                   child: Center(
@@ -214,10 +220,9 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, idx) {
                       return GestureDetector(
                         onTap: () async {
-                          // final token = context.read<UserProvider>().token ?? "";
-                          // final res = await context.read<PostProvider>().getPostById(token, favoritePost[idx].id!);
-                          // if(context.mounted) context.read<DataBloc>().add(RequestPostDataEvent(res));
-                          Get.to(() => PostDetailPage(postId: favoritePost[idx].id!));
+                          favoritePost[idx].domain == null ?
+                          Get.to(() => RecruitPostDetailPage(postId: favoritePost[idx].id!))
+                              : Get.to(() => PromotionPostDetailPage(postId: favoritePost[idx].id!));
                         },
                         child: SizedBox(
                           height: 210,
@@ -334,7 +339,7 @@ class _HomePageState extends State<HomePage> {
                           itemBuilder: (context, idx) {
                             return GestureDetector(
                               onTap: () async {
-                                Get.to(() => PostDetailPage(postId: posts[idx].id!));
+                                Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
                               },
                               child: SizedBox(
                                 height: 230,
@@ -434,6 +439,7 @@ class _HomePageState extends State<HomePage> {
       );
     });
   }
+  
   Widget _promotionList(BuildContext context) {
     return BlocBuilder<BasePostBloc, BasePostState>(builder: (context, state) {
       return Column(
@@ -448,7 +454,7 @@ class _HomePageState extends State<HomePage> {
                 TextButton(
                     onPressed: () async {
                       // await context.read<RecruitPostProvider>().getPostPagination(page: 1);
-                      context.read<PromotionBloc>().add(RequestPromotionPaginationEvent(1, 10));
+                      // context.read<PromotionBloc>().add(RequestPromotionPaginationEvent(1, 10));
                       Get.to(() => PostMainPage(type: 'promotion'));
                       // widget.onTap(1);
                     },
@@ -465,8 +471,8 @@ class _HomePageState extends State<HomePage> {
               ),
             )
           else
-            Selector<BasePostProvider, List<RecruitPostEntity>>(
-              selector: (context, provider) => provider.recruitPosts?? [],
+            Selector<BasePostProvider, List<PromotionPostEntity>>(
+              selector: (context, provider) => provider.promotionPosts ?? [],
               builder: (context, posts, child) => SizedBox(
                   height: 230,
                   width: MediaQuery.sizeOf(context).width,
@@ -475,7 +481,7 @@ class _HomePageState extends State<HomePage> {
                   //     border: Border.all()
                   // ),
                   child: posts.isEmpty
-                      ? const Center(child: Text("테스터 모집이 아직 없습니다."))
+                      ? const Center(child: Text("서비스 홍보가 아직 없습니다."))
                       : ListView.separated(
                       shrinkWrap: true,
                       padding: EdgeInsets.only(left: 20, right: 20),
@@ -483,7 +489,7 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, idx) {
                         return GestureDetector(
                           onTap: () async {
-                            Get.to(() => PostDetailPage(postId: posts[idx].id!));
+                            Get.to(() => PromotionPostDetailPage(postId: posts[idx].id!));
                           },
                           child: SizedBox(
                             height: 230,

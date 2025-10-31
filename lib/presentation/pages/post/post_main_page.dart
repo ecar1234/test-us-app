@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider/promotion_post_provider.dart';
 
@@ -40,7 +41,7 @@ class _PostMainPageState extends State<PostMainPage> {
       return SafeArea(
           child: Scaffold(
         appBar: AppBar(
-          title: Text("테스터 모집"),
+          title: Text(widget.type == 'recruit' ? '테스터 모집' : '서비스 홍보'),
         ),
         body: SingleChildScrollView(
           child: Container(
@@ -76,7 +77,7 @@ class _PostMainPageState extends State<PostMainPage> {
         width: MediaQuery.sizeOf(context).width - 40,
         // height: hei - 40,
         child: posts.isEmpty
-            ? SizedBox(height: hei, child: Center(child: Text("테스터 모집이 아직 없습니다.")))
+            ? SizedBox(height: hei, child: Center(child: Text(widget.type == 'recruit' ? "테스터 모집이 아직 없습니다." : '서비스 홍보가 아직 없습니다.')))
             : Column(
           children: [
             GridView.builder(
@@ -93,11 +94,9 @@ class _PostMainPageState extends State<PostMainPage> {
               itemBuilder: (context, idx) {
                 return GestureDetector(
                   onTap: () async {
-                    // context.read<DataBloc>().add(PostDataLoadEvent());
-                    // final token = context.read<UserProvider>().token ?? "";
-                    // final res = await context.read<PostProvider>().getPostById(token, posts[idx].id!);
-                    // if(context.mounted) context.read<DataBloc>().add(RequestPostDataEvent(res));
-                    Get.to(() => PostDetailPage(postId: posts[idx].id!,));
+                    widget.type == 'recruit' ?
+                    Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!,)) :
+                    Get.to(() => PromotionPostDetailPage(postId: posts[idx].id!));
                   },
                   child: SizedBox(
                     child: Column(

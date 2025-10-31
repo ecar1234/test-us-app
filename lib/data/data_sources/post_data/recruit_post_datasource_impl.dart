@@ -31,7 +31,7 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
 
   @override
   Future<RecruitPostModel> createPost(String token, RecruitPostModel post, List<XFile> images) async {
-    final res = await netDriver.requestRegisterFormData(token, PostApi.createRecruitPost, images, post.toJson());
+    final res = await netDriver.requestRegisterFormData(token, RecruitPostApi.createRecruitPost, images, post.toJson());
     if (res['status'] == 200) {
       return RecruitPostModel.fromJson(res['post']);
     } else {

@@ -15,11 +15,9 @@ import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_create_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
-import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/linkfy_util.dart';
-import 'package:test_us_app/utils/play_store_linkify_util.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../domain/entities/recruit_post_entity.dart';
@@ -32,17 +30,17 @@ import '../../../components/login_dialogs.dart';
 import '../../../provider/post_provider/base_post_provider.dart';
 
 
-class PostDetailPage extends StatefulWidget {
+class RecruitPostDetailPage extends StatefulWidget {
   final RecruitPostEntity? post;
   final String? postId;
 
-  const PostDetailPage({super.key, this.post, this.postId});
+  const RecruitPostDetailPage({super.key, this.post, this.postId});
 
   @override
-  State<PostDetailPage> createState() => _PostDetailPageState();
+  State<RecruitPostDetailPage> createState() => _RecruitPostDetailPageState();
 }
 
-class _PostDetailPageState extends State<PostDetailPage> {
+class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
   final logger = Logger();
   @override
   void initState() {
@@ -184,20 +182,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           height: 250,
                         ),
                       ))),
-              // test code
-              // if (_post == null)
-              //   SliverList(
-              //       key: const ValueKey("nullValue"),
-              //       delegate: SliverChildBuilderDelegate(
-              //         (context, index) => SizedBox(
-              //           height: 100,
-              //           child: Card(
-              //             child: Text(index.toString()),
-              //           ),
-              //         ),
-              //         childCount: 30,
-              //       ))
-              // else
               SliverToBoxAdapter(
                 key: const ValueKey("postValue"),
                 child: Container(
