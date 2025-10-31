@@ -11,19 +11,7 @@ class RequestPromotionPaginationEvent extends PromotionEvent {
   int size;
   RequestPromotionPaginationEvent(this.page, this.size);
 }
-//
-class RequestPostDataEvent extends PromotionEvent {
-  final String token;
-  final String postId;
-  RequestPostDataEvent(this.token, this.postId);
-}
-class RequestPostUpdateEvent extends PromotionEvent {
-  String token;
-  PromotionPostEntity? post;
-  List<XFile> selectedImages;
-  List<ImageEntity> deletedImages;
-  RequestPostUpdateEvent(this.token, this.post, this.selectedImages, this.deletedImages);
-}
+
 //
 class RequestPostCreateEvent extends PromotionEvent {
   String token;
@@ -32,16 +20,30 @@ class RequestPostCreateEvent extends PromotionEvent {
   RequestPostCreateEvent(this.token, this.post, this.selectedImages);
 }
 //
+class RequestPostUpdateEvent extends PromotionEvent {
+  String token;
+  PromotionPostEntity? post;
+  List<XFile> selectedImages;
+  List<ImageEntity> deletedImages;
+  RequestPostUpdateEvent(this.token, this.post, this.selectedImages, this.deletedImages);
+}
+//
 class RequestPostDeleteEvent extends PromotionEvent {
   final String token;
   final PromotionPostEntity post;
   RequestPostDeleteEvent(this.token, this.post);
 }
 //
-class RequestUserRecruitmentPosts extends PromotionEvent {
+class RequestPromotionPostDataEvent extends PromotionEvent {
+  final String token;
+  final String postId;
+  RequestPromotionPostDataEvent(this.token, this.postId);
+}
+//
+class RequestUserPromotionPosts extends PromotionEvent {
   final String token;
   final String userId;
-  RequestUserRecruitmentPosts(this.token, this.userId);
+  RequestUserPromotionPosts(this.token, this.userId);
 }
 //
 class PostDataLoadEvent extends PromotionEvent {

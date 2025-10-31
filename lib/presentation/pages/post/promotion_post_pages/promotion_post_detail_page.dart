@@ -37,7 +37,7 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
     super.initState();
     if (widget.post == null && widget.postId != null) {
       final token = context.read<UserProvider>().token ?? '';
-      context.read<PromotionBloc>().add(RequestPostDataEvent(token, widget.postId!));
+      context.read<PromotionBloc>().add(RequestPromotionPostDataEvent(token, widget.postId!));
     }
   }
   
