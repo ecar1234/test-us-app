@@ -14,6 +14,8 @@ class UserUseCase {
     final res = await repository.login(email, password);
     if(res['user'].id != null){
       pref.setToken(res['token']);
+    }else {
+      return {'message':res['message']};
     }
     return res;
   }

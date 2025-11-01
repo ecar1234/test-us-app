@@ -70,7 +70,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
           listener: (context, state) async {
             if (state.state == BasePostLoadState.getUserInitPostsCompletedState) {
               final recruit = state.initData!['recruitPosts'];
-              final promotion = state.initData!['promotionPost'];
+              final promotion = state.initData!['promotionPosts'];
               context.read<BasePostProvider>().setUserInitData(recruit, promotion);
             }
           },

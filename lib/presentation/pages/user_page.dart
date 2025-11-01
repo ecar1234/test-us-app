@@ -11,6 +11,7 @@ import 'package:test_us_app/presentation/provider/post_provider/base_post_provid
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
+import '../../data/models/application/application_model.dart';
 import '../components/login_dialogs.dart';
 import 'my_pages/my_recruitment_page.dart';
 
@@ -109,117 +110,139 @@ class _UserPageState extends State<UserPage> {
                     //   border: Border.all(),
                     //   borderRadius: BorderRadius.circular(10),
                     // ),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) => Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              // border: Border.all(),
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.shade200,
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: Offset(0, 3), // changes position of shadow
-                                ),
-                              ]),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // 테스트 완료 서비스
-                              SizedBox(
-                                  width: (constraints.maxWidth * 0.3) - 12,
-                                  // decoration: BoxDecoration(
-                                  //   border: Border.all()
-                                  // ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      SizedBox(
-                                        child: Icon(
-                                          Symbols.check_circle,
-                                          color: Colors.blue.shade300,
-                                          size: 25,
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      return Selector<UserProvider, bool>(
+                        selector: (context, provider) => provider.isLogged ?? false,
+                        builder: (context, isLogged, child) => Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                // border: Border.all(),
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.shade200,
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 3), // changes position of shadow
+                                  ),
+                                ]),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // 테스트 완료 서비스
+                                SizedBox(
+                                    width: (constraints.maxWidth * 0.3) - 12,
+                                    // decoration: BoxDecoration(
+                                    //   border: Border.all()
+                                    // ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        SizedBox(
+                                          child: Icon(
+                                            Symbols.check_circle,
+                                            color: Colors.blue.shade300,
+                                            size: 25,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        child: Text(
-                                          '${context.read<BasePostProvider>().userRecruitPosts!.length}',
-                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        child: Text(
-                                          "테스트 모집",
-                                          style: TextStyle(color: Colors.grey.shade500),
-                                        ),
-                                      ),
-                                    ],
-                                  )),
-                              SizedBox(width: 16, height: constraints.maxHeight - 40, child: const VerticalDivider()),
-                              // 나의 홍보
-                              SizedBox(
-                                  width: (constraints.maxWidth * 0.3) - 12,
-                                  // decoration: BoxDecoration(
-                                  //   border: Border.all()
-                                  // ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      SizedBox(
-                                        child: Icon(
-                                          Symbols.electrical_services,
-                                          color: Colors.blue.shade300,
-                                          size: 25,
-                                        ),
-                                      ),
-                                      SizedBox(
+                                        SizedBox(
                                           child: Text(
-                                        '${context.read<BasePostProvider>().userPromotionPosts?.length}',
-                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                      )),
-                                      SizedBox(
-                                        child: Text(
-                                          "나의 서비스",
-                                          style: TextStyle(color: Colors.grey.shade500),
+                                            isLogged
+                                                ? '${context.read<BasePostProvider>().userRecruitPosts?.length ?? 0}'
+                                            : '0',
+                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  )),
-                              SizedBox(width: 16, height: constraints.maxHeight - 40, child: const VerticalDivider()),
-                              // 나의 테스트 신청
-                              SizedBox(
-                                  width: (constraints.maxWidth * 0.3) - 12,
-                                  // decoration: BoxDecoration(
-                                  //   border: Border.all()
-                                  // ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      SizedBox(
-                                        child: Icon(
-                                          Symbols.crop_free,
-                                          color: Colors.blue.shade300,
-                                          size: 25,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        child: Text(
-                                          '${context.read<ApplicationProvider>().applications?.length}',
-                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                        ),
-                                      ),
-                                      SizedBox(
+                                        SizedBox(
                                           child: Text(
-                                        "진행중",
-                                        style: TextStyle(color: Colors.grey.shade500),
-                                      )),
-                                    ],
-                                  )),
-                            ],
-                          )),
-                    )),
+                                            "테스트 모집",
+                                            style: TextStyle(color: Colors.grey.shade500),
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                                SizedBox(width: 16, height: constraints.maxHeight - 40, child: const VerticalDivider()),
+                                // 나의 홍보
+                                SizedBox(
+                                    width: (constraints.maxWidth * 0.3) - 12,
+                                    // decoration: BoxDecoration(
+                                    //   border: Border.all()
+                                    // ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        SizedBox(
+                                          child: Icon(
+                                            Symbols.electrical_services,
+                                            color: Colors.blue.shade300,
+                                            size: 25,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            child: Text(
+                                              isLogged ?
+                                          '${context.read<BasePostProvider>().userPromotionPosts?.length ?? 0}'
+                                              :'0',
+                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                        )),
+                                        SizedBox(
+                                          child: Text(
+                                            "나의 서비스",
+                                            style: TextStyle(color: Colors.grey.shade500),
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                                SizedBox(width: 16, height: constraints.maxHeight - 40, child: const VerticalDivider()),
+                                // 나의 테스트 신청
+                                SizedBox(
+                                    width: (constraints.maxWidth * 0.3) - 12,
+                                    // decoration: BoxDecoration(
+                                    //   border: Border.all()
+                                    // ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        SizedBox(
+                                          child: Icon(
+                                            Symbols.crop_free,
+                                            color: Colors.blue.shade300,
+                                            size: 25,
+                                          ),
+                                        ),
+                                        Builder(
+                                          builder: (context) {
+                                            final myApp = context.read<ApplicationProvider>().applications ?? [];
+                                            int length = 0;
+                                            if( myApp.isNotEmpty ) {
+                                              for( var app in myApp ) {
+                                                if( app.status == ApplicationStatus.accepted) {
+                                                  length++;
+                                                }
+                                              }
+                                            }
+                                            return SizedBox(
+                                              child: Text(
+                                                isLogged ?
+                                                '$length'
+                                                : '0',
+                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                              ),
+                                            );
+                                          }
+                                        ),
+                                        SizedBox(
+                                            child: Text(
+                                          "진행중",
+                                          style: TextStyle(color: Colors.grey.shade500),
+                                        )),
+                                      ],
+                                    )),
+                              ],
+                            )),
+                      );
+                    })),
                 const Gap(20),
                 // menu section
                 Container(
@@ -244,15 +267,16 @@ class _UserPageState extends State<UserPage> {
                               ),
                             ]),
                         child: Selector<UserProvider, bool>(
-                          selector: (context ,provider) => provider.isLogged ?? false,
-                          builder:(context, isLogged, child) =>  ListView.separated(
+                          selector: (context, provider) => provider.isLogged ?? false,
+                          builder: (context, isLogged, child) => ListView.separated(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, idx) {
                               return GestureDetector(
-                                onTap: (){
-                                  isLogged  ? _pageNavigator(idx) :
-                                  showDialog(context: context, builder: (context) => const LoginDialog());
+                                onTap: () {
+                                  isLogged
+                                      ? _pageNavigator(idx)
+                                      : showDialog(context: context, builder: (context) => const LoginDialog());
                                 },
                                 child: SizedBox(
                                     height: 40,
@@ -304,7 +328,7 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
-  void _pageNavigator(int idx){
+  void _pageNavigator(int idx) {
     switch (idx) {
       case 0:
         debugPrint(menu[idx]);

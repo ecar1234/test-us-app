@@ -29,8 +29,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
       emit(AuthState(state: UserAuthState.authPendingState));
       try{
         final res = await userUseCase.login(event.email, event.password);
-        if(res['token'] == null){
-          emit(AuthState(state: UserAuthState.loginFailedState));
+        if(res['message'] != null){
+          emit(AuthState(state: UserAuthState.loginFailedState, message: res['message']));
           return;
         }
         final user = res['user'] as UserEntity;

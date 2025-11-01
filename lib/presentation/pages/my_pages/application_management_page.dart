@@ -40,7 +40,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
     // TODO: implement initState
     super.initState();
     _applications =
-        context.read<RecruitPostProvider>().posts!.firstWhere((element) => element.id == widget.postId).applications!;
+        context.read<RecruitPostProvider>().recruitmentPosts!.firstWhere((element) => element.id == widget.postId).applications!;
 
     final applicantIds = _applications.map((app) => app.applicantId!).toList();
     final token = context.read<UserProvider>().token ?? '';
@@ -67,10 +67,10 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
               if (state.state == UserDataState.loadingState) {
                 return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
               }
-              if (state.usersAddAverage == null) {
-                return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
+              if (state.usersAddAverage != null) {
+                return _mainBuilder(state.usersAddAverage!);
               }
-              return _mainBuilder(state.usersAddAverage!);
+              return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
             })));
   }
 
@@ -461,7 +461,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                         child: ElevatedButton(
                                             onPressed: () {
                                               final token = context.read<UserProvider>().token ?? '';
-
+                                              // TODO: 신청자 승인/거부 로직 확인 필요함.
                                               context.read<AppBloc>().add(RequestCompleteApplicationEvent(
                                                   token, _applications[idx].applicantId!, _applications[idx].postId!));
                                             },

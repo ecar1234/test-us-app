@@ -85,9 +85,16 @@ class UserDataSourceImpl implements UserDataSource {
     final res = await netDriver.requestPostJson("", AuthApi.login, {"email": email, "password": password});
     if (res['status'] == 200) {
       return {'user': UserModel.fromJson(res['user']), 'token': res['token']};
+    } else if(res['error'] != null) {
+      String message = '';
+      if(res['error'] == 'User not found'){
+        message = '이메일을 찾을 수 없습니다.';
+      }else {
+        message = '비밀번호가 일치 하지 않습니다.';
+      }
+        return {'user': UserModel(), 'message' : message };
     } else {
-      // debugPrint("$res, ${res['message']}");
-      return {'user': UserModel()};
+      throw Exception('Server 500 Error');
     }
   }
 

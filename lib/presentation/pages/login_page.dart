@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_state.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/pages/signup_page.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
@@ -13,6 +14,7 @@ import 'package:provider/provider.dart';
 
 import '../../data/sharedPreferences/auth_preference.dart';
 import '../bloc/auth_bloc/auth_event.dart';
+import '../bloc/post_blocs/base_post_bloc/base_post_event.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -45,10 +47,11 @@ class _LoginPageState extends State<LoginPage> {
               onTap: () {
                 FocusScope.of(context).unfocus();
               },
-              child: BlocConsumer<AuthBloc, AuthState>(
+              child: BlocListener<AuthBloc, AuthState>(
                 listener: (context, state) async {
                   if (state.state == UserAuthState.loginCompletedState) {
-                    context.read<UserProvider>().autoLogin(state.token!, state.user!);
+                    // context.read<UserProvider>().autoLogin(state.token!, state.user!);
+                    // context.read<BasePostBloc>().add(RequestUserInItDataEvent(state.token!, state.user!.id!));
                     await showDialog(
                         context: context,
                         builder: (context) {
@@ -98,15 +101,11 @@ class _LoginPageState extends State<LoginPage> {
                     return;
                   }
                   else if (state.state == UserAuthState.loginFailedState) {
-                    Get.snackbar("로그인 실패", "로그인 중 오류가 발생했습니다.");
+                    Get.snackbar("로그인 실패", state.message!);
                     return;
                   }
                 },
-                builder: (context, state) {
-                  // if(state.state == UserAuthState.authPendingState){
-                  //   return SizedBox(height: height, child: Center(child: CircularProgressIndicator()));
-                  // }
-                       return SingleChildScrollView(
+                  child: SingleChildScrollView(
                           child: Container(
                             height: height,
                             width: MediaQuery.sizeOf(context).width,
@@ -163,8 +162,8 @@ class _LoginPageState extends State<LoginPage> {
                               ],
                             ),
                           ),
-                        );
-                      }),
+                        )
+                      ),
             )));
   }
 

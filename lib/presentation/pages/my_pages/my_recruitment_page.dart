@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
+import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import '../../../data/models/application/application_model.dart';
 import '../../../data/models/post/recruit_post_model.dart';
 import '../../../services/common_height_provider.dart';
@@ -26,40 +28,26 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _requestRecruitmentPosts();
+    // _requestRecruitmentPosts();
   }
-  Future<void> _requestRecruitmentPosts() async {
-    final token = context.read<UserProvider>().token ?? '';
-    final userId = context.read<UserProvider>().user!.id ?? '';
-    context.read<RecruitPostBloc>().add(RequestUserRecruitmentPosts(token, userId));
-  }
+  // Future<void> _requestRecruitmentPosts() async {
+  //   final token = context.read<UserProvider>().token ?? '';
+  //   final userId = context.read<UserProvider>().user!.id ?? '';
+  //   context.read<RecruitPostBloc>().add(RequestUserRecruitmentPosts(token, userId));
+  // }
 
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
-    List<RecruitPostEntity> posts = [];
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
         title: Text("테스터 모집 관리"),
       ),
-      body: BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
-        if (state.state == RecruitPostLoadState.getUserRecruitmentPostsCompletedState) {
-          // posts = state.posts!;
-          // context.read<DataBloc>().add(RequestCompleteEvent());
-        }
-      }, builder: (context, state) {
-        if (state.state == RecruitPostLoadState.dataLoadState) {
-          return SizedBox(
-            width: MediaQuery.sizeOf(context).width,
-            height: hei,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-        if (state.posts != null) {
-          if(state.posts!.isEmpty){
+      body: Selector<RecruitPostProvider, List<RecruitPostEntity>>(
+          selector: (context, provider) => provider.recruitmentPosts ?? [],
+          builder: (context, posts, child) {
+        if (posts.isEmpty) {
             return SizedBox(
               width: MediaQuery.sizeOf(context).width,
               height: hei,
@@ -74,16 +62,9 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
               ),
             ); 
           }
-          return _postsInfoBuilder(state.posts!, hei);
+          return _postsInfoBuilder(posts, hei);
         }
-        return SizedBox(
-          width: MediaQuery.sizeOf(context).width,
-          height: hei,
-          child: Center(
-            child: Text('데이터 조회중 오류가 발생했습니다.'),
-          ),
-        );
-      }),
+      ),
     ));
   }
 

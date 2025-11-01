@@ -26,7 +26,7 @@ class BasePostProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setUserInitData(List<RecruitPostEntity>? recruitPosts, List<PromotionPostEntity>? promotionPosts) async {
+  void setUserInitData(List<RecruitPostEntity>? recruitPosts, List<PromotionPostEntity>? promotionPosts) {
     _userRecruitPosts ??= [];
     _userPromotionPosts ??= [];
 
@@ -39,38 +39,52 @@ class BasePostProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createRecruitPost(RecruitPostEntity post) async {
-    _recruitPosts = [post, ..._recruitPosts!];
-    notifyListeners();
+  void createRecruitPost(RecruitPostEntity post) {
+    if(_recruitPosts!.length > 10){
+      _recruitPosts = [post, ..._recruitPosts!];
+      notifyListeners();
+      return;
+    }
+    return;
   }
-  Future<void> createPromotionPost(PromotionPostEntity post) async {
-    _promotionPosts = [post, ..._promotionPosts!];
-    notifyListeners();
+  void createPromotionPost(PromotionPostEntity post) {
+    if(_promotionPosts!.length > 10){
+      _promotionPosts = [post, ..._promotionPosts!];
+      notifyListeners();
+      return;
+    }
+    return;
   }
-  Future<void> updateRecruitPost(RecruitPostEntity post) async {
-    final index = _recruitPosts?.indexWhere((element) => element.id == post.id);
-    if(index == null) return;
-     _recruitPosts!.removeAt(index);
-    _recruitPosts = [post, ..._recruitPosts!];
-    notifyListeners();
+  void updateRecruitPost(RecruitPostEntity post) {
+    if(_recruitPosts!.any((element) => element.id == post.id)){
+      final index = _recruitPosts?.indexWhere((element) => element.id == post.id);
+      if(index == null) return;
+      _recruitPosts!.removeAt(index);
+      _recruitPosts = [post, ..._recruitPosts!];
+      notifyListeners();
+      return;
+    }
+    return;
   }
-  Future<void> updatePromotionPost(PromotionPostEntity post) async {
-    final index = _promotionPosts?.indexWhere((element) => element.id == post.id);
-    if(index == null) return;
-     _promotionPosts!.removeAt(index);
-    _promotionPosts = [post, ..._promotionPosts!];
-    notifyListeners();
+  void updatePromotionPost(PromotionPostEntity post) {
+    if(_promotionPosts!.any((element) => element.id == post.id)){
+      final index = _promotionPosts?.indexWhere((element) => element.id == post.id);
+      if(index == null) return;
+      _promotionPosts!.removeAt(index);
+      _promotionPosts = [post, ..._promotionPosts!];
+      notifyListeners();
+    }
+    return;
   }
-  Future<void> deleteRecruitPost(String id) async {
+  void deleteRecruitPost(String id) {
     if(_recruitPosts!.any((element) => element.id == id)) {
       _recruitPosts = _recruitPosts?.where((element) => element.id != id).toList();
       notifyListeners();
     }else {
       return;
     }
-
   }
-  Future<void> deletePromotionPost(String id) async {
+  void deletePromotionPost(String id) {
     if(_promotionPosts!.any((element) => element.id == id)){
       _promotionPosts = _promotionPosts?.where((element) => element.id != id).toList();
       notifyListeners();
@@ -78,4 +92,20 @@ class BasePostProvider extends ChangeNotifier {
       return;
     }
   }
+
+  void updateUserRecruitPosts (RecruitPostEntity post) {
+    final index = _userRecruitPosts?.indexWhere((element) => element.id == post.id);
+    if(index == null) return;
+    _userRecruitPosts!.removeAt(index);
+    _userRecruitPosts = [post, ..._userRecruitPosts!];
+    notifyListeners();
+  }
+  void updateUserPromotionPosts (PromotionPostEntity post) {
+    final index = _userPromotionPosts?.indexWhere((element) => element.id == post.id);
+    if(index == null) return;
+    _userPromotionPosts!.removeAt(index);
+    _userPromotionPosts = [post, ..._userPromotionPosts!];
+    notifyListeners();
+  }
+
 }

@@ -13,8 +13,7 @@ class RecruitPostProvider with ChangeNotifier {
   List<RecruitPostEntity>? _initPosts;
   List<RecruitPostEntity>? _recruitmentPosts;
 
-  List<RecruitPostEntity>? get posts => _initPosts;
-
+  List<RecruitPostEntity>? get initPosts => _initPosts;
   List<RecruitPostEntity>? get recruitmentPosts => _recruitmentPosts;
 
   Future<void> getInitPosts(List<RecruitPostEntity> posts) async {
