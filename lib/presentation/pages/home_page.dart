@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -252,9 +253,11 @@ class _HomePageState extends State<HomePage> {
                                           )
                                         : ClipRRect(
                                             borderRadius: BorderRadius.circular(10),
-                                            child: Image.network(
-                                              favoritePost[idx].images![0].url ?? '',
+                                            child: CachedNetworkImage(
+                                              imageUrl: favoritePost[idx].images![0].url ?? '',
                                               fit: BoxFit.cover,
+                                              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                                  Center(child: SizedBox(height: 50, width: 50, child: CircularProgressIndicator(value: downloadProgress.progress))),
                                             ),
                                           ),
                                   );

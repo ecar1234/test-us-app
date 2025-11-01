@@ -62,12 +62,20 @@ class BasePostProvider extends ChangeNotifier {
     notifyListeners();
   }
   Future<void> deleteRecruitPost(String id) async {
-    _recruitPosts = _recruitPosts?.where((element) => element.id != id).toList();
-    notifyListeners();
+    if(_recruitPosts!.any((element) => element.id == id)) {
+      _recruitPosts = _recruitPosts?.where((element) => element.id != id).toList();
+      notifyListeners();
+    }else {
+      return;
+    }
 
   }
   Future<void> deletePromotionPost(String id) async {
-    _promotionPosts = _promotionPosts?.where((element) => element.id != id).toList();
-    notifyListeners();
+    if(_promotionPosts!.any((element) => element.id == id)){
+      _promotionPosts = _promotionPosts?.where((element) => element.id != id).toList();
+      notifyListeners();
+    }else {
+      return;
+    }
   }
 }

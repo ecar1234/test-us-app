@@ -53,55 +53,53 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
-      final provider = context.read<BasePostProvider>();
-      if(state.state == RecruitPostLoadState.getPostByIdCompletedState){
+    return SafeArea(
+      child: Scaffold(
+        body: BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
+          final provider = context.read<BasePostProvider>();
+          if(state.state == RecruitPostLoadState.getPostByIdCompletedState){
 
-      }else if(state.state == RecruitPostLoadState.postDeleteCompletedState){
-        provider.deleteRecruitPost(state.post!.id!);
-        Navigator.pop(context);
-      }else if(state.state == RecruitPostLoadState.postUpdateCompletedState){
-        provider.updateRecruitPost(state.post!);
-        Navigator.pop(context);
-      }
-    }, builder: (context, state) {
-      final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
-      if(widget.post != null){
-        return _postInfoBuilder(widget.post!, hei);
-      }
-      if (state.state == RecruitPostLoadState.dataLoadState) {
-        return Scaffold(
-          body: SizedBox(
-            width: MediaQuery.sizeOf(context).width,
-            height: hei,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-        );
-      }
-      if(state.state == RecruitPostLoadState.getPostByIdCompletedState
-          || state.state == RecruitPostLoadState.postUpdateCompletedState){
-        return _postInfoBuilder(state.post!, hei);
-      }
-      return Scaffold(
-        body: SizedBox(
-          height: hei,
-          width: MediaQuery.sizeOf(context).width,
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      );
-    });
+          }else if(state.state == RecruitPostLoadState.postDeleteCompletedState){
+            provider.deleteRecruitPost(state.post!.id!);
+            Navigator.pop(context);
+          }else if(state.state == RecruitPostLoadState.postUpdateCompletedState){
+            provider.updateRecruitPost(state.post!);
+            Navigator.pop(context);
+          }
+        }, builder: (context, state) {
+          final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
+          if(widget.post != null){
+            return _postInfoBuilder(widget.post!, hei);
+          }
+          if (state.state == RecruitPostLoadState.dataLoadState) {
+            return SizedBox(
+                width: MediaQuery.sizeOf(context).width,
+                height: hei,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+          }
+          if(state.state == RecruitPostLoadState.getPostByIdCompletedState
+              || state.state == RecruitPostLoadState.postUpdateCompletedState){
+            return _postInfoBuilder(state.post!, hei);
+          }
+          return SizedBox(
+              height: hei,
+              width: MediaQuery.sizeOf(context).width,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+        }),
+      ),
+    );
   }
 
   Widget _postInfoBuilder(RecruitPostEntity post, double hei){
     final userId = context.read<UserProvider>().isLogged ?? false ? context.read<UserProvider>().user!.id : "";
     final isAuthor = post.author != null && post.author!.id == userId;
-    return SafeArea(
-        child: Scaffold(
-          body: CustomScrollView(
+    return CustomScrollView(
             slivers: [
               SliverAppBar(
                   expandedHeight: hei * 0.3,
@@ -288,8 +286,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                 ),
               )
             ],
-          ),
-        ));
+          );
   }
 
   Widget _applicationSection(bool isLogged, RecruitPostEntity post, ApplicationEntity application) {

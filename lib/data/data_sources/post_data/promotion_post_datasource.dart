@@ -8,7 +8,8 @@ import '../../models/image/image_model.dart';
 abstract class PromotionPostDataSource {
   Future<PromotionPostModel> createPost(String token, PromotionPostModel post, List<XFile> images);
   Future<PromotionPostModel> updatePost(String token, PromotionPostModel post, List<XFile> images, List<ImageModel> deleteImages);
-  Future<bool> deletePost(String token, int id);
+  Future<bool> deletePost(String token, String id);
   Future<PromotionPostModel> getPromotionPostById(String token, String postId);
   Future<List<PromotionPostModel>> getUserPromotionPosts(String token, String userId);
+  Future<List<PromotionPostModel>> getPostPagination(int page, int size);
 }

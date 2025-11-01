@@ -47,7 +47,7 @@ class PromotionPostDataSourceImpl implements PromotionPostDataSource {
   }
 
   @override
-  Future<bool> deletePost(String token, int id) async {
+  Future<bool> deletePost(String token, String id) async {
     final data = {"id": id};
     final res = await netDriver.requestPostJson(token, PromotionApi.delete, data);
     if (res['status'] == 200) {
@@ -74,6 +74,18 @@ class PromotionPostDataSourceImpl implements PromotionPostDataSource {
       if(res['posts'] == null || res['posts'] == []){
         return [];
       }
+      return (res['posts'] as List).map<PromotionPostModel>((e) => PromotionPostModel.fromJson(e)).toList();
+    } else {
+      throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<List<PromotionPostModel>> getPostPagination(int page, int size) async {
+    final res = await netDriver.requestPostJson(page.toString(), PromotionApi.getPostsPagination,
+        {'size': size, 'page': page});
+    if (res['status'] == 200) {
+      // logger.d(res['posts']);
       return (res['posts'] as List).map<PromotionPostModel>((e) => PromotionPostModel.fromJson(e)).toList();
     } else {
       throw Exception('Error');

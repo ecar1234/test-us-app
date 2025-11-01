@@ -20,7 +20,7 @@ class PromotionPostUseCase {
     final res = await repository.updatePost(token, post, images, deleteImages);
     return res;
   }
-  Future<bool> deletePost(String token, int id) async {
+  Future<bool> deletePost(String token, String id) async {
     final res = await repository.deletePost(token, id);
     return res;
   }
@@ -33,4 +33,8 @@ class PromotionPostUseCase {
     return res;
   }
 
+  Future<List<PromotionPostEntity>> getPostPagination(int page, int size) async {
+    final res = await repository.getPostPagination(page, size);
+    return res;
+  }
 }

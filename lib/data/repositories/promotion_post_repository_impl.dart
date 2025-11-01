@@ -28,7 +28,7 @@ class PromotionPostRepositoryImpl implements PromotionPostRepository {
   }
 
   @override
-  Future<bool> deletePost(String token, int id) async {
+  Future<bool> deletePost(String token, String id) async {
     final res = await remote.deletePost(token, id);
     return res;
   }
@@ -42,6 +42,12 @@ class PromotionPostRepositoryImpl implements PromotionPostRepository {
   @override
   Future<List<PromotionPostEntity>> getUserPromotionPosts(String token, String userId) async {
     final res = await remote.getUserPromotionPosts(token, userId);
+    return res.map((e) => PromotionPostEntity.toEntity(e)).toList();
+  }
+
+  @override
+  Future<List<PromotionPostEntity>> getPostPagination(int page, int size) async {
+    final res = await remote.getPostPagination(page, size);
     return res.map((e) => PromotionPostEntity.toEntity(e)).toList();
   }
 }

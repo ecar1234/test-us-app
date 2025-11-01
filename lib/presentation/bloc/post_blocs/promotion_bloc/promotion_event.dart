@@ -22,7 +22,7 @@ class RequestPostCreateEvent extends PromotionEvent {
 //
 class RequestPostUpdateEvent extends PromotionEvent {
   String token;
-  PromotionPostEntity? post;
+  PromotionPostEntity post;
   List<XFile> selectedImages;
   List<ImageEntity> deletedImages;
   RequestPostUpdateEvent(this.token, this.post, this.selectedImages, this.deletedImages);
@@ -30,8 +30,8 @@ class RequestPostUpdateEvent extends PromotionEvent {
 //
 class RequestPostDeleteEvent extends PromotionEvent {
   final String token;
-  final PromotionPostEntity post;
-  RequestPostDeleteEvent(this.token, this.post);
+  final String postId;
+  RequestPostDeleteEvent(this.token, this.postId);
 }
 //
 class RequestPromotionPostDataEvent extends PromotionEvent {

@@ -6,6 +6,8 @@ enum PromotionPostLoadState {
   postLoadingState,
   postCreateCompletedState,
   postUpdateCompletedState,
+  postDeleteCompletedState,
+  getPaginationCompletedState,
   getPostByIdCompletedState,
   errorState,
   failedState
@@ -13,7 +15,9 @@ enum PromotionPostLoadState {
 
 class PromotionPostState {
   PromotionPostLoadState state;
+  int? page;
   PromotionPostEntity? post;
   List<PromotionPostEntity>? posts;
-  PromotionPostState({ this.state = PromotionPostLoadState.serviceStartState, this.post, this.posts }) ;
+  String? postId;
+  PromotionPostState({ this.state = PromotionPostLoadState.serviceStartState, this.post, this.posts, this.postId, this.page }) ;
 }

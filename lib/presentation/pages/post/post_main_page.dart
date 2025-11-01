@@ -1,17 +1,23 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_event.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_state.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider/promotion_post_provider.dart';
+import 'package:test_us_app/presentation/provider/user_provider.dart';
 
 import '../../../domain/entities/promotion_post_entity.dart';
 import '../../../domain/entities/recruit_post_entity.dart';
 import '../../../services/common_height_provider.dart';
+import '../../bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
 import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../../provider/post_provider/recruit_post_provider.dart';
 
@@ -25,19 +31,21 @@ class PostMainPage extends StatefulWidget {
 }
 
 class _PostMainPageState extends State<PostMainPage> {
-  // late String platform;
+  int page = 0;
+  @override
+  void initState() {
+    // TODO: 스크롤에 비례한 페이지네이션 추가가 필요함.
+    // NOTE: page는 pagination이 호출될때 1씩 증가한다.
+    super.initState();
+    page ++;
+    widget.type == 'recruit' ?
+    context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent(page, 20))
+        : context.read<PromotionBloc>().add(RequestPromotionPaginationEvent(page, 20));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RecruitPostBloc, RecruitPostState>(builder: (context, state) {
-      if (state.state == RecruitPostLoadState.dataLoadState) {
-        return SizedBox(child: Center(child: CircularProgressIndicator()));
-      }
-      // else if (state.state == RecruitPostLoadState.postImgRegisterCompletedState ||
-      //     state.state == RecruitPostLoadState.postImgDeleteCompletedState) {
-      //   context.read<RecruitPostBloc>().add(RequestCompleteEvent());
-      // }
-
+    final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
       return SafeArea(
           child: Scaffold(
         appBar: AppBar(
@@ -47,30 +55,50 @@ class _PostMainPageState extends State<PostMainPage> {
           child: Container(
               width: MediaQuery.sizeOf(context).width,
               padding: EdgeInsets.symmetric(horizontal: 20),
-              child: widget.type == 'recruit' ? _recruitSelector()
-                  : _promotionSelector()
+              child: widget.type == 'recruit' ? _recruitSelector(context, hei)
+                  : _promotionSelector(context, hei)
           ),
         ),
       ));
-    });
   }
-
-  Widget _recruitSelector() {
-    return Selector<RecruitPostProvider, List<RecruitPostEntity>>(
-        selector: (context, provider) => provider.recruitmentPosts ?? [],
-        builder: (context, posts, child) {
-          return _postListBuilder(context, posts);
+  Widget _recruitSelector(context, double hei) {
+    return BlocConsumer<RecruitPostBloc, RecruitPostState>(
+        listener: (context, state) {
+          final provider = context.read<RecruitPostProvider>();
+          if(state.state == RecruitPostLoadState.getPostByIdCompletedState){
+            provider.getPostPagination(state.posts!, state.page);
+            page ++;
+          }
+        },
+        builder: (context, state) {
+          if(state.posts != null){
+            return _postListBuilder(context, state.posts!);
+          }
+          if(state.state == RecruitPostLoadState.dataLoadState){
+            return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
+          }
+          return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
         });
   }
 
-  Widget _promotionSelector() {
-    return Selector<PromotionPostProvider, List<PromotionPostEntity>>(
-        selector: (context, provider) => provider.promotionPosts ?? [],
-        builder: (context, posts, child) {
-          return _postListBuilder(context, posts);
+  Widget _promotionSelector(context, double hei) {
+    return BlocConsumer<PromotionBloc, PromotionPostState>(
+        listener: (context, state) {
+          final provider = context.read<PromotionPostProvider>();
+          if(state.state == PromotionPostLoadState.getPostByIdCompletedState){
+            provider.getPagination(state.posts!, state.page!);
+            page ++;
+          }
+        },
+        builder: (context, state) {
+          if(state.posts != null){
+            return _postListBuilder(context, state.posts!);
+          }else if(state.state == PromotionPostLoadState.postLoadingState){
+            return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
+          }
+          return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
         });
   }
-  // TODO: post type에 따라서 detail page의 전환 방법을 설정해야 함.
   Widget _postListBuilder(BuildContext context, List<dynamic> posts) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
     return SizedBox(
@@ -116,9 +144,11 @@ class _PostMainPageState extends State<PostMainPage> {
                               )
                                   : ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                  posts[idx].images![0].url!,
+                                child: CachedNetworkImage(
+                                  imageUrl: posts[idx].images![0].url!,
                                   fit: BoxFit.cover,
+                                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                      Center(child: SizedBox(height: 50, width: 50, child: CircularProgressIndicator(value: downloadProgress.progress))),
                                 ),
                               ),
                             )),
