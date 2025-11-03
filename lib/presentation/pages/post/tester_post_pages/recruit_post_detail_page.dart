@@ -162,7 +162,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                       )
                     : CarouselSlider(
                         items: post.images!.map((e) {
-                          if (e.id == null) {
+                          if (e.filename == null) {
                             return Image.file(
                               File(e.url!),
                               fit: BoxFit.cover,

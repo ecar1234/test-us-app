@@ -160,7 +160,7 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                       )
                     : CarouselSlider(
                         items: post.images!.map((e) {
-                          if (e.id == null) {
+                          if (e.filename == null) {
                             return Image.file(
                               File(e.url!),
                               fit: BoxFit.cover,
@@ -275,9 +275,13 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                             width:  80,
                             child: ElevatedButton.icon(
                                 onPressed: () async {
-                                  final uri = Uri.parse(post.domain![idx]);
+                                  String url = post.domain![idx];
+                                  if (!url.startsWith('http')) {
+                                    url = 'https://$url';
+                                  }
+                                  final uri = Uri.parse(url);
                                   if (await canLaunchUrl(uri)) {
-                                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                    await launchUrl(uri, mode: LaunchMode.platformDefault);
                                   } else {
                                     Get.snackbar('연결 실패', '접속할 수 없거나 존재하지 않는 주소입니다.');
                                   }

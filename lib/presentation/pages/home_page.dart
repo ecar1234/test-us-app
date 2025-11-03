@@ -425,7 +425,7 @@ class _HomePageState extends State<HomePage> {
                                     const Gap(5),
                                     SizedBox(
                                         child: Text(
-                                      "${posts[idx].author!.nickname}",
+                                      posts[idx].author!.nickname ?? context.read<UserProvider>().user!.nickname ?? '',
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.normal,
@@ -575,7 +575,7 @@ class _HomePageState extends State<HomePage> {
                                 const Gap(5),
                                 SizedBox(
                                     child: Text(
-                                      "${posts[idx].author!.nickname}",
+                                      posts[idx].author!.nickname ?? context.read<UserProvider>().user!.nickname ?? '',
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.normal,

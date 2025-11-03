@@ -51,7 +51,7 @@ class BasePostProvider extends ChangeNotifier {
   }
 
   void createRecruitPost(RecruitPostEntity post) {
-    if(_recruitPosts!.length > 10){
+    if(_recruitPosts!.length < 10){
       _recruitPosts = [post, ..._recruitPosts!];
       notifyListeners();
       return;
@@ -59,7 +59,7 @@ class BasePostProvider extends ChangeNotifier {
     return;
   }
   void createPromotionPost(PromotionPostEntity post) {
-    if(_promotionPosts!.length > 10){
+    if(_promotionPosts!.length < 10){
       _promotionPosts = [post, ..._promotionPosts!];
       notifyListeners();
       return;
@@ -91,17 +91,23 @@ class BasePostProvider extends ChangeNotifier {
     if(_recruitPosts!.any((element) => element.id == id)) {
       _recruitPosts = _recruitPosts?.where((element) => element.id != id).toList();
       notifyListeners();
-    }else {
-      return;
     }
+    if(_userRecruitPosts!.any((element) => element.id == id)){
+      _userRecruitPosts = _userRecruitPosts?.where((element) => element.id != id).toList();
+      notifyListeners();
+    }
+    return;
   }
   void deletePromotionPost(String id) {
     if(_promotionPosts!.any((element) => element.id == id)){
       _promotionPosts = _promotionPosts?.where((element) => element.id != id).toList();
       notifyListeners();
-    }else {
-      return;
     }
+    if(_userPromotionPosts!.any((element) => element.id == id)){
+      _userPromotionPosts = _userPromotionPosts?.where((element) => element.id != id).toList();
+      notifyListeners();
+    }
+    return;
   }
 
   void updateUserRecruitPosts (RecruitPostEntity post) {

@@ -9,6 +9,7 @@ import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/pages/login_page.dart';
+import 'package:test_us_app/presentation/pages/my_pages/application/my_applications_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
@@ -17,6 +18,7 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import '../../data/models/application/application_model.dart';
 import '../components/login_dialogs.dart';
 import 'my_pages/my_recruitment_page.dart';
+import 'my_pages/promotion/my_promotion_page.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -26,7 +28,7 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  List<String> menu = ['메시지 관리', '팔로우 관리', '테스터 모집 관리', '테스트 신청 관리', '나의 서비스 관리'];
+  List<String> menu = ['메시지 관리', '팔로우 관리', '테스터 모집 관리', '나의 테스터 신청', '나의 서비스 홍보'];
 
   @override
   Widget build(BuildContext context) {
@@ -291,7 +293,7 @@ class _UserPageState extends State<UserPage> {
                               return GestureDetector(
                                 onTap: () {
                                   isLogged
-                                      ? _pageNavigator(idx)
+                                      ? _pageNavigator(context, idx)
                                       : showDialog(context: context, builder: (context) => const LoginDialog());
                                 },
                                 child: SizedBox(
@@ -344,7 +346,7 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
-  void _pageNavigator(int idx) {
+  void _pageNavigator(BuildContext context, int idx) {
     switch (idx) {
       case 0:
         debugPrint(menu[idx]);
@@ -357,9 +359,11 @@ class _UserPageState extends State<UserPage> {
         break;
       case 3:
         debugPrint(menu[idx]);
+        Get.to(() => MyApplicationsPage());
         break;
       case 4:
         debugPrint(menu[idx]);
+        Get.to(() => const MyPromotionPage());
         break;
       default:
     }

@@ -55,7 +55,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                   Text('모집해 보세요.'),
                 ],
               ),
-            ); 
+            );
           }
           return _postsInfoBuilder(posts, hei);
         }
@@ -170,6 +170,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
               itemCount: posts.length)),
     );
   }
+
   int _getApplicantLength(RecruitPostEntity post) {
     int length = 0;
     if (post.applications != null) {
