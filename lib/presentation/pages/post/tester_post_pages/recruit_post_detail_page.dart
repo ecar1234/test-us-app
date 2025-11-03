@@ -259,7 +259,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                 ),
                 const Gap(40),
                 if (post.author != null && post.author!.id != userId)
-                  BlocConsumer<AppBloc, AppState>(listener: (context, state) {
+                  BlocListener<AppBloc, AppState>(listener: (context, state) {
                     if (state.state == UserAppState.applicationCompletedState) {
                       context.read<ApplicationProvider>().requestApply(state.application!);
                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
@@ -270,16 +270,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                       context.read<ApplicationProvider>().cancelApplication(state.application!);
                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
                     }
-                  }, builder: (context, state) {
-                    if(state.newPost != null){
-                      return _applicationSection(context, state.newPost!);
-                    }
-                    return SizedBox(
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  })
+                  }, child: _applicationSection(context))
+
               ],
             ),
           ),
@@ -288,19 +280,21 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
     );
   }
 
-  Widget _applicationSection(BuildContext context, RecruitPostEntity initPostData) {
+  Widget _applicationSection(BuildContext context) {
     final isLogged = context.watch<UserProvider>().isLogged ?? false;
-    if (!isLogged) return _beforeApplicationSection(context, initPostData);
 
-    final applications = context.read<ApplicationProvider>().applications ?? [];
-    final user = context.read<UserProvider>().user!;
-    final app = applications.firstWhere((e) => e.postId == initPostData.id && e.applicantId == user.id,
-        orElse: () => ApplicationEntity());
-    if (app.id == null) return _beforeApplicationSection(context, initPostData);
+    // if (app.id == null) return _beforeApplicationSection(context, initPostData);
     return Selector<BasePostProvider, RecruitPostEntity>(selector: (context, provider) {
-      final post = provider.recruitPosts!.firstWhere((e) => e.id == initPostData.id);
+      final post = provider.recruitPosts!.firstWhere((e) => e.id == widget.postId!);
       return post;
     }, builder: (context, post, child) {
+      if (!isLogged) return _beforeApplicationSection(context, post);
+
+      final applications = context.read<ApplicationProvider>().userApplications ?? [];
+      final user = context.read<UserProvider>().user!;
+      final app = applications.firstWhere((e) => e.postId == post.id && e.applicantId == user.id,
+          orElse: () => ApplicationEntity());
+
       switch (app.status) {
         case ApplicationStatus.pending:
         case ApplicationStatus.accepted:
@@ -315,20 +309,20 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
 
   Widget _afterApplicationSection(BuildContext context, RecruitPostEntity post) {
     return SizedBox(
-        height: 180,
-        width: MediaQuery.sizeOf(context).width,
-        child: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
+        height: 60,
+        width: MediaQuery.sizeOf(context).width - 40,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Selector<ApplicationProvider, ApplicationEntity>(
-              selector: (context, provider) => provider.applications!.firstWhere((e) => e.postId == post.id),
+              selector: (context, provider) => provider.userApplications!.firstWhere((e) => e.postId == post.id),
               builder: (context, app, child) => SizedBox(
-                width: 250,
+                width: 100,
                 height: 50,
                 child: ElevatedButton(
                     onPressed: () async {
                       final token = context.read<UserProvider>().token ?? '';
-                      final appId = context.read<ApplicationProvider>().applications!.firstWhere((element) {
+                      final appId = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
                         return element.postId == post.id;
                       }).id!;
 
@@ -336,13 +330,13 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                     },
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: Text('신청 취소 ${app.status == ApplicationStatus.pending ? '(대기 중)' : '(테스트 중)'}')),
+                    child: Text('취소')),
               ),
             ),
             const Gap(20),
             if (post.platform!.contains('IOS') || post.platform!.contains('ANDROID'))
               SizedBox(
-                width: 250,
+                width: 200,
                 height: 50,
                 child: ElevatedButton(
                     onPressed: () {
@@ -353,7 +347,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                             bool isIos = false;
                             bool isAndroid = false;
 
-                            final prevApp = context.read<ApplicationProvider>().applications!.firstWhere((element) {
+                            final prevApp = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
                               return element.postId == post.id &&
                                   element.applicantId == context.read<UserProvider>().user!.id;
                             });
@@ -436,7 +430,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                     child: Text('플랫폼 변경')),
               ),
-            const Gap(40)
+            const Gap(20)
           ],
         ));
   }
@@ -458,7 +452,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
             final userId = isLogged ? context.read<UserProvider>().user!.id : '';
             final application = context
                 .read<ApplicationProvider>()
-                .applications!
+                .userApplications!
                 .firstWhere((e) => e.postId == post.id! && e.applicantId == userId, orElse: () => ApplicationEntity());
 
             if (post.platform!.contains('WEB') || post.platform!.contains('GAME')) {
@@ -576,15 +570,16 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
         height: 50,
         width: MediaQuery.sizeOf(context).width,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 150,
+              width: 250,
               height: 50,
               child: ElevatedButton(
                   onPressed: null,
                   style:
                       ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                  child: Text("테스터 신청에 거부된 모집입니다.")),
+                  child: Text("테스터 승인 거부 되었습니다.")),
             )
           ],
         ));

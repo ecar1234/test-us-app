@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
+import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import '../../../data/models/application/application_model.dart';
 import '../../../data/models/post/recruit_post_model.dart';
@@ -28,13 +29,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // _requestRecruitmentPosts();
   }
-  // Future<void> _requestRecruitmentPosts() async {
-  //   final token = context.read<UserProvider>().token ?? '';
-  //   final userId = context.read<UserProvider>().user!.id ?? '';
-  //   context.read<RecruitPostBloc>().add(RequestUserRecruitmentPosts(token, userId));
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +39,8 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
       appBar: AppBar(
         title: Text("테스터 모집 관리"),
       ),
-      body: Selector<RecruitPostProvider, List<RecruitPostEntity>>(
-          selector: (context, provider) => provider.recruitmentPosts ?? [],
+      body: Selector<BasePostProvider, List<RecruitPostEntity>>(
+          selector: (context, provider) => provider.userRecruitPosts ?? [],
           builder: (context, posts, child) {
         if (posts.isEmpty) {
             return SizedBox(

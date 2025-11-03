@@ -26,6 +26,7 @@ import '../bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
 import '../bloc/post_blocs/promotion_bloc/promotion_event.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import '../provider/application_provider.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -72,6 +73,8 @@ class _HomePageState extends State<HomePage> {
                                   onPressed: () async {
                                     Navigator.pop(context);
                                     context.read<UserProvider>().logout();
+                                    context.read<BasePostProvider>().logout();
+                                    context.read<ApplicationProvider>().logout();
                                     context.read<AuthBloc>().add(LogoutEvent());
                                   },
                                   child: const Text('확인')),

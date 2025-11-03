@@ -4,6 +4,9 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/domain/entities/application_entity.dart';
+import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/pages/login_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
@@ -146,14 +149,20 @@ class _UserPageState extends State<UserPage> {
                                             size: 25,
                                           ),
                                         ),
-                                        SizedBox(
-                                          child: Text(
-                                            isLogged
-                                                ? '${context.read<BasePostProvider>().userRecruitPosts?.length ?? 0}'
-                                            : '0',
-                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
+                                        Selector<BasePostProvider, List<RecruitPostEntity>>(
+                                          selector: (context, provider) {
+                                            return provider.userRecruitPosts ?? [];
+                                          },
+                                          builder:(context, posts, child) {
+                                              return SizedBox(
+                                                child: Text(
+                                                  isLogged
+                                                      ? '${posts.length}'
+                                                      : '0',
+                                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                                ),
+                                              );
+                                            }),
                                         SizedBox(
                                           child: Text(
                                             "테스트 모집",
@@ -166,9 +175,6 @@ class _UserPageState extends State<UserPage> {
                                 // 나의 홍보
                                 SizedBox(
                                     width: (constraints.maxWidth * 0.3) - 12,
-                                    // decoration: BoxDecoration(
-                                    //   border: Border.all()
-                                    // ),
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
@@ -179,13 +185,20 @@ class _UserPageState extends State<UserPage> {
                                             size: 25,
                                           ),
                                         ),
-                                        SizedBox(
-                                            child: Text(
-                                              isLogged ?
-                                          '${context.read<BasePostProvider>().userPromotionPosts?.length ?? 0}'
-                                              :'0',
-                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                        )),
+                                        Selector<BasePostProvider, List<PromotionPostEntity>>(
+                                          selector: (context, provider) {
+                                            return provider.userPromotionPosts ?? [];
+                                          },
+                                          builder:(context, posts, child) {
+                                            return SizedBox(
+                                                child: Text(
+                                                  isLogged ?
+                                                  '${posts.length}'
+                                                      :'0',
+                                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                                ));
+                                          },
+                                        ),
                                         SizedBox(
                                           child: Text(
                                             "나의 서비스",
@@ -211,13 +224,16 @@ class _UserPageState extends State<UserPage> {
                                             size: 25,
                                           ),
                                         ),
-                                        Builder(
-                                          builder: (context) {
-                                            final myApp = context.read<ApplicationProvider>().applications ?? [];
+                                        Selector<ApplicationProvider, List<ApplicationEntity>>(
+                                          selector: (context, provider) {
+                                            return provider.userApplications ?? [];
+                                          },
+                                          builder: (context, apps, child) {
                                             int length = 0;
-                                            if( myApp.isNotEmpty ) {
-                                              for( var app in myApp ) {
-                                                if( app.status == ApplicationStatus.accepted) {
+                                            if( apps.isNotEmpty ) {
+                                              for( var app in apps ) {
+                                                if( app.status != ApplicationStatus.cancel
+                                                    && app.status != ApplicationStatus.rejected ) {
                                                   length++;
                                                 }
                                               }
@@ -234,7 +250,7 @@ class _UserPageState extends State<UserPage> {
                                         ),
                                         SizedBox(
                                             child: Text(
-                                          "진행중",
+                                          "테스트 신청",
                                           style: TextStyle(color: Colors.grey.shade500),
                                         )),
                                       ],

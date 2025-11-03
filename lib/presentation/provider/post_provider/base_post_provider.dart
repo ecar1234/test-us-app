@@ -38,6 +38,17 @@ class BasePostProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+  void logout() {
+    if(_userRecruitPosts!.isNotEmpty){
+      _userRecruitPosts!.clear();
+      _userRecruitPosts = [];
+    }
+    if(_userPromotionPosts!.isNotEmpty){
+      _userPromotionPosts!.clear();
+      _userPromotionPosts = [];
+    }
+    notifyListeners();
+  }
 
   void createRecruitPost(RecruitPostEntity post) {
     if(_recruitPosts!.length > 10){

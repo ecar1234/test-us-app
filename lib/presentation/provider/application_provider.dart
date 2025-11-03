@@ -9,44 +9,52 @@ class ApplicationProvider with ChangeNotifier{
   final ApplicationUseCase useCase;
   ApplicationProvider(this.useCase);
 
-  List<ApplicationEntity>? _applications;
-  List<ApplicationEntity>? get applications => _applications;
+  List<ApplicationEntity>? _userApplications;
+  List<ApplicationEntity>? get userApplications => _userApplications;
+
+  Future<void> getMyApplications(String token, String userId) async {
+    final res = await useCase.getMyApplications(token, userId);
+    if(_userApplications == null){
+      _userApplications = res;
+    }else {
+      _userApplications!.addAll(res);
+    }
+    notifyListeners();
+  }
+
+  void logout(){
+    if(_userApplications != null && _userApplications!.isNotEmpty){
+      _userApplications!.clear();
+      _userApplications = [];
+    }
+    notifyListeners();
+  }
 
   void requestApply(ApplicationEntity app)  {
     // final res = await useCase.requestApply(token, app);
-    if(_applications == null){
-      _applications = [app];
+    if(_userApplications == null){
+      _userApplications = [app];
     }else {
-      _applications!.add(app);
+      _userApplications!.add(app);
     }
     notifyListeners();
   }
   void cancelApplication(ApplicationEntity app)  {
-    if(_applications!.any((element) => element.id == app.id)){
-      final idx = _applications!.indexWhere((e) {
+    if(_userApplications!.any((element) => element.id == app.id)){
+      final idx = _userApplications!.indexWhere((e) {
         return e.id == app.id;
       });
-      _applications![idx] = app;
+      _userApplications![idx] = app;
     }
     notifyListeners();
   }
 
   void requestUpdateApplication(ApplicationEntity app) {
-    if(_applications!.any((element) => element.id == app.id)){
-      final idx = _applications!.indexWhere((e) {
+    if(_userApplications!.any((element) => element.id == app.id)){
+      final idx = _userApplications!.indexWhere((e) {
         return e.id == app.id;
       });
-      _applications![idx] = app;
-    }
-    notifyListeners();
-  }
-
-  Future<void> getMyApplications(String token, String userId) async {
-    final res = await useCase.getMyApplications(token, userId);
-    if(_applications == null){
-      _applications = res;
-    }else {
-      _applications!.addAll(res);
+      _userApplications![idx] = app;
     }
     notifyListeners();
   }
