@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -60,7 +61,7 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                   padding: EdgeInsets.symmetric(vertical: 20),
                   itemBuilder: (context, idx) {
                     return SizedBox(
-                      // height: 70,
+                      height: 110,
                       width: MediaQuery.sizeOf(context).width,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -72,52 +73,80 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                             },
                             child: Container(
                               width: (MediaQuery.sizeOf(context).width - 50),
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                // title
-                                SizedBox(
-                                  height: 30,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        posts[idx].title!,
-                                        style: TextStyle(
-                                            fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
-                                        maxLines: 1,
-                                      ),
-                                    ],
+                              decoration: BoxDecoration(
+                                // border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                      flex: 3,
+                                      child: SizedBox(
+                                        height: 110,
+                                        width: (MediaQuery.sizeOf(context).width - 50) * 0.3,
+                                          child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child:
+                                            CachedNetworkImage(imageUrl: posts[idx].images![0].url!, fit: BoxFit.cover),
+                                      ))),
+                                  const Gap(10),
+                                  Flexible(
+                                    flex: 7,
+                                    child: SizedBox(
+
+                                      width: (MediaQuery.sizeOf(context).width - 50) * 0.7,
+                                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                        // title
+                                        SizedBox(
+                                          height: 30,
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                posts[idx].title!,
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    overflow: TextOverflow.ellipsis),
+                                                maxLines: 1,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        // platform
+                                        SizedBox(
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                child: posts[idx].platform!.length == 1
+                                                    ? Text('플랫폼 : ${posts[idx].platform![0]}')
+                                                    : Text(
+                                                        '플랫폼 : ${posts[idx].platform![0]} / ${posts[idx].platform![1]}'),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        // created at
+                                        SizedBox(
+                                          child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              children: [Text('게시일 : '), Text(_getDate(posts[idx].createdAt!))]),
+                                        ),
+                                        // expire at
+                                        SizedBox(
+                                          child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                                            Text('만료일 : '),
+                                            Text(_getDate(posts[idx].createdAt!.add(Duration(days: 7))))
+                                          ]),
+                                        )
+                                      ]),
+                                    ),
                                   ),
-                                ),
-                                // platform
-                                SizedBox(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        child: posts[idx].platform!.length == 1
-                                            ? Text('플랫폼 : ${posts[idx].platform![0]}')
-                                            : Text('플랫폼 : ${posts[idx].platform![0]} / ${posts[idx].platform![1]}'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // created at
-                                SizedBox(
-                                  child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [Text('게시일 : '), Text(_getDate(posts[idx].createdAt!))]),
-                                ),
-                                // expire at
-                                SizedBox(
-                                  child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                                    Text('만료일 : '),
-                                    Text(_getDate(posts[idx].createdAt!.add(Duration(days: 7))))
-                                  ]),
-                                )
-                              ]),
+                                ],
+                              ),
                             ),
                           ),
                         ],

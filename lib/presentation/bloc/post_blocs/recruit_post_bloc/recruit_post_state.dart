@@ -14,6 +14,7 @@ enum RecruitPostLoadState {
   postDeleteCompletedState,
   getPostByIdCompletedState,
   getUserRecruitmentPostsCompletedState,
+  getAppRecruitPostsCompletedState,
   postDataLoadCompletedState,
   errorState,
   failedState

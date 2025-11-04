@@ -89,4 +89,20 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
     // TODO: implement getPostByTitle
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<RecruitPostModel>> getAppRecruitPosts(String token, List<String> ids) async {
+    try {
+      final res = await netDriver.requestPostJson(token, RecruitPostApi.getAppRecruitPosts, {'ids': ids});
+      if(res['status'] == 200){
+        return (res['posts'] as List).map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();
+      }else {
+        return [];
+      }
+    } on Exception catch (e) {
+      // TODO
+      logger.d(e);
+      return [];
+    }
+  }
 }

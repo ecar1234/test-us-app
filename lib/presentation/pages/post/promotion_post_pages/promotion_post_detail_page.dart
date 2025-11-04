@@ -271,7 +271,7 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                             title = 'URL 접속하기';
                           }
                           return SizedBox(
-                            height: 40,
+                            height: 50,
                             width:  80,
                             child: ElevatedButton.icon(
                                 onPressed: () async {
@@ -288,7 +288,9 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                                 },
                                 style: ElevatedButton.styleFrom(
                                   padding: EdgeInsets.zero,
-                                  
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  )
                                 ),
                                 label: Text(title, style: TextStyle(fontWeight: FontWeight.bold),),
                               icon: Icon(Symbols.download),

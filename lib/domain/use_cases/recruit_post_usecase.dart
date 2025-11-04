@@ -47,4 +47,9 @@ class RecruitPostUseCase {
     final res = await repository.getPostPagination(page, size);
     return res;
   }
+
+  Future<List<RecruitPostEntity>> getAppRecruitPosts(String token, List<String> ids) async {
+    final res = await repository.getAppRecruitPosts(token, ids);
+    return res;
+  }
 }

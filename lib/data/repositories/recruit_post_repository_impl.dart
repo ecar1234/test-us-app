@@ -60,4 +60,10 @@ class RecruitPostRepositoryImpl implements RecruitPostRepository {
     final res = await remote.getPostsPagination(page, size);
     return res.map((e) => RecruitPostEntity.toPostEntity(e)).toList();
   }
+
+  @override
+  Future<List<RecruitPostEntity>> getAppRecruitPosts(String token, List<String> ids) async {
+    final res = await remote.getAppRecruitPosts(token, ids);
+    return res.map((e) => RecruitPostEntity.toPostEntity(e)).toList();
+  }
 }

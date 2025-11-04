@@ -267,7 +267,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                       context.read<ApplicationProvider>().requestUpdateApplication(state.application!);
                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
                     } else if (state.state == UserAppState.applicationCancelCompletedState) {
-                      context.read<ApplicationProvider>().cancelApplication(state.application!);
+                      context.read<ApplicationProvider>().cancelApplication(state.application!, state.newPost!);
                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
                     }
                   }, child: _applicationSection(context))
@@ -346,6 +346,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                           builder: (context) {
                             bool isIos = false;
                             bool isAndroid = false;
+                            bool isAndroidDevice = Platform.isAndroid;
 
                             final prevApp = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
                               return element.postId == post.id &&
@@ -369,6 +370,10 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                     SizedBox(
                                         child: Text('테스트 진행 할 플랫폼을 선택해 주세요.',
                                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                                    SizedBox(
+                                        child: Text(' (Device와 동일한 OS만 선택이 가능합니다.)',
+                                            style: TextStyle(fontSize: 14, color: Colors.grey))),
+
                                     const Gap(20),
                                     SizedBox(
                                         child: Row(
@@ -378,26 +383,28 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                           child: Row(children: [
                                             Checkbox(
                                                 value: isIos,
-                                                onChanged: (value) {
+                                                onChanged: isAndroidDevice ? null : (value) {
                                                   state(() {
                                                     isIos = value!;
                                                     isAndroid = false;
                                                   });
                                                 }),
-                                            Text("IOS")
+                                            Text("IOS", style: TextStyle(fontSize: 16,
+                                                color: isAndroidDevice ? Colors.grey : Colors.black))
                                           ]),
                                         ),
                                         SizedBox(
                                           child: Row(children: [
                                             Checkbox(
                                                 value: isAndroid,
-                                                onChanged: (value) {
+                                                onChanged: isAndroidDevice ? (value) {
                                                   state(() {
                                                     isAndroid = value!;
                                                     isIos = false;
                                                   });
-                                                }),
-                                            Text("Android")
+                                                } : null),
+                                            Text("Android", style: TextStyle(fontSize: 16,
+                                                color: isAndroidDevice ? Colors.black87 : Colors.grey))
                                           ]),
                                         )
                                       ],
@@ -419,7 +426,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                           context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
                                           if (context.mounted) Navigator.pop(context);
                                         },
-                                        child: Text("신청하기"),
+                                        child: Text("변경하기"),
                                       ),
                                     ),
                                   ])),
@@ -481,7 +488,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                   builder: (context) {
                     bool isIos = false;
                     bool isAndroid = false;
-
+                    bool isAndroidDevice = Platform.isAndroid;
                     return StatefulBuilder(
                       builder: (context, state) => Container(
                           height: 300,
@@ -499,8 +506,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                 SizedBox(
                                   child: Row(children: [
                                     Checkbox(
-                                        value: isIos,
-                                        onChanged: (value) {
+                                        value: isAndroidDevice ? false : isIos,
+                                        onChanged: isAndroidDevice ? null : (value) {
                                           state(() {
                                             isIos = value!;
                                             isAndroid = false;
@@ -512,13 +519,13 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                 SizedBox(
                                   child: Row(children: [
                                     Checkbox(
-                                        value: isAndroid,
-                                        onChanged: (value) {
+                                        value: isAndroidDevice ? isAndroid : false,
+                                        onChanged: isAndroidDevice ? (value) {
                                           state(() {
                                             isAndroid = value!;
                                             isIos = false;
                                           });
-                                        }),
+                                        } : null),
                                     Text("Android")
                                   ]),
                                 )
