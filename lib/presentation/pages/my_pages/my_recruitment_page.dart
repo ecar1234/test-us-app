@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
+import 'package:test_us_app/utils/time_util.dart';
 import '../../../data/models/application/application_model.dart';
 import '../../../data/models/post/recruit_post_model.dart';
 import '../../../services/common_height_provider.dart';
@@ -74,21 +76,32 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
               shrinkWrap: true,
               padding: EdgeInsets.symmetric(vertical: 20),
               itemBuilder: (context, idx) {
-                return SizedBox(
-                  height: 70,
-                  width: MediaQuery.sizeOf(context).width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        flex: 8,
-                        child: GestureDetector(
-                          onTap: () {
-                            Get.to(() => RecruitPostDetailPage(post: posts[idx]));
-                          },
+                return GestureDetector(
+                  onTap: () {
+                    Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
+                  },
+                  child: SizedBox(
+                    height: 130,
+                    width: MediaQuery.sizeOf(context).width,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          flex: 3,
+                          child: SizedBox(
+                            // width: (MediaQuery.sizeOf(context).width - 50) * 0.35,
+                            height: 130,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: CachedNetworkImage(imageUrl: posts[idx].images![0].url!, fit: BoxFit.cover),
+                            )
+                          )
+                        ),
+                        Flexible(
+                          flex: 7,
                           child: Container(
-                            width: (MediaQuery.sizeOf(context).width - 50) * 0.8,
+                            // width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
                             padding: EdgeInsets.symmetric(horizontal: 10),
                             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                               SizedBox(
@@ -129,40 +142,74 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                     )
                                   ],
                                 ),
+                              ),
+                            SizedBox(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text('게시 만료 : ${TimeUtil().getDateTimeString(posts[idx].createdAt!, true)}'),
+                                ],
                               )
+                            ),
+                            Gap(10),
+                            SizedBox(
+                                  height: 40,
+                                  width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
+                                  child: ElevatedButton(
+                                    onPressed: _getApplicantLength(posts[idx]) == 0
+                                        ? null
+                                        : () {
+                                      Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation: 2,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text('신청 인원', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                        Text(' ( ${_getApplicantLength(posts[idx])} / 8 )'),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                             ]),
                           ),
                         ),
-                      ),
-                      Flexible(
-                        flex: 2,
-                        child: SizedBox(
-                          height: 60,
-                          width: (MediaQuery.sizeOf(context).width - 50) * 0.2,
-                          child: ElevatedButton(
-                            onPressed: _getApplicantLength(posts[idx]) == 0
-                                ? null
-                                : () {
-                              Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
-                            },
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 2,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('신청 인원', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                                Text('(${_getApplicantLength(posts[idx])} / 8)'),
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                        // Flexible(
+                        //   flex: 2,
+                        //   child: SizedBox(
+                        //     height: 60,
+                        //     width: (MediaQuery.sizeOf(context).width - 50) * 0.2,
+                        //     child: ElevatedButton(
+                        //       onPressed: _getApplicantLength(posts[idx]) == 0
+                        //           ? null
+                        //           : () {
+                        //         Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
+                        //       },
+                        //       style: ElevatedButton.styleFrom(
+                        //         padding: EdgeInsets.zero,
+                        //         shape: RoundedRectangleBorder(
+                        //           borderRadius: BorderRadius.circular(10),
+                        //         ),
+                        //         elevation: 2,
+                        //       ),
+                        //       child: Column(
+                        //         mainAxisAlignment: MainAxisAlignment.center,
+                        //         children: [
+                        //           Text('신청 인원', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                        //           Text('(${_getApplicantLength(posts[idx])} / 8)'),
+                        //         ],
+                        //       ),
+                        //     ),
+                        //   ),
+                        // )
+                      ],
+                    ),
                   ),
                 );
               },

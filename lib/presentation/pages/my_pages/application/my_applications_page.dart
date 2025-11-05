@@ -12,6 +12,7 @@ import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
+import 'package:test_us_app/utils/time_util.dart';
 
 import '../../../../domain/entities/recruit_post_entity.dart';
 import '../../../bloc/app_bloc/app_bloc.dart';
@@ -93,7 +94,7 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                           : ListView.separated(
                               itemBuilder: (context, idx) {
                                 return Container(
-                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+
                                   decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: BorderRadius.circular(10)),
                                   // height: 200,
                                   child: Column(
@@ -121,7 +122,7 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                                                 children: [
                                                   _buttonBuilder(applications[idx].status!, applications[idx].id!, applications[idx].postId!),
                                                   const Gap(10),
-                                                  Text('업데이트 : ${_getTime(applications[idx].updatedAt!, false)}')
+                                                  Text('업데이트 : ${TimeUtil().getDateTimeString(applications[idx].updatedAt!, false)}')
                                                 ],
                                               ),
                                             );
@@ -219,18 +220,5 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
       );
     }
     return SizedBox();
-  }
-  String _getTime (DateTime time, bool addTime) {
-    final year = time.year.toString();
-    final month = time.month.toString().padLeft(2, '0');
-    final day = time.day.toString().padLeft(2, '0');
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    final second = time.second.toString().padLeft(2, '0');
-    if(addTime) {
-      return '$year.$month.$day $hour:$minute:$second';
-    } else {
-      return '$year.$month.$day';
-    }
   }
 }

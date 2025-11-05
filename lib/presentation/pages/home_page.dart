@@ -196,104 +196,111 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _favoritePostList(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          children: [
-            Icon(Icons.local_fire_department, color: Colors.red),
-            Text("HOT", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-      Selector<BasePostProvider, List<dynamic>>(
+    return Selector<BasePostProvider, List<dynamic>>(
         selector: (context, provider) => provider.favoritePost ?? [],
-        builder: (context, favoritePost, child) => SizedBox(
-            height: 220,
-            width: MediaQuery.sizeOf(context).width,
-            // padding: EdgeInsets.all(10),
-            // decoration: BoxDecoration(
-            //     border: Border.all()
-            // ),
-            child: favoritePost.isEmpty
-                ? const Center(child: Text("아직 HOT 게시글이 없습니다."))
-                : ListView.separated(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.only(left: 20),
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, idx) {
-                      return GestureDetector(
-                        onTap: () async {
-                          favoritePost[idx].domain == null ?
-                          Get.to(() => RecruitPostDetailPage(postId: favoritePost[idx].id!))
-                              : Get.to(() => PromotionPostDetailPage(postId: favoritePost[idx].id!));
-                        },
-                        child: SizedBox(
-                          height: 210,
-                          width: 160,
-                          // decoration: BoxDecoration(
-                          //   color: Theme.of(context).colorScheme.surface,
-                          // ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ConstrainedBox(
-                                constraints: BoxConstraints(maxHeight: 210, maxWidth: 180),
-                                child: LayoutBuilder(builder: (context, constraints) {
-                                  return Container(
-                                    width: constraints.maxWidth,
-                                    height: constraints.maxHeight * 0.55,
-                                    decoration: BoxDecoration(
-                                      // color: Colors.green,
-                                      border: favoritePost[idx].images!.isEmpty ? Border.all() : null,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: favoritePost[idx].images!.isEmpty
-                                        ? SizedBox(
-                                            child: Center(
-                                              child: Text('이미지가 없습니다.'),
-                                            ),
-                                          )
-                                        : ClipRRect(
-                                            borderRadius: BorderRadius.circular(10),
-                                            child: CachedNetworkImage(
-                                              imageUrl: favoritePost[idx].images![0].url ?? '',
-                                              fit: BoxFit.cover,
-                                              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                                                  Center(child: SizedBox(height: 50, width: 50, child: CircularProgressIndicator(value: downloadProgress.progress))),
-                                            ),
-                                          ),
-                                  );
-                                }),
+        builder: (context, favoritePost, child) {
+          if (favoritePost.isNotEmpty) {
+          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Icon(Icons.local_fire_department, color: Colors.red),
+                  Text("HOT", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            SizedBox(
+                height: 220,
+                width: MediaQuery.sizeOf(context).width,
+                // padding: EdgeInsets.all(10),
+                // decoration: BoxDecoration(
+                //     border: Border.all()
+                // ),
+                child: favoritePost.isEmpty
+                    ? const Center(child: Text("아직 HOT 게시글이 없습니다."))
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.only(left: 20),
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, idx) {
+                          return GestureDetector(
+                            onTap: () async {
+                              favoritePost[idx].domain == null
+                                  ? Get.to(() => RecruitPostDetailPage(postId: favoritePost[idx].id!))
+                                  : Get.to(() => PromotionPostDetailPage(postId: favoritePost[idx].id!));
+                            },
+                            child: SizedBox(
+                              height: 210,
+                              width: 160,
+                              // decoration: BoxDecoration(
+                              //   color: Theme.of(context).colorScheme.surface,
+                              // ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(maxHeight: 210, maxWidth: 180),
+                                    child: LayoutBuilder(builder: (context, constraints) {
+                                      return Container(
+                                        width: constraints.maxWidth,
+                                        height: constraints.maxHeight * 0.55,
+                                        decoration: BoxDecoration(
+                                          // color: Colors.green,
+                                          border: favoritePost[idx].images!.isEmpty ? Border.all() : null,
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: favoritePost[idx].images!.isEmpty
+                                            ? SizedBox(
+                                                child: Center(
+                                                  child: Text('이미지가 없습니다.'),
+                                                ),
+                                              )
+                                            : ClipRRect(
+                                                borderRadius: BorderRadius.circular(10),
+                                                child: CachedNetworkImage(
+                                                  imageUrl: favoritePost[idx].images![0].url ?? '',
+                                                  fit: BoxFit.cover,
+                                                  progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+                                                      child: SizedBox(
+                                                          height: 50,
+                                                          width: 50,
+                                                          child: CircularProgressIndicator(
+                                                              value: downloadProgress.progress))),
+                                                ),
+                                              ),
+                                      );
+                                    }),
+                                  ),
+                                  const Gap(10),
+                                  SizedBox(
+                                      child: Text(
+                                    "${favoritePost[idx].title}",
+                                    style: TextStyle(
+                                        fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
+                                    maxLines: 2,
+                                  )),
+                                  const Gap(10),
+                                  SizedBox(
+                                      child: Text(
+                                    "${favoritePost[idx].author!.nickname}",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey.shade600,
+                                        overflow: TextOverflow.ellipsis),
+                                    maxLines: 1,
+                                  )),
+                                ],
                               ),
-                              const Gap(10),
-                              SizedBox(
-                                  child: Text(
-                                "${favoritePost[idx].title}",
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
-                                maxLines: 2,
-                              )),
-                              const Gap(10),
-                              SizedBox(
-                                  child: Text(
-                                "${favoritePost[idx].author!.nickname}",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal,
-                                    color: Colors.grey.shade600,
-                                    overflow: TextOverflow.ellipsis),
-                                maxLines: 1,
-                              )),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, idx) => const Gap(10),
-                    itemCount: favoritePost.length)),
-      )
-    ]);
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, idx) => const Gap(10),
+                        itemCount: favoritePost.length)),
+          ]);}
+          return SizedBox();
+        });
   }
 
   Widget _testerList(BuildContext context) {
@@ -328,7 +335,7 @@ class _HomePageState extends State<HomePage> {
             )
           else
             Selector<BasePostProvider, List<RecruitPostEntity>>(
-              selector: (context, provider) => provider.recruitPosts?? [],
+              selector: (context, provider) => provider.recruitPosts ?? [],
               builder: (context, posts, child) => SizedBox(
                   height: 230,
                   width: MediaQuery.sizeOf(context).width,
@@ -445,7 +452,7 @@ class _HomePageState extends State<HomePage> {
       );
     });
   }
-  
+
   Widget _promotionList(BuildContext context) {
     return BlocBuilder<BasePostBloc, BasePostState>(builder: (context, state) {
       return Column(
@@ -489,58 +496,58 @@ class _HomePageState extends State<HomePage> {
                   child: posts.isEmpty
                       ? const Center(child: Text("서비스 홍보가 아직 없습니다."))
                       : ListView.separated(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.only(left: 20, right: 20),
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, idx) {
-                        return GestureDetector(
-                          onTap: () async {
-                            Get.to(() => PromotionPostDetailPage(postId: posts[idx].id!));
-                          },
-                          child: SizedBox(
-                            height: 230,
-                            width: 160,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ConstrainedBox(
-                                  constraints: BoxConstraints(maxHeight: 210, maxWidth: 180),
-                                  child: LayoutBuilder(builder: (context, constraints) {
-                                    return Container(
-                                      width: constraints.maxWidth,
-                                      height: constraints.maxHeight * 0.55,
-                                      decoration: BoxDecoration(
-                                        border: posts[idx].images!.isEmpty ? Border.all() : null,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: posts[idx].images!.isEmpty
-                                          ? SizedBox(
-                                        child: Center(
-                                          child: Text('이미지가 없습니다.'),
-                                        ),
-                                      )
-                                          : ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                          posts[idx].images![0].url ?? '',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                ),
-                                const Gap(10),
-                                SizedBox(
-                                    child: Text(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.only(left: 20, right: 20),
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, idx) {
+                            return GestureDetector(
+                              onTap: () async {
+                                Get.to(() => PromotionPostDetailPage(postId: posts[idx].id!));
+                              },
+                              child: SizedBox(
+                                height: 230,
+                                width: 160,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(maxHeight: 210, maxWidth: 180),
+                                      child: LayoutBuilder(builder: (context, constraints) {
+                                        return Container(
+                                          width: constraints.maxWidth,
+                                          height: constraints.maxHeight * 0.55,
+                                          decoration: BoxDecoration(
+                                            border: posts[idx].images!.isEmpty ? Border.all() : null,
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: posts[idx].images!.isEmpty
+                                              ? SizedBox(
+                                                  child: Center(
+                                                    child: Text('이미지가 없습니다.'),
+                                                  ),
+                                                )
+                                              : ClipRRect(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Image.network(
+                                                    posts[idx].images![0].url ?? '',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                        );
+                                      }),
+                                    ),
+                                    const Gap(10),
+                                    SizedBox(
+                                        child: Text(
                                       "${posts[idx].title}",
                                       style: TextStyle(
                                           fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
                                       maxLines: 2,
                                     )),
-                                const Gap(5),
-                                if (posts[idx].platform!.length > 1)
-                                  SizedBox(
-                                      child: Row(
+                                    const Gap(5),
+                                    if (posts[idx].platform!.length > 1)
+                                      SizedBox(
+                                          child: Row(
                                         children: [
                                           Text(
                                             posts[idx].platform![0],
@@ -561,20 +568,20 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ],
                                       ))
-                                else
-                                  SizedBox(
-                                    child: Text(
-                                      posts[idx].platform![0],
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.grey.shade600,
-                                          overflow: TextOverflow.ellipsis),
-                                    ),
-                                  ),
-                                const Gap(5),
-                                SizedBox(
-                                    child: Text(
+                                    else
+                                      SizedBox(
+                                        child: Text(
+                                          posts[idx].platform![0],
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.grey.shade600,
+                                              overflow: TextOverflow.ellipsis),
+                                        ),
+                                      ),
+                                    const Gap(5),
+                                    SizedBox(
+                                        child: Text(
                                       posts[idx].author!.nickname ?? context.read<UserProvider>().user!.nickname ?? '',
                                       style: TextStyle(
                                           fontSize: 14,
@@ -583,13 +590,13 @@ class _HomePageState extends State<HomePage> {
                                           overflow: TextOverflow.ellipsis),
                                       maxLines: 1,
                                     )),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, idx) => const Gap(10),
-                      itemCount: posts.length > 10 ? 10 : posts.length)),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          separatorBuilder: (context, idx) => const Gap(10),
+                          itemCount: posts.length > 10 ? 10 : posts.length)),
             ),
         ],
       );
