@@ -47,7 +47,7 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
     return SafeArea(
       child: Scaffold(
           appBar: AppBar(
-            title: const Text('My Applications'),
+            title: const Text('나의 테스터 신청'),
           ),
           body: BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
             if (state.state == RecruitPostLoadState.getAppRecruitPostsCompletedState) {

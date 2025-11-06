@@ -12,16 +12,16 @@ import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
-import '../../../data/models/application/application_model.dart';
-import '../../../data/models/user/user_model.dart';
-import '../../../domain/entities/recruit_post_entity.dart';
-import '../../bloc/app_bloc/app_bloc.dart';
-import '../../bloc/app_bloc/app_state.dart';
-import '../../bloc/user_bloc/user_bloc.dart';
-import '../../bloc/user_bloc/user_event.dart';
-import '../../bloc/user_bloc/user_state.dart';
-import '../../provider/post_provider/base_post_provider.dart';
-import '../../provider/user_provider.dart';
+import '../../../../data/models/application/application_model.dart';
+import '../../../../data/models/user/user_model.dart';
+import '../../../../domain/entities/recruit_post_entity.dart';
+import '../../../bloc/app_bloc/app_bloc.dart';
+import '../../../bloc/app_bloc/app_state.dart';
+import '../../../bloc/user_bloc/user_bloc.dart';
+import '../../../bloc/user_bloc/user_event.dart';
+import '../../../bloc/user_bloc/user_state.dart';
+import '../../../provider/post_provider/base_post_provider.dart';
+import '../../../provider/user_provider.dart';
 
 class ApplicationManagementPage extends StatefulWidget {
   final String? postId;

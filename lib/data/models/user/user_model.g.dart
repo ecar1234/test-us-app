@@ -11,6 +11,9 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       email: json['email'] as String?,
       password: json['password'] as String?,
       nickname: json['nickname'] as String?,
+      profileImg: json['profileImg'] == null
+          ? null
+          : ImageModel.fromJson(json['profileImg'] as Map<String, dynamic>),
       userType: $enumDecodeNullable(_$UserTypeEnumMap, json['userType']),
       role: $enumDecodeNullable(_$UserRoleEnumMap, json['role']),
       userName: json['userName'] as String?,
@@ -33,6 +36,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'email': instance.email,
       'password': instance.password,
       'nickname': instance.nickname,
+      'profileImg': instance.profileImg,
       'userType': _$UserTypeEnumMap[instance.userType],
       'role': _$UserRoleEnumMap[instance.role],
       'userName': instance.userName,

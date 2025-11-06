@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../application/application_model.dart';
+import '../image/image_model.dart';
 part 'user_model.g.dart';
 
 enum UserType {
@@ -41,6 +42,7 @@ class UserModel {
   String? email;
   String? password;
   String? nickname;
+  ImageModel? profileImg;
   UserType? userType;
   UserRole? role;
   String? userName;
@@ -54,6 +56,7 @@ class UserModel {
     this.email,
     this.password,
     this.nickname,
+    this.profileImg,
     this.userType,
     this.role,
     this.userName,

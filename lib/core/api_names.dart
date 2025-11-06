@@ -23,6 +23,8 @@ class UserApi {
   static const String isNicknameAvailable = '/api/v1/user/isNicknameAvailable';
   static const String isEmailAvailable = '/api/v1/user/isEmailAvailable';
   static const String isPasswordValid = '/api/v1/user/isPasswordValid';
+  // static const String updateUserInfo = '/api/v1/user/updateUserInfo';
+  static const String updateUserInfoWithImg = '/api/v1/user/updateUserInfoWithImg';
 }
 
 class ImageApi {

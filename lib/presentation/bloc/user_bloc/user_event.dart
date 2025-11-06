@@ -1,5 +1,8 @@
 
 import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:test_us_app/domain/entities/image_entity.dart';
+import 'package:test_us_app/domain/entities/user_entity.dart';
 
 class UserEvent {}
 
@@ -18,6 +21,14 @@ class RequestUsersDataEvent extends UserEvent {
 class RequestUserReviewEvent extends UserEvent {
   String userId;
   RequestUserReviewEvent(this.userId);
+}
+
+class RequestUserInfoUpdateEvent extends UserEvent {
+  final String token;
+  final UserEntity userInfo;
+  final XFile? profileImage;
+  final ImageEntity? oldImage;
+  RequestUserInfoUpdateEvent(this.token, this.userInfo, {this.profileImage, this.oldImage});
 }
 
 class UserRequestCompleteEvent extends UserEvent {

@@ -4,11 +4,13 @@ import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
+import '../../data/sharedPreferences/auth_preference.dart';
 import '../../domain/use_cases/user_usecase.dart';
 
 class UserProvider with ChangeNotifier {
   final UserUseCase useCase;
   final logger = Logger();
+  final pref = AuthPreference.instance;
   UserProvider(this.useCase);
 
   UserEntity? _user;
@@ -53,6 +55,11 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateUserInfo (UserEntity user) async {
+    _user = user;
+    await pref.setUserInfo(user);
+    notifyListeners();
+  }
 
 
   Future<int> signup(UserEntity userInfo) async {

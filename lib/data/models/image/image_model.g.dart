@@ -12,6 +12,7 @@ ImageModel _$ImageModelFromJson(Map<String, dynamic> json) => ImageModel(
       originalname: json['originalname'] as String?,
       mimetype: json['mimetype'] as String?,
       size: (json['size'] as num?)?.toInt(),
+      postType: $enumDecodeNullable(_$PostTypeEnumMap, json['postType']),
       url: json['url'] as String?,
       createdAt: json['createdAt'] == null
           ? null
@@ -25,6 +26,12 @@ Map<String, dynamic> _$ImageModelToJson(ImageModel instance) =>
       'originalname': instance.originalname,
       'mimetype': instance.mimetype,
       'size': instance.size,
+      'postType': _$PostTypeEnumMap[instance.postType],
       'url': instance.url,
       'createdAt': instance.createdAt?.toIso8601String(),
     };
+
+const _$PostTypeEnumMap = {
+  PostType.promotion: 'promotion',
+  PostType.recruit: 'recruit',
+};

@@ -7,9 +7,6 @@ import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart';
 
-import '../data/models/image/image_model.dart';
-import '../data/models/post/promotion_post_model.dart';
-import '../data/models/post/recruit_post_model.dart';
 
 class NetDriver {
   final String? baseUrl;
@@ -136,8 +133,7 @@ class NetDriver {
     }
   }
 
-  Future<Map<String, dynamic>> requestUpdateFormData(
-      String token, String url, Map<String, dynamic> post, List<XFile> data, List<Map<String, dynamic>> deleteImages) async {
+  Future<Map<String, dynamic>> requestUpdateFormData(String token, String url, Map<String, dynamic> post, List<XFile> data, List<Map<String, dynamic>> deleteImages) async {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
     if (token != "" || token != '') {
       dio.options.headers['Authorization'] = 'Bearer $token';
@@ -181,8 +177,7 @@ class NetDriver {
     }
   }
 
-  Future<Map<String, dynamic>> requestImagesDeleteFormData(
-      String token, String url, List<Map<String, dynamic>> data) async {
+  Future<Map<String, dynamic>> requestImagesDeleteFormData(String token, String url, List<Map<String, dynamic>> data) async {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
     if (token != "" || token != '') {
       dio.options.headers['Authorization'] = 'Bearer $token';
@@ -201,5 +196,41 @@ class NetDriver {
       logger.e("${res.statusCode} : ${res.statusMessage}s");
       return res.data;
     }
+  }
+
+  Future<Map<String, dynamic>> updateProfileFormData(String token, String url, Map<String, dynamic> data, Map<String, dynamic> images) async {
+    if (token != "" || token != '') {
+      dio.options.headers['Authorization'] = 'Bearer $token';
+    }
+    final api = '$baseUrl$url';
+
+    final file = await MultipartFile.fromFile(
+      images['newImage'].path,
+      filename: basename(images['newImage'].path),
+      contentType: MediaType.parse(lookupMimeType(images['newImage'].path) ?? 'application/octet-stream'),
+    );
+
+    final Map<String, dynamic> formData = {
+      'user': jsonEncode(data),
+      'image': file
+    };
+
+    if(images['oldImage'] != null){
+      formData['oldImage'] = jsonEncode(images['oldImage']);
+    }
+
+    final form = FormData.fromMap(formData);
+
+    final res = await dio.post(api, data: form, options: Options(validateStatus: (status) {
+      return status != null && status < 500;
+    }));
+
+    if (res.statusCode == 200) {
+      return res.data;
+    } else {
+      logger.e("${res.statusCode} : ${res.statusMessage}s");
+      return res.data;
+    }
+
   }
 }

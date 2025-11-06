@@ -81,6 +81,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             final userProvider = context.read<UserProvider>();
             final appProvider = context.read<ApplicationProvider>();
             final basePostProvider = context.read<BasePostBloc>();
+
             if (state.state == UserAuthState.loginCompletedState) {
               await userProvider.autoLogin(state.token!, state.user!);
               basePostProvider.add(RequestUserInItDataEvent(state.token!, state.user!.id!));

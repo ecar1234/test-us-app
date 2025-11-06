@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/user_data/user_data_source.dart';
-import 'package:test_us_app/data/models/post/promotion_post_model.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
 
 import '../../../core/net_driver.dart';
-import '../../models/post/recruit_post_model.dart';
-import '../../models/review/review_model.dart';
+import '../../models/image/image_model.dart';
 
 class UserDataSourceImpl implements UserDataSource {
   final logger = Logger();
@@ -127,6 +125,33 @@ class UserDataSourceImpl implements UserDataSource {
         return {'user': UserModel.fromJson(e['user']), 'average': e['averageRating'], 'reviewCount': e['reviewCount']};
       }).toList();
       return data;
+    } else {
+      throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<UserModel> updateUserInfo(String token, UserModel userInfo) async {
+    final res = await netDriver.requestPostJson(token, UserApi.update, userInfo.toJson());
+    if (res['status'] == 200) {
+      return UserModel.fromJson(res['user']);
+    } else {
+      throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<UserModel> updateUserInfoWithImage(String token, UserModel userInfo, XFile image, {ImageModel? oldImage}) async {
+    Map<String, dynamic> res = {};
+    if(oldImage != null){
+      final data = {'newImage': image, 'oldImage': oldImage};
+      res = await netDriver.updateProfileFormData(token, UserApi.updateUserInfoWithImg, userInfo.toJson(), data);
+    }else {
+      final data = {'newImage': image};
+      res = await netDriver.updateProfileFormData(token, UserApi.updateUserInfoWithImg, userInfo.toJson(), data);
+    }
+    if (res['status'] == 200) {
+      return UserModel.fromJson(res['user']);
     } else {
       throw Exception('Error');
     }

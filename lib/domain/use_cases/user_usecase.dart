@@ -1,5 +1,7 @@
 
+import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
+import 'package:test_us_app/domain/entities/image_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../data/sharedPreferences/auth_preference.dart';
@@ -12,9 +14,7 @@ class UserUseCase {
   final pref = AuthPreference.instance;
   Future<Map<String,dynamic>> login(String email, String password) async {
     final res = await repository.login(email, password);
-    if(res['user'].id != null){
-      pref.setToken(res['token']);
-    }else {
+    if(res['user'].id == null){
       return {'message':res['message']};
     }
     return res;
@@ -60,6 +60,20 @@ class UserUseCase {
 
   Future<bool> updatePassword(String newPassword) async {
     final res = await repository.updatePassword(newPassword);
+    return res;
+  }
+
+  Future<UserEntity> updateUserInfo(String token, UserEntity userInfo) async {
+    final res = await repository.updateUserInfo(token, userInfo);
+    return res;
+  }
+  Future<UserEntity> updateUserInfoWithImage(String token, UserEntity userInfo, XFile image, {ImageEntity? oldImage}) async {
+    UserEntity res;
+    if(oldImage != null){
+      res = await repository.updateUserInfoWithImage(token, userInfo, image, oldImage: oldImage);
+    }else {
+      res = await repository.updateUserInfoWithImage(token, userInfo, image);
+    }
     return res;
   }
 

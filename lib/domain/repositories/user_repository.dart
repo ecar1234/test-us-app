@@ -1,5 +1,8 @@
 
 
+import 'package:image_picker/image_picker.dart';
+
+import '../entities/image_entity.dart';
 import '../entities/review_entity.dart';
 import '../entities/user_entity.dart';
 
@@ -14,4 +17,6 @@ abstract class UserRepository {
   Future<bool> isEmailAvailable(String email);
   Future<bool> isPasswordValid(String password);
   Future<bool> updatePassword(String newPassword);
+  Future<UserEntity> updateUserInfoWithImage(String token, UserEntity userInfo, XFile image, {ImageEntity? oldImage});
+  Future<UserEntity> updateUserInfo(String token, UserEntity userInfo);
 }

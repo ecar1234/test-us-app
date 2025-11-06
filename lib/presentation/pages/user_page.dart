@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/pages/login_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/application/my_applications_page.dart';
+import 'package:test_us_app/presentation/pages/my_pages/user_info/user_info_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
@@ -17,7 +19,7 @@ import 'package:test_us_app/services/common_height_provider.dart';
 
 import '../../data/models/application/application_model.dart';
 import '../components/login_dialogs.dart';
-import 'my_pages/my_recruitment_page.dart';
+import 'my_pages/recruit/my_recruitment_page.dart';
 import 'my_pages/promotion/my_promotion_page.dart';
 
 class UserPage extends StatefulWidget {
@@ -58,6 +60,10 @@ class _UserPageState extends State<UserPage> {
                         children: [
                           CircleAvatar(
                             radius: 40,
+                            backgroundColor: Colors.grey.shade200,
+                            backgroundImage: user.profileImg == null || user.profileImg!.url == null ?
+                                const AssetImage('assets/images/Generic avatar.png')
+                                : CachedNetworkImageProvider(user.profileImg!.url!),
                           ),
                           const Gap(20),
                           SizedBox(
@@ -84,7 +90,9 @@ class _UserPageState extends State<UserPage> {
                                       )
                                     : SizedBox(
                                         child: TextButton.icon(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Get.to(() => UserInfoPage(user: user));
+                                          },
                                           style: TextButton.styleFrom(
                                             padding: EdgeInsets.zero,
                                           ),

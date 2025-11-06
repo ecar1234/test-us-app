@@ -1,8 +1,11 @@
 
 
+
+import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
+import '../../domain/entities/image_entity.dart';
 import '../../domain/entities/recruit_post_entity.dart';
 import '../../domain/entities/review_entity.dart';
 import '../../domain/repositories/user_repository.dart';
@@ -74,5 +77,22 @@ class UserRepositoryImpl implements UserRepository {
       element['user'] = UserEntity.toEntity(element['user']);
     }
     return res;
+  }
+
+  @override
+  Future<UserEntity> updateUserInfo(String token, UserEntity userInfo) async {
+    final res = await remote.updateUserInfo(token, UserEntity.toModel(userInfo));
+    return UserEntity.toEntity(res);
+  }
+
+  @override
+  Future<UserEntity> updateUserInfoWithImage(String token, UserEntity userInfo, XFile image, { ImageEntity? oldImage}) async {
+    UserModel res = UserModel();
+    if(oldImage != null) {
+      res = await remote.updateUserInfoWithImage(token, UserEntity.toModel(userInfo), image, oldImage: ImageEntity.toImageModel(oldImage));
+    }else {
+      res = await remote.updateUserInfoWithImage(token, UserEntity.toModel(userInfo), image);
+    }
+    return UserEntity.toEntity(res);
   }
 }
