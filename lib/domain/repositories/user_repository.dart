@@ -19,4 +19,5 @@ abstract class UserRepository {
   Future<bool> updatePassword(String newPassword);
   Future<UserEntity> updateUserInfoWithImage(String token, UserEntity userInfo, XFile image, {ImageEntity? oldImage});
   Future<UserEntity> updateUserInfo(String token, UserEntity userInfo);
+  Future<UserEntity> googleLogin(UserEntity userInfo);
 }

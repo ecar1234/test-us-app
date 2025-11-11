@@ -35,6 +35,14 @@ enum UserRole {
   @JsonValue('CS')
   cs
 }
+enum AuthType {
+  @JsonValue('EMAIL')
+  email,
+  @JsonValue('GOOGLE')
+  google,
+  @JsonValue('NAVER')
+  naver
+}
 
 @JsonSerializable()
 class UserModel {
@@ -47,6 +55,7 @@ class UserModel {
   UserRole? role;
   String? userName;
   DateTime? birth;
+  AuthType? method;
   List<ApplicationModel>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -61,6 +70,7 @@ class UserModel {
     this.role,
     this.userName,
     this.birth,
+    this.method,
     this.applications,
     this.createdAt,
     this.updatedAt,

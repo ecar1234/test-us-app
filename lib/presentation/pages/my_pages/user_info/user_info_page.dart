@@ -12,6 +12,7 @@ import 'package:test_us_app/presentation/bloc/user_bloc/user_event.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
+import 'package:test_us_app/utils/type_conversion_util.dart';
 
 import '../../../../data/models/user/user_model.dart';
 import '../../../bloc/user_bloc/user_bloc.dart';
@@ -31,7 +32,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
   final _userRoleController = TextEditingController();
   XFile? profileImage;
   final ImagePicker _picker = ImagePicker();
-
+  final typeUtil = TypeConversionUtil();
 
 
   @override
@@ -227,7 +228,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  initialSelection: _userTypeToString(widget.user.userType!),
+                  initialSelection: typeUtil.userTypeToString(widget.user.userType!),
                   dropdownMenuEntries: [
                     DropdownMenuEntry(value: "", label: "선택"),
                     DropdownMenuEntry(value: "INDIVIDUALS", label: "1인 개발자"),
@@ -245,7 +246,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
             flex: 2,
             child: SizedBox(
               width: wid * 0.2,
-              child: Text('유저 역할', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black54)),
+              child: Text('역할', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black54)),
             )),
         Flexible(
             flex: 8,
@@ -260,7 +261,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  initialSelection: _userRoleToString(widget.user.role!),
+                  initialSelection: typeUtil.userRoleToString(widget.user.role!),
                   dropdownMenuEntries: [
                     DropdownMenuEntry(value: "", label: "선택"),
                     DropdownMenuEntry(
@@ -313,8 +314,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     id: widget.user.id,
                     email: widget.user.email,
                     nickname: _nicknameController.text,
-                    userType: _toUserType(_userTypeController.text),
-                    role: _toUserRole(_userRoleController.text),
+                    userType: typeUtil.toUserType(_userTypeController.text),
+                    role: typeUtil.toUserRole(_userRoleController.text),
                   );
 
                   if(profileImage != null) {
@@ -338,79 +339,5 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ],
       )
     );
-  }
-
-  String _userRoleToString(UserRole role) {
-    switch (role) {
-      case UserRole.programmer:
-        return "programmer";
-      case UserRole.planner:
-        return "planner";
-      case UserRole.marketer:
-        return "marketer";
-      case UserRole.designer:
-        return "designer";
-      case UserRole.publisher:
-        return "publisher";
-      case UserRole.analyst:
-        return "analyst";
-      case UserRole.operator:
-        return "operator";
-      case UserRole.pm:
-        return "pm";
-      case UserRole.qa:
-        return "qa";
-      case UserRole.cs:
-        return "cs";
-      case UserRole.manager:
-        return "manager";
-    }
-  }
-
-  String _userTypeToString(UserType type) {
-    switch (type) {
-      case UserType.individuals:
-        return "INDIVIDUALS";
-      case UserType.companies:
-        return "COMPANIES";
-    }
-  }
-
-  UserRole _toUserRole(String role) {
-    switch (role) {
-      case "프로그래머":
-        return UserRole.programmer;
-      case "기획자":
-        return UserRole.planner;
-      case "마케터":
-        return UserRole.marketer;
-      case "디자이너":
-        return UserRole.designer;
-      case "퍼블리셔":
-        return UserRole.publisher;
-      case "데이터 분석":
-        return UserRole.analyst;
-      case "서비스 운영":
-        return UserRole.operator;
-      case "PM":
-        return UserRole.pm;
-      case "QA":
-        return UserRole.qa;
-      case "CS":
-        return UserRole.cs;
-      default:
-        return UserRole.programmer;
-    }
-  }
-
-  UserType _toUserType(String type) {
-    switch (type) {
-      case "1인 개발자":
-        return UserType.individuals;
-      case "기업":
-        return UserType.companies;
-      default:
-        return UserType.individuals;
-    }
   }
 }

@@ -10,6 +10,7 @@ class AuthApi {
   static const String signup = '/api/v1/auth/register';
   static const String delete = '/api/v1/auth/delete';
   static const String login = '/api/v1/auth/login';
+  static const String googleLogin = '/api/v1/auth/googleLogin';
 }
 
 class UserApi {

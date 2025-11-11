@@ -43,13 +43,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
 
   final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
-  // final _categoryList = ['WEB', 'IOS', 'ANDROID'];
   List<String> _selectedCategory = [];
-
-  bool _webCheck = false;
-  bool _iosCheck = false;
-  bool _androidCheck = false;
-  bool _gameCheck = false;
 
   @override
   void initState() {
@@ -58,19 +52,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
       titleController.text = widget.post!.title!;
       subtitleController.text = widget.post!.subtitle!;
       contentController.text = widget.post!.contents!;
-      _selectedCategory = widget.post!.platform!;
-      if (_selectedCategory.contains('WEB')) {
-        _webCheck = true;
-      }
-      if (_selectedCategory.contains('IOS')) {
-        _iosCheck = true;
-      }
-      if (_selectedCategory.contains('Android')) {
-        _androidCheck = true;
-      }
-      if (_selectedCategory.contains('GAME')) {
-        _gameCheck = true;
-      }
+      _selectedCategory = List<String>.from(widget.post!.platform!);
       if (widget.post!.images != null && widget.post!.images!.isNotEmpty) {
         _existedImages = widget.post!.images!;
       }
@@ -93,6 +75,26 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
     titleController.dispose();
     subtitleController.dispose();
     contentController.dispose();
+  }
+
+  void _onPlatformSelected(bool? checked, String platform) {
+    setState(() {
+      if (checked == true) {
+        if (platform == 'WEB' || platform == 'GAME') {
+          _selectedCategory.clear();
+          _selectedCategory.add(platform);
+        } else {
+          // IOS or Android
+          _selectedCategory.remove('WEB');
+          _selectedCategory.remove('GAME');
+          if (!_selectedCategory.contains(platform)) {
+            _selectedCategory.add(platform);
+          }
+        }
+      } else {
+        _selectedCategory.remove(platform);
+      }
+    });
   }
 
   @override
@@ -181,9 +183,6 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
               controller: subtitleController,
               maxLines: 1,
               maxLength: 30,
-              // decoration: InputDecoration(
-              //   counterText: "30",
-              // ),
             ),
           )
         ],
@@ -306,34 +305,34 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                                   fit: BoxFit.cover,
                                 ),
                               Positioned(
-                                    top: 4,
-                                    right: 4,
-                                    child: GestureDetector(
-                                        onTap: () {
-                                          if (idx < _existedImages.length) {
-                                            setState(() {
-                                              _deleteImages.add(_existedImages[idx]);
-                                            });
-                                            setState(() {
-                                              _existedImages.removeAt(idx);
-                                            });
-                                          } else {
-                                            setState(() {
-                                              _selectedImages.removeAt(idx - _existedImages.length);
-                                            });
-                                          }
-                                        },
-                                        child: Container(
-                                          height: 30,
-                                          width: 30,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.black.withValues(alpha: 0.5),
-                                          ),
-                                          child: Center(
-                                            child: Icon(Icons.close),
-                                          ),
-                                        ))),
+                                  top: 4,
+                                  right: 4,
+                                  child: GestureDetector(
+                                      onTap: () {
+                                        if (idx < _existedImages.length) {
+                                          setState(() {
+                                            _deleteImages.add(_existedImages[idx]);
+                                          });
+                                          setState(() {
+                                            _existedImages.removeAt(idx);
+                                          });
+                                        } else {
+                                          setState(() {
+                                            _selectedImages.removeAt(idx - _existedImages.length);
+                                          });
+                                        }
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.black.withOpacity(0.5),
+                                        ),
+                                        child: Center(
+                                          child: Icon(Icons.close),
+                                        ),
+                                      ))),
                             ]),
                           ),
                         );
@@ -347,7 +346,6 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
 
   Widget _periodSection() {
     return SizedBox(
-        // height: 200,
         width: MediaQuery.sizeOf(context).width - 40,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +394,6 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                     child: TextField(
                       controller: periodController,
                       readOnly: true,
-                      // enabled: false,
                       decoration: InputDecoration(enabled: false),
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.right,
@@ -412,9 +409,15 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
   }
 
   Widget _categorySection() {
+    final platforms = {
+      'WEB': 'WEB',
+      'GAME': 'GAME',
+      'IOS': 'IOS',
+      'Android': 'Android',
+    };
+
     return SizedBox(
         width: MediaQuery.sizeOf(context).width - 40,
-        // height: 150,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -424,148 +427,33 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             )),
             const Gap(10),
-            SizedBox(
-                child: GridView.count(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    crossAxisCount: 2,
-                    childAspectRatio: 3.5,
+            GridView.count(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              crossAxisCount: 2,
+              childAspectRatio: 3.5,
+              children: platforms.entries.map((entry) {
+                final platformKey = entry.key;
+                final platformName = entry.value;
+                final isSelected = _selectedCategory.contains(platformKey);
+
+                return SizedBox(
+                  height: 30,
+                  child: Row(
                     children: [
-                  SizedBox(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: _webCheck,
-                            onChanged: (value) {
-                              setState(() {
-                                _webCheck = value!;
-                                if (_webCheck) {
-                                  _selectedCategory.add('WEB');
-                                  if (_iosCheck) {
-                                    _selectedCategory.remove('IOS');
-                                    _iosCheck = false;
-                                  }
-                                  if (_androidCheck) {
-                                    _selectedCategory.remove('Android');
-                                    _androidCheck = false;
-                                  }
-                                  if (_gameCheck) {
-                                    _selectedCategory.remove('GAME');
-                                    _gameCheck = false;
-                                  }
-                                } else {
-                                  _selectedCategory.remove('WEB');
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            "WEB",
-                            style: TextStyle(fontSize: 14, fontWeight: _webCheck ? FontWeight.bold : FontWeight.normal),
-                          )
-                        ],
-                      )),
-                  SizedBox(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: _gameCheck,
-                            onChanged: (value) {
-                              setState(() {
-                                _gameCheck = value!;
-                                if (_gameCheck) {
-                                  _selectedCategory.add('GAME');
-                                  if (_webCheck) {
-                                    _selectedCategory.remove('WEB');
-                                    _webCheck = false;
-                                  }
-                                  if (_iosCheck) {
-                                    _selectedCategory.remove('IOS');
-                                    _iosCheck = false;
-                                  }
-                                  if (_androidCheck) {
-                                    _selectedCategory.remove('Android');
-                                    _androidCheck = false;
-                                  }
-                                } else {
-                                  _selectedCategory.remove('GAME');
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            "GAME",
-                            style:
-                                TextStyle(fontSize: 14, fontWeight: _gameCheck ? FontWeight.bold : FontWeight.normal),
-                          )
-                        ],
-                      )),
-                  SizedBox(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: _iosCheck,
-                            onChanged: (value) {
-                              setState(() {
-                                _iosCheck = value!;
-                                if (_iosCheck) {
-                                  _selectedCategory.add('IOS');
-                                  if (_webCheck) {
-                                    _selectedCategory.remove('WEB');
-                                    _webCheck = false;
-                                  }
-                                  if (_gameCheck) {
-                                    _selectedCategory.remove('GAME');
-                                    _gameCheck = false;
-                                  }
-                                } else {
-                                  _selectedCategory.remove('IOS');
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            "IOS",
-                            style: TextStyle(fontSize: 14, fontWeight: _iosCheck ? FontWeight.bold : FontWeight.normal),
-                          )
-                        ],
-                      )),
-                  SizedBox(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: _androidCheck,
-                            onChanged: (value) {
-                              setState(() {
-                                _androidCheck = value!;
-                                if (_androidCheck) {
-                                  _selectedCategory.add('Android');
-                                  if (_webCheck) {
-                                    _selectedCategory.remove('WEB');
-                                    _webCheck = false;
-                                  }
-                                  if (_gameCheck) {
-                                    _selectedCategory.remove('GAME');
-                                    _gameCheck = false;
-                                  }
-                                } else {
-                                  _selectedCategory.remove('Android');
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            "Android",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: _androidCheck ? FontWeight.bold : FontWeight.normal),
-                          )
-                        ],
-                      )),
-                ]))
+                      Checkbox(
+                        value: isSelected,
+                        onChanged: (value) => _onPlatformSelected(value, platformKey),
+                      ),
+                      Text(
+                        platformName,
+                        style: TextStyle(fontSize: 14, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                      )
+                    ],
+                  ),
+                );
+              }).toList(),
+            )
           ],
         ));
   }
@@ -600,8 +488,6 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
     final token = context.read<UserProvider>().token ?? '';
     return BlocListener<RecruitPostBloc, RecruitPostState>(
         listener: (context, state) async {
-          // NOTE: Recruit Post는 페이지 접속 시 새로 불러옴.
-          // NOTE: init post의 Recruit post에만 추가 필요. CRUD 모두 적용
           final provider = context.read<BasePostProvider>();
           if (state.state == RecruitPostLoadState.postCreateCompletedState) {
             provider.createRecruitPost(state.post!);
@@ -609,8 +495,8 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
           } else if (state.state == RecruitPostLoadState.postUpdateCompletedState) {
             provider.updateRecruitPost(state.post!);
             await _alertDialog(context, '수정');
-          } else if(state.state == RecruitPostLoadState.errorState
-              || state.state == RecruitPostLoadState.failedState){
+          } else if (state.state == RecruitPostLoadState.errorState ||
+              state.state == RecruitPostLoadState.failedState) {
             Get.snackbar('알림', '등록 실패');
             return;
           }
@@ -671,8 +557,6 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         return;
                       }
                       try {
-                        // context.read<RecruitPostBloc>().add(PostDataLoadEvent());
-                        // final token = context.read<UserProvider>().token!;
                         final post = RecruitPostEntity(
                           title: titleController.text,
                           subtitle: subtitleController.text,
@@ -710,13 +594,13 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                           author: context.read<UserProvider>().user!);
                       final token = context.read<UserProvider>().token ?? "";
                       try {
-                        context.read<RecruitPostBloc>().add(RequestPostUpdateEvent(token, post, _selectedImages, _deleteImages));
+                        context
+                            .read<RecruitPostBloc>()
+                            .add(RequestPostUpdateEvent(token, post, _selectedImages, _deleteImages));
                       } on Exception catch (e) {
                         logger.e(e);
                         Get.snackbar('알림', '수정 실패');
                       }
-
-                      // Get.back();
                     },
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
@@ -739,7 +623,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
             TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  if(context.mounted) Navigator.pop(context);
+                  if (context.mounted) Navigator.pop(context);
                 },
                 child: Text("확인"))
           ],
@@ -748,5 +632,3 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
     );
   }
 }
-
-

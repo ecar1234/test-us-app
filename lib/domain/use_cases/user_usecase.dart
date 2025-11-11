@@ -77,4 +77,11 @@ class UserUseCase {
     return res;
   }
 
+  Future<UserEntity> googleLogin(UserEntity userInfo) async {
+    final res = await repository.googleLogin(userInfo);
+    return res;
+  }
+
+
+
 }

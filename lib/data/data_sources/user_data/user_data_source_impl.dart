@@ -156,4 +156,14 @@ class UserDataSourceImpl implements UserDataSource {
       throw Exception('Error');
     }
   }
+
+  @override
+  Future<UserModel> googleLogin(UserModel userInfo) async {
+    final res = await netDriver.requestPostJson("", AuthApi.googleLogin, userInfo.toJson());
+    if (res['status'] == 200) {
+      return UserModel.fromJson(res['user']);
+    } else {
+      throw Exception('Error');
+    }
+  }
 }

@@ -31,6 +31,11 @@ class RequestUserInfoUpdateEvent extends UserEvent {
   RequestUserInfoUpdateEvent(this.token, this.userInfo, {this.profileImage, this.oldImage});
 }
 
+class RequestUserInfoByEmail extends UserEvent {
+  final String email;
+  RequestUserInfoByEmail(this.email);
+}
+
 class UserRequestCompleteEvent extends UserEvent {
   UserRequestCompleteEvent();
 }

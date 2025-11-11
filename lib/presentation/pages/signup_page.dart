@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
+import 'package:test_us_app/utils/type_conversion_util.dart';
 
 import '../../data/models/user/user_model.dart';
 
@@ -49,32 +50,32 @@ class _SignupPageState extends State<SignupPage> {
     roleController.dispose();
   }
 
-  UserRole _toUserRole(String role) {
-    switch (role) {
-      case "프로그래머":
-        return UserRole.programmer;
-      case "기획자":
-        return UserRole.planner;
-      case "마케터":
-        return UserRole.marketer;
-      case "디자이너":
-        return UserRole.designer;
-      case "퍼블리셔":
-        return UserRole.publisher;
-      case "데이터 분석":
-        return UserRole.analyst;
-      case "서비스 운영":
-        return UserRole.operator;
-      case "PM":
-        return UserRole.pm;
-      case "QA":
-        return UserRole.qa;
-      case "CS":
-        return UserRole.cs;
-      default:
-        return UserRole.programmer;
-    }
-  }
+  // UserRole _toUserRole(String role) {
+  //   switch (role) {
+  //     case "프로그래머":
+  //       return UserRole.programmer;
+  //     case "기획자":
+  //       return UserRole.planner;
+  //     case "마케터":
+  //       return UserRole.marketer;
+  //     case "디자이너":
+  //       return UserRole.designer;
+  //     case "퍼블리셔":
+  //       return UserRole.publisher;
+  //     case "데이터 분석":
+  //       return UserRole.analyst;
+  //     case "서비스 운영":
+  //       return UserRole.operator;
+  //     case "PM":
+  //       return UserRole.pm;
+  //     case "QA":
+  //       return UserRole.qa;
+  //     case "CS":
+  //       return UserRole.cs;
+  //     default:
+  //       return UserRole.programmer;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -144,10 +145,9 @@ class _SignupPageState extends State<SignupPage> {
                             email: emailController.text,
                             password: passwordController.text,
                             nickname: nicknameController.text,
-                            userType: userTypeController.text == "1인 개발자"
-                                ? UserType.individuals
-                                : UserType.companies,
-                            role: _toUserRole(roleController.text),
+                            userType: TypeConversionUtil().toUserType(userTypeController.text),
+                            role: TypeConversionUtil().toUserRole(roleController.text),
+                            method: AuthType.email
                           );
                           try {
                             // logger.i('회원가입 시도: ${{

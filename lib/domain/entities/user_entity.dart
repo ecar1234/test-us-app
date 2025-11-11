@@ -15,6 +15,7 @@ class UserEntity {
   UserRole? role;
   String? userName;
   DateTime? birth;
+  AuthType? method;
   List<ApplicationEntity>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -29,6 +30,7 @@ class UserEntity {
     this.role,
     this.userName,
     this.birth,
+    this.method,
     this.applications,
     this.createdAt,
     this.updatedAt,
@@ -47,6 +49,7 @@ class UserEntity {
         role: model.role,
         userName: model.userName,
         birth: model.birth,
+        method: model.method,
         applications: applications,
         createdAt: model.createdAt,
         updatedAt: model.updatedAt
@@ -66,6 +69,7 @@ class UserEntity {
       role: entity.role,
       userName: entity.userName,
       birth: entity.birth,
+      method: entity.method,
       applications: applications,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt

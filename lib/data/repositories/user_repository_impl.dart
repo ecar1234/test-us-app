@@ -95,4 +95,10 @@ class UserRepositoryImpl implements UserRepository {
     }
     return UserEntity.toEntity(res);
   }
+
+  @override
+  Future<UserEntity> googleLogin(UserEntity userInfo) {
+    // TODO: implement googleLogin
+    throw UnimplementedError();
+  }
 }

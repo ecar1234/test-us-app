@@ -1,4 +1,4 @@
-package com.testus.devon.studio.app.test_us_app
+package com.testus.devon.studio.app
 
 import io.flutter.embedding.android.FlutterActivity
 

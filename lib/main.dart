@@ -27,6 +27,7 @@ import 'domain/use_cases/review_usecase.dart';
 import 'domain/use_cases/user_usecase.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await serviceLocator();
   runApp(MultiProvider(
     providers: [

@@ -1,7 +1,19 @@
 
 import '../../../domain/entities/user_entity.dart';
 
-enum UserAuthState { serviceStartState, beforeLoginState, authPendingState, loginCompletedState, logoutState, loginFailedState }
+enum UserAuthState {
+  serviceStartState,
+  beforeLoginState,
+  authPendingState,
+  authCompletedState,
+  loginPendingState,
+  loginCompletedState,
+  authLoginCompletedState,
+  authCanceledState,
+  logoutState,
+  loginFailedState,
+  authFailedState
+}
 
 class AuthState {
   final UserAuthState state;

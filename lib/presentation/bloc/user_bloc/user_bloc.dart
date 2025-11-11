@@ -61,6 +61,13 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       }
     });
 
+    on<RequestUserInfoByEmail>((event, emit)async {
+      emit(UserState(UserDataState.loadingState));
+      logger.i('user state : loading state');
+      final user = await userUseCase.getUserByEmail(event.email);
+      emit(UserState(UserDataState.getUsersInfoCompletedState, user: user));
+    });
+
     on<UserRequestCompleteEvent>((event, emit) {
       emit(UserState(UserDataState.userDataLoadedState));
     });

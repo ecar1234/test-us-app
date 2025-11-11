@@ -1,6 +1,9 @@
 
 
+import 'dart:async';
+
 import 'package:get_it/get_it.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/application_data/application_datasource.dart';
 import 'package:test_us_app/data/data_sources/application_data/application_datasource_impl.dart';
@@ -16,14 +19,11 @@ import 'package:test_us_app/domain/use_cases/base_post_usecase.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
 import 'core/net_driver.dart';
-import 'data/data_sources/image_data/image_data_source.dart';
-import 'data/data_sources/image_data/image_data_source_impl.dart';
 import 'data/data_sources/post_data/base_post_datasource.dart';
 import 'data/data_sources/post_data/promotion_post_datasource.dart';
 import 'data/data_sources/post_data/promotion_post_datasource_impl.dart';
 import 'data/repositories/application_repository_impl.dart';
 import 'data/repositories/base_post_repository_impl.dart';
-import 'data/repositories/image_repository_impl.dart';
 import 'data/repositories/promotion_post_repository_impl.dart';
 import 'data/repositories/review_repository_impl.dart';
 import 'data/repositories/user_repository_impl.dart';
@@ -43,6 +43,11 @@ import 'domain/use_cases/user_usecase.dart';
 
 final getIt = GetIt.instance;
 Future<void> serviceLocator() async {
+
+  final GoogleSignIn signIn = GoogleSignIn.instance;
+  await signIn.initialize(serverClientId: '185199812075-7r7c3fin3ka58mdr7atqat89jce2lv1u.apps.googleusercontent.com');
+  // await signIn.initialize();
+  getIt.registerLazySingleton<GoogleSignIn>(() => signIn);
 
   getIt.registerLazySingleton<NetDriver>(() => NetDriver(Host.baseDevUrl));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());

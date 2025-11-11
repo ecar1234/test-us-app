@@ -9,11 +9,21 @@ class AuthEvent {}
 class TokenCheckEvent extends AuthEvent {
   TokenCheckEvent();
 }
-class LoginEvent extends AuthEvent {
+class EmailLoginEvent extends AuthEvent {
   final String email;
   final String password;
-  LoginEvent(this.email, this.password);
+  EmailLoginEvent(this.email, this.password);
 }
+
+class RequestGoogleAuth extends AuthEvent {
+
+}
+class GoogleLoginEvent extends AuthEvent {
+  final UserEntity user;
+  GoogleLoginEvent(this.user);
+}
+
+
 class LoginCompletedEvent extends AuthEvent {
   final UserEntity user;
   LoginCompletedEvent(this.user);

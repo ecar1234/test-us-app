@@ -19,4 +19,5 @@ abstract class UserDataSource {
   Future<List<Map<String, dynamic>>> getUsersByIds(String token, List<String> ids);
   Future<UserModel> updateUserInfo(String token, UserModel userInfo);
   Future<UserModel> updateUserInfoWithImage(String token, UserModel userInfo, XFile image, {ImageModel? oldImage});
+  Future<UserModel> googleLogin(UserModel userInfo);
 }

@@ -20,6 +20,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       birth: json['birth'] == null
           ? null
           : DateTime.parse(json['birth'] as String),
+      method: $enumDecodeNullable(_$AuthTypeEnumMap, json['method']),
       applications: (json['applications'] as List<dynamic>?)
           ?.map((e) => ApplicationModel.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -41,6 +42,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'role': _$UserRoleEnumMap[instance.role],
       'userName': instance.userName,
       'birth': instance.birth?.toIso8601String(),
+      'method': _$AuthTypeEnumMap[instance.method],
       'applications': instance.applications,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
@@ -63,4 +65,10 @@ const _$UserRoleEnumMap = {
   UserRole.pm: 'PM',
   UserRole.qa: 'QA',
   UserRole.cs: 'CS',
+};
+
+const _$AuthTypeEnumMap = {
+  AuthType.email: 'EMAIL',
+  AuthType.google: 'GOOGLE',
+  AuthType.naver: 'NAVER',
 };
