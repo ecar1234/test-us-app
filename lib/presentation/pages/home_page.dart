@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
               height: 80,
               width: (MediaQuery.sizeOf(context).width - 80) / 4,
-              child: ElevatedButton(
+              child: FilledButton(
                   onPressed: () {
                     Get.to(() => PostMainPage(type: 'recruit'));
                   },
@@ -159,7 +159,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
               height: 80,
               width: (MediaQuery.sizeOf(context).width - 80) / 4,
-              child: ElevatedButton(
+              child: FilledButton(
                   onPressed: () {
                     Get.to(() => PostMainPage(type: 'promotion'));
                   },
@@ -172,7 +172,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
               height: 80,
               width: (MediaQuery.sizeOf(context).width - 80) / 4,
-              child: ElevatedButton(
+              child: FilledButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
               height: 80,
               width: (MediaQuery.sizeOf(context).width - 80) / 4,
-              child: ElevatedButton(
+              child: FilledButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
@@ -322,7 +322,7 @@ class _HomePageState extends State<HomePage> {
                       Get.to(() => PostMainPage(type: 'recruit'));
                     },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                    child: Text("전체 보기"))
+                    child: Text("전체 보기", ))
               ],
             ),
           ),

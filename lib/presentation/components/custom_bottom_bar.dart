@@ -76,7 +76,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                           widget.onTap(_selectedIndex);
                         },
                         icon: Icon(Icons.home,
-                            color: _selectedIndex == 0 ? Colors.blue : null)),
+                            color: _selectedIndex == 0 ? Theme.of(context).colorScheme.primary : null)),
                     IconButton(
                         onPressed: () async {
                           // context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent(1, 20));
@@ -86,7 +86,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                           widget.onTap(_selectedIndex);
                         },
                         icon: Icon(Icons.search,
-                            color: _selectedIndex == 1 ? Colors.blue : null))
+                            color: _selectedIndex == 1 ? Theme.of(context).colorScheme.primary : null)),
                   ],
                 ),
               ),
@@ -142,7 +142,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                         widget.onTap(_selectedIndex);
                       },
                       icon: Icon(Icons.person,
-                          color: _selectedIndex == 2 ? Colors.blue : null)),
+                          color: _selectedIndex == 2 ? Theme.of(context).colorScheme.primary : null)),
                   IconButton(
                       onPressed: () {
                         setState(() {

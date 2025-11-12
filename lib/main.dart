@@ -19,6 +19,7 @@ import 'package:test_us_app/presentation/provider/review_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/service_locator.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/services/theme_provider.dart';
 
 import 'domain/use_cases/base_post_usecase.dart';
 import 'domain/use_cases/promotion_post_usecase.dart';
@@ -37,6 +38,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (context) => PromotionPostProvider()),
       ChangeNotifierProvider(create: (context) => ApplicationProvider(getIt<ApplicationUseCase>())),
       ChangeNotifierProvider(create: (context) => ReviewProvider(getIt<ReviewUseCase>())),
+      ChangeNotifierProvider(create: (context) => ThemeProvider()),
     ],
     child: MultiBlocProvider(
       providers: [

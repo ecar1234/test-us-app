@@ -17,6 +17,7 @@ import 'package:test_us_app/data/data_sources/user_data/user_data_source_impl.da
 import 'package:test_us_app/data/repositories/recruit_post_repository_impl.dart';
 import 'package:test_us_app/domain/use_cases/base_post_usecase.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
+import 'package:test_us_app/services/theme_provider.dart';
 
 import 'core/net_driver.dart';
 import 'data/data_sources/post_data/base_post_datasource.dart';
@@ -51,6 +52,7 @@ Future<void> serviceLocator() async {
 
   getIt.registerLazySingleton<NetDriver>(() => NetDriver(Host.baseDevUrl));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());
+  // getIt.registerSingleton<ThemeProvider>(ThemeProvider());
 
   // data
   getIt.registerLazySingleton<UserDataSource>(() => UserDataSourceImpl(getIt<NetDriver>()));

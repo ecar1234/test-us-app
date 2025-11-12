@@ -153,7 +153,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             border: Border.all(color: Colors.grey),
                             shape: BoxShape.circle
                         ),
-                        child: Icon(Icons.camera_alt, color: Colors.black54,),
+                        child: Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.primary,),
                       ),
                     )
                 )
@@ -174,14 +174,14 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 width: wid * 0.2,
                 child: Text(
                   '이메일',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black54),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ))),
         const Gap(10),
         Flexible(
             flex: 8,
             child: SizedBox(
                 width: wid * 0.8,
-                child: Text(widget.user.email!, style: TextStyle(fontSize: 18, color: Colors.black54))))
+                child: Text(widget.user.email!, style: TextStyle(fontSize: 18 ))))
       ]),
     );
   }
@@ -194,7 +194,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
             child: SizedBox(
                 width: wid * 0.2,
                 child:
-                    Text('닉네임', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black54)))),
+                    Text('닉네임', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)))),
         Flexible(
           flex: 8,
           child: SizedBox(
@@ -215,7 +215,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
             flex: 2,
             child: SizedBox(
               width: wid * 0.2,
-              child: Text('유져 타입', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black54)),
+              child: Text('유져 타입', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             )),
         Flexible(
             flex: 8,
@@ -246,7 +246,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
             flex: 2,
             child: SizedBox(
               width: wid * 0.2,
-              child: Text('역할', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black54)),
+              child: Text('역할', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             )),
         Flexible(
             flex: 8,

@@ -1,9 +1,11 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
@@ -18,6 +20,7 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/pages/user_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:test_us_app/services/theme_provider.dart';
 
 import '../../data/sharedPreferences/auth_preference.dart';
 import '../bloc/auth_bloc/auth_bloc.dart';
@@ -48,18 +51,22 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
 
   Future<void> _init() async {
     GetIt.I.get<ResponsiveHeightProvider>().setHeight(context);
+    context.read<ThemeProvider>().getIsDarkMod();
     context.read<BasePostBloc>().add(ServiceStartEvent());
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = context.watch<ThemeProvider>().isDarkMode;
     return MultiBlocListener(
       listeners: [
         BlocListener<BasePostBloc, BasePostState>(
           listener: (context, state) async {
             if (state.state == BasePostLoadState.getInitPostCompletedState) {
               context.read<AuthBloc>().add(TokenCheckEvent());
-              context.read<BasePostProvider>().getInitPosts(state.favoritePosts!, state.recruitPosts!, state.promotionPosts!);
+              context
+                  .read<BasePostProvider>()
+                  .getInitPosts(state.favoritePosts!, state.recruitPosts!, state.promotionPosts!);
               context.read<RecruitPostProvider>().getInitPosts(state.recruitPosts!);
               context.read<PromotionPostProvider>().getInitPromotionPosts(state.promotionPosts!);
             }
@@ -92,34 +99,68 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
       ],
       child: GetMaterialApp(
         theme: FlexThemeData.light(
-                scheme: FlexScheme.ebonyClay,
-                surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-                blendLevel: 9,
-                subThemesData: const FlexSubThemesData(
-                    blendOnLevel: 10,
-                    blendOnColors: false,
-                    inputDecoratorRadius: 10,
-                    inputCursorSchemeColor: SchemeColor.black,
-                    inputDecoratorIsFilled: false),
-                useMaterial3: true,
-                swapLegacyOnMaterial3: true,
-                fontFamily: GoogleFonts.notoSans().fontFamily)
-            .copyWith(
-                inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        )),
-        darkTheme: FlexThemeData.dark(
-            scheme: FlexScheme.ebonyClay,
-            surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-            blendLevel: 15,
+            scheme: FlexScheme.damask,
+            // surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+            // blendLevel: 9,
             subThemesData: const FlexSubThemesData(
-                blendOnLevel: 20,
-                inputDecoratorRadius: 10,
-                inputCursorSchemeColor: SchemeColor.black,
-                inputDecoratorIsFilled: false),
+              interactionEffects: true,
+              tintedDisabledControls: true,
+              useM2StyleDividerInM3: true,
+              inputDecoratorIsFilled: true,
+              inputDecoratorBorderType: FlexInputBorderType.outline,
+              alignedDropdown: true,
+              navigationRailUseIndicator: true,
+            ),
+            keyColors: const FlexKeyColors(
+              keepPrimary: true,
+              keepSecondary: true,
+              keepTertiary: true,
+              keepError: true,
+              keepPrimaryContainer: true,
+              keepSecondaryContainer: true,
+              keepTertiaryContainer: true,
+              keepErrorContainer: true,
+            ),
+            variant: FlexSchemeVariant.monochrome,
+            // Direct ThemeData properties.
+            visualDensity: FlexColorScheme.comfortablePlatformDensity,
+            cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
             useMaterial3: true,
-            swapLegacyOnMaterial3: true),
-        themeMode: ThemeMode.light,
+            swapLegacyOnMaterial3: true,
+            fontFamily: GoogleFonts.notoSans().fontFamily),
+        //     .copyWith(
+        //         inputDecorationTheme: InputDecorationTheme(
+        //   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        // )),
+        darkTheme: FlexThemeData.dark(
+            scheme: FlexScheme.damask,
+            subThemesData: const FlexSubThemesData(
+              interactionEffects: true,
+              tintedDisabledControls: true,
+              useM2StyleDividerInM3: true,
+              inputDecoratorIsFilled: true,
+              inputDecoratorBorderType: FlexInputBorderType.outline,
+              alignedDropdown: true,
+              navigationRailUseIndicator: true,
+            ),
+            keyColors: const FlexKeyColors(
+              keepPrimary: true,
+              keepSecondary: true,
+              keepTertiary: true,
+              keepError: true,
+              keepPrimaryContainer: true,
+              keepSecondaryContainer: true,
+              keepTertiaryContainer: true,
+              keepErrorContainer: true,
+            ),
+            variant: FlexSchemeVariant.monochrome,
+            // Direct ThemeData properties.
+            visualDensity: FlexColorScheme.comfortablePlatformDensity,
+            cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+            useMaterial3: true,
+            swapLegacyOnMaterial3: true
+        ),
+        themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
         debugShowCheckedModeBanner: false,
         home: const MainPage(),
       ),
@@ -173,26 +214,30 @@ class _MainState extends State<MainPage> {
           });
         }
       },
-      child: Container(
-        decoration: BoxDecoration(color: Colors.white),
-        child: Stack(children: [
-          SizedBox(
-            height: hei - 20,
-            child: _pageList[_currentIdx],
-          ),
-          Positioned(
-            bottom: 0,
-            child: CustomBottomBar(
-              currentIndex: _currentIdx,
-              onTap: (idx) {
-                setState(() {
-                  _currentIdx = idx;
-                });
-              },
-            ),
-          )
-        ]),
-      ),
+      child: Selector<ThemeProvider, bool>(
+          selector: (contest, provider) => provider.isDarkMode,
+          builder: (context, isDarkMode, chile) {
+            return Container(
+              decoration: BoxDecoration(color: isDarkMode ? Colors.black : Colors.white),
+              child: Stack(children: [
+                SizedBox(
+                  height: hei - 20,
+                  child: _pageList[_currentIdx],
+                ),
+                Positioned(
+                  bottom: 0,
+                  child: CustomBottomBar(
+                    currentIndex: _currentIdx,
+                    onTap: (idx) {
+                      setState(() {
+                        _currentIdx = idx;
+                      });
+                    },
+                  ),
+                )
+              ]),
+            );
+          }),
     ));
   }
 }

@@ -16,6 +16,7 @@ import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
+import 'package:test_us_app/services/theme_provider.dart';
 
 import '../../data/models/application/application_model.dart';
 import '../components/login_dialogs.dart';
@@ -35,6 +36,7 @@ class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
+    final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
     // final user = context.watch<UserProvider>().user!;
     return SafeArea(
       child: Scaffold(
@@ -43,11 +45,11 @@ class _UserPageState extends State<UserPage> {
           ),
           body: Container(
             // height: hei,
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.blue.shade50, Colors.white, Colors.white, Colors.white])),
+            // decoration: BoxDecoration(
+                // gradient: LinearGradient(
+                //     begin: Alignment.topCenter,
+                //     end: Alignment.bottomCenter,
+                //     colors: [Colors.blue.shade50, Colors.white, Colors.white, Colors.white])),
             child: Column(
               children: [
                 //image section
@@ -131,8 +133,8 @@ class _UserPageState extends State<UserPage> {
                             decoration: BoxDecoration(
                                 // border: Border.all(),
                                 borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                                boxShadow: [
+                                color: isDarkMode ? Colors.grey.shade800 : Colors.white,
+                                boxShadow: isDarkMode? null : [
                                   BoxShadow(
                                     color: Colors.grey.shade200,
                                     spreadRadius: 5,
@@ -283,8 +285,8 @@ class _UserPageState extends State<UserPage> {
                         decoration: BoxDecoration(
                             // border: Border.all(),
                             borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            boxShadow: [
+                            color: isDarkMode ? Colors.grey.shade800 : Colors.white,
+                            boxShadow: isDarkMode ? null : [
                               BoxShadow(
                                 color: Colors.grey.shade200,
                                 spreadRadius: 5,

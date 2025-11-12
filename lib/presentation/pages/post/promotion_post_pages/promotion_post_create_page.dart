@@ -37,14 +37,14 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
   List<ImageEntity> _existedImages = [];
   final List<ImageEntity> _deleteImages = [];
 
-  TextEditingController titleController = TextEditingController();
-  TextEditingController subtitleController = TextEditingController();
-  TextEditingController contentController = TextEditingController();
-  TextEditingController periodController = TextEditingController(text: "7");
-  TextEditingController webUrlController = TextEditingController();
-  TextEditingController gameUrlController = TextEditingController();
-  TextEditingController iosUrlController = TextEditingController();
-  TextEditingController androidUrlController = TextEditingController();
+  TextEditingController _titleController = TextEditingController();
+  TextEditingController _subtitleController = TextEditingController();
+  TextEditingController _contentController = TextEditingController();
+  TextEditingController _periodController = TextEditingController(text: "7");
+  TextEditingController _webUrlController = TextEditingController();
+  TextEditingController _gameUrlController = TextEditingController();
+  TextEditingController _iosUrlController = TextEditingController();
+  TextEditingController _androidUrlController = TextEditingController();
 
   final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
@@ -61,9 +61,26 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
     // TODO: implement initState
     super.initState();
     if (widget.post != null) {
-      titleController.text = widget.post!.title!;
-      subtitleController.text = widget.post!.subtitle!;
-      contentController.text = widget.post!.contents!;
+      _titleController.text = widget.post!.title!;
+      _subtitleController.text = widget.post!.subtitle!;
+      _contentController.text = widget.post!.contents!;
+      if(widget.post!.domain!.length < 2){
+        if (widget.post!.platform!.contains('WEB')) {
+          _webUrlController.text = widget.post!.domain!.isNotEmpty ? widget.post!.domain![0] : '';
+ ;
+        }else {
+          _gameUrlController.text = widget.post!.domain!.isNotEmpty ? widget.post!.domain![0] : '';
+        }
+      }else {
+        for(int i = 0; i < widget.post!.domain!.length; i++) {
+          if (widget.post!.domain![i].contains('apps.apple.com')) {
+            _iosUrlController.text = widget.post!.domain![i];
+          } else if (i == 1) {
+            _androidUrlController.text = widget.post!.domain![i];
+          }
+        }
+      }
+
       _selectedCategory = widget.post!.platform!;
       if (_selectedCategory.contains('WEB')) {
         _webCheck = true;
@@ -96,9 +113,14 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
   @override
   void dispose() {
     super.dispose();
-    titleController.dispose();
-    subtitleController.dispose();
-    contentController.dispose();
+    _titleController.dispose();
+    _subtitleController.dispose();
+    _contentController.dispose();
+    _periodController.dispose();
+    _webUrlController.dispose();
+    _gameUrlController.dispose();
+    _iosUrlController.dispose();
+    _androidUrlController.dispose();
   }
 
   @override
@@ -164,7 +186,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
           SizedBox(
             height: 60,
             child: TextField(
-              controller: titleController,
+              controller: _titleController,
             ),
           )
         ],
@@ -187,7 +209,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
           SizedBox(
             height: 80,
             child: TextField(
-              controller: subtitleController,
+              controller: _subtitleController,
               maxLines: 1,
               maxLength: 30,
               // decoration: InputDecoration(
@@ -403,7 +425,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                     height: 50,
                     width: 80,
                     child: TextField(
-                      controller: periodController,
+                      controller: _periodController,
                       readOnly: true,
                       // enabled: false,
                       decoration: InputDecoration(enabled: false),
@@ -599,13 +621,13 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       width: MediaQuery.sizeOf(context).width - 40,
                       child: Center(child: Text('플랫폼을 선택해 주세요.', style: TextStyle(fontSize: 16, color: Colors.grey)))),
                 if (_webCheck)
-                  _urlTextFiled(context, '웹사이트', webUrlController),
+                  _urlTextFiled(context, '웹사이트', _webUrlController),
                 if (_gameCheck)
-                  _urlTextFiled(context, 'URL', gameUrlController),
+                  _urlTextFiled(context, 'URL', _gameUrlController),
                 if (_iosCheck)
-                  _urlTextFiled(context, 'App Store', iosUrlController),
+                  _urlTextFiled(context, 'App Store', _iosUrlController),
                 if (_androidCheck)
-                  _urlTextFiled(context, 'Play Store', androidUrlController),
+                  _urlTextFiled(context, 'Play Store', _androidUrlController),
               ],
             ),
           )
@@ -628,7 +650,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
           SizedBox(
             height: hei * 0.5,
             child: TextField(
-              controller: contentController,
+              controller: _contentController,
               minLines: 20,
               maxLines: 20,
             ),
@@ -668,9 +690,9 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                   width: 150,
                   child: ElevatedButton(
                     onPressed: () {
-                      if (titleController.text.isEmpty ||
-                          subtitleController.text.isEmpty ||
-                          contentController.text.isEmpty) {
+                      if (_titleController.text.isEmpty ||
+                          _subtitleController.text.isEmpty ||
+                          _contentController.text.isEmpty) {
                         Get.snackbar("알림", "모든 항목을 입력해주세요.");
                         return;
                       }
@@ -678,30 +700,30 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }
-                      if (_webCheck && webUrlController.text.isEmpty ||
-                          _gameCheck && gameUrlController.text.isEmpty ||
-                          _iosCheck && iosUrlController.text.isEmpty ||
-                          _androidCheck && androidUrlController.text.isEmpty) {
+                      if (_webCheck && _webUrlController.text.isEmpty ||
+                          _gameCheck && _gameUrlController.text.isEmpty ||
+                          _iosCheck && _iosUrlController.text.isEmpty ||
+                          _androidCheck && _androidUrlController.text.isEmpty) {
                         Get.snackbar("알림", "URL을 입력해주세요.");
                         return;
                       }
                       final domain = <String>[];
                       if (_webCheck) {
-                        domain.add(webUrlController.text);
+                        domain.add(_webUrlController.text);
                       } else if (_gameCheck) {
-                        domain.add(gameUrlController.text);
+                        domain.add(_gameUrlController.text);
                       } else {
                         if (_iosCheck) {
-                          domain.add(iosUrlController.text);
+                          domain.add(_iosUrlController.text);
                         }
                         if (_androidCheck) {
-                          domain.add(androidUrlController.text);
+                          domain.add(_androidUrlController.text);
                         }
                       }
                       final post = PromotionPostEntity(
-                        title: titleController.text,
-                        subtitle: subtitleController.text,
-                        contents: contentController.text,
+                        title: _titleController.text,
+                        subtitle: _subtitleController.text,
+                        contents: _contentController.text,
                         platform: _selectedCategory,
                         domain: domain,
                         images: _selectedImages.map((e) => ImageEntity(url: e.path)).toList(),
@@ -719,9 +741,9 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                   width: 150,
                   child: ElevatedButton(
                     onPressed: () async {
-                      if (titleController.text.isEmpty ||
-                          subtitleController.text.isEmpty ||
-                          contentController.text.isEmpty) {
+                      if (_titleController.text.isEmpty ||
+                          _subtitleController.text.isEmpty ||
+                          _contentController.text.isEmpty) {
                         Get.snackbar("알림", "모든 항목을 입력해주세요.");
                         return;
                       }
@@ -733,10 +755,10 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
                         return;
                       }
-                      if (_webCheck && webUrlController.text.isEmpty ||
-                          _gameCheck && gameUrlController.text.isEmpty ||
-                          _iosCheck && iosUrlController.text.isEmpty ||
-                          _androidCheck && androidUrlController.text.isEmpty) {
+                      if (_webCheck && _webUrlController.text.isEmpty ||
+                          _gameCheck && _gameUrlController.text.isEmpty ||
+                          _iosCheck && _iosUrlController.text.isEmpty ||
+                          _androidCheck && _androidUrlController.text.isEmpty) {
                         Get.snackbar("알림", "URL을 입력해주세요.");
                         return;
                       }
@@ -746,21 +768,21 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         // final token = context.read<UserProvider>().token!;
                         final domain = <String>[];
                         if (_webCheck) {
-                          domain.add(webUrlController.text);
+                          domain.add(_webUrlController.text);
                         } else if (_gameCheck) {
-                          domain.add(gameUrlController.text);
+                          domain.add(_gameUrlController.text);
                         } else {
                           if (_iosCheck) {
-                            domain.add(iosUrlController.text);
+                            domain.add(_iosUrlController.text);
                           }
                           if (_androidCheck) {
-                            domain.add(androidUrlController.text);
+                            domain.add(_androidUrlController.text);
                           }
                         }
                         final post = PromotionPostEntity(
-                          title: titleController.text,
-                          subtitle: subtitleController.text,
-                          contents: contentController.text,
+                          title: _titleController.text,
+                          subtitle: _subtitleController.text,
+                          contents: _contentController.text,
                           platform: _selectedCategory,
                           author: context.read<UserProvider>().user!,
                           domain: domain,
@@ -784,9 +806,9 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                   width: 150,
                   child: ElevatedButton(
                     onPressed: () async {
-                      if (titleController.text.isEmpty ||
-                          subtitleController.text.isEmpty ||
-                          contentController.text.isEmpty) {
+                      if (_titleController.text.isEmpty ||
+                          _subtitleController.text.isEmpty ||
+                          _contentController.text.isEmpty) {
                         Get.snackbar("알림", "모든 항목을 입력해주세요.");
                         return;
                       }
@@ -794,14 +816,14 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }
-                      if (_selectedImages.isEmpty) {
-                        Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
-                        return;
-                      }
-                      if (_webCheck && webUrlController.text.isEmpty ||
-                          _gameCheck && gameUrlController.text.isEmpty ||
-                          _iosCheck && iosUrlController.text.isEmpty ||
-                          _androidCheck && androidUrlController.text.isEmpty) {
+                      // if (_selectedImages.isEmpty) {
+                      //   Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
+                      //   return;
+                      // }
+                      if (_webCheck && _webUrlController.text.isEmpty ||
+                          _gameCheck && _gameUrlController.text.isEmpty ||
+                          _iosCheck && _iosUrlController.text.isEmpty ||
+                          _androidCheck && _androidUrlController.text.isEmpty) {
                         Get.snackbar("알림", "URL을 입력해주세요.");
                         return;
                       }
@@ -809,26 +831,27 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       try {
                         final domain = <String>[];
                         if (_webCheck) {
-                          domain.add(webUrlController.text);
+                          domain.add(_webUrlController.text);
                         } else if (_gameCheck) {
-                          domain.add(gameUrlController.text);
+                          domain.add(_gameUrlController.text);
                         } else {
                           if (_iosCheck) {
-                            domain.add(iosUrlController.text);
+                            domain.add(_iosUrlController.text);
                           }
                           if (_androidCheck) {
-                            domain.add(androidUrlController.text);
+                            domain.add(_androidUrlController.text);
                           }
                         }
+
                         final post = PromotionPostEntity(
                             id: widget.post!.id,
-                            title: titleController.text,
-                            subtitle: subtitleController.text,
-                            contents: contentController.text,
+                            title: _titleController.text,
+                            subtitle: _subtitleController.text,
+                            contents: _contentController.text,
                             platform: _selectedCategory,
                             status: widget.post!.status,
                             period: widget.post!.period,
-                            domain: [],
+                            domain: domain,
                             author: context.read<UserProvider>().user!);
                         final token = context.read<UserProvider>().token ?? "";
                         context

@@ -258,6 +258,7 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                 const Gap(40),
                 SizedBox(
                     child: ListView.separated(
+                      padding: EdgeInsets.symmetric(vertical: 20),
                       scrollDirection: Axis.vertical,
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
@@ -271,8 +272,8 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                             title = 'URL 접속하기';
                           }
                           return SizedBox(
-                            height: 50,
-                            width:  80,
+                            height: 40,
+                            // width:  80,
                             child: ElevatedButton.icon(
                                 onPressed: () async {
                                   String url = post.domain![idx];
