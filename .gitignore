@@ -49,3 +49,4 @@ app.*.map.json
 android/app/.cxx
 *.jks
 android/app/*.json
+*.plist
