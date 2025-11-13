@@ -40,6 +40,8 @@ dependencies:
   flutter_naver_login: ^2.1.1
   firebase_messaging: ^16.0.4
   firebase_core: ^4.2.1
+  flutter_native_splash: ^2.4.6
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -83,3 +85,26 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  remove_alpha_ios: true
+  min_sdk_android: 36
+
+
+flutter_native_splash:
+  android: true
+  ios: true
+  #    color: "#FFFFFF"
+  image: "assets/images/splash_image.png"
+  background_image: "assets/images/splash_background.png"
+  android_12:
+    color: "#FFFFFF"
+    image: "assets/images/splash_image.png"
+  #      background_image: "assets/images/splash_background.png"
+  #      icon_background_color: "#FFFFFF"
+  web: false

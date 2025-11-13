@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:test_us_app/domain/use_cases/application_usecase.dart';
 import 'package:test_us_app/domain/use_cases/image_usecase.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
@@ -28,7 +29,7 @@ import 'domain/use_cases/review_usecase.dart';
 import 'domain/use_cases/user_usecase.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
   await serviceLocator();
   runApp(MultiProvider(
     providers: [
