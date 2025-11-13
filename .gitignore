@@ -49,4 +49,5 @@ app.*.map.json
 android/app/.cxx
 *.jks
 android/app/*.json
-*.plist
+GoogleService-info.plist
+report.xml

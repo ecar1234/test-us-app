@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="default_web_client_id">185199812075-7r7c3fin3ka58mdr7atqat89jce2lv1u.apps.googleusercontent.com</string>
     <string name="client_id">4mW2ueAWyfWyZlGJaxdX</string>
     <string name="client_secret">3xKLwYb80C</string>
     <string name="client_name">Testus</string>
+    <string name="default_notification_channel_id" translatable="false">high_importance_channel</string>
+    <string name="default_notification_channel_name" translatable="true">High Importance Notifications</string>
 </resources>

@@ -2,6 +2,8 @@
 
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:test_us_app/core/api_names.dart';
@@ -45,6 +47,17 @@ import 'domain/use_cases/user_usecase.dart';
 final getIt = GetIt.instance;
 Future<void> serviceLocator() async {
 
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
+  //
+  // await FirebaseMessaging.instance.requestPermission(
+  //   alert: true,
+  //   badge: true,
+  //   sound: true,
+  // );
+
+
   final GoogleSignIn signIn = GoogleSignIn.instance;
   await signIn.initialize(serverClientId: '185199812075-7r7c3fin3ka58mdr7atqat89jce2lv1u.apps.googleusercontent.com');
   // await signIn.initialize();
@@ -63,9 +76,6 @@ Future<void> serviceLocator() async {
   getIt.registerLazySingleton<RecruitPostDatasource>(() => RecruitPostDatasourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<PromotionPostDataSource>(() => PromotionPostDataSourceImpl(getIt<NetDriver>()));
 
-
-
-
   // domain
   getIt.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(getIt<UserDataSource>()));
   getIt.registerLazySingleton<ApplicationRepository>(() => ApplicationRepositoryImpl(getIt<ApplicationDataSource>()));
@@ -74,8 +84,6 @@ Future<void> serviceLocator() async {
   getIt.registerLazySingleton<BasePostRepository>(() => BasePostRepositoryImpl(getIt<BasePostDataSource>()));
   getIt.registerLazySingleton<RecruitPostRepository>(() => RecruitPostRepositoryImpl(getIt<RecruitPostDatasource>()));
   getIt.registerLazySingleton<PromotionPostRepository>(() => PromotionPostRepositoryImpl(getIt<PromotionPostDataSource>()));
-
-
 
   // use case
   getIt.registerLazySingleton<UserUseCase>(() => UserUseCase(getIt<UserRepository>()));
