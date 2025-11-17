@@ -51,3 +51,4 @@ android/app/.cxx
 android/app/*.json
 GoogleService-info.plist
 report.xml
+firebase_options.dart
