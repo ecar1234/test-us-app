@@ -4,6 +4,7 @@ import 'dart:async';
 
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -20,6 +21,7 @@ import 'package:test_us_app/data/data_sources/user_data/user_data_source_impl.da
 import 'package:test_us_app/data/repositories/recruit_post_repository_impl.dart';
 import 'package:test_us_app/domain/use_cases/base_post_usecase.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
+import 'package:test_us_app/services/firebase/firebase_options.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import 'core/net_driver.dart';
@@ -60,9 +62,13 @@ Future<void> serviceLocator() async {
 
 
   final GoogleSignIn signIn = GoogleSignIn.instance;
-  await signIn.initialize(serverClientId: '185199812075-7r7c3fin3ka58mdr7atqat89jce2lv1u.apps.googleusercontent.com');
+  await signIn.initialize(serverClientId: '648151978741-cuqclu86us8ra4m6vanjh8ijfi1dvvbs.apps.googleusercontent.com');
   // await signIn.initialize();
   getIt.registerLazySingleton<GoogleSignIn>(() => signIn);
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   getIt.registerLazySingleton<NetDriver>(() => NetDriver(Host.baseDevUrl));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());

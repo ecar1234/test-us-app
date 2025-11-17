@@ -16,11 +16,14 @@ class EmailLoginEvent extends AuthEvent {
 }
 
 class RequestGoogleAuth extends AuthEvent {
-
+  RequestGoogleAuth();
 }
-class GoogleLoginEvent extends AuthEvent {
-  final UserEntity user;
-  GoogleLoginEvent(this.user);
+class OauthLoginEvent extends AuthEvent {
+  OauthLoginEvent();
+}
+
+class RequestNaverAuth extends AuthEvent {
+  RequestNaverAuth();
 }
 
 
