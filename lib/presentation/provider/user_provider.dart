@@ -83,7 +83,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<UserEntity> getUserById(String token, String id) async {
+  Future<UserEntity?> getUserById(String token, String id) async {
     final res = await useCase.getUserById(token, id);
     _user = res;
     notifyListeners();

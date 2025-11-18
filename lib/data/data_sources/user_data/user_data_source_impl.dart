@@ -13,32 +13,32 @@ class UserDataSourceImpl implements UserDataSource {
   UserDataSourceImpl(this.netDriver);
 
   @override
-  Future<UserModel> getUserByEmail(String email) async {
+  Future<UserModel?> getUserByEmail(String email) async {
     final res = await netDriver.requestGetJson("", UserApi.getUserByEmail, param: email);
     if (res['status'] == 200) {
-      return UserModel.fromJson(res['data']);
+      return UserModel.fromJson(res['user']);
     } else {
-      throw Exception('Error');
+      return null;
     }
   }
 
   @override
-  Future<UserModel> getUserById(String token, String id) async {
+  Future<UserModel?> getUserById(String token, String id) async {
     final res = await netDriver.requestGetJson("", UserApi.getUserById, param: id);
     if (res['status'] == 200) {
       return UserModel.fromJson(res['data']);
     } else {
-      throw Exception('Error');
+      return null;
     }
   }
 
   @override
-  Future<UserModel> getUserByNickname(String nickname) async {
+  Future<UserModel?> getUserByNickname(String nickname) async {
     final res = await netDriver.requestGetJson("", UserApi.getUserByNickname, param: nickname);
     if (res['status'] == 200) {
       return UserModel.fromJson(res['data']);
     } else {
-      throw Exception('Error');
+      return null;
     }
   }
 
@@ -158,10 +158,20 @@ class UserDataSourceImpl implements UserDataSource {
   }
 
   @override
-  Future<UserModel> googleLogin(UserModel userInfo) async {
-    final res = await netDriver.requestPostJson("", AuthApi.googleLogin, userInfo.toJson());
+  Future<Map<String, dynamic>> authLogin(String email, AuthType authType) async {
+    final res = await netDriver.requestPostJson("", AuthApi.authLogin, { "email": email });
     if (res['status'] == 200) {
-      return UserModel.fromJson(res['user']);
+      return {'user': UserModel.fromJson(res['user']), 'token': res['token']};
+    } else {
+      throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> authSignup(UserModel userInfo) async {
+    final res = await netDriver.requestPostJson("", AuthApi.authSignup, userInfo.toJson());
+    if (res['status'] == 200) {
+      return {'user': UserModel.fromJson(res['user']), 'token': res['token']};
     } else {
       throw Exception('Error');
     }

@@ -24,17 +24,17 @@ class UserUseCase {
     return res;
   }
 
-  Future<UserEntity> getUserByEmail(String email) async {
+  Future<UserEntity?> getUserByEmail(String email) async {
     final res = await repository.getUserByEmail(email);
     return res;
   }
 
-  Future<UserEntity> getUserByNickname(String nickname) async {
+  Future<UserEntity?> getUserByNickname(String nickname) async {
     final res = await repository.getUserByNickname(nickname);
     return res;
   }
 
-  Future<UserEntity> getUserById(String token, String id) async {
+  Future<UserEntity?> getUserById(String token, String id) async {
     final res = await repository.getUserById(token, id);
     return res;
   }
@@ -77,11 +77,13 @@ class UserUseCase {
     return res;
   }
 
-  Future<UserEntity> googleLogin(UserEntity userInfo) async {
-    final res = await repository.googleLogin(userInfo);
+  Future<Map<String, dynamic>> authLogin(String email, AuthType authType) async {
+    final res = await repository.authLogin(email, authType);
     return res;
   }
 
-
-
+  Future<Map<String, dynamic>> authSignup(UserEntity user) async {
+    final res = await repository.authSignup(user);
+    return res;
+  }
 }

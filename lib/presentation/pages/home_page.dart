@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
@@ -72,6 +73,10 @@ class _HomePageState extends State<HomePage> {
                               TextButton(
                                   onPressed: () async {
                                     Navigator.pop(context);
+                                    final user = context.read<UserProvider>().user!;
+                                    if(user.method! != AuthType.email){
+                                      context.read<AuthBloc>().add(RequestAuthLogoutEvent(user));
+                                    }
                                     context.read<UserProvider>().logout();
                                     context.read<BasePostProvider>().logout();
                                     context.read<ApplicationProvider>().logout();

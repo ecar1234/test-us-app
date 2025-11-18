@@ -1,6 +1,3 @@
-
-
-
 import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
@@ -17,20 +14,24 @@ class UserRepositoryImpl implements UserRepository {
   UserRepositoryImpl(this.remote);
 
   @override
-  Future<UserEntity> getUserByEmail(String email) async {
+  Future<UserEntity?> getUserByEmail(String email) async {
     final res = await remote.getUserByEmail(email);
+    if (res == null) return null;
     return UserEntity.toEntity(res);
   }
 
   @override
-  Future<UserEntity> getUserById(String token, String id) async {
+  Future<UserEntity?> getUserById(String token, String id) async {
     final res = await remote.getUserById(token, id);
+    if (res == null) return null;
+
     return UserEntity.toEntity(res);
   }
 
   @override
-  Future<UserEntity> getUserByNickname(String nickname) async {
+  Future<UserEntity?> getUserByNickname(String nickname) async {
     final res = await remote.getUserByNickname(nickname);
+    if (res == null) return null;
     return UserEntity.toEntity(res);
   }
 
@@ -52,10 +53,10 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Map<String, dynamic>> login(String email, String password) async {
     final res = await remote.login(email, password);
-    if(res['message'] != null) {
-      return {'user':UserEntity.toEntity(res['user']), 'message':res['message']};
+    if (res['message'] != null) {
+      return {'user': UserEntity.toEntity(res['user']), 'message': res['message']};
     }
-    return {'user':UserEntity.toEntity(res['user']), 'token':res['token']};
+    return {'user': UserEntity.toEntity(res['user']), 'token': res['token']};
   }
 
   @override
@@ -86,19 +87,32 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<UserEntity> updateUserInfoWithImage(String token, UserEntity userInfo, XFile image, { ImageEntity? oldImage}) async {
+  Future<UserEntity> updateUserInfoWithImage(String token, UserEntity userInfo, XFile image,
+      {ImageEntity? oldImage}) async {
     UserModel res = UserModel();
-    if(oldImage != null) {
-      res = await remote.updateUserInfoWithImage(token, UserEntity.toModel(userInfo), image, oldImage: ImageEntity.toImageModel(oldImage));
-    }else {
+    if (oldImage != null) {
+      res = await remote.updateUserInfoWithImage(token, UserEntity.toModel(userInfo), image,
+          oldImage: ImageEntity.toImageModel(oldImage));
+    } else {
       res = await remote.updateUserInfoWithImage(token, UserEntity.toModel(userInfo), image);
     }
     return UserEntity.toEntity(res);
   }
 
   @override
-  Future<UserEntity> googleLogin(UserEntity userInfo) {
-    // TODO: implement googleLogin
-    throw UnimplementedError();
+  Future<Map<String, dynamic>> authLogin(String email, AuthType authType) async {
+    final res = await remote.authLogin(email, authType);
+    final user = UserEntity.toEntity(res['user']);
+    final token = res['token'];
+    return {'user': user, 'token': token};
+  }
+
+  @override
+  Future<Map<String, dynamic>> authSignup(UserEntity userInfo) async {
+    final userModel = UserEntity.toModel(userInfo);
+    final res = await remote.authSignup(userModel);
+    final user = UserEntity.toEntity(res['user']);
+    final token = res['token'];
+    return {'user': user, 'token': token};
   }
 }

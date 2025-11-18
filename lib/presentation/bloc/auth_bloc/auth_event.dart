@@ -19,13 +19,18 @@ class RequestGoogleAuth extends AuthEvent {
   RequestGoogleAuth();
 }
 class OauthLoginEvent extends AuthEvent {
-  OauthLoginEvent();
+  final UserEntity user;
+  OauthLoginEvent({required this.user});
 }
 
 class RequestNaverAuth extends AuthEvent {
   RequestNaverAuth();
 }
 
+class RequestAuthLogoutEvent extends AuthEvent {
+  final UserEntity user;
+  RequestAuthLogoutEvent(this.user);
+}
 
 class LoginCompletedEvent extends AuthEvent {
   final UserEntity user;
