@@ -1,6 +1,7 @@
 
 
 import 'dart:async';
+import 'dart:io';
 
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
@@ -49,26 +50,17 @@ import 'domain/use_cases/user_usecase.dart';
 
 final getIt = GetIt.instance;
 Future<void> serviceLocator() async {
-
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
-  //
-  // await FirebaseMessaging.instance.requestPermission(
-  //   alert: true,
-  //   badge: true,
-  //   sound: true,
-  // );
-
-
-  final GoogleSignIn signIn = GoogleSignIn.instance;
-  await signIn.initialize(serverClientId: '648151978741-l7i9qrn10f2ptlfp48t1k32qpj1o5l1a.apps.googleusercontent.com');
-  // await signIn.initialize();
-  getIt.registerLazySingleton<GoogleSignIn>(() => signIn);
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final GoogleSignIn signIn = GoogleSignIn.instance;
+
+  await signIn.initialize();
+
+
+  getIt.registerLazySingleton<GoogleSignIn>(() => signIn);
+
 
   getIt.registerLazySingleton<NetDriver>(() => NetDriver(Host.baseDevUrl));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());

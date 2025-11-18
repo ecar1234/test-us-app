@@ -65,8 +65,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           return;
         }
 
+        final findUser = await userUseCase.getUserByEmail(authUser.email);
+        if (findUser != null) {
+          final loginRes = await userUseCase.authLogin(
+            authUser.email,
+            AuthType.naver,
+          );
+
+          final user = loginRes['user'] as UserEntity;
+          final token = loginRes['token'] as String;
+          await pref.setToken(token);
+          await pref.setUserInfo(user);
+          emit(AuthState(state: UserAuthState.loginCompletedState, user: user, token: token));
+          return;
+        }
+
         final userInfo = UserEntity(
-            email: authUser.email, userName: authUser.displayName, profileImg: ImageEntity(url: authUser.photoUrl));
+            email: authUser.email, nickname: authUser.displayName, profileImg: ImageEntity(url: authUser.photoUrl));
         emit(AuthState(state: UserAuthState.authLoginCompletedState, user: userInfo, message: 'google'));
         logger.i('state : Google login completed state');
       } catch (e) {

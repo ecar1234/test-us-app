@@ -472,7 +472,7 @@ class _LoginPageState extends State<LoginPage> {
               try {
                 context.read<AuthBloc>().add(RequestGoogleAuth());
               } catch (error) {
-                print('Google Sign-in error: $error');
+                logger.e('Google Sign-in error: $error');
               }
             },
             child: SizedBox(
@@ -490,7 +490,7 @@ class _LoginPageState extends State<LoginPage> {
               try {
                 context.read<AuthBloc>().add(RequestNaverAuth());
               } catch (error) {
-                print('Google Sign-in error: $error');
+                logger.e('Naver Sign-in error: $error');
               }
             },
             child: SizedBox(
