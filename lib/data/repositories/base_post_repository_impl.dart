@@ -25,7 +25,7 @@ class BasePostRepositoryImpl implements BasePostRepository {
   Future<Map<String, dynamic>> getPostInitData() async {
     final res = await remote.getPostsInitData();
     final favoritePosts = res['favorite']!.map((e) {
-      if(e is RecruitPostModel) {
+      if(e.postType == 'RecruitmentPostEntity') {
         return RecruitPostEntity.toPostEntity(e);
       }else {
         return PromotionPostEntity.toEntity(e);

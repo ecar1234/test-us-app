@@ -18,6 +18,7 @@ class PromotionPostEntity {
   int? views;
   List<ImageEntity>? images;
   List<String>? domain;
+  String? postType;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -33,6 +34,7 @@ class PromotionPostEntity {
     this.views,
     this.images,
     this.domain,
+    this.postType,
     this.createdAt,
     this.updatedAt,
   });
@@ -41,6 +43,7 @@ class PromotionPostEntity {
     final user = UserEntity(
       id: model.author!.userId,
       nickname: model.author!.nickname,
+      profileImg: ImageEntity.toImageEntity(model.author!.profileImg!),
     );
     final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
     return PromotionPostEntity(
@@ -55,6 +58,7 @@ class PromotionPostEntity {
       views: model.views,
       images: images,
       domain: model.domain,
+      postType: model.postType,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt
     );

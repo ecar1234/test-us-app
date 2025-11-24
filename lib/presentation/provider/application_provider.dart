@@ -39,6 +39,8 @@ class ApplicationProvider with ChangeNotifier{
 
   void requestApply(ApplicationEntity app)  {
     // final res = await useCase.requestApply(token, app);
+    _userApplications ??= [];
+
     if(_userApplications == null){
       _userApplications = [app];
     }else {
@@ -46,9 +48,13 @@ class ApplicationProvider with ChangeNotifier{
     }
     notifyListeners();
   }
-  void cancelApplication(ApplicationEntity app, RecruitPostEntity post)  {
-    if(_userApplications!.any((element) => element.id == app.id)){
-      _userApplications = _userApplications!.where((element) => element.id != app.id).toList();
+  void cancelApplication(ApplicationEntity newApp, RecruitPostEntity post)  {
+    _userApplications ??= [];
+    _userApplicationPosts ??= [];
+
+    if(_userApplications!.any((element) => element.id == newApp.id)){
+      _userApplications = _userApplications!.where((element) => element.id != newApp.id).toList();
+      _userApplications!.add(newApp);
     }
     if(_userApplicationPosts!.any((element) => element.id == post.id)){
       _userApplicationPosts = _userApplicationPosts!.where((element) => element.id != post.id).toList();

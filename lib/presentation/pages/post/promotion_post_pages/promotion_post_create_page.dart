@@ -720,13 +720,25 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                           domain.add(_androidUrlController.text);
                         }
                       }
+
+                      List<ImageEntity> postImage = [];
+                      if (_selectedImages.isNotEmpty) {
+                        postImage = _selectedImages.map((e) => ImageEntity(url: e.path)).toList();
+                      }
+                      if(widget.post != null){
+                        postImage.addAll(widget.post!.images!);
+                      }
+                      if(_deleteImages.isNotEmpty) {
+                        postImage.removeWhere((element) => _deleteImages.contains(element));
+                      }
+
                       final post = PromotionPostEntity(
                         title: _titleController.text,
                         subtitle: _subtitleController.text,
                         contents: _contentController.text,
                         platform: _selectedCategory,
                         domain: domain,
-                        images: _selectedImages.map((e) => ImageEntity(url: e.path)).toList(),
+                        images: postImage,
                       );
                       Get.to(() => PromotionPostDetailPage(post: post));
                     },

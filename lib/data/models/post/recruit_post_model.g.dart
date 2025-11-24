@@ -27,6 +27,7 @@ RecruitPostModel _$RecruitPostModelFromJson(Map<String, dynamic> json) =>
       images: (json['images'] as List<dynamic>?)
           ?.map((e) => ImageModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      postType: json['postType'] as String?,
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -47,6 +48,7 @@ Map<String, dynamic> _$RecruitPostModelToJson(RecruitPostModel instance) =>
       'author': instance.author,
       'views': instance.views,
       'images': instance.images,
+      'postType': instance.postType,
       'applications': instance.applications,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),

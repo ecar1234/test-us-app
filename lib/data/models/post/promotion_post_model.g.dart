@@ -26,6 +26,7 @@ PromotionPostModel _$PromotionPostModelFromJson(Map<String, dynamic> json) =>
           .toList(),
       domain:
           (json['domain'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      postType: json['postType'] as String?,
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -47,6 +48,7 @@ Map<String, dynamic> _$PromotionPostModelToJson(PromotionPostModel instance) =>
       'views': instance.views,
       'images': instance.images,
       'domain': instance.domain,
+      'postType': instance.postType,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };

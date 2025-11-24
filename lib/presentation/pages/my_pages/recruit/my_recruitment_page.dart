@@ -70,9 +70,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
       width: MediaQuery.sizeOf(context).width,
       child: Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
-          child: posts.isEmpty
-              ? SizedBox()
-              : ListView.separated(
+          child: ListView.separated(
               shrinkWrap: true,
               padding: EdgeInsets.symmetric(vertical: 20),
               itemBuilder: (context, idx) {
@@ -220,7 +218,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
 
   int _getApplicantLength(RecruitPostEntity post) {
     int length = 0;
-    if (post.applications != null) {
+    if (post.applications != null && post.applications!.isNotEmpty) {
       for (final application in post.applications!) {
         if (application.status != ApplicationStatus.cancel || application.status == null) {
           length++;

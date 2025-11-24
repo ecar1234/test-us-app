@@ -4,9 +4,11 @@ import '../../../domain/entities/user_entity.dart';
 enum UserAuthState {
   serviceStartState,
   beforeLoginState,
-  authPendingState,
+  emailLoginLoadingState,
+  googleAuthPendingState,
+  naverAuthPendingState,
   authCompletedState,
-  loginPendingState,
+  startLoginState,
   loginCompletedState,
   authLoginCompletedState,
   authCanceledState,

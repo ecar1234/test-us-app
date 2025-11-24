@@ -75,12 +75,12 @@ class _HomePageState extends State<HomePage> {
                                     Navigator.pop(context);
                                     final user = context.read<UserProvider>().user!;
                                     if(user.method! != AuthType.email){
-                                      context.read<AuthBloc>().add(RequestAuthLogoutEvent(user));
+                                      context.read<AuthBloc>().add(LogoutEvent());
                                     }
                                     context.read<UserProvider>().logout();
                                     context.read<BasePostProvider>().logout();
                                     context.read<ApplicationProvider>().logout();
-                                    context.read<AuthBloc>().add(LogoutEvent());
+                                    // context.read<AuthBloc>().add(LogoutEvent());
                                   },
                                   child: const Text('확인')),
                             ],
@@ -231,7 +231,7 @@ class _HomePageState extends State<HomePage> {
                         itemBuilder: (context, idx) {
                           return GestureDetector(
                             onTap: () async {
-                              favoritePost[idx].domain == null
+                              favoritePost[idx].postType == "RecruitmentPostEntity"
                                   ? Get.to(() => RecruitPostDetailPage(postId: favoritePost[idx].id!))
                                   : Get.to(() => PromotionPostDetailPage(postId: favoritePost[idx].id!));
                             },

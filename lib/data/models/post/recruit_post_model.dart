@@ -29,6 +29,7 @@ class RecruitPostModel {
   UserModel? author;
   int? views;
   List<ImageModel>? images;
+  String? postType;
   List<ApplicationModel>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -45,6 +46,7 @@ class RecruitPostModel {
     this.applications,
     this.views,
     this.images,
+    this.postType,
     this.createdAt,
     this.updatedAt,
   });

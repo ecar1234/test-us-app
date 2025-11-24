@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
+import 'package:flutter_naver_login/interface/types/naver_login_result.dart';
 import 'package:flutter_naver_login/interface/types/naver_login_status.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -31,7 +33,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<EmailLoginEvent>((event, emit) async {
-      emit(AuthState(state: UserAuthState.authPendingState));
+      emit(AuthState(state: UserAuthState.emailLoginLoadingState));
       try {
         final res = await userUseCase.login(event.email, event.password);
         if (res['message'] != null) {
@@ -52,12 +54,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<RequestGoogleAuth>((event, emit) async {
-      emit(AuthState(state: UserAuthState.authPendingState));
+      emit(AuthState(state: UserAuthState.googleAuthPendingState));
       logger.i('state : auth pending state');
       try {
-        GoogleSignInAccount authUser;
+        await GetIt.I.get<GoogleSignIn>().initialize();
+
+        GoogleSignInAccount googleUser;
         if (GoogleSignIn.instance.supportsAuthenticate()) {
-          authUser = await GetIt.I.get<GoogleSignIn>().authenticate(scopeHint: ['email', 'profile']);
+          googleUser = await GetIt.I.get<GoogleSignIn>().authenticate(scopeHint: ['email', 'profile']);
           logger.i('Google Sign-In: Used authenticate()');
         } else {
           emit(AuthState(state: UserAuthState.authFailedState));
@@ -65,10 +69,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           return;
         }
 
-        final findUser = await userUseCase.getUserByEmail(authUser.email);
+        final findUser = await userUseCase.getUserByEmail(googleUser.email);
         if (findUser != null) {
           final loginRes = await userUseCase.authLogin(
-            authUser.email,
+            googleUser.email,
             AuthType.naver,
           );
 
@@ -81,7 +85,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
 
         final userInfo = UserEntity(
-            email: authUser.email, nickname: authUser.displayName, profileImg: ImageEntity(url: authUser.photoUrl));
+            email: googleUser.email, nickname: googleUser.displayName, profileImg: ImageEntity(url: googleUser.photoUrl));
         emit(AuthState(state: UserAuthState.authLoginCompletedState, user: userInfo, message: 'google'));
         logger.i('state : Google login completed state');
       } catch (e) {
@@ -90,19 +94,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthState(state: UserAuthState.authFailedState, message: '구글 로그인 정보를 가져오지 못했습니다. 다시 시도해주세요.'));
       }
     });
+
     on<RequestNaverAuth>((event, emit) async {
-      emit(AuthState(state: UserAuthState.authPendingState));
+      emit(AuthState(state: UserAuthState.naverAuthPendingState));
       try {
-        final authUser = await FlutterNaverLogin.logIn();
-        if (authUser.status == NaverLoginStatus.error) {
+
+        final NaverLoginResult naverUser = await FlutterNaverLogin.logIn();
+        if (naverUser.status == NaverLoginStatus.error) {
           emit(AuthState(state: UserAuthState.authFailedState, message: '네이버 로그인 정보를 가져오지 못했습니다. 다시 시도해주세요.'));
           return;
         }
 
-        final findUser = await userUseCase.getUserByEmail(authUser.account!.email!);
+        final findUser = await userUseCase.getUserByEmail(naverUser.account!.email!);
         if (findUser != null) {
           final loginRes = await userUseCase.authLogin(
-            authUser.account!.email!,
+            naverUser.account!.email!,
             AuthType.naver,
           );
 
@@ -115,9 +121,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
 
         final userInfo = UserEntity(
-            email: authUser.account!.email,
-            nickname: authUser.account!.name,
-            profileImg: ImageEntity(url: authUser.account!.profileImage));
+            email: naverUser.account!.email,
+            nickname: naverUser.account!.name,
+            profileImg: ImageEntity(url: naverUser.account!.profileImage));
         emit(AuthState(state: UserAuthState.authLoginCompletedState, user: userInfo, message: 'naver'));
         logger.i('state : Naver login completed state');
         return;
@@ -129,7 +135,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<OauthLoginEvent>((event, emit) async {
-      emit(AuthState(state: UserAuthState.authPendingState));
+      emit(AuthState(state: UserAuthState.startLoginState));
       try {
         final loginRes = await userUseCase.authSignup(event.user);
         final user = loginRes['user'] as UserEntity;
@@ -145,30 +151,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
-    on<RequestAuthLogoutEvent>((event, emit) async {
-      emit(AuthState(state: UserAuthState.authPendingState));
-      logger.i('state : auth pending state');
-      try {
-        if(event.user.method == AuthType.google){
-          await GetIt.I.get<GoogleSignIn>().signOut();
-        }else if(event.user.method == AuthType.naver){
-          await FlutterNaverLogin.logOut();
-        }
-      } catch(error){
-        logger.e(error);
-        emit(AuthState(state: UserAuthState.authFailedState));
-      }
-    });
 
     on<LoginCompletedEvent>((event, emit) {
       emit(AuthState(state: UserAuthState.loginCompletedState, user: event.user));
     });
 
     on<LogoutEvent>((event, emit) async {
-      await pref.removeToken();
-      await pref.removeUserInfo();
-      emit(AuthState(state: UserAuthState.logoutState));
-      logger.i('state : logout state');
+      try {
+        await GetIt.I.get<GoogleSignIn>().disconnect();
+        await GetIt.I.get<GoogleSignIn>().signOut();
+        await FlutterNaverLogin.logOut();
+
+        await pref.removeToken();
+        await pref.removeUserInfo();
+        emit(AuthState(state: UserAuthState.logoutState));
+        logger.i('state : logout state');
+      } on Exception catch (e) {
+        logger.e(e);
+        emit(AuthState(state: UserAuthState.authFailedState));
+      }
     });
   }
 }

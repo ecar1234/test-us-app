@@ -56,7 +56,7 @@ Future<void> serviceLocator() async {
 
   final GoogleSignIn signIn = GoogleSignIn.instance;
 
-  await signIn.initialize();
+  // await signIn.initialize();
 
 
   getIt.registerLazySingleton<GoogleSignIn>(() => signIn);

@@ -31,7 +31,7 @@ class BasePostProvider extends ChangeNotifier {
     _userPromotionPosts ??= [];
 
     if(recruitPosts != null) {
-      _userRecruitPosts = recruitPosts;;
+      _userRecruitPosts = recruitPosts;
     }
     if(promotionPosts != null) {
       _userPromotionPosts = promotionPosts;
@@ -68,10 +68,8 @@ class BasePostProvider extends ChangeNotifier {
   }
   void updateRecruitPost(RecruitPostEntity post) {
     if(_recruitPosts!.any((element) => element.id == post.id)){
-      final index = _recruitPosts?.indexWhere((element) => element.id == post.id);
-      if(index == null) return;
-      _recruitPosts!.removeAt(index);
-      _recruitPosts = [post, ..._recruitPosts!];
+      List<RecruitPostEntity> removedList = _recruitPosts!.where((element) => element.id != post.id).toList();
+      _recruitPosts = [post, ...removedList];
       notifyListeners();
       return;
     }

@@ -17,6 +17,7 @@ class RecruitPostEntity {
   int? period;
   int? views;
   List<ImageEntity>? images;
+  String? postType;
   UserEntity? author;
   List<ApplicationEntity>? applications;
   DateTime? createdAt;
@@ -34,6 +35,7 @@ class RecruitPostEntity {
     this.period,
     this.views,
     this.images,
+    this.postType,
     this.createdAt,
     this.updatedAt,
   });
@@ -42,6 +44,7 @@ class RecruitPostEntity {
     final user = UserEntity(
       id: model.author!.userId,
       nickname: model.author!.nickname,
+      profileImg: ImageEntity.toImageEntity(model.author!.profileImg!),
     );
     final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
     final applications = model.applications!.map((e) => ApplicationEntity.toEntity(e)).toList();
@@ -57,6 +60,7 @@ class RecruitPostEntity {
       period: model.period,
       views: model.views,
       images: images,
+      postType: model.postType,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
     );
@@ -79,7 +83,7 @@ class RecruitPostEntity {
       status: entity.status,
       period: entity.period,
       views: entity.views,
-      images: images
+      images: images,
     );
   }
 }

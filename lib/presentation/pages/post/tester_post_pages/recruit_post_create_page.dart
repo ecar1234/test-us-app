@@ -522,12 +522,24 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }
+
+                      List<ImageEntity> postImage = [];
+                      if (_selectedImages.isNotEmpty) {
+                        postImage = _selectedImages.map((e) => ImageEntity(url: e.path)).toList();
+                      }
+                      if(widget.post != null){
+                        postImage.addAll(widget.post!.images!);
+                      }
+                      if(_deleteImages.isNotEmpty) {
+                        postImage.removeWhere((element) => _deleteImages.contains(element));
+                      }
+
                       final post = RecruitPostEntity(
                         title: titleController.text,
                         subtitle: subtitleController.text,
                         contents: contentController.text,
                         platform: _selectedCategory,
-                        images: _selectedImages.map((e) => ImageEntity(url: e.path)).toList(),
+                        images: postImage,
                       );
                       Get.to(() => RecruitPostDetailPage(post: post));
                     },

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -97,8 +98,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
   }
 
   Widget _postInfoBuilder(RecruitPostEntity post, double hei) {
-    final userId = context.read<UserProvider>().isLogged ?? false ? context.read<UserProvider>().user!.id : "";
-    final isAuthor = post.author != null && post.author!.id == userId;
+    final user = context.read<UserProvider>().isLogged ?? false ? context.read<UserProvider>().user : null;
+    final isAuthor = post.author != null && post.author!.id == user?.id;
     return CustomScrollView(
       slivers: [
         SliverAppBar(
@@ -200,26 +201,72 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                 SizedBox(
                   child: Row(
                     children: [
-                      if (isAuthor)
+                      // if (isAuthor)
+                      //   SizedBox(
+                      //       child: Row(
+                      //         children: [
+                      //           SizedBox(
+                      //             height: 30,
+                      //             width: 30,
+                      //             child: CircleAvatar(
+                      //                 radius: 40,
+                      //                 backgroundImage: user!.profileImg!.url!.isNotEmpty
+                      //                     ? CachedNetworkImageProvider(
+                      //                   user.profileImg!.url!,
+                      //                 ) : const AssetImage('assets/images/Generic avatar.png')
+                      //             ),
+                      //           ),
+                      //           const Gap(5),
+                      //           Text(
+                      //             '${post.author!.nickname}',
+                      //             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      //           ),
+                      //         ],
+                      //       ))
+                      if (post.author == null)
                         SizedBox(
-                            child: Text(
-                          '${post.author!.nickname}',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ))
-                      else if (post.author == null)
-                        SizedBox(
-                          child: Text(
-                            '${context.read<UserProvider>().user!.nickname}',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        )
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 30,
+                                  width: 30,
+                                  child: CircleAvatar(
+                                      radius: 40,
+                                      backgroundImage:( user!.profileImg!.url!.isNotEmpty ? CachedNetworkImageProvider(
+                                        user.profileImg!.url!,
+                                      ) : const AssetImage('assets/images/Generic Profile.png')) as ImageProvider
+                                  ),
+                                ),
+                                const Gap(5),
+                                Text(
+                                  '${context.read<UserProvider>().user!.nickname}',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ))
                       else
                         SizedBox(
-                          child: Text(
-                            '${post.author!.nickname}',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 30,
+                                  width: 30,
+                                  child: CircleAvatar(
+                                      radius: 40,
+                                      backgroundImage: post.author!.profileImg == null
+                                          ? const AssetImage('assets/images/Generic avatar.png')
+                                          : CachedNetworkImageProvider(
+                                        post.author!.profileImg!.url!,
+                                      ) as ImageProvider
+                                  ),
+                                ),
+                                const Gap(5),
+                                Text(
+                                  '${post.author!.nickname}',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            )),
                       const Gap(10),
                       SizedBox(
                         child: post.platform!.length == 1
@@ -258,17 +305,20 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                   )),
                 ),
                 const Gap(40),
-                if (post.author != null && post.author!.id != userId)
+                if (post.author != null && post.author!.id != user?.id)
                   BlocListener<AppBloc, AppState>(listener: (context, state) {
                     if (state.state == UserAppState.applicationCompletedState) {
                       context.read<ApplicationProvider>().requestApply(state.application!);
                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
+                      // context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
                     } else if (state.state == UserAppState.applicationUpdateCompletedState) {
                       context.read<ApplicationProvider>().requestUpdateApplication(state.application!);
                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
+                      // context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
                     } else if (state.state == UserAppState.applicationCancelCompletedState) {
-                      context.read<ApplicationProvider>().cancelApplication(state.application!, state.newPost!);
                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
+                      context.read<ApplicationProvider>().cancelApplication(state.application!, state.newPost!);
+                      // context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
                     }
                   }, child: _applicationSection(context))
 

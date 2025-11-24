@@ -22,6 +22,7 @@ class PromotionPostModel {
   int? views;
   List<ImageModel>? images;
   List<String>? domain;
+  String? postType;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -37,6 +38,7 @@ class PromotionPostModel {
     this.views,
     this.images,
     this.domain,
+    this.postType,
     this.createdAt,
     this.updatedAt,
   });

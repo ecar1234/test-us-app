@@ -96,9 +96,9 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                           offset: Offset(0, 3), // changes position of shadow
                         ),
                       ]),
-                  child: Selector<RecruitPostProvider, RecruitPostEntity>(
+                  child: Selector<BasePostProvider, RecruitPostEntity>(
                       selector: (context, provider) =>
-                          provider.recruitmentPosts!.firstWhere((e) => e.id == widget.postId),
+                          provider.userRecruitPosts!.firstWhere((e) => e.id == widget.postId),
                       builder: (context, post, child) {
                         DateTime appDate = post.applications![idx].updatedAt!;
                         return Row(
@@ -118,34 +118,25 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                             style: TextStyle(
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w600,
-                                                color: post.applications![idx].status == ApplicationStatus.rejected
-                                                    ? Colors.grey
-                                                    : Colors.black87),
+                                                // color: post.applications![idx].status == ApplicationStatus.rejected
+                                                //     ? Colors.grey
+                                                //     : Colors.black87
+                                            ),
                                           ),
                                         ),
                                         const Gap(5),
                                         // email
                                         if (post.applications![idx].status == ApplicationStatus.accepted)
                                           SizedBox(
-                                              child: GestureDetector(
-                                            onTap: () {
-                                              Clipboard.setData(ClipboardData(text: users[idx]['user'].email));
-                                              Get.snackbar('알림', '이메일이 클립보드에 복사되었습니다.',
-                                                  snackPosition: SnackPosition.BOTTOM,
-                                                  backgroundColor: Colors.grey.shade300,
-                                                  colorText: Colors.black);
-                                              return;
-                                            },
-                                            child: Text(
-                                              users[idx]['user'].email!,
-                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
-                                            ),
-                                          ))
+                                              child: Text(
+                                                users[idx]['user'].email!,
+                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                                              ))
                                         else if (post.applications![idx].status == ApplicationStatus.rejected)
                                           SizedBox(
                                             child: Text('승인거부 된 유저 입니다.'),
                                           )
-                                        else
+                                        else if(post.applications![idx].status == ApplicationStatus.pending)
                                           SizedBox(
                                               child: Text(
                                             '초대 메일주소는 승인 후 표시됩니다.',
@@ -248,9 +239,14 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                   listener: (context, state) {
                                     if (state.state == UserAppState.applicationCompletedState) {
                                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
+                                      context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
                                     } else if (state.state == UserAppState.applicationRejectCompletedState) {
                                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
+                                      context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
                                       // Get.back();
+                                    } else if(state.state == UserAppState.applicationUpdateCompletedState){
+                                      context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
+                                      context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
                                     }
                                   },
                                   builder: (context, state) {
@@ -259,17 +255,38 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                       appState = state.newPost!.applications![idx].status!;
                                     }
                                     if (appState == ApplicationStatus.accepted) {
-                                      return SizedBox(
-                                        width: MediaQuery.sizeOf(context).width * 0.3,
-                                        child: ElevatedButton(
-                                            onPressed: () {
-                                              final token = context.read<UserProvider>().token ?? '';
-                                              context.read<AppBloc>().add(RequestRejectApplicationEvent(
-                                                  token, post.applications![idx].applicantId!, post.id!));
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                            child: Text('승인 취소')),
+                                      return Column(
+                                        children: [
+                                          SizedBox(
+                                            width: MediaQuery.sizeOf(context).width * 0.3,
+                                            child: ElevatedButton(
+                                                onPressed: () {
+                                                  Clipboard.setData(ClipboardData(text: users[idx]['user'].email));
+                                                  Get.snackbar('알림', '이메일이 클립보드에 복사되었습니다.',
+                                                      snackPosition: SnackPosition.BOTTOM,
+                                                      backgroundColor: Colors.grey.shade300,
+                                                      colorText: Colors.black);
+                                                  return;
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                                                child: Text('주소 복사')),
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.sizeOf(context).width * 0.3,
+                                            child: ElevatedButton(
+                                                onPressed: () {
+                                                  final token = context.read<UserProvider>().token ?? '';
+                                                  ApplicationEntity app = post.applications![idx];
+                                                  app.status = ApplicationStatus.pending;
+                                                  app.postId = post.id;
+                                                  context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                                                child: Text('승인 취소')),
+                                          ),
+                                        ],
                                       );
                                     } else if (appState == ApplicationStatus.rejected) {
                                       return SizedBox(
@@ -284,6 +301,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             SizedBox(
+                                              width: MediaQuery.sizeOf(context).width * 0.3,
                                               child: ElevatedButton(
                                                   onPressed: () {
                                                     final token = context.read<UserProvider>().token ?? '';
@@ -298,6 +316,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                             ),
                                             const Gap(4),
                                             SizedBox(
+                                              width: MediaQuery.sizeOf(context).width * 0.3,
                                               child: ElevatedButton(
                                                   onPressed: () {
                                                     _userRejectDialog(context, post.applications![idx]);

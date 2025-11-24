@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,8 +17,6 @@ import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promoti
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:material_symbols_icons/symbols.dart';
-
-
 
 import '../../../../services/common_height_provider.dart';
 import '../../../../utils/linkfy_util.dart';
@@ -95,8 +94,8 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
   }
 
   Widget _buildPostInfo(BuildContext context, PromotionPostEntity post, double hei) {
-    final userId = context.read<UserProvider>().isLogged ?? false ? context.read<UserProvider>().user!.id : "";
-    final isAuthor = post.author != null && post.author!.id == userId;
+    final user = context.read<UserProvider>().isLogged ?? false ? context.read<UserProvider>().user : null;
+    final isAuthor = post.author != null && post.author!.id == user?.id;
     return CustomScrollView(
       slivers: [
         SliverAppBar(
@@ -198,26 +197,68 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                 SizedBox(
                   child: Row(
                     children: [
-                      if (isAuthor)
+                      // if (isAuthor)
+                      //   SizedBox(
+                      //       child: Row(
+                      //     children: [
+                      //       SizedBox(
+                      //         height: 30,
+                      //         width: 30,
+                      //         child: CircleAvatar(
+                      //           radius: 40,
+                      //           backgroundImage:post.author!.profileImg!.url!.isNotEmpty ? CachedNetworkImageProvider(
+                      //             post.author!.profileImg!.url!,
+                      //           ) : const AssetImage('assets/images/Generic Profile.png')
+                      //         ),
+                      //       ),
+                      //       Text(
+                      //         '${post.author!.nickname}',
+                      //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      //       ),
+                      //     ],
+                      //   ))
+                      if (post.author == null)
                         SizedBox(
-                            child: Text(
-                          '${post.author!.nickname}',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ))
-                      else if (post.author == null)
-                        SizedBox(
-                          child: Text(
-                            '${context.read<UserProvider>().user!.nickname}',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        )
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 30,
+                                  width: 30,
+                                  child: CircleAvatar(
+                                      radius: 40,
+                                      backgroundImage:( user!.profileImg!.url!.isNotEmpty ? CachedNetworkImageProvider(
+                                        user.profileImg!.url!,
+                                      ) : const AssetImage('assets/images/Generic Profile.png')) as ImageProvider
+                                  ),
+                                ),
+                                const Gap(5),
+                                Text(
+                                  '${context.read<UserProvider>().user!.nickname}',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ))
                       else
                         SizedBox(
-                          child: Text(
-                            '${post.author!.nickname}',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 30,
+                                  width: 30,
+                                  child: CircleAvatar(
+                                      radius: 40,
+                                      backgroundImage: post.author!.profileImg!.url!.isNotEmpty ? CachedNetworkImageProvider(
+                                        post.author!.profileImg!.url!,
+                                      ) : const AssetImage('assets/images/Generic avatar.png') as ImageProvider
+                                  ),
+                                ),
+                                const Gap(5),
+                                Text(
+                                  '${post.author!.nickname}',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            )),
                       const Gap(10),
                       SizedBox(
                         child: post.platform!.length == 1
@@ -226,16 +267,6 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                                 children: [Text(post.platform![0]), const Gap(10), Text(post.platform![1])],
                               ),
                       ),
-                      // const Gap(10),
-                      // SizedBox(
-                      //     child: _post!.createdAt != null
-                      //         ? Text(
-                      //             '게시일 : ${_post!.createdAt!.year} - ${_post!.createdAt!.month < 10 ?
-                      //             '0${_post!.createdAt!.month}' : _post!.createdAt!.month} - ${_post!.createdAt!.day < 10 ?
-                      //             '0${_post!.createdAt!.day}' : '${_post!.createdAt!.day}'}',
-                      //             style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-                      //           )
-                      //         : SizedBox()),
                     ],
                   ),
                 ),
@@ -258,8 +289,8 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                 const Gap(40),
                 SizedBox(
                     child: ListView.separated(
-                      padding: EdgeInsets.symmetric(vertical: 20),
-                      scrollDirection: Axis.vertical,
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        scrollDirection: Axis.vertical,
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         itemBuilder: (context, idx) {
@@ -275,29 +306,30 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                             height: 40,
                             // width:  80,
                             child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  String url = post.domain![idx];
-                                  if (!url.startsWith('http')) {
-                                    url = 'https://$url';
-                                  }
-                                  final uri = Uri.parse(url);
-                                  if (await canLaunchUrl(uri)) {
-                                    await launchUrl(uri, mode: LaunchMode.platformDefault);
-                                  } else {
-                                    Get.snackbar('연결 실패', '접속할 수 없거나 존재하지 않는 주소입니다.');
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
+                              onPressed: () async {
+                                String url = post.domain![idx];
+                                if (!url.startsWith('http')) {
+                                  url = 'https://$url';
+                                }
+                                final uri = Uri.parse(url);
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri, mode: LaunchMode.platformDefault);
+                                } else {
+                                  Get.snackbar('연결 실패', '접속할 수 없거나 존재하지 않는 주소입니다.');
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
                                   padding: EdgeInsets.zero,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                  )
-                                ),
-                                label: Text(title, style: TextStyle(fontWeight: FontWeight.bold),),
+                                  )),
+                              label: Text(
+                                title,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                               icon: Icon(Symbols.download),
                               iconAlignment: IconAlignment.end,
                             ),
-                            
                           );
                         },
                         separatorBuilder: (context, idx) => const Gap(16),

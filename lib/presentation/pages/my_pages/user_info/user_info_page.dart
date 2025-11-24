@@ -34,7 +34,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
   final ImagePicker _picker = ImagePicker();
   final typeUtil = TypeConversionUtil();
 
-
   @override
   void initState() {
     // TODO: implement initState
@@ -69,7 +68,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
           },
           child: BlocListener<UserBloc, UserState>(
             listener: (context, state) {
-              if(state.state == UserDataState.getUsersInfoCompletedState){
+              if (state.state == UserDataState.getUsersInfoCompletedState) {
                 context.read<UserProvider>().updateUserInfo(state.user!);
                 Get.back();
               }
@@ -100,69 +99,67 @@ class _UserInfoPageState extends State<UserInfoPage> {
     );
   }
 
-  Widget _profileSection(BuildContext context,double hei, double wid) {
+  Widget _profileSection(BuildContext context, double hei, double wid) {
     return SizedBox(
-      height: hei * 0.3,
-      width: wid,
-      child: SizedBox(
+        height: hei * 0.3,
         width: wid,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Stack(
-              children: [
-                SizedBox(
-                  height: 150,
-                  width: 150,
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Colors.grey.shade200,
-                    backgroundImage:  profileImage != null
-
-                        ? FileImage(File(profileImage!.path))
-                        : (widget.user.profileImg == null || widget.user.profileImg!.url == null
-                        ? const AssetImage('assets/images/Generic avatar.png')
-                    // 2-2. 기존 네트워크 이미지가 있으면 CachedNetworkImageProvider로 표시
-                        : CachedNetworkImageProvider(widget.user.profileImg!.url!))
-                    as ImageProvider,
+        child: SizedBox(
+          width: wid,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Stack(
+                children: [
+                  SizedBox(
+                    height: 150,
+                    width: 150,
+                    child: CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.grey.shade200,
+                      backgroundImage: profileImage != null
+                          ? FileImage(File(profileImage!.path))
+                          : (widget.user.profileImg == null || widget.user.profileImg!.url == null
+                              ? const AssetImage('assets/images/Generic avatar.png')
+                              // 2-2. 기존 네트워크 이미지가 있으면 CachedNetworkImageProvider로 표시
+                              : CachedNetworkImageProvider(widget.user.profileImg!.url!)) as ImageProvider,
+                    ),
                   ),
-                ),
-                Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: () async {
-                        final image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
-                        if (image == null) {
-                          return;
-                        } else if (File(image.path).lengthSync() / (1024 * 1024) > 5) {
-                          Get.snackbar('알림', '5MB를 초과하는 이미지는 업로드 할 수 없습니다.');
-                          return;
-                        } else {
-                          setState(() {
-                            profileImage = image;
-                          });
-                        }
-                      },
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                            border: Border.all(color: Colors.grey),
-                            shape: BoxShape.circle
+                  Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: () async {
+                          final image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
+                          if (image == null) {
+                            return;
+                          } else if (File(image.path).lengthSync() / (1024 * 1024) > 5) {
+                            Get.snackbar('알림', '5MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                            return;
+                          } else {
+                            setState(() {
+                              profileImage = image;
+                            });
+                          }
+                        },
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              border: Border.all(color: Colors.grey),
+                              shape: BoxShape.circle),
+                          child: Icon(
+                            Icons.camera_alt,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                         ),
-                        child: Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.primary,),
-                      ),
-                    )
-                )
-              ],
-            )
-          ],
-        ),
-      )
-    );
+                      ))
+                ],
+              )
+            ],
+          ),
+        ));
   }
 
   Widget _emailSection(BuildContext context, double wid) {
@@ -178,10 +175,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 ))),
         const Gap(10),
         Flexible(
-            flex: 8,
-            child: SizedBox(
-                width: wid * 0.8,
-                child: Text(widget.user.email!, style: TextStyle(fontSize: 18 ))))
+            flex: 8, child: SizedBox(width: wid * 0.8, child: Text(widget.user.email!, style: TextStyle(fontSize: 18))))
       ]),
     );
   }
@@ -192,9 +186,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
         Flexible(
             flex: 2,
             child: SizedBox(
-                width: wid * 0.2,
-                child:
-                    Text('닉네임', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)))),
+                width: wid * 0.2, child: Text('닉네임', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)))),
         Flexible(
           flex: 8,
           child: SizedBox(
@@ -264,8 +256,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   initialSelection: typeUtil.userRoleToString(widget.user.role!),
                   dropdownMenuEntries: [
                     DropdownMenuEntry(value: "", label: "선택"),
-                    DropdownMenuEntry(
-                        value: "programmer", label: "프로그래머"),
+                    DropdownMenuEntry(value: "programmer", label: "프로그래머"),
                     DropdownMenuEntry(value: "planner", label: "기획자"),
                     DropdownMenuEntry(value: "marketer", label: "마케터"),
                     DropdownMenuEntry(value: "designer", label: "디자이너"),
@@ -283,61 +274,59 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   Widget _buttonSection(BuildContext context, double wid) {
     return SizedBox(
-      height: 50,
-      width: wid,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: wid * 0.2,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text('확인')
-            ),
-          ),
-          const Gap(20),
-          SizedBox(
-            width: wid * 0.6,
-            height: 50,
-            child: ElevatedButton(
-                onPressed: () {
-                  final token = context.read<UserProvider>().token ?? '';
-                  final userInfo = UserEntity(
-                    id: widget.user.id,
-                    email: widget.user.email,
-                    nickname: _nicknameController.text,
-                    userType: typeUtil.toUserType(_userTypeController.text),
-                    role: typeUtil.toUserRole(_userRoleController.text),
-                  );
-
-                  if(profileImage != null) {
-                    context.read<UserBloc>()
-                        .add(RequestUserInfoUpdateEvent(token, userInfo, profileImage: profileImage, oldImage: widget.user.profileImg));
-                  }else {
-                    if(widget.user.profileImg != null){
-                      userInfo.profileImg = widget.user.profileImg;
-                    }
-                    context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo));
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+        height: 50,
+        width: wid,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: wid * 0.2,
+              height: 50,
+              child: ElevatedButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                ),
-                child: Text('업데이트')
+                  child: Text('확인')),
             ),
-          ),
-        ],
-      )
-    );
+            const Gap(20),
+            SizedBox(
+              width: wid * 0.6,
+              height: 50,
+              child: ElevatedButton(
+                  onPressed: () {
+                    final token = context.read<UserProvider>().token ?? '';
+                    final userInfo = UserEntity(
+                      id: widget.user.id,
+                      email: widget.user.email,
+                      nickname: _nicknameController.text,
+                      userType: typeUtil.toUserType(_userTypeController.text),
+                      role: typeUtil.toUserRole(_userRoleController.text),
+                    );
+
+                    if (profileImage != null) {
+                      context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo,
+                          profileImage: profileImage, oldImage: widget.user.profileImg));
+                    } else {
+                      if (widget.user.profileImg != null) {
+                        userInfo.profileImg = widget.user.profileImg;
+                      }
+                      context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo));
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text('업데이트')),
+            ),
+          ],
+        ));
   }
 }
