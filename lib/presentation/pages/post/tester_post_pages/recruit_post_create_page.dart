@@ -494,6 +494,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
             await _alertDialog(context, '등록');
           } else if (state.state == RecruitPostLoadState.postUpdateCompletedState) {
             provider.updateRecruitPost(state.post!);
+            provider.updateUserRecruitPosts(state.post!);
             await _alertDialog(context, '수정');
           } else if (state.state == RecruitPostLoadState.errorState ||
               state.state == RecruitPostLoadState.failedState) {

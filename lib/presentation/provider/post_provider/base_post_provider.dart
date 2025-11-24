@@ -51,16 +51,24 @@ class BasePostProvider extends ChangeNotifier {
   }
 
   void createRecruitPost(RecruitPostEntity post) {
+    _recruitPosts ??= [];
+    _userRecruitPosts ??= [];
+
     if(_recruitPosts!.length < 10){
       _recruitPosts = [post, ..._recruitPosts!];
+      _userRecruitPosts = [post, ..._userRecruitPosts!];
       notifyListeners();
       return;
     }
     return;
   }
   void createPromotionPost(PromotionPostEntity post) {
+    _promotionPosts ??= [];
+    _userPromotionPosts ??= [];
+
     if(_promotionPosts!.length < 10){
       _promotionPosts = [post, ..._promotionPosts!];
+      _userPromotionPosts = [post, ..._userPromotionPosts!];
       notifyListeners();
       return;
     }

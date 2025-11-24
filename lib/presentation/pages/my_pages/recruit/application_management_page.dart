@@ -15,6 +15,7 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import '../../../../data/models/application/application_model.dart';
 import '../../../../data/models/user/user_model.dart';
 import '../../../../domain/entities/recruit_post_entity.dart';
+import '../../../../services/theme_provider.dart';
 import '../../../bloc/app_bloc/app_bloc.dart';
 import '../../../bloc/app_bloc/app_state.dart';
 import '../../../bloc/user_bloc/user_bloc.dart';
@@ -75,6 +76,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
   }
 
   Widget _mainBuilder(List<Map<String, dynamic>> users) {
+    final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
     return Container(
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: ListView.separated(
@@ -85,10 +87,10 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                   width: MediaQuery.sizeOf(context).width - 60,
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDarkMode ? Colors.grey.shade800 : Colors.white,
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
+                      boxShadow: isDarkMode ? null : [
                         BoxShadow(
                           color: Colors.grey.withAlpha(84),
                           spreadRadius: 2,
@@ -160,10 +162,12 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                                       style: TextStyle(
                                                           fontSize: 14,
                                                           fontWeight: FontWeight.w500,
-                                                          color: post.applications![idx].status ==
-                                                                  ApplicationStatus.rejected
-                                                              ? Colors.grey
-                                                              : Colors.black87)),
+                                                          // color: post.applications![idx].status ==
+                                                          //         ApplicationStatus.rejected
+                                                          //     ? Colors.grey
+                                                          //     : Colors.black87
+                                                      )
+                                                  ),
                                                 ),
                                               ),
                                               const Gap(10),
@@ -177,10 +181,11 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                                       style: TextStyle(
                                                           fontSize: 14,
                                                           fontWeight: FontWeight.w500,
-                                                          color: post.applications![idx].status ==
-                                                                  ApplicationStatus.rejected
-                                                              ? Colors.grey
-                                                              : Colors.black87)),
+                                                          // color: post.applications![idx].status ==
+                                                          //         ApplicationStatus.rejected
+                                                          //     ? Colors.grey
+                                                          //     : Colors.black87
+                                                      )),
                                                 ),
                                               ),
                                               const Gap(10),
@@ -227,9 +232,10 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                               '${appDate.month}월 '
                                               '${appDate.day}일',
                                               style: TextStyle(
-                                                  color: post.applications![idx].status == ApplicationStatus.rejected
-                                                      ? Colors.grey
-                                                      : Colors.black87)),
+                                                  // color: post.applications![idx].status == ApplicationStatus.rejected
+                                                  //     ? Colors.grey
+                                                  //     : Colors.black87
+                                              )),
                                         )
                                       ],
                                     ))),
@@ -246,7 +252,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                       // Get.back();
                                     } else if(state.state == UserAppState.applicationUpdateCompletedState){
                                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
-                                      context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
+                                      // context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
                                     }
                                   },
                                   builder: (context, state) {

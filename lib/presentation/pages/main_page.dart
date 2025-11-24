@@ -221,7 +221,7 @@ class _MainState extends State<MainPage> {
               decoration: BoxDecoration(color: isDarkMode ? Colors.black : Colors.white),
               child: Stack(children: [
                 SizedBox(
-                  height: hei - 20,
+                  height: hei-10,
                   child: _pageList[_currentIdx],
                 ),
                 Positioned(

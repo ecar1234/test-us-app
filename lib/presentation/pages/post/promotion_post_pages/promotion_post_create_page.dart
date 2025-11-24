@@ -672,6 +672,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
             await _alertDialog(context, '등록');
           } else if (state.state == PromotionPostLoadState.postUpdateCompletedState) {
             provider.updatePromotionPost(state.post!);
+            provider.updateUserPromotionPosts(state.post!);
             await _alertDialog(context, '수정');
           } else if (state.state == PromotionPostLoadState.errorState ||
               state.state == PromotionPostLoadState.failedState) {

@@ -48,46 +48,18 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: Scaffold(
           appBar: AppBar(
-            title: const Text('Testus', style: TextStyle(fontWeight: FontWeight.bold)),
+            title: const Text('TESTUS', style: TextStyle(fontWeight: FontWeight.bold)),
             // 추후 로고 이미지로 변경
             actions: [
               Selector<UserProvider, bool>(
                 selector: (context, provider) => provider.isLogged ?? false,
                 builder: (context, isLogin, child) => !isLogin
-                    ? IconButton(
+                    ? TextButton(
                         onPressed: () {
                           Get.to(() => LoginPage());
                         },
-                        icon: const Icon(Icons.login))
-                    : IconButton(
-                        onPressed: () {
-                          Get.defaultDialog(
-                            title: '로그아웃',
-                            middleText: '로그아웃 하시겠습니까?',
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('취소')),
-                              TextButton(
-                                  onPressed: () async {
-                                    Navigator.pop(context);
-                                    final user = context.read<UserProvider>().user!;
-                                    if(user.method! != AuthType.email){
-                                      context.read<AuthBloc>().add(LogoutEvent());
-                                    }
-                                    context.read<UserProvider>().logout();
-                                    context.read<BasePostProvider>().logout();
-                                    context.read<ApplicationProvider>().logout();
-                                    // context.read<AuthBloc>().add(LogoutEvent());
-                                  },
-                                  child: const Text('확인')),
-                            ],
-                          );
-                          // context.read<AuthBloc>().add(LogoutEvent(context));
-                        },
-                        icon: const Icon(Icons.logout)),
+                        child: Text('로그인', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)))
+                    : SizedBox()
               ),
               IconButton(
                   onPressed: () {

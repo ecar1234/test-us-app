@@ -15,6 +15,7 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
 
 import '../../../../data/models/user/user_model.dart';
+import '../../../../services/theme_provider.dart';
 import '../../../bloc/user_bloc/user_bloc.dart';
 
 class UserInfoPage extends StatefulWidget {
@@ -89,6 +90,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     _userRoleSection(context, wid),
                     const Gap(30),
                     _buttonSection(context, wid),
+                    const Gap(30),
+                    _userInfoButtonSection(context, wid)
                   ],
                 ),
               ),
@@ -325,6 +328,62 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     ),
                   ),
                   child: Text('업데이트')),
+            ),
+          ],
+        ));
+  }
+
+  Widget _userInfoButtonSection(BuildContext context, double wid) {
+    final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
+    return Container(
+        width: wid,
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+            // border: Border.all(),
+            borderRadius: BorderRadius.circular(10),
+            color: isDarkMode ? Colors.grey.shade800 : Colors.white,
+            boxShadow: isDarkMode
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.grey.shade200,
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ]),
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: (){},
+              child: SizedBox(
+                height: 40,
+                width: wid-40,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("비밀번호 변경", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
+                    Icon(Icons.arrow_forward_ios_sharp, size: 16)
+                  ],
+                ),
+              ),
+            ),
+            Divider(
+              color: Colors.grey.shade200,
+            ),
+            GestureDetector(
+              onTap: (){},
+              child: SizedBox(
+                height: 40,
+                width: wid-40,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("회원 탈퇴", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
+                    Icon(Icons.arrow_forward_ios_sharp, size: 16)
+                  ],
+                ),
+              ),
             ),
           ],
         ));

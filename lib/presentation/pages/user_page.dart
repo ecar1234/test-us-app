@@ -19,6 +19,9 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import '../../data/models/application/application_model.dart';
+import '../../data/models/user/user_model.dart';
+import '../bloc/auth_bloc/auth_bloc.dart';
+import '../bloc/auth_bloc/auth_event.dart';
 import '../components/login_dialogs.dart';
 import 'my_pages/recruit/my_recruitment_page.dart';
 import 'my_pages/promotion/my_promotion_page.dart';
@@ -43,13 +46,13 @@ class _UserPageState extends State<UserPage> {
           appBar: AppBar(
             title: Text("마이페이지"),
           ),
-          body: Container(
+          body: SizedBox(
             // height: hei,
             // decoration: BoxDecoration(
-                // gradient: LinearGradient(
-                //     begin: Alignment.topCenter,
-                //     end: Alignment.bottomCenter,
-                //     colors: [Colors.blue.shade50, Colors.white, Colors.white, Colors.white])),
+            // gradient: LinearGradient(
+            //     begin: Alignment.topCenter,
+            //     end: Alignment.bottomCenter,
+            //     colors: [Colors.blue.shade50, Colors.white, Colors.white, Colors.white])),
             child: Column(
               children: [
                 //image section
@@ -63,8 +66,8 @@ class _UserPageState extends State<UserPage> {
                           CircleAvatar(
                             radius: 40,
                             backgroundColor: Colors.grey.shade200,
-                            backgroundImage: user.profileImg == null || user.profileImg!.url == null ?
-                                const AssetImage('assets/images/Generic avatar.png')
+                            backgroundImage: user.profileImg == null || user.profileImg!.url == null
+                                ? const AssetImage('assets/images/Generic avatar.png')
                                 : CachedNetworkImageProvider(user.profileImg!.url!),
                           ),
                           const Gap(20),
@@ -134,14 +137,16 @@ class _UserPageState extends State<UserPage> {
                                 // border: Border.all(),
                                 borderRadius: BorderRadius.circular(10),
                                 color: isDarkMode ? Colors.grey.shade800 : Colors.white,
-                                boxShadow: isDarkMode? null : [
-                                  BoxShadow(
-                                    color: Colors.grey.shade200,
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: Offset(0, 3), // changes position of shadow
-                                  ),
-                                ]),
+                                boxShadow: isDarkMode
+                                    ? null
+                                    : [
+                                        BoxShadow(
+                                          color: Colors.grey.shade200,
+                                          spreadRadius: 5,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 3), // changes position of shadow
+                                        ),
+                                      ]),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -157,24 +162,21 @@ class _UserPageState extends State<UserPage> {
                                         SizedBox(
                                           child: Icon(
                                             Symbols.check_circle,
-                                            color: Colors.blue.shade300,
+                                            color: const Color(0xffEE6C20),
                                             size: 25,
                                           ),
                                         ),
                                         Selector<BasePostProvider, List<RecruitPostEntity>>(
-                                          selector: (context, provider) {
-                                            return provider.userRecruitPosts ?? [];
-                                          },
-                                          builder:(context, posts, child) {
-                                              return SizedBox(
-                                                child: Text(
-                                                  isLogged
-                                                      ? '${posts.length}'
-                                                      : '0',
-                                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                                ),
-                                              );
-                                            }),
+                                            selector: (context, provider) {
+                                          return provider.userRecruitPosts ?? [];
+                                        }, builder: (context, posts, child) {
+                                          return SizedBox(
+                                            child: Text(
+                                              isLogged ? '${posts.length}' : '0',
+                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                            ),
+                                          );
+                                        }),
                                         SizedBox(
                                           child: Text(
                                             "테스트 모집",
@@ -193,7 +195,7 @@ class _UserPageState extends State<UserPage> {
                                         SizedBox(
                                           child: Icon(
                                             Symbols.electrical_services,
-                                            color: Colors.blue.shade300,
+                                            color: const Color(0xffEE6C20),
                                             size: 25,
                                           ),
                                         ),
@@ -201,14 +203,12 @@ class _UserPageState extends State<UserPage> {
                                           selector: (context, provider) {
                                             return provider.userPromotionPosts ?? [];
                                           },
-                                          builder:(context, posts, child) {
+                                          builder: (context, posts, child) {
                                             return SizedBox(
                                                 child: Text(
-                                                  isLogged ?
-                                                  '${posts.length}'
-                                                      :'0',
-                                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                                ));
+                                              isLogged ? '${posts.length}' : '0',
+                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                            ));
                                           },
                                         ),
                                         SizedBox(
@@ -232,34 +232,30 @@ class _UserPageState extends State<UserPage> {
                                         SizedBox(
                                           child: Icon(
                                             Symbols.crop_free,
-                                            color: Colors.blue.shade300,
+                                            color: const Color(0xffEE6C20),
                                             size: 25,
                                           ),
                                         ),
                                         Selector<ApplicationProvider, List<ApplicationEntity>>(
-                                          selector: (context, provider) {
-                                            return provider.userApplications ?? [];
-                                          },
-                                          builder: (context, apps, child) {
-                                            int length = 0;
-                                            if( apps.isNotEmpty ) {
-                                              for( var app in apps ) {
-                                                if( app.status != ApplicationStatus.cancel
-                                                    && app.status != ApplicationStatus.rejected ) {
-                                                  length++;
-                                                }
+                                            selector: (context, provider) {
+                                          return provider.userApplications ?? [];
+                                        }, builder: (context, apps, child) {
+                                          int length = 0;
+                                          if (apps.isNotEmpty) {
+                                            for (var app in apps) {
+                                              if (app.status != ApplicationStatus.cancel &&
+                                                  app.status != ApplicationStatus.rejected) {
+                                                length++;
                                               }
                                             }
-                                            return SizedBox(
-                                              child: Text(
-                                                isLogged ?
-                                                '$length'
-                                                : '0',
-                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                              ),
-                                            );
                                           }
-                                        ),
+                                          return SizedBox(
+                                            child: Text(
+                                              isLogged ? '$length' : '0',
+                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                            ),
+                                          );
+                                        }),
                                         SizedBox(
                                             child: Text(
                                           "테스트 신청",
@@ -286,14 +282,16 @@ class _UserPageState extends State<UserPage> {
                             // border: Border.all(),
                             borderRadius: BorderRadius.circular(10),
                             color: isDarkMode ? Colors.grey.shade800 : Colors.white,
-                            boxShadow: isDarkMode ? null : [
-                              BoxShadow(
-                                color: Colors.grey.shade200,
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: Offset(0, 3), // changes position of shadow
-                              ),
-                            ]),
+                            boxShadow: isDarkMode
+                                ? null
+                                : [
+                                    BoxShadow(
+                                      color: Colors.grey.shade200,
+                                      spreadRadius: 5,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 3), // changes position of shadow
+                                    ),
+                                  ]),
                         child: Selector<UserProvider, bool>(
                           selector: (context, provider) => provider.isLogged ?? false,
                           builder: (context, isLogged, child) => ListView.separated(
@@ -332,7 +330,54 @@ class _UserPageState extends State<UserPage> {
                             },
                             itemCount: menu.length,
                           ),
-                        )))
+                        ))),
+                const Gap(40),
+                Selector<UserProvider, bool>(
+                    selector: (context, provider) => provider.isLogged ?? false,
+                    builder: (context, isLogged, child) {
+                      if (isLogged) {
+                        return SizedBox(
+                          height: 50,
+                          width: 350,
+                          child: ElevatedButton(
+                              onPressed: () {
+                                Get.defaultDialog(
+                                  title: '로그아웃',
+                                  middleText: '로그아웃 하시겠습니까?',
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('취소')),
+                                    TextButton(
+                                        onPressed: () async {
+                                          Navigator.pop(context);
+                                          final user = context.read<UserProvider>().user!;
+                                          if (user.method! != AuthType.email) {
+                                            context.read<AuthBloc>().add(LogoutEvent());
+                                          }
+                                          context.read<UserProvider>().logout();
+                                          context.read<BasePostProvider>().logout();
+                                          context.read<ApplicationProvider>().logout();
+                                          // context.read<AuthBloc>().add(LogoutEvent());
+                                        },
+                                        child: const Text('확인')),
+                                  ],
+                                );
+                                // context.read<AuthBloc>().add(LogoutEvent(context));
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text("로그아웃", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
+                        );
+                      }
+                      return SizedBox();
+                    })
               ],
             ),
           )),
