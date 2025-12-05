@@ -5,35 +5,35 @@ import '../application/application_model.dart';
 
 part 'review_model.g.dart';
 
-enum ReviewType {
-  @JsonValue('PRODUCT_RATING')
-  productRating,
-  @JsonValue('PARTICIPANT_ATTITUDE_RATING')
-  attitudeRating,
-}
+// enum ReviewType {
+//   @JsonValue('PRODUCT_RATING')
+//   productRating,
+//   @JsonValue('PARTICIPANT_ATTITUDE_RATING')
+//   attitudeRating,
+// }
 
 @JsonSerializable()
-class ReviewModel {
+class UserReviewModel {
   String? reviewId;
-  int? rating;
+  double? rating;
   String? comment;
-  ReviewType? reviewType;
+  // ReviewType? reviewType;
   ApplicationModel? application;
-  UserModel? reviewer;
-  UserModel? reviewed;
+  String? reviewerId;
+  String? reviewedId;
   DateTime? createdAt;
 
-  ReviewModel({
+  UserReviewModel({
     this.reviewId,
     this.rating,
     this.comment,
-    this.reviewType,
+    // this.reviewType,
     this.application,
-    this.reviewer,
-    this.reviewed,
+    this.reviewerId,
+    this.reviewedId,
     this.createdAt,
   });
 
-  factory ReviewModel.fromJson(Map<String, dynamic> json) => _$ReviewModelFromJson(json);
+  factory UserReviewModel.fromJson(Map<String, dynamic> json) => _$UserReviewModelFromJson(json);
   Map<String, dynamic> toJson() => _$ReviewModelToJson(this);
 }
