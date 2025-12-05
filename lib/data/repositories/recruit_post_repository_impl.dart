@@ -28,6 +28,12 @@ class RecruitPostRepositoryImpl implements RecruitPostRepository {
   }
 
   @override
+  Future<RecruitPostEntity> endPost(String token, String id) async {
+    final res = await remote.endPost(token, id);
+    return RecruitPostEntity.toPostEntity(res);
+  }
+
+  @override
   Future<bool> deletePost(String token, String id) async {
     final res = await remote.deletePost(token, id);
     return res;

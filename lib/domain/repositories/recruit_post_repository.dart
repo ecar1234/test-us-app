@@ -13,6 +13,7 @@ abstract class RecruitPostRepository{
   Future<List<RecruitPostEntity>> getPostByTitle(String title);
   Future<RecruitPostEntity> createPost(String token, RecruitPostEntity post, List<XFile> images);
   Future<RecruitPostEntity> updatePost(String token, RecruitPostEntity post, List<XFile> images, List<ImageEntity> oldImages);
+  Future<RecruitPostEntity> endPost(String token, String id);
   Future<bool> deletePost(String token, String id);
   Future<List<RecruitPostEntity>> getAppRecruitPosts(String token, List<String> ids);
 }

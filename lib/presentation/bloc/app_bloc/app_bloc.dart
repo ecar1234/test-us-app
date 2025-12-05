@@ -18,6 +18,14 @@ class AppBloc extends Bloc<AppEvent, AppState>{
     // on<ApplyRejectEvent>((event, emit) {
     //   emit(AppState(state: UserAppState.requestCompletedState));
     // });
+    on<RequestMyApplicationsEvent>((event, emit) async {
+      emit(AppState(state: UserAppState.loadingState));
+      logger.i('application state: loadingState');
+
+      final res = await applicationUseCase.getMyApplications(event.token, event.userId);
+      emit(AppState(state: UserAppState.getUserApplicationsCompletedState, applications: res));
+      logger.i('application state: getUserApplicationsCompletedState');
+    });
 
     on<RequestApplyEvent>((event, emit) async {
       emit(AppState(state: UserAppState.loadingState));

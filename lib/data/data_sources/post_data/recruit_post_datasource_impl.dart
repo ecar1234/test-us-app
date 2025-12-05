@@ -7,6 +7,7 @@ import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/post_data/recruit_post_datasource.dart';
 import 'package:test_us_app/data/models/post/promotion_post_model.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
+import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
 import '../../../core/net_driver.dart';
 import '../../models/image/image_model.dart';
@@ -31,11 +32,17 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
 
   @override
   Future<RecruitPostModel> createPost(String token, RecruitPostModel post, List<XFile> images) async {
-    final res = await netDriver.requestRegisterFormData(token, RecruitPostApi.createRecruitPost, images, post.toJson());
-    if (res['status'] == 200) {
-      return RecruitPostModel.fromJson(res['post']);
-    } else {
-      throw Exception('Error');
+    try {
+      final res = await netDriver.requestRegisterFormData(token, RecruitPostApi.createRecruitPost, images, post.toJson());
+      if (res['status'] == 200) {
+        return RecruitPostModel.fromJson(res['post']);
+      } else {
+        throw Exception('Error');
+      }
+    } on Exception catch (e) {
+      // TODO
+      logger.i(e.toString());
+      return RecruitPostModel();
     }
   }
 
@@ -45,6 +52,18 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
     final res = await netDriver.requestUpdateFormData(token, RecruitPostApi.update, post.toJson(), images, deleteImages);
     if (res['status'] == 200) {
       return RecruitPostModel.fromJson(res['post']);
+    } else {
+      throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<RecruitPostModel> endPost(String token, String id) async {
+    final data = {"id": id};
+    final res = await netDriver.requestPutJson(token, RecruitPostApi.end, data);
+    if (res['status'] == 200) {
+      final post = RecruitPostModel.fromJson(res['post']);
+      return post;
     } else {
       throw Exception('Error');
     }

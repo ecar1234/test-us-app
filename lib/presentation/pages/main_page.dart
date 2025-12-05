@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
@@ -23,9 +24,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import '../../data/sharedPreferences/auth_preference.dart';
+import '../bloc/app_bloc/app_event.dart';
+import '../bloc/app_bloc/app_state.dart';
 import '../bloc/auth_bloc/auth_bloc.dart';
 import '../bloc/auth_bloc/auth_state.dart';
 import '../bloc/post_blocs/base_post_bloc/base_post_event.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../components/custom_bottom_bar.dart';
 import 'home_page.dart';
 
@@ -79,6 +85,14 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
               final recruit = state.initData!['recruitPosts'];
               final promotion = state.initData!['promotionPosts'];
               context.read<BasePostProvider>().setUserInitData(recruit, promotion);
+
+              final posts = context.read<ApplicationProvider>().userApplicationPosts ?? [];
+              final app = context.read<ApplicationProvider>().userApplications ?? [];
+              if (posts.isEmpty || posts.length != app.length) {
+                final postIds = app.map((e) => e.postId!).toList();
+                final token = context.read<UserProvider>().token ?? '';
+                context.read<RecruitPostBloc>().add(RequestAppRecruitPosts(token, postIds));
+              }
             }
           },
           listenWhen: (preState, state) => state.state == BasePostLoadState.getUserInitPostsCompletedState,
@@ -86,16 +100,28 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         BlocListener<AuthBloc, AuthState>(
           listener: (context, state) async {
             final userProvider = context.read<UserProvider>();
-            final appProvider = context.read<ApplicationProvider>();
-            final basePostProvider = context.read<BasePostBloc>();
+            final basePostBloc = context.read<BasePostBloc>();
+            final applicationBloc = context.read<AppBloc>();
 
             if (state.state == UserAuthState.loginCompletedState) {
               await userProvider.autoLogin(state.token!, state.user!);
-              basePostProvider.add(RequestUserInItDataEvent(state.token!, state.user!.id!));
-              appProvider.getMyApplications(state.token!, state.user!.id!);
+              basePostBloc.add(RequestUserInItDataEvent(state.token!, state.user!.id!));
+              applicationBloc.add(RequestMyApplicationsEvent(state.token!, state.user!.id!));
             }
           },
         ),
+        BlocListener<AppBloc, AppState>(listener: (context, state) async {
+          if(state.state == UserAppState.getUserApplicationsCompletedState){
+            context.read<ApplicationProvider>().getMyApplications(state.applications!);
+          }
+        }),
+        BlocListener<RecruitPostBloc, RecruitPostState>(
+          listener: (context, state) async {
+            if (state.state == RecruitPostLoadState.getAppRecruitPostsCompletedState) {
+              context.read<ApplicationProvider>().setUserApplicationPosts(state.posts!);
+            }
+          }
+        )
       ],
       child: GetMaterialApp(
         theme: FlexThemeData.light(

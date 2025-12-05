@@ -1,21 +1,64 @@
 
 
+import 'package:provider/provider.dart';
+import 'package:test_us_app/domain/entities/user_entity.dart';
+
+import '../../../domain/entities/post_review_entity.dart';
+import '../../../domain/entities/user_review_entity.dart';
+
 class ReviewEvent {}
 
+// note: 나의 테스터 리뷰
 class RequestUserReviewEvent extends ReviewEvent {
-  final String userId;
   final String token;
+  final String userId;
+
   RequestUserReviewEvent(this.token, this.userId);
 }
 
-class RequestUserReviewAverage extends ReviewEvent {
-  final String userId;
+// note: 테스터 모집 프로젝트 리뷰
+class RequestPostReviewEvent extends ReviewEvent {
   final String token;
-  RequestUserReviewAverage(this.token, this.userId);
+  final String postId;
+
+  RequestPostReviewEvent(this.token, this.postId);
 }
 
-class RequestUsersReviewEvent extends ReviewEvent {
+// note: 테스터 모집 프로젝트의 테스터들의 리뷰
+// note: 내용이 있으면 불러오고 없다면 리뷰 작성 버튼으로 대체.
+class RequestTestersReviewEvent extends ReviewEvent {
   final String token;
-  final List<String> userIds;
-  RequestUsersReviewEvent(this.token, this.userIds);
+  final List<String> testerIds;
+  final int appId;
+
+
+  RequestTestersReviewEvent(this.token, this.testerIds, this.appId);
+}
+
+class CreateUserReviewEvent extends ReviewEvent {
+  final String token;
+  final UserReviewEntity review;
+
+  CreateUserReviewEvent(this.token, this.review);
+}
+
+class CreateRecruitPostReviewEvent extends ReviewEvent {
+  final String token;
+  final PostReviewEntity review;
+
+  CreateRecruitPostReviewEvent(this.token, this.review);
+}
+
+class CreatePromotionPostReviewEvent extends ReviewEvent {
+  final String token;
+  final PostReviewEntity review;
+
+  CreatePromotionPostReviewEvent(this.token, this.review);
+}
+
+class ChangeStateToGetTestersReview extends ReviewEvent {
+  final List<UserReviewEntity> reviews;
+  final List<UserEntity> users;
+
+  ChangeStateToGetTestersReview({required this.reviews, required this.users});
 }

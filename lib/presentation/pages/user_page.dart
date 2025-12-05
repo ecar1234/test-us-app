@@ -19,12 +19,14 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import '../../data/models/application/application_model.dart';
+import '../../data/models/post/recruit_post_model.dart';
 import '../../data/models/user/user_model.dart';
 import '../bloc/auth_bloc/auth_bloc.dart';
 import '../bloc/auth_bloc/auth_event.dart';
 import '../components/login_dialogs.dart';
 import 'my_pages/recruit/my_recruitment_page.dart';
 import 'my_pages/promotion/my_promotion_page.dart';
+import 'my_pages/reviews/review_page.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -34,7 +36,7 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  List<String> menu = ['메시지 관리', '팔로우 관리', '테스터 모집 관리', '나의 테스터 신청', '나의 서비스 홍보'];
+  List<String> menu = ['메시지 관리', '팔로우 관리', '테스터 모집 관리', '나의 테스터 신청', '나의 서비스 홍보', '리뷰 관리'];
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +88,7 @@ class _UserPageState extends State<UserPage> {
                                             padding: EdgeInsets.zero,
                                           ),
                                           label: Text(
-                                            '로그인 하러가기',
+                                            '로그인',
                                             style: TextStyle(fontSize: 20),
                                           ),
                                           icon: Icon(Icons.arrow_forward_ios_sharp),
@@ -168,7 +170,18 @@ class _UserPageState extends State<UserPage> {
                                         ),
                                         Selector<BasePostProvider, List<RecruitPostEntity>>(
                                             selector: (context, provider) {
-                                          return provider.userRecruitPosts ?? [];
+                                              List<RecruitPostEntity> posts = [];
+                                              if (provider.userRecruitPosts != null) {
+                                                if(provider.userRecruitPosts!.isEmpty) {
+                                                  return posts;
+                                                }
+                                                for (var post in provider.userRecruitPosts!) {
+                                                  if (post.status == PostStatus.active) {
+                                                    posts.add(post);
+                                                  }
+                                                }
+                                              }
+                                          return posts;
                                         }, builder: (context, posts, child) {
                                           return SizedBox(
                                             child: Text(
@@ -201,7 +214,18 @@ class _UserPageState extends State<UserPage> {
                                         ),
                                         Selector<BasePostProvider, List<PromotionPostEntity>>(
                                           selector: (context, provider) {
-                                            return provider.userPromotionPosts ?? [];
+                                            List<PromotionPostEntity> posts = [];
+                                            if (provider.userPromotionPosts != null) {
+                                              if(provider.userPromotionPosts!.isEmpty){
+                                                return posts;
+                                              }
+                                              for (var post in provider.userPromotionPosts!) {
+                                                if (post.status == PostStatus.active) {
+                                                  posts.add(post);
+                                                }
+                                              }
+                                            }
+                                            return posts;
                                           },
                                           builder: (context, posts, child) {
                                             return SizedBox(
@@ -238,7 +262,19 @@ class _UserPageState extends State<UserPage> {
                                         ),
                                         Selector<ApplicationProvider, List<ApplicationEntity>>(
                                             selector: (context, provider) {
-                                          return provider.userApplications ?? [];
+                                              List<ApplicationEntity> apps = [];
+                                              if (provider.userApplications != null) {
+                                                if(provider.userApplications!.isEmpty){
+                                                  return apps;
+                                                }
+                                                for (var app in provider.userApplications!) {
+                                                  if (app.status != ApplicationStatus.cancel &&
+                                                      app.status != ApplicationStatus.rejected) {
+                                                    apps.add(app);
+                                                  }
+                                                }
+                                              }
+                                          return apps;
                                         }, builder: (context, apps, child) {
                                           int length = 0;
                                           if (apps.isNotEmpty) {
@@ -277,7 +313,7 @@ class _UserPageState extends State<UserPage> {
                     //   borderRadius: BorderRadius.circular(10),
                     // ),
                     child: Container(
-                        padding: EdgeInsets.all(20),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         decoration: BoxDecoration(
                             // border: Border.all(),
                             borderRadius: BorderRadius.circular(10),
@@ -396,6 +432,8 @@ class _UserPageState extends State<UserPage> {
         return Symbols.crop_free;
       case 4:
         return Symbols.linked_services;
+      case 5:
+        return Symbols.reviews;
       default:
         return Symbols.design_services;
     }
@@ -410,6 +448,7 @@ class _UserPageState extends State<UserPage> {
         debugPrint(menu[idx]);
         break;
       case 2:
+        debugPrint(menu[idx]);
         Get.to(() => const MyRecruitmentPage());
         break;
       case 3:
@@ -419,6 +458,10 @@ class _UserPageState extends State<UserPage> {
       case 4:
         debugPrint(menu[idx]);
         Get.to(() => const MyPromotionPage());
+        break;
+      case 5:
+        debugPrint(menu[idx]);
+        Get.to(() => ReviewPage());
         break;
       default:
     }

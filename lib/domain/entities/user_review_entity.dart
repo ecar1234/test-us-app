@@ -9,7 +9,7 @@ class UserReviewEntity {
   String? reviewId;
   double? rating;
   String? comment;
-  int? application;
+  int? applicationId;
   String? reviewerId;
   String? reviewedId;
   DateTime? createdAt;
@@ -18,34 +18,32 @@ class UserReviewEntity {
     this.reviewId,
     this.rating,
     this.comment,
-    this.application,
+    this.applicationId,
     this.reviewerId,
     this.reviewedId,
     this.createdAt,
   });
 
-  static ReviewEntity toEntity(UserReviewModel model){
+  static UserReviewEntity toEntity(UserReviewModel model){
 
     return UserReviewEntity(
       reviewId: model.reviewId,
       rating: model.rating,
       comment: model.comment,
-      application: application,
-      reviewerId: model.reviewerId,
-      reviewedId: model.reviewedId,
+      applicationId: model.applicationId,
+      reviewerId: model.reviewerUserId,
+      reviewedId: model.reviewedUserId,
       createdAt: model.createdAt,
     );
   }
-  static ReviewModel toModel(ReviewEntity entity){
-    final application = entity.application == null ? null : ApplicationEntity.toModel(entity.application!);
-    return ReviewModel(
+  static UserReviewModel toModel(UserReviewEntity entity){
+    return UserReviewModel(
       reviewId: entity.reviewId,
       rating: entity.rating,
       comment: entity.comment,
-      reviewType: entity.reviewType,
-      application: application,
-      reviewerId: entity.reviewerId,
-      reviewedId: entity.reviewedId,
+      applicationId: entity.applicationId,
+      reviewerUserId: entity.reviewerId,
+      reviewedUserId: entity.reviewedId,
       createdAt: entity.createdAt,
     );
   }

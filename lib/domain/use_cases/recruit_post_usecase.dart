@@ -24,6 +24,11 @@ class RecruitPostUseCase {
     return res;
   }
 
+  Future<RecruitPostEntity> endPost(String token, String id) async {
+    final res = await repository.endPost(token, id);
+    return res;
+  }
+
   Future<bool> deletePost(String token, String id) async {
     final res = await repository.deletePost(token, id);
     return res;

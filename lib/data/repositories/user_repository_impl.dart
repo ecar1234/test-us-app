@@ -4,7 +4,7 @@ import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../domain/entities/image_entity.dart';
 import '../../domain/entities/recruit_post_entity.dart';
-import '../../domain/entities/review_entity.dart';
+import '../../domain/entities/user_review_entity.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../data_sources/user_data/user_data_source.dart';
 
@@ -72,12 +72,12 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getUsersByIds(String token, List<String> ids) async {
+  Future<List<UserEntity>> getUsersByIds(String token, List<String> ids) async {
     final res = await remote.getUsersByIds(token, ids);
-    for (var element in res) {
-      element['user'] = UserEntity.toEntity(element['user']);
-    }
-    return res;
+    if (res.isEmpty) return [];
+    final users = res.map((e) => UserEntity.toEntity(e)).toList();
+
+    return users;
   }
 
   @override

@@ -35,6 +35,12 @@ class RequestPostCreateEvent extends RecruitPostEvent {
   RequestPostCreateEvent(this.token, this.post, this.selectedImages);
 }
 //
+class RequestPostEndEvent extends RecruitPostEvent {
+  final String token;
+  final String postId;
+  RequestPostEndEvent(this.token, this.postId);
+}
+//
 class RequestPostDeleteEvent extends RecruitPostEvent {
   final String token;
   final RecruitPostEntity post;

@@ -15,13 +15,8 @@ class ApplicationProvider with ChangeNotifier{
   List<RecruitPostEntity>? get userApplicationPosts => _userApplicationPosts;
 
 
-  Future<void> getMyApplications(String token, String userId) async {
-    final res = await useCase.getMyApplications(token, userId);
-    if(_userApplications == null){
-      _userApplications = res;
-    }else {
-      _userApplications!.addAll(res);
-    }
+  void getMyApplications(List<ApplicationEntity> applications) async {
+    _userApplications ??= applications;
     notifyListeners();
   }
 

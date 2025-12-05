@@ -41,10 +41,29 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
       appBar: AppBar(
         title: Text("테스터 모집 관리"),
       ),
-      body: Selector<BasePostProvider, List<RecruitPostEntity>>(
-          selector: (context, provider) => provider.userRecruitPosts ?? [],
-          builder: (context, posts, child) {
-        if (posts.isEmpty) {
+      body: BlocListener<RecruitPostBloc, RecruitPostState>(
+        listener: (context, state) {
+          if(state.state == RecruitPostLoadState.postEndCompletedState) {
+            context.read<BasePostProvider>().updateRecruitPost(state.post!);
+            context.read<BasePostProvider>().updateUserRecruitPosts(state.post!);
+          }
+        },
+        child: Selector<BasePostProvider, List<RecruitPostEntity>>(selector: (context, provider) {
+          List<RecruitPostEntity> posts = [];
+          if (provider.userRecruitPosts != null) {
+            if(provider.userRecruitPosts!.isEmpty){
+              return posts;
+            }
+            for (int i = 0; i < provider.userRecruitPosts!.length; i++) {
+              if (provider.userRecruitPosts![i].status != PostStatus.end &&
+                  provider.userRecruitPosts![i].status != PostStatus.delete) {
+                posts.add(provider.userRecruitPosts![i]);
+              }
+            }
+          }
+          return posts;
+        }, builder: (context, posts, child) {
+          if (posts.isEmpty) {
             return SizedBox(
               width: MediaQuery.sizeOf(context).width,
               height: hei,
@@ -60,7 +79,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
             );
           }
           return _postsInfoBuilder(posts, hei);
-        }
+        }),
       ),
     ));
   }
@@ -74,10 +93,13 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
               shrinkWrap: true,
               padding: EdgeInsets.symmetric(vertical: 20),
               itemBuilder: (context, idx) {
+                bool isExpired = posts[idx].status == PostStatus.expired;
                 return GestureDetector(
-                  onTap: () {
-                    Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
-                  },
+                  onTap: isExpired
+                      ? null
+                      : () {
+                          Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
+                        },
                   child: SizedBox(
                     height: 130,
                     width: MediaQuery.sizeOf(context).width,
@@ -86,16 +108,19 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Flexible(
-                          flex: 3,
-                          child: SizedBox(
-                            // width: (MediaQuery.sizeOf(context).width - 50) * 0.35,
-                            height: 130,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: CachedNetworkImage(imageUrl: posts[idx].images![0].url!, fit: BoxFit.cover),
-                            )
-                          )
-                        ),
+                            flex: 3,
+                            child: SizedBox(
+                                // width: (MediaQuery.sizeOf(context).width - 50) * 0.35,
+                                height: 130,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: CachedNetworkImage(
+                                    imageUrl: posts[idx].images![0].url!,
+                                    fit: BoxFit.cover,
+                                    color: isExpired ? Colors.grey.shade200 : null,
+                                    colorBlendMode: isExpired ? BlendMode.saturation : null,
+                                  ),
+                                ))),
                         Flexible(
                           flex: 7,
                           child: Container(
@@ -111,9 +136,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                     Text(
                                       posts[idx].title!,
                                       style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          overflow: TextOverflow.ellipsis),
+                                          fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
                                       maxLines: 1,
                                     ),
                                   ],
@@ -127,85 +150,67 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                     SizedBox(
                                       child: posts[idx].platform!.length == 1
                                           ? Text('플랫폼 : ${posts[idx].platform![0]}')
-                                          : Text(
-                                          '플랫폼 : ${posts[idx].platform![0]} / ${posts[idx].platform![1]}'),
+                                          : Text('플랫폼 : ${posts[idx].platform![0]} / ${posts[idx].platform![1]}'),
                                     ),
-                                    const Gap(20),
+                                    const Gap(10),
                                     SizedBox(
                                       child: posts[idx].status == PostStatus.active
                                           ? Text('(모집 중)')
-                                          : (posts[idx].status == PostStatus.end
-                                          ? Text('(기간 종료)')
-                                          : Text('(만료)')),
+                                          : Text('(모집기간 만료)'),
                                     )
                                   ],
                                 ),
                               ),
-                            SizedBox(
-                              child: Row(
+                              SizedBox(
+                                  child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
+                                  // NOTE: 현재는 period가 7일로 고정 되어 있지만, 상확에 따라 변경필요, 변수로 period 포함 시키는 로직 필요.
                                   Text('게시 만료 : ${TimeUtil().getDateTimeString(posts[idx].createdAt!, true)}'),
                                 ],
-                              )
-                            ),
-                            Gap(10),
-                            SizedBox(
+                              )),
+                              Gap(10),
+                              if(isExpired)
+                                SizedBox(
                                   height: 40,
                                   width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
-                                  child: ElevatedButton(
-                                    onPressed: _getApplicantLength(posts[idx]) == 0
-                                        ? null
-                                        : () {
-                                      Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      elevation: 2,
+                                  child: ElevatedButton(onPressed: (){
+                                    //TODO: 테스트 종료 -> status.end 로 update
+                                    //TODO: alert으로 테스트 종료 시 리뷰를 쓰도록 이동 또는 알림
+                                    final token = context.read<UserProvider>().token ?? '';
+                                    final postId = posts[idx].id!;
+                                    context.read<RecruitPostBloc>().add(RequestPostEndEvent(token, postId));
+                                  }, child: Text('테스트 종료')),
+                                )
+                              else
+                              SizedBox(
+                                height: 40,
+                                width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
+                                child: ElevatedButton(
+                                  onPressed: _getApplicantLength(posts[idx]) == 0
+                                      ? null
+                                      : () {
+                                          Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
+                                        },
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text('신청 인원', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                                        Text(' ( ${_getApplicantLength(posts[idx])} / 8 )'),
-                                      ],
-                                    ),
+                                    elevation: 2,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('신청 인원', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                      Text(' ( ${_getApplicantLength(posts[idx])} / 8 )'),
+                                    ],
                                   ),
                                 ),
+                              ),
                             ]),
                           ),
                         ),
-                        // Flexible(
-                        //   flex: 2,
-                        //   child: SizedBox(
-                        //     height: 60,
-                        //     width: (MediaQuery.sizeOf(context).width - 50) * 0.2,
-                        //     child: ElevatedButton(
-                        //       onPressed: _getApplicantLength(posts[idx]) == 0
-                        //           ? null
-                        //           : () {
-                        //         Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
-                        //       },
-                        //       style: ElevatedButton.styleFrom(
-                        //         padding: EdgeInsets.zero,
-                        //         shape: RoundedRectangleBorder(
-                        //           borderRadius: BorderRadius.circular(10),
-                        //         ),
-                        //         elevation: 2,
-                        //       ),
-                        //       child: Column(
-                        //         mainAxisAlignment: MainAxisAlignment.center,
-                        //         children: [
-                        //           Text('신청 인원', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                        //           Text('(${_getApplicantLength(posts[idx])} / 8)'),
-                        //         ],
-                        //       ),
-                        //     ),
-                        //   ),
-                        // )
                       ],
                     ),
                   ),

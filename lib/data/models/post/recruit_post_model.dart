@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:test_us_app/data/models/review/post_review_model.dart';
 
 import '../application/application_model.dart';
 import '../user/user_model.dart';
@@ -30,6 +31,7 @@ class RecruitPostModel {
   int? views;
   List<ImageModel>? images;
   String? postType;
+  List<PostReviewModel>? reviews;
   List<ApplicationModel>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -47,6 +49,7 @@ class RecruitPostModel {
     this.views,
     this.images,
     this.postType,
+    this.reviews,
     this.createdAt,
     this.updatedAt,
   });

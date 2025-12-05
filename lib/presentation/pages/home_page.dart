@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
@@ -174,7 +175,26 @@ class _HomePageState extends State<HomePage> {
 
   Widget _favoritePostList(BuildContext context) {
     return Selector<BasePostProvider, List<dynamic>>(
-        selector: (context, provider) => provider.favoritePost ?? [],
+        selector: (context, provider) {
+          List<dynamic> posts = [];
+          if (provider.favoritePost != null) {
+            if(provider.favoritePost!.isEmpty){
+              return posts;
+            }
+            for(var post in provider.favoritePost!){
+              if(post is RecruitPostEntity){
+                if(post.status == PostStatus.active){
+                  posts.add(post);
+                }
+              }else {
+                if(post.status == PostStatus.active){
+                  posts.add(post);
+                }
+              }
+            }
+          }
+          return posts;
+        },
         builder: (context, favoritePost, child) {
           if (favoritePost.isNotEmpty) {
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

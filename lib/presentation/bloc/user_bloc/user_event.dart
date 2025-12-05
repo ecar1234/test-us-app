@@ -15,7 +15,8 @@ class RequestUserDataEvent extends UserEvent {
 class RequestUsersDataEvent extends UserEvent {
   String token;
   List<String> ids;
-  RequestUsersDataEvent(this.token, this.ids);
+  String postId;
+  RequestUsersDataEvent(this.token, this.ids, this.postId);
 }
 
 class RequestUserReviewEvent extends UserEvent {

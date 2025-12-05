@@ -22,7 +22,8 @@ class RecruitPostBloc extends Bloc<RecruitPostEvent, RecruitPostState> {
     on<RequestRecruitmentPaginationEvent>((event, emit) async {
       try {
         final res = await postUseCase.getPostPagination(event.page, event.size);
-        emit(RecruitPostState(state: RecruitPostLoadState.recruitPostsLoadCompletedState, posts: res, page: event.page));
+        emit(
+            RecruitPostState(state: RecruitPostLoadState.recruitPostsLoadCompletedState, posts: res, page: event.page));
         logger.i("data state : recruitPostsLoadCompletedState");
       } on Exception catch (e) {
         // TODO
@@ -75,12 +76,25 @@ class RecruitPostBloc extends Bloc<RecruitPostEvent, RecruitPostState> {
       }
     });
     //
+    on<RequestPostEndEvent>((event, emit) async {
+      emit(RecruitPostState(state: RecruitPostLoadState.dataLoadState));
+      logger.i('data state : dataLoadState');
+      try {
+        final res = await postUseCase.endPost(event.token, event.postId);
+        emit(RecruitPostState(state: RecruitPostLoadState.postEndCompletedState, post: res));
+        logger.i("data state : postEndCompletedState");
+      } on Exception catch (e) {
+        emit(RecruitPostState(state: RecruitPostLoadState.errorState));
+        logger.e("data state : errorState");
+      }
+    });
+    //
     on<RequestPostDeleteEvent>((event, emit) async {
       emit(RecruitPostState(state: RecruitPostLoadState.dataLoadState));
       try {
         logger.i('data state : dataLoadState');
         final res = await postUseCase.deletePost(event.token, event.post.id!);
-        if(res == true) {
+        if (res == true) {
           emit(RecruitPostState(state: RecruitPostLoadState.postDeleteCompletedState, post: event.post));
         } else {
           emit(RecruitPostState(state: RecruitPostLoadState.failedState));

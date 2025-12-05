@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
 
 import '../entities/image_entity.dart';
-import '../entities/review_entity.dart';
+import '../entities/user_review_entity.dart';
 import '../entities/user_entity.dart';
 
 abstract class UserRepository {
@@ -13,7 +13,7 @@ abstract class UserRepository {
   Future<UserEntity?> getUserByEmail(String email);
   Future<UserEntity?> getUserByNickname(String nickname);
   Future<UserEntity?> getUserById(String token, String id);
-  Future<List<Map<String, dynamic>>> getUsersByIds(String token, List<String> ids);
+  Future<List<UserEntity>> getUsersByIds(String token, List<String> ids);
   Future<bool> isNicknameAvailable(String nickname);
   Future<bool> isEmailAvailable(String email);
   Future<bool> isPasswordValid(String password);

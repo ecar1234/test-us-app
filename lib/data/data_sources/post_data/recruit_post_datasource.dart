@@ -12,6 +12,7 @@ abstract class RecruitPostDatasource {
   Future<List<RecruitPostModel>> getPostByTitle(String title);
   Future<RecruitPostModel> createPost(String token, RecruitPostModel post, List<XFile> images);
   Future<RecruitPostModel> updatePost(String token, RecruitPostModel post, List<XFile> images, List<ImageModel> oldImages);
+  Future<RecruitPostModel> endPost(String token, String id);
   Future<bool> deletePost(String token, String id);
   Future<List<RecruitPostModel>> getAppRecruitPosts(String token, List<String> ids);
 }

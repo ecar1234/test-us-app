@@ -29,18 +29,18 @@ class MyApplicationsPage extends StatefulWidget {
 }
 
 class _MyApplicationsPageState extends State<MyApplicationsPage> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    final posts = context.read<ApplicationProvider>().userApplicationPosts ?? [];
-    final app = context.read<ApplicationProvider>().userApplications ?? [];
-    if (posts.isEmpty || posts.length != app.length) {
-      final postIds = app.map((e) => e.postId!).toList();
-      final token = context.read<UserProvider>().token ?? '';
-      context.read<RecruitPostBloc>().add(RequestAppRecruitPosts(token, postIds));
-    }
-  }
+  // @override
+  // void initState() {
+  //   // TODO: implement initState
+  //   super.initState();
+  //   final posts = context.read<ApplicationProvider>().userApplicationPosts ?? [];
+  //   final app = context.read<ApplicationProvider>().userApplications ?? [];
+  //   if (posts.isEmpty || posts.length != app.length) {
+  //     final postIds = app.map((e) => e.postId!).toList();
+  //     final token = context.read<UserProvider>().token ?? '';
+  //     context.read<RecruitPostBloc>().add(RequestAppRecruitPosts(token, postIds));
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -49,21 +49,7 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
           appBar: AppBar(
             title: const Text('나의 테스터 신청'),
           ),
-          body: BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
-            if (state.state == RecruitPostLoadState.getAppRecruitPostsCompletedState) {
-              context.read<ApplicationProvider>().setUserApplicationPosts(state.posts!);
-            }
-          }, builder: (context, state) {
-            if (state.state == RecruitPostLoadState.dataLoadState) {
-              return SizedBox(
-                height: GetIt.I.get<ResponsiveHeightProvider>().hei ?? 0,
-                width: MediaQuery.sizeOf(context).width,
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-            return BlocListener<AppBloc, AppState>(
+          body: BlocListener<AppBloc, AppState>(
               listener: (context, state) {
                 final appProvider = context.read<ApplicationProvider>();
                 if (state.state == UserAppState.applicationCancelCompletedState) {
@@ -135,9 +121,8 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                               itemCount: posts.length);
                     },
                   )),
-            );
-          })),
-    );
+            )
+          ));
   }
 
   Widget _buttonBuilder(ApplicationStatus state, int appId, String postId) {

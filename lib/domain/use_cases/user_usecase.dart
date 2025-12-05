@@ -5,7 +5,7 @@ import 'package:test_us_app/domain/entities/image_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../data/sharedPreferences/auth_preference.dart';
-import '../entities/review_entity.dart';
+import '../entities/user_review_entity.dart';
 import '../repositories/user_repository.dart';
 
 class UserUseCase {
@@ -38,7 +38,7 @@ class UserUseCase {
     final res = await repository.getUserById(token, id);
     return res;
   }
-  Future<List<Map<String, dynamic>>> getUsersByIds(String token, List<String> ids) async {
+  Future<List<UserEntity>> getUsersByIds(String token, List<String> ids) async {
     final res = await repository.getUsersByIds(token, ids);
     return res;
   }

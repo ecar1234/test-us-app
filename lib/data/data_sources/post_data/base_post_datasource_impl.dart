@@ -1,6 +1,7 @@
 
 import 'dart:async';
 
+import 'package:logger/logger.dart';
 import 'package:test_us_app/data/data_sources/post_data/base_post_datasource.dart';
 
 import '../../../core/api_names.dart';
@@ -10,7 +11,7 @@ import '../../models/post/recruit_post_model.dart';
 
 class BasePostDataSourceImpl implements BasePostDataSource {
   final NetDriver netDriver;
-
+  final logger = Logger();
   BasePostDataSourceImpl(this.netDriver);
 
   @override
@@ -64,15 +65,20 @@ class BasePostDataSourceImpl implements BasePostDataSource {
   Future<Map<String, dynamic>> _startGetUserPosts(String jobId, String token) {
     final controller = Completer<Map<String, List<dynamic>>>();
     Timer.periodic(Duration(seconds: 2), (timer) async {
-      final res = await netDriver.requestGetJson(token, JobApi.jobGetUserPosts, param: jobId);
-      if (res['status'] == 200) {
-        final recruitPosts = res['recruitPosts'].map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();
-        final promotionPosts = res['promotionPosts'].map<PromotionPostModel>((e) => PromotionPostModel.fromJson(e)).toList();
-          controller.complete({
-            'recruitPosts' : recruitPosts,
-            'promotionPosts' : promotionPosts
-          });
-          timer.cancel();
+      try {
+        final res = await netDriver.requestGetJson(token, JobApi.jobGetUserPosts, param: jobId);
+        if (res['status'] == 200) {
+          final recruitPosts = res['recruitPosts'].map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();
+          final promotionPosts = res['promotionPosts'].map<PromotionPostModel>((e) => PromotionPostModel.fromJson(e)).toList();
+            controller.complete({
+              'recruitPosts' : recruitPosts,
+              'promotionPosts' : promotionPosts
+            });
+            timer.cancel();
+        }
+      } on Exception catch (e) {
+        // TODO
+        logger.e(e.toString());
       }
     });
     return controller.future;

@@ -11,6 +11,7 @@ enum RecruitPostLoadState {
   postCreateCompletedState,
   recruitPostsLoadCompletedState,
   postUpdateCompletedState,
+  postEndCompletedState,
   postDeleteCompletedState,
   getPostByIdCompletedState,
   getUserRecruitmentPostsCompletedState,

@@ -5,11 +5,12 @@ import 'package:test_us_app/domain/use_cases/user_usecase.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_event.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
 
+import '../../../domain/use_cases/review_usecase.dart';
 import '../../provider/user_provider.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
   final logger = Logger();
-  UserBloc(UserUseCase userUseCase) : super(UserState(UserDataState.serviceStartState)) {
+  UserBloc(UserUseCase userUseCase, ReviewUseCase reviewUseCase) : super(UserState(UserDataState.serviceStartState)) {
 
     on<RequestUserDataEvent>((event, emit) async {
       emit(UserState(UserDataState.loadingState));
@@ -29,8 +30,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserState(UserDataState.loadingState));
       logger.i('user state : loading state');
       try {
-        final data = await userUseCase.getUsersByIds(event.token, event.ids);
-        emit(UserState(UserDataState.getUsersInfoCompletedState, usersAddAverage: data));
+        final users = await userUseCase.getUsersByIds(event.token, event.ids);
+        // final reviews = await reviewUseCase.getTestersReviewOnPost(event.token, event.ids, event.postId);
+        emit(UserState(UserDataState.getUsersInfoCompletedState,users: users));
         } catch (e) {
         emit(UserState(UserDataState.errorState));
         logger.i('user state : error state');

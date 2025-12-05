@@ -1,4 +1,5 @@
 import 'package:test_us_app/data/models/user/user_model.dart';
+import 'package:test_us_app/domain/entities/post_review_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../data/models/application/application_model.dart';
@@ -18,6 +19,7 @@ class RecruitPostEntity {
   int? views;
   List<ImageEntity>? images;
   String? postType;
+  List<PostReviewEntity>? reviews;
   UserEntity? author;
   List<ApplicationEntity>? applications;
   DateTime? createdAt;
@@ -36,6 +38,7 @@ class RecruitPostEntity {
     this.views,
     this.images,
     this.postType,
+    this.reviews,
     this.createdAt,
     this.updatedAt,
   });
@@ -48,6 +51,7 @@ class RecruitPostEntity {
     );
     final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
     final applications = model.applications!.map((e) => ApplicationEntity.toEntity(e)).toList();
+    final reviews = model.reviews!.map((e) => PostReviewEntity.toEntity(e)).toList();
     return RecruitPostEntity(
       id: model.id,
       title: model.title,
@@ -61,6 +65,7 @@ class RecruitPostEntity {
       views: model.views,
       images: images,
       postType: model.postType,
+      reviews: reviews,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
     );

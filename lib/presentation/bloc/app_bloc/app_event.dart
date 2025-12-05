@@ -36,6 +36,13 @@ class RequestRejectApplicationEvent extends AppEvent {
   RequestRejectApplicationEvent(this.token, this.userId, this.postId);
 }
 
+class RequestMyApplicationsEvent extends AppEvent {
+  final String token;
+  final String userId;
+
+  RequestMyApplicationsEvent(this.token, this.userId);
+}
+
 class ApplicationDataLoadEvent extends AppEvent {
   ApplicationDataLoadEvent();
 }

@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/user_data/user_data_source.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
+import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../../core/net_driver.dart';
 import '../../models/image/image_model.dart';
@@ -118,15 +121,19 @@ class UserDataSourceImpl implements UserDataSource {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getUsersByIds(String token, List<String> ids) async {
-    final res = await netDriver.requestPostJson(token, UserApi.getUsersByIds, {'ids': ids});
-    if (res['status'] == 200) {
-      final data = (res['users'] as List).map<Map<String, dynamic>>((e) {
-        return {'user': UserModel.fromJson(e['user']), 'average': e['averageRating'], 'reviewCount': e['reviewCount']};
-      }).toList();
-      return data;
-    } else {
-      throw Exception('Error');
+  Future<List<UserModel>> getUsersByIds(String token, List<String> ids) async {
+    try {
+      final res = await netDriver.requestPostJson(token, UserApi.getUsersByIds, {'ids': ids});
+      if (res['status'] == 200) {
+        final users = res['users'].map<UserModel>((e) => UserModel.fromJson(e)).toList();
+        return users;
+      } else {
+        throw Exception('Error');
+      }
+    } on Exception catch (e) {
+      // TODO
+      logger.e(e);
+      rethrow;
     }
   }
 

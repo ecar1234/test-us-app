@@ -1,5 +1,7 @@
 import 'package:test_us_app/data/models/post/promotion_post_model.dart';
 import 'package:test_us_app/domain/entities/image_entity.dart';
+import 'package:test_us_app/domain/entities/post_review_entity.dart';
+import 'package:test_us_app/domain/entities/user_review_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import '../../data/models/image/image_model.dart';
 import '../../data/models/post/recruit_post_model.dart';
@@ -19,6 +21,7 @@ class PromotionPostEntity {
   List<ImageEntity>? images;
   List<String>? domain;
   String? postType;
+  List<PostReviewEntity>? reviews;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -35,6 +38,7 @@ class PromotionPostEntity {
     this.images,
     this.domain,
     this.postType,
+    this.reviews,
     this.createdAt,
     this.updatedAt,
   });
@@ -46,6 +50,7 @@ class PromotionPostEntity {
       profileImg: ImageEntity.toImageEntity(model.author!.profileImg!),
     );
     final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
+    final reviews = model.reviews!.map((e) => PostReviewEntity.toEntity(e)).toList();
     return PromotionPostEntity(
       id: model.id,
       title: model.title,
@@ -59,6 +64,7 @@ class PromotionPostEntity {
       images: images,
       domain: model.domain,
       postType: model.postType,
+      reviews: reviews,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt
     );

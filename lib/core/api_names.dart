@@ -43,6 +43,7 @@ class PostApi {
 class RecruitPostApi {
   static const String createRecruitPost = '/api/v1/post/createRecruitPost';
   static const String update = '/api/v1/post/updateRecruitPost';
+  static const String end = '/api/v1/post/endRecruitPost';
   static const String delete = '/api/v1/post/deleteRecruitPost';
   static const String getPostById = '/api/v1/post/getRecruitPostById';
   static const String getPostsByTitle = '/api/v1/post/getRecruitPostByTitle';
@@ -76,11 +77,14 @@ class ApplicationApi {
 }
 
 class ReviewApi {
-  static const String create = '/api/v1/review/create';
-  static const String update = '/api/v1/review/update';
-  static const String delete = '/api/v1/review/delete';
-  static const String getReviewsById = '/api/v1/review/getReviewsById';
-  static const String gatUsersReviewAverage = '/api/v1/review/getUserReviewAverage';
+  static const String addUserReview = '/api/v1/review/addUserReview';
+  static const String addRecruitReview = '/api/v1/review/addRecruitReview';
+  static const String addPromotionReview = '/api/v1/review/addPromotionReview';
+  static const String getUserReview = '/api/v1/review/getUserReview';
+  static const String getReviewByPostId = '/api/v1/review/getReviewByPostId';
+  static const String getReviewByUserId = '/api/v1/review/getReviewByUserId';
+  static const String getReviewByTesters = '/api/v1/review/getReviewByTesters';
+  static const String getReviewByNickname = '/api/v1/review/getReviewByNickname';
 }
 
 class MessageApi {}

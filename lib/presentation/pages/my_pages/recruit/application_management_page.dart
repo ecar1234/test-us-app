@@ -8,6 +8,8 @@ import 'package:logger/logger.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
+import 'package:test_us_app/domain/entities/user_entity.dart';
+import 'package:test_us_app/domain/entities/user_review_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
@@ -45,7 +47,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
     final ids = post.applications!.map((e) => e.applicantId!).toList();
 
     final token = context.read<UserProvider>().token ?? '';
-    context.read<UserBloc>().add(RequestUsersDataEvent(token, ids));
+    context.read<UserBloc>().add(RequestUsersDataEvent(token, ids, post.id!));
   }
 
   @override
@@ -56,26 +58,25 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
               title: Text("신청 관리"),
             ),
             body: BlocConsumer<UserBloc, UserState>(listener: (context, state) {
-              if (state.state == UserDataState.getUsersInfoCompletedState) {
-                if (_toolKeys.length != state.usersAddAverage!.length) {
-                  setState(() {
-                    _toolKeys = List.generate(state.usersAddAverage!.length, (index) => GlobalKey<TooltipState>());
-                  });
-                }
-              }
+              // if (state.state == UserDataState.getUsersInfoCompletedState) {
+              //   if (_toolKeys.length != state.usersAddAverage!.length) {
+              //     setState(() {
+              //       _toolKeys = List.generate(state.usersAddAverage!.length, (index) => GlobalKey<TooltipState>());
+              //     });
+              //   }
+              // }
             }, builder: (context, state) {
               final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
               if (state.state == UserDataState.loadingState) {
                 return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
               }
-              if (state.usersAddAverage != null) {
-                return _mainBuilder(state.usersAddAverage!);
-              }
-              return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
+
+              return _mainBuilder(state.users!);
+              // return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
             })));
   }
 
-  Widget _mainBuilder(List<Map<String, dynamic>> users) {
+  Widget _mainBuilder(List<UserEntity> users) {
     final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
     return Container(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -90,14 +91,16 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                       color: isDarkMode ? Colors.grey.shade800 : Colors.white,
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(10),
-                      boxShadow: isDarkMode ? null : [
-                        BoxShadow(
-                          color: Colors.grey.withAlpha(84),
-                          spreadRadius: 2,
-                          blurRadius: 9,
-                          offset: Offset(0, 3), // changes position of shadow
-                        ),
-                      ]),
+                      boxShadow: isDarkMode
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: Colors.grey.withAlpha(84),
+                                spreadRadius: 2,
+                                blurRadius: 9,
+                                offset: Offset(0, 3), // changes position of shadow
+                              ),
+                            ]),
                   child: Selector<BasePostProvider, RecruitPostEntity>(
                       selector: (context, provider) =>
                           provider.userRecruitPosts!.firstWhere((e) => e.id == widget.postId),
@@ -116,13 +119,13 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                         // user nickname
                                         SizedBox(
                                           child: Text(
-                                            "${users[idx]['user'].nickname!}",
+                                            users[idx].nickname!,
                                             style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                                // color: post.applications![idx].status == ApplicationStatus.rejected
-                                                //     ? Colors.grey
-                                                //     : Colors.black87
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
+                                              // color: post.applications![idx].status == ApplicationStatus.rejected
+                                              //     ? Colors.grey
+                                              //     : Colors.black87
                                             ),
                                           ),
                                         ),
@@ -130,15 +133,16 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                         // email
                                         if (post.applications![idx].status == ApplicationStatus.accepted)
                                           SizedBox(
-                                              child: Text(
-                                                users[idx]['user'].email!,
-                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
-                                              ))
+                                              child: SelectableText(
+                                            users[idx].email!,
+                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                                            enableInteractiveSelection: true,
+                                          ))
                                         else if (post.applications![idx].status == ApplicationStatus.rejected)
                                           SizedBox(
                                             child: Text('승인거부 된 유저 입니다.'),
                                           )
-                                        else if(post.applications![idx].status == ApplicationStatus.pending)
+                                        else if (post.applications![idx].status == ApplicationStatus.pending)
                                           SizedBox(
                                               child: Text(
                                             '초대 메일주소는 승인 후 표시됩니다.',
@@ -156,18 +160,15 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                                     borderRadius: BorderRadius.circular(20)),
                                                 child: Center(
                                                   child: Text(
-                                                      users[idx]['user'].userType == UserType.individuals
-                                                          ? '1인 개발'
-                                                          : '기업/소속',
+                                                      users[idx].userType == UserType.individuals ? '1인 개발' : '기업/소속',
                                                       style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight: FontWeight.w500,
-                                                          // color: post.applications![idx].status ==
-                                                          //         ApplicationStatus.rejected
-                                                          //     ? Colors.grey
-                                                          //     : Colors.black87
-                                                      )
-                                                  ),
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.w500,
+                                                        // color: post.applications![idx].status ==
+                                                        //         ApplicationStatus.rejected
+                                                        //     ? Colors.grey
+                                                        //     : Colors.black87
+                                                      )),
                                                 ),
                                               ),
                                               const Gap(10),
@@ -177,50 +178,50 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                                     border: Border.all(color: Colors.grey.shade400),
                                                     borderRadius: BorderRadius.circular(20)),
                                                 child: Center(
-                                                  child: Text(_getUserRole(users[idx]['user'].role!),
+                                                  child: Text(_getUserRole(users[idx].role!),
                                                       style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight: FontWeight.w500,
-                                                          // color: post.applications![idx].status ==
-                                                          //         ApplicationStatus.rejected
-                                                          //     ? Colors.grey
-                                                          //     : Colors.black87
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.w500,
+                                                        // color: post.applications![idx].status ==
+                                                        //         ApplicationStatus.rejected
+                                                        //     ? Colors.grey
+                                                        //     : Colors.black87
                                                       )),
                                                 ),
                                               ),
-                                              const Gap(10),
-                                              GestureDetector(
-                                                onTap: post.applications![idx].status == ApplicationStatus.rejected
-                                                    ? null
-                                                    : () {
-                                                        _toolKeys[idx].currentState!.ensureTooltipVisible();
-                                                      },
-                                                child: Tooltip(
-                                                  key: _toolKeys.isEmpty ? null : _toolKeys[idx],
-                                                  message: "완료한 테스터 수 : ${users[idx]['reviewCount']}",
-                                                  child: Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                    decoration: BoxDecoration(
-                                                        border: Border.all(color: Colors.grey.shade400),
-                                                        borderRadius: BorderRadius.circular(20)),
-                                                    child: Row(
-                                                      children: [
-                                                        SizedBox(
-                                                          child: Icon(Symbols.star,
-                                                              fill: 1, size: 16, color: Colors.yellow),
-                                                        ),
-                                                        const Gap(5),
-                                                        SizedBox(
-                                                          child: Text(
-                                                            '${users[idx]['average']}',
-                                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
+                                              // const Gap(10),
+                                              // GestureDetector(
+                                              //   onTap: post.applications![idx].status == ApplicationStatus.rejected
+                                              //       ? null
+                                              //       : () {
+                                              //           _toolKeys[idx].currentState!.ensureTooltipVisible();
+                                              //         },
+                                              //   child: Tooltip(
+                                              //     key: _toolKeys.isEmpty ? null : _toolKeys[idx],
+                                              //     message: "완료한 테스터 수 : ${averages['']}",
+                                              //     child: Container(
+                                              //       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              //       decoration: BoxDecoration(
+                                              //           border: Border.all(color: Colors.grey.shade400),
+                                              //           borderRadius: BorderRadius.circular(20)),
+                                              //       child: Row(
+                                              //         children: [
+                                              //           SizedBox(
+                                              //             child: Icon(Symbols.star,
+                                              //                 fill: 1, size: 16, color: Colors.yellow),
+                                              //           ),
+                                              //           const Gap(5),
+                                              //           SizedBox(
+                                              //             child: Text(
+                                              //               '${users[idx]['average']}',
+                                              //               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                              //             ),
+                                              //           ),
+                                              //         ],
+                                              //       ),
+                                              //     ),
+                                              //   ),
+                                              // )
                                             ],
                                           ),
                                         ),
@@ -235,7 +236,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                                   // color: post.applications![idx].status == ApplicationStatus.rejected
                                                   //     ? Colors.grey
                                                   //     : Colors.black87
-                                              )),
+                                                  )),
                                         )
                                       ],
                                     ))),
@@ -250,7 +251,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
                                       context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
                                       // Get.back();
-                                    } else if(state.state == UserAppState.applicationUpdateCompletedState){
+                                    } else if (state.state == UserAppState.applicationUpdateCompletedState) {
                                       context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
                                       // context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
                                     }
@@ -263,21 +264,21 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                     if (appState == ApplicationStatus.accepted) {
                                       return Column(
                                         children: [
-                                          SizedBox(
-                                            width: MediaQuery.sizeOf(context).width * 0.3,
-                                            child: ElevatedButton(
-                                                onPressed: () {
-                                                  Clipboard.setData(ClipboardData(text: users[idx]['user'].email));
-                                                  Get.snackbar('알림', '이메일이 클립보드에 복사되었습니다.',
-                                                      snackPosition: SnackPosition.BOTTOM,
-                                                      backgroundColor: Colors.grey.shade300,
-                                                      colorText: Colors.black);
-                                                  return;
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                                child: Text('주소 복사')),
-                                          ),
+                                          // SizedBox(
+                                          //   width: MediaQuery.sizeOf(context).width * 0.3,
+                                          //   child: ElevatedButton(
+                                          //       onPressed: () {
+                                          //         Clipboard.setData(ClipboardData(text: users[idx]['user'].email));
+                                          //         Get.snackbar('알림', '이메일이 클립보드에 복사되었습니다.',
+                                          //             snackPosition: SnackPosition.BOTTOM,
+                                          //             backgroundColor: Colors.grey.shade300,
+                                          //             colorText: Colors.black);
+                                          //         return;
+                                          //       },
+                                          //       style: ElevatedButton.styleFrom(
+                                          //           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                                          //       child: Text('주소 복사')),
+                                          // ),
                                           SizedBox(
                                             width: MediaQuery.sizeOf(context).width * 0.3,
                                             child: ElevatedButton(
@@ -286,10 +287,13 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                                   ApplicationEntity app = post.applications![idx];
                                                   app.status = ApplicationStatus.pending;
                                                   app.postId = post.id;
-                                                  context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
+                                                  context
+                                                      .read<AppBloc>()
+                                                      .add(RequestUpdateApplicationEvent(token, app));
                                                 },
                                                 style: ElevatedButton.styleFrom(
-                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(10))),
                                                 child: Text('승인 취소')),
                                           ),
                                         ],

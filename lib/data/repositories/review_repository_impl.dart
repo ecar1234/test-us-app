@@ -1,7 +1,8 @@
 
 
-import 'package:test_us_app/domain/entities/review_entity.dart';
+import 'package:test_us_app/domain/entities/user_review_entity.dart';
 
+import '../../domain/entities/post_review_entity.dart';
 import '../../domain/repositories/review_repository.dart';
 import '../data_sources/review_data/review_data_source.dart';
 
@@ -10,15 +11,42 @@ class ReviewRepositoryImpl implements ReviewRepository {
   ReviewRepositoryImpl(this.remote);
 
   @override
-  Future<ReviewEntity> getUserReview(String token, String userId) async {
-    final res = await remote.getUserReview(token, userId);
-    return ReviewEntity.toEntity(res);
+  Future<PostReviewEntity> addPromotionPostReview(String token, PostReviewEntity review) async {
+    final res = await remote.addPromotionPostReview(token, PostReviewEntity.toModel(review));
+    return PostReviewEntity.toEntity(res);
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getUsersReview(String token, List<String> userIds) async {
-    final res = await remote.getUsersReview(token, userIds);
-    return res;
+  Future<PostReviewEntity> addRecruitPostReview(String token, PostReviewEntity review) async {
+    final res = await remote.addRecruitPostReview(token, PostReviewEntity.toModel(review));
+    return PostReviewEntity.toEntity(res);
   }
 
+  @override
+  Future<UserReviewEntity> addTesterReview(String token, UserReviewEntity review) async {
+    final res = await remote.addTesterReview(token, UserReviewEntity.toModel(review));
+    return UserReviewEntity.toEntity(res);
+  }
+
+
+  @override
+  Future<List<UserReviewEntity>> getReviews(String token, String userId) async {
+    final res = await remote.getReviews(token, userId);
+    if(res.isEmpty) return [];
+    return res.map((e) => UserReviewEntity.toEntity(e)).toList();
+  }
+
+  @override
+  Future<List<UserReviewEntity>> getTestersReviews(String token, List<String> ids, int appId) async {
+    final res = await remote.getTestersReviews(token, ids, appId);
+    if(res.isEmpty) return [];
+    return res.map((e) => UserReviewEntity.toEntity(e)).toList();
+  }
+
+  @override
+  Future<List<PostReviewEntity>> getPostReviews(String token, String postId) async {
+    final res = await remote.getPostReviews(token, postId);
+    if(res.isEmpty) return [];
+    return res.map((e) => PostReviewEntity.toEntity(e)).toList();
+  }
 }

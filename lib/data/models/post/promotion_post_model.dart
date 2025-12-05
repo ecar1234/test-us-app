@@ -5,6 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 
 import '../image/image_model.dart';
+import '../review/post_review_model.dart';
 import '../user/user_model.dart';
 
 part 'promotion_post_model.g.dart';
@@ -23,6 +24,7 @@ class PromotionPostModel {
   List<ImageModel>? images;
   List<String>? domain;
   String? postType;
+  List<PostReviewModel>? reviews;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -39,6 +41,7 @@ class PromotionPostModel {
     this.images,
     this.domain,
     this.postType,
+    this.reviews,
     this.createdAt,
     this.updatedAt,
   });
