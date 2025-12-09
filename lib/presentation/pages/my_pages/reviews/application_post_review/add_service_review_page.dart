@@ -53,87 +53,90 @@ class _AddServiceReviewPageState extends State<AddServiceReviewPage> {
                     }
                   },
                   builder: (context, state) {
-                    return Container(
-                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      width: MediaQuery
-                          .sizeOf(context)
-                          .width,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
-                            children: [
-                              RichText(text: TextSpan(text: '${widget.post.title}',
-                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87,
-                                      overflow: TextOverflow.ellipsis),
-                                  children: [
-                                    TextSpan(text: ' 은(는)')
-                                  ])),
-                              Text('어떤 서비스 였나요?', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                              Text('피드백을 남겨 주세요.', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                          RatingBar.builder(
-                              initialRating: _rating,
-                              minRating: 1,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 5,
-                              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                              itemBuilder: (context, idx) {
-                                return Icon(Icons.star, color: Colors.amber,);
-                              },
-                              onRatingUpdate: (value) {
-                                setState(() {
-                                  _rating = value;
-                                });
-                              }),
-                          SizedBox(
-                            height: hei * 0.4,
-                            width: MediaQuery
-                                .sizeOf(context)
-                                .width - 40,
-                            child: TextField(
-                              controller: _commentController,
-                              minLines: 20,
-                              maxLines: 30,
+                    return SingleChildScrollView(
+                      child: Container(
+                        height: hei,
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        width: MediaQuery
+                            .sizeOf(context)
+                            .width,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                              children: [
+                                RichText(text: TextSpan(text: '${widget.post.title}',
+                                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87,
+                                        overflow: TextOverflow.ellipsis),
+                                    children: [
+                                      TextSpan(text: ' 은(는)')
+                                    ])),
+                                Text('어떤 서비스 였나요?', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                Text('피드백을 남겨 주세요.', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                              ],
                             ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                  height: 50,
-                                  width: 150,
-                                  child: ElevatedButton(
-                                      onPressed: () {
-                                        final token = context
-                                            .read<UserProvider>()
-                                            .token!;
-                                        final userId = context
-                                            .read<UserProvider>()
-                                            .user!.id!;
-
-                                        final review = PostReviewEntity(
-                                          rating: _rating,
-                                          comment: _commentController.text,
-                                          reviewType: PostReviewType.recruit,
-                                          reviewerUserId: userId,
-                                          // reviewedId: widget.post.author!.id!,
-                                          postId: widget.post.id!,
-                                        );
-                                        context.read<ReviewBloc>().add(CreateRecruitPostReviewEvent(token, review));
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
-                                      ),
-                                      child: Text('리뷰 전송')
-                                  )
-                              )
-                            ],
-                          )
-                        ],
+                            RatingBar.builder(
+                                initialRating: _rating,
+                                minRating: 1,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 5,
+                                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                                itemBuilder: (context, idx) {
+                                  return Icon(Icons.star, color: Colors.amber,);
+                                },
+                                onRatingUpdate: (value) {
+                                  setState(() {
+                                    _rating = value;
+                                  });
+                                }),
+                            SizedBox(
+                              height: hei * 0.4,
+                              width: MediaQuery
+                                  .sizeOf(context)
+                                  .width - 40,
+                              child: TextField(
+                                controller: _commentController,
+                                minLines: 20,
+                                maxLines: 20,
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                    height: 50,
+                                    width: 150,
+                                    child: ElevatedButton(
+                                        onPressed: () {
+                                          final token = context
+                                              .read<UserProvider>()
+                                              .token!;
+                                          final userId = context
+                                              .read<UserProvider>()
+                                              .user!.id!;
+                      
+                                          final review = PostReviewEntity(
+                                            rating: _rating,
+                                            comment: _commentController.text,
+                                            reviewType: PostReviewType.recruit,
+                                            reviewerUserId: userId,
+                                            // reviewedId: widget.post.author!.id!,
+                                            postId: widget.post.id!,
+                                          );
+                                          context.read<ReviewBloc>().add(CreateRecruitPostReviewEvent(token, review));
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
+                                        ),
+                                        child: Text('리뷰 전송')
+                                    )
+                                )
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                     );
                   }

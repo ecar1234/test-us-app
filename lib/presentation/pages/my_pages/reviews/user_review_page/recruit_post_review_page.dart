@@ -1,11 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/presentation/pages/my_pages/reviews/user_review_page/check_post_review_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 
 import '../../../../../data/models/application/application_model.dart';
 import '../../../../../data/models/post/recruit_post_model.dart';
+import '../../../../../domain/entities/post_review_entity.dart';
 import '../../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../../services/theme_provider.dart';
 import '../../../../../utils/time_util.dart';
@@ -33,7 +36,11 @@ class _RecruitPostReviewPageState extends State<RecruitPostReviewPage> {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [Text('테스터 모집 게시글이 없네요.'), Text('지금 첫 모집글을 작성해서, 더 많은 사용자에게 프로덕트를 알려보세요.')],
+                children: [
+                  Text('테스터 모집 게시글이 없네요.', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Gap(10),
+                  Text('지금 첫 모집글을 작성해서,'),
+                  Text(' 더 많은 사용자에게 프로덕트를 알려보세요.')],
               );
             }
             return ListView.separated(
@@ -63,7 +70,7 @@ class _RecruitPostReviewPageState extends State<RecruitPostReviewPage> {
                             flex: 3,
                             child: SizedBox(
                                 // width: (MediaQuery.sizeOf(context).width - 50) * 0.35,
-                                height: 120,
+                                height: 140,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: CachedNetworkImage(
@@ -123,13 +130,24 @@ class _RecruitPostReviewPageState extends State<RecruitPostReviewPage> {
                                   Text('테스트 종료일 : ${TimeUtil().getDateTimeString(posts[idx].updatedAt!, false)}'),
                                 ],
                               )),
+                              SizedBox(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text('평점 : ${_getAverageRating(posts[idx].reviews!)}',
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                  ]
+                                )
+                              ),
                               const Gap(5),
-                              if (posts[idx].reviews!.isNotEmpty)
+                              if (posts[idx].status == PostStatus.end && posts[idx].reviews!.isNotEmpty)
                                 SizedBox(
                                   height: 30,
                                   width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
                                   child: ElevatedButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Get.to(() => CheckPostReviewPage(reviews: posts[idx].reviews!));
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         padding: EdgeInsets.zero,
                                         shape: RoundedRectangleBorder(
@@ -195,5 +213,15 @@ class _RecruitPostReviewPageState extends State<RecruitPostReviewPage> {
                 itemCount: posts.length);
           })),
     );
+  }
+  double _getAverageRating(List<PostReviewEntity> reviews) {
+    if (reviews.isEmpty) {
+      return 0.0;
+    }
+    double totalRating = 0.0;
+    for (var review in reviews) {
+      totalRating += review.rating!;
+    }
+    return totalRating / reviews.length;
   }
 }

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../../../domain/entities/promotion_post_entity.dart';
@@ -13,13 +12,17 @@ class BasePostProvider extends ChangeNotifier {
   List<PromotionPostEntity>? _userPromotionPosts;
 
   List<dynamic>? get favoritePost => _favoritePost;
+
   List<RecruitPostEntity>? get recruitPosts => _recruitPosts;
+
   List<PromotionPostEntity>? get promotionPosts => _promotionPosts;
 
   List<RecruitPostEntity>? get userRecruitPosts => _userRecruitPosts;
+
   List<PromotionPostEntity>? get userPromotionPosts => _userPromotionPosts;
 
-  void getInitPosts(List<dynamic> posts, List<RecruitPostEntity> recruitPosts, List<PromotionPostEntity> promotionPosts) {
+  void getInitPosts(
+      List<dynamic> posts, List<RecruitPostEntity> recruitPosts, List<PromotionPostEntity> promotionPosts) {
     _favoritePost = posts;
     _recruitPosts = recruitPosts;
     _promotionPosts = promotionPosts;
@@ -27,23 +30,18 @@ class BasePostProvider extends ChangeNotifier {
   }
 
   void setUserInitData(List<RecruitPostEntity>? recruitPosts, List<PromotionPostEntity>? promotionPosts) {
-    _userRecruitPosts ??= [];
-    _userPromotionPosts ??= [];
+    _userRecruitPosts = recruitPosts;
+    _userPromotionPosts = promotionPosts;
 
-    if(recruitPosts != null) {
-      _userRecruitPosts = recruitPosts;
-    }
-    if(promotionPosts != null) {
-      _userPromotionPosts = promotionPosts;
-    }
     notifyListeners();
   }
+
   void logout() {
-    if(_userRecruitPosts!.isNotEmpty){
+    if (_userRecruitPosts!.isNotEmpty) {
       _userRecruitPosts!.clear();
       _userRecruitPosts = [];
     }
-    if(_userPromotionPosts!.isNotEmpty){
+    if (_userPromotionPosts!.isNotEmpty) {
       _userPromotionPosts!.clear();
       _userPromotionPosts = [];
     }
@@ -54,7 +52,7 @@ class BasePostProvider extends ChangeNotifier {
     _recruitPosts ??= [];
     _userRecruitPosts ??= [];
 
-    if(_recruitPosts!.length < 10){
+    if (_recruitPosts!.length < 10) {
       _recruitPosts = [post, ..._recruitPosts!];
       _userRecruitPosts = [post, ..._userRecruitPosts!];
       notifyListeners();
@@ -62,11 +60,12 @@ class BasePostProvider extends ChangeNotifier {
     }
     return;
   }
+
   void createPromotionPost(PromotionPostEntity post) {
     _promotionPosts ??= [];
     _userPromotionPosts ??= [];
 
-    if(_promotionPosts!.length < 10){
+    if (_promotionPosts!.length < 10) {
       _promotionPosts = [post, ..._promotionPosts!];
       _userPromotionPosts = [post, ..._userPromotionPosts!];
       notifyListeners();
@@ -74,8 +73,9 @@ class BasePostProvider extends ChangeNotifier {
     }
     return;
   }
+
   void updateRecruitPost(RecruitPostEntity post) {
-    if(_recruitPosts!.any((element) => element.id == post.id)){
+    if (_recruitPosts!.any((element) => element.id == post.id)) {
       List<RecruitPostEntity> removedList = _recruitPosts!.where((element) => element.id != post.id).toList();
       _recruitPosts = [post, ...removedList];
       notifyListeners();
@@ -83,52 +83,55 @@ class BasePostProvider extends ChangeNotifier {
     }
     return;
   }
+
   void updatePromotionPost(PromotionPostEntity post) {
-    if(_promotionPosts!.any((element) => element.id == post.id)){
+    if (_promotionPosts!.any((element) => element.id == post.id)) {
       final index = _promotionPosts?.indexWhere((element) => element.id == post.id);
-      if(index == null) return;
+      if (index == null) return;
       _promotionPosts!.removeAt(index);
       _promotionPosts = [post, ..._promotionPosts!];
       notifyListeners();
     }
     return;
   }
+
   void deleteRecruitPost(String id) {
-    if(_recruitPosts!.any((element) => element.id == id)) {
+    if (_recruitPosts!.any((element) => element.id == id)) {
       _recruitPosts = _recruitPosts?.where((element) => element.id != id).toList();
       notifyListeners();
     }
-    if(_userRecruitPosts!.any((element) => element.id == id)){
+    if (_userRecruitPosts!.any((element) => element.id == id)) {
       _userRecruitPosts = _userRecruitPosts?.where((element) => element.id != id).toList();
       notifyListeners();
     }
     return;
   }
+
   void deletePromotionPost(String id) {
-    if(_promotionPosts!.any((element) => element.id == id)){
+    if (_promotionPosts!.any((element) => element.id == id)) {
       _promotionPosts = _promotionPosts?.where((element) => element.id != id).toList();
       notifyListeners();
     }
-    if(_userPromotionPosts!.any((element) => element.id == id)){
+    if (_userPromotionPosts!.any((element) => element.id == id)) {
       _userPromotionPosts = _userPromotionPosts?.where((element) => element.id != id).toList();
       notifyListeners();
     }
     return;
   }
 
-  void updateUserRecruitPosts (RecruitPostEntity post) {
+  void updateUserRecruitPosts(RecruitPostEntity post) {
     final index = _userRecruitPosts?.indexWhere((element) => element.id == post.id);
-    if(index == null) return;
+    if (index == null) return;
     _userRecruitPosts!.removeAt(index);
     _userRecruitPosts = [post, ..._userRecruitPosts!];
     notifyListeners();
   }
-  void updateUserPromotionPosts (PromotionPostEntity post) {
+
+  void updateUserPromotionPosts(PromotionPostEntity post) {
     final index = _userPromotionPosts?.indexWhere((element) => element.id == post.id);
-    if(index == null) return;
+    if (index == null) return;
     _userPromotionPosts!.removeAt(index);
     _userPromotionPosts = [post, ..._userPromotionPosts!];
     notifyListeners();
   }
-
 }

@@ -27,11 +27,9 @@ class RecruitPostProvider with ChangeNotifier {
     return res;
   }
 
-  Future<List<RecruitPostEntity>?> getUserRecruitmentPosts(String token, String userId) async {
-    final res = await useCase.getUserRecruitmentPosts(token, userId);
-    _recruitmentPosts = res;
+  void getUserRecruitmentPosts(List<RecruitPostEntity> posts) async {
+    _recruitmentPosts = posts;
     notifyListeners();
-    return res;
   }
 
   Future<void> getPostPagination(List<RecruitPostEntity> posts, int page) async {

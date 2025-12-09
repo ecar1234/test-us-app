@@ -116,7 +116,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             if (state.state == RecruitPostLoadState.getAppRecruitPostsCompletedState) {
               context.read<ApplicationProvider>().setUserApplicationPosts(state.posts!);
             }
-          }
+          },
         )
       ],
       child: GetMaterialApp(
