@@ -7,9 +7,9 @@ part 'post_review_model.g.dart';
 
 
 enum PostReviewType {
-  @JsonValue('PROMOTION_RATING')
+  @JsonValue('PROMOTION')
   promotion,
-  @JsonValue('RECRUIT_RATING')
+  @JsonValue('RECRUIT')
   recruit,
 }
 
@@ -19,8 +19,8 @@ class PostReviewModel {
   double? rating;
   String? comment;
   PostReviewType? reviewType;
-  String? reviewerId;
-  String? reviewedId;
+  String? reviewerUserId;
+  // String? reviewedId;
   DateTime? createdAt;
   String? postId;
 
@@ -29,8 +29,8 @@ class PostReviewModel {
     this.rating,
     this.comment,
     this.reviewType,
-    this.reviewerId,
-    this.reviewedId,
+    this.reviewerUserId,
+    // this.reviewedId,
     this.createdAt,
     this.postId,
   });

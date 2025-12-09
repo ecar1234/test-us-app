@@ -85,14 +85,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
               final recruit = state.initData!['recruitPosts'];
               final promotion = state.initData!['promotionPosts'];
               context.read<BasePostProvider>().setUserInitData(recruit, promotion);
-
-              final posts = context.read<ApplicationProvider>().userApplicationPosts ?? [];
-              final app = context.read<ApplicationProvider>().userApplications ?? [];
-              if (posts.isEmpty || posts.length != app.length) {
-                final postIds = app.map((e) => e.postId!).toList();
-                final token = context.read<UserProvider>().token ?? '';
-                context.read<RecruitPostBloc>().add(RequestAppRecruitPosts(token, postIds));
-              }
             }
           },
           listenWhen: (preState, state) => state.state == BasePostLoadState.getUserInitPostsCompletedState,
@@ -113,6 +105,10 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         BlocListener<AppBloc, AppState>(listener: (context, state) async {
           if(state.state == UserAppState.getUserApplicationsCompletedState){
             context.read<ApplicationProvider>().getMyApplications(state.applications!);
+
+            final postIds = state.applications!.map((e) => e.postId!).toList();
+            final token = context.read<UserProvider>().token ?? '';
+            context.read<RecruitPostBloc>().add(RequestAppRecruitPosts(token, postIds));
           }
         }),
         BlocListener<RecruitPostBloc, RecruitPostState>(

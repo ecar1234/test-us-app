@@ -88,7 +88,7 @@ class _SignupPageState extends State<SignupPage> {
         ),
         body: GestureDetector(
           onTap: () {
-            FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
           },
           child: SingleChildScrollView(
             child: Container(

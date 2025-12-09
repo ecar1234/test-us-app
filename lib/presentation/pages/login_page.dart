@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
             appBar: AppBar(),
             body: GestureDetector(
               onTap: () {
-                FocusScope.of(context).unfocus();
+                FocusManager.instance.primaryFocus?.unfocus();
               },
               child: BlocListener<AuthBloc, AuthState>(
                   listener: (context, state) async {

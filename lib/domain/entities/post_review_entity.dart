@@ -5,8 +5,8 @@ class PostReviewEntity {
   double? rating;
   String? comment;
   PostReviewType? reviewType;
-  String? reviewerId;
-  String? reviewedId;
+  String? reviewerUserId;
+  // String? reviewedId;
   DateTime? createdAt;
   String? postId;
 
@@ -15,8 +15,8 @@ class PostReviewEntity {
     this.rating,
     this.comment,
     this.reviewType,
-    this.reviewerId,
-    this.reviewedId,
+    this.reviewerUserId,
+    // this.reviewedId,
     this.createdAt,
     this.postId,
   });
@@ -27,8 +27,8 @@ class PostReviewEntity {
       rating: model.rating,
       comment: model.comment,
       reviewType: model.reviewType,
-      reviewerId: model.reviewerId,
-      reviewedId: model.reviewedId,
+      reviewerUserId: model.reviewerUserId,
+      // reviewedId: model.reviewedId,
       createdAt: model.createdAt,
       postId: model.postId,
     );
@@ -39,8 +39,8 @@ class PostReviewEntity {
       rating: entity.rating,
       comment: entity.comment,
       reviewType: entity.reviewType,
-      reviewerId: entity.reviewerId,
-      reviewedId: entity.reviewedId,
+      reviewerUserId: entity.reviewerUserId,
+      // reviewedId: entity.reviewedId,
       createdAt: entity.createdAt,
       postId: entity.postId,
     );

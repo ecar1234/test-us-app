@@ -127,7 +127,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          FocusScope.of(context).unfocus();
+          FocusManager.instance.primaryFocus?.unfocus();
         },
         child: SafeArea(
           child: Scaffold(

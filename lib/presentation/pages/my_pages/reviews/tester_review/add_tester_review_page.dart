@@ -8,11 +8,11 @@ import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/domain/entities/user_review_entity.dart';
 
-import '../../../../services/common_height_provider.dart';
-import '../../../bloc/review_bloc/review_bloc.dart';
-import '../../../bloc/review_bloc/review_event.dart';
-import '../../../bloc/review_bloc/review_state.dart';
-import '../../../provider/user_provider.dart';
+import '../../../../../services/common_height_provider.dart';
+import '../../../../bloc/review_bloc/review_bloc.dart';
+import '../../../../bloc/review_bloc/review_event.dart';
+import '../../../../bloc/review_bloc/review_state.dart';
+import '../../../../provider/user_provider.dart';
 
 class AddTesterReviewPage extends StatefulWidget {
   final UserEntity tester;
@@ -78,35 +78,34 @@ class _AddTesterReviewPageState extends State<AddTesterReviewPage> {
                         ],
                       )
                     ),
-                    Column(
-                      children: [
-                        RatingBar.builder(
-                            initialRating: 2.5,
-                            minRating: 1,
-                            direction: Axis.horizontal,
-                            allowHalfRating: true ,
-                            itemCount: 5,
-                            itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                            itemBuilder: (context, _){
-                          return Icon(Icons.star, color: Colors.amber,);
-                        }, onRatingUpdate: (rating){
-                              setState(() {
-                                _rating = rating;
-                              });
-                              // print(_rating);
-                        }),
-                        const Gap(20),
-                        SizedBox(
-                          height: hei + 0.4,
-                          child: TextField(
+                    SizedBox(
+                      height: hei * 0.5,
+                      child: Column(
+                        children: [
+                          RatingBar.builder(
+                              initialRating: 2.5,
+                              minRating: 1,
+                              direction: Axis.horizontal,
+                              allowHalfRating: true ,
+                              itemCount: 5,
+                              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                              itemBuilder: (context, _){
+                            return Icon(Icons.star, color: Colors.amber,);
+                          }, onRatingUpdate: (rating){
+                                setState(() {
+                                  _rating = rating;
+                                });
+                                // print(_rating);
+                          }),
+                          const Gap(30),
+                          TextField(
                             controller: _contentController,
-                            minLines: 20,
-                            maxLines: 30,
-                          )
-                        ),
-                      ],
+                            minLines: 10,
+                            maxLines: 10,
+                          ),
+                        ],
+                      ),
                     ),
-                    const Gap(20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

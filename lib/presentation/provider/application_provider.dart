@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
+import '../../domain/entities/post_review_entity.dart';
 import '../../domain/use_cases/application_usecase.dart';
 
 class ApplicationProvider with ChangeNotifier{
@@ -71,6 +72,16 @@ class ApplicationProvider with ChangeNotifier{
     if(_userApplicationPosts == null || _userApplicationPosts!.isEmpty) {
       _userApplicationPosts = posts;
     }
+    notifyListeners();
+  }
+  void addReviewToUserApplicationPost(PostReviewEntity review) {
+    if(_userApplicationPosts!.any((e) => e.id == review.postId)) {
+      final idx = _userApplicationPosts!.indexWhere((e) => e.id == review.postId);
+      final post = _userApplicationPosts![idx];
+      post.reviews = [...post.reviews!, review];
+      _userApplicationPosts = [..._userApplicationPosts!];
+    }
+
     notifyListeners();
   }
   Future<void> completeApplication(String token, String appId) async {}

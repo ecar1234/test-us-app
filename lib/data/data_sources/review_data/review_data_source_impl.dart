@@ -28,11 +28,18 @@ class ReviewDataSourceImpl implements ReviewDataSource {
 
   @override
   Future<PostReviewModel> addRecruitPostReview(String token, PostReviewModel review) async {
-    final res = await netDriver.requestPostJson(token, ReviewApi.addRecruitReview, review.toJson());
-    if(res['status'] == 200 ){
-      return PostReviewModel.fromJson(res['review']);
-    }else{
-      throw Exception(res['message']);
+    try {
+      final json = review.toJson();
+      final res = await netDriver.requestPostJson(token, ReviewApi.addRecruitReview, json);
+      if(res['status'] == 200 ){
+        return PostReviewModel.fromJson(res['review']);
+      }else{
+        throw Exception(res['message']);
+      }
+    } on Exception catch (e) {
+      // TODO
+      logger.e(e.toString());
+      return PostReviewModel();
     }
   }
 

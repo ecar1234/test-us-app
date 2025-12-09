@@ -11,17 +11,18 @@ class ReviewProvider extends ChangeNotifier{
   ReviewProvider(this.useCase);
 
   List<UserReviewEntity>? _userReviews;
+  List<UserReviewEntity>? get userReviews => _userReviews;
+
   List<UserReviewEntity>? _testersReviewOnPost;
   List<UserReviewEntity>? get testersReviewOnPost => _testersReviewOnPost;
 
-  List<UserReviewEntity>? get reviews => _userReviews;
+  List<PostReviewEntity>? _applicationPostReviews;
+  List<PostReviewEntity>? get applicationPostReviews => _applicationPostReviews;
 
 
-  List<PostReviewEntity>? _postReviews;
-  List<PostReviewEntity>? get postReviews => _postReviews;
 
   void setUserReviews(List<UserReviewEntity> reviews) async {
-    _userReviews ??= reviews;
+    _userReviews = reviews;
     notifyListeners();
   }
 
@@ -36,7 +37,7 @@ class ReviewProvider extends ChangeNotifier{
   }
 
   void setPostReviews(List<PostReviewEntity> reviews) async {
-    _postReviews ??= reviews;
+    _applicationPostReviews ??= reviews;
     notifyListeners();
   }
 

@@ -43,6 +43,13 @@ class RequestMyApplicationsEvent extends AppEvent {
   RequestMyApplicationsEvent(this.token, this.userId);
 }
 
+// class RequestPostByApplicationIdsEvent extends AppEvent {
+//   final String token;
+//   final List<int> applicationIds;
+//
+//   RequestPostByApplicationIdsEvent(this.token, this.applicationIds);
+// }
+
 class ApplicationDataLoadEvent extends AppEvent {
   ApplicationDataLoadEvent();
 }

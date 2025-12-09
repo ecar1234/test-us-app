@@ -15,11 +15,11 @@ import 'package:test_us_app/presentation/provider/review_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
-import '../../../../data/models/application/application_model.dart';
-import '../../../../domain/entities/user_review_entity.dart';
-import '../../../../services/common_height_provider.dart';
-import '../../../bloc/app_bloc/app_bloc.dart';
-import '../../../bloc/review_bloc/review_event.dart';
+import '../../../../../data/models/application/application_model.dart';
+import '../../../../../domain/entities/user_review_entity.dart';
+import '../../../../../services/common_height_provider.dart';
+import '../../../../bloc/app_bloc/app_bloc.dart';
+import '../../../../bloc/review_bloc/review_event.dart';
 import 'add_tester_review_page.dart';
 
 class TesterReviewPage extends StatefulWidget {

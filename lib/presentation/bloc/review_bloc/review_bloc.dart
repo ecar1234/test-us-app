@@ -10,6 +10,7 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   final logger = Logger();
 
   ReviewBloc(ReviewUseCase useCase, UserUseCase userUseCase) : super(ReviewState(ReviewDataState.serviceStartState)) {
+
     on<RequestUserReviewEvent>((event, emit) async {
       emit(ReviewState(ReviewDataState.loadingState));
       logger.i('Review State: Start Loading');

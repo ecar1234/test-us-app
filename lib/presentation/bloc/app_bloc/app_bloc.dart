@@ -67,6 +67,14 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       logger.i('application state: applicationCancelCompletedState');
     });
 
+    // on<RequestPostByApplicationIdsEvent>((event, emit) async {
+    //   emit(AppState(state: UserAppState.loadingState));
+    //   logger.i('application state: loadingState');
+    //
+    //   final res = await recruitPostUseCase.getAppRecruitPosts(event.token, event.applicationIds);
+    //
+    // });
+
     on<RequestCompletedEvent>((event, emit) {
       emit(AppState(state: UserAppState.requestCompletedState));
     });

@@ -47,7 +47,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
     final ids = post.applications!.map((e) => e.applicantId!).toList();
 
     final token = context.read<UserProvider>().token ?? '';
-    context.read<UserBloc>().add(RequestUsersDataEvent(token, ids, post.id!));
+    context.read<UserBloc>().add(RequestUsersDataEvent(token, ids));
   }
 
   @override

@@ -65,7 +65,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ),
         body: GestureDetector(
           onTap: () {
-            FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
           },
           child: BlocListener<UserBloc, UserState>(
             listener: (context, state) {
