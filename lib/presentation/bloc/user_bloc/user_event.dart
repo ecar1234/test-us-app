@@ -6,6 +6,23 @@ import 'package:test_us_app/domain/entities/user_entity.dart';
 
 class UserEvent {}
 
+class CreateFirebaseTokenEvent extends UserEvent {
+  final String? token;
+  final String? messagingToken;
+  final String? userId;
+  final String? deviceType;
+
+  CreateFirebaseTokenEvent(this.token, this.messagingToken, this.userId, this.deviceType);
+}
+
+class RemoveFirebaseTokenEvent extends UserEvent {
+  final String? token;
+  final String? userId;
+  final String? messagingToken;
+
+  RemoveFirebaseTokenEvent(this.token, this.userId, this.messagingToken);
+}
+
 class RequestUserDataEvent extends UserEvent {
   String token;
   String userId;

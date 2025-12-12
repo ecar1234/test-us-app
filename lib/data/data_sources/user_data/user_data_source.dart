@@ -21,4 +21,7 @@ abstract class UserDataSource {
   Future<UserModel> updateUserInfoWithImage(String token, UserModel userInfo, XFile image, {ImageModel? oldImage});
   Future<Map<String, dynamic>> authLogin(String email, AuthType authType);
   Future<Map<String, dynamic>> authSignup(UserModel userInfo);
+  Future<void> createFirebaseToken(String token, String messagingToken, String userId, String deviceType);
+  Future<void> updateFirebaseToken(String token, String messagingToken, String userId, String deviceType);
+  Future<void> deleteFirebaseToken(String token, String messagingToken, String userId);
 }

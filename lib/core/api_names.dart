@@ -94,3 +94,9 @@ class JobApi {
   static const String jobGetInitPosts = '/api/v1/jobState/jobInitPosts';
   static const String jobGetUserPosts = '/api/v1/jobState/jobInitUserPosts';
 }
+
+class FirebaseApi {
+  static const String createToken = '/api/v1/firebase/createToken';
+  static const String updateToken = '/api/v1/firebase/updateToken';
+  static const String deleteToken = '/api/v1/firebase/removeToken';
+}

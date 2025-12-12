@@ -13,6 +13,7 @@ import '../../models/image/image_model.dart';
 class UserDataSourceImpl implements UserDataSource {
   final logger = Logger();
   final NetDriver netDriver;
+
   UserDataSourceImpl(this.netDriver);
 
   @override
@@ -86,14 +87,14 @@ class UserDataSourceImpl implements UserDataSource {
     final res = await netDriver.requestPostJson("", AuthApi.login, {"email": email, "password": password});
     if (res['status'] == 200) {
       return {'user': UserModel.fromJson(res['user']), 'token': res['token']};
-    } else if(res['error'] != null) {
+    } else if (res['error'] != null) {
       String message = '';
-      if(res['error'] == 'User not found'){
+      if (res['error'] == 'User not found') {
         message = '이메일을 찾을 수 없습니다.';
-      }else {
+      } else {
         message = '비밀번호가 일치 하지 않습니다.';
       }
-        return {'user': UserModel(), 'message' : message };
+      return {'user': UserModel(), 'message': message};
     } else {
       throw Exception('Server 500 Error');
     }
@@ -148,12 +149,13 @@ class UserDataSourceImpl implements UserDataSource {
   }
 
   @override
-  Future<UserModel> updateUserInfoWithImage(String token, UserModel userInfo, XFile image, {ImageModel? oldImage}) async {
+  Future<UserModel> updateUserInfoWithImage(String token, UserModel userInfo, XFile image,
+      {ImageModel? oldImage}) async {
     Map<String, dynamic> res = {};
-    if(oldImage != null){
+    if (oldImage != null) {
       final data = {'newImage': image, 'oldImage': oldImage};
       res = await netDriver.updateProfileFormData(token, UserApi.updateUserInfoWithImg, userInfo.toJson(), data);
-    }else {
+    } else {
       final data = {'newImage': image};
       res = await netDriver.updateProfileFormData(token, UserApi.updateUserInfoWithImg, userInfo.toJson(), data);
     }
@@ -166,7 +168,7 @@ class UserDataSourceImpl implements UserDataSource {
 
   @override
   Future<Map<String, dynamic>> authLogin(String email, AuthType authType) async {
-    final res = await netDriver.requestPostJson("", AuthApi.authLogin, { "email": email });
+    final res = await netDriver.requestPostJson("", AuthApi.authLogin, {"email": email});
     if (res['status'] == 200) {
       return {'user': UserModel.fromJson(res['user']), 'token': res['token']};
     } else {
@@ -181,6 +183,44 @@ class UserDataSourceImpl implements UserDataSource {
       return {'user': UserModel.fromJson(res['user']), 'token': res['token']};
     } else {
       throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<void> createFirebaseToken(String token, String messagingToken, String userId, String deviceType) async {
+    final res = await netDriver.requestPostJson(
+        token, FirebaseApi.createToken, {"userId": userId, 'fcmToken': messagingToken, "deviceType": deviceType});
+    if (res['status'] == 200) {
+      return;
+    } else {
+      throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<void> updateFirebaseToken(String token, String messagingToken, String userId, String deviceType) async {
+    final res = await netDriver.requestPostJson(
+        token, FirebaseApi.updateToken, {"userId": userId, 'fcmToken': messagingToken, "deviceType": deviceType});
+    if (res['status'] == 200) {
+      return;
+    } else {
+      throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<void> deleteFirebaseToken(String token, String messagingToken, String userId) async {
+    try {
+      final res =
+          await netDriver.requestPostJson(token, FirebaseApi.deleteToken, {"userId": userId, 'fcmToken': messagingToken});
+      if (res['status'] == 200) {
+        return;
+      } else {
+        throw Exception('Error');
+      }
+    } on Exception catch (e) {
+      // TODO
+      logger.e(e.toString());
     }
   }
 }

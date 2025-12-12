@@ -86,4 +86,14 @@ class UserUseCase {
     final res = await repository.authSignup(user);
     return res;
   }
+
+  Future<void> createFirebaseToken(String token, String messagingToken, String userId, String deviceType)async{
+    await repository.createFirebaseToken(token, messagingToken ,userId, deviceType);
+  }
+  Future<void> updateFirebaseToken(String token, String messagingToken, String userId, String deviceType)async{
+    await repository.updateFirebaseToken(token, messagingToken ,userId, deviceType);
+  }
+  Future<void> deleteFirebaseToken(String token, String messagingToken, String userId)async{
+    await repository.deleteFirebaseToken(token, messagingToken ,userId);
+  }
 }

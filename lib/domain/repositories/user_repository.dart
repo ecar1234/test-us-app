@@ -22,4 +22,7 @@ abstract class UserRepository {
   Future<UserEntity> updateUserInfo(String token, UserEntity userInfo);
   Future<Map<String, dynamic>> authLogin(String email, AuthType authType);
   Future<Map<String, dynamic>> authSignup(UserEntity userInfo);
+  Future<void> createFirebaseToken(String token, String messagingToken, String userId, String deviceType);
+  Future<void> updateFirebaseToken(String token, String messagingToken, String userId, String deviceType);
+  Future<void> deleteFirebaseToken(String token, String messagingToken, String userId);
 }

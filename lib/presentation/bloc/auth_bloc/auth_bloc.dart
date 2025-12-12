@@ -12,12 +12,14 @@ import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/domain/use_cases/user_usecase.dart';
 
 import '../../../data/sharedPreferences/auth_preference.dart';
+import '../../../data/sharedPreferences/firebase_messaging_preference.dart';
 import '../../provider/user_provider.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final pref = AuthPreference.instance;
+  final firebasePref = FirebaseMessagingPreference.instance;
   final logger = Logger();
 
   AuthBloc(UserUseCase userUseCase) : super(AuthState(state: UserAuthState.serviceStartState)) {
@@ -164,6 +166,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
         await pref.removeToken();
         await pref.removeUserInfo();
+        await firebasePref.removeFirebaseToken();
         emit(AuthState(state: UserAuthState.logoutState));
         logger.i('state : logout state');
       } on Exception catch (e) {

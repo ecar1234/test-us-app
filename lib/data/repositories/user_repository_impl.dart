@@ -115,4 +115,19 @@ class UserRepositoryImpl implements UserRepository {
     final token = res['token'];
     return {'user': user, 'token': token};
   }
+
+  @override
+  Future<void> createFirebaseToken(String token, String messagingToken, String userId, String deviceType) async {
+    await remote.createFirebaseToken(token, messagingToken, userId, deviceType);
+  }
+
+  @override
+  Future<void> deleteFirebaseToken(String token, String messagingToken, String userId) async {
+    await remote.deleteFirebaseToken(token, messagingToken ,userId);
+  }
+
+  @override
+  Future<void> updateFirebaseToken(String token, String messagingToken, String userId, String deviceType) async {
+    await remote.updateFirebaseToken(token, messagingToken, userId, deviceType);
+  }
 }

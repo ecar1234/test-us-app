@@ -43,7 +43,7 @@ class RecruitPostBloc extends Bloc<RecruitPostEvent, RecruitPostState> {
         logger.i("data state : getPostByIdCompletedState");
       } on Exception catch (e) {
         // TODO
-        emit(RecruitPostState(state: RecruitPostLoadState.errorState));
+        emit(RecruitPostState(state: RecruitPostLoadState.errorState, post: RecruitPostEntity()));
         logger.e("data state : errorState");
       }
     });

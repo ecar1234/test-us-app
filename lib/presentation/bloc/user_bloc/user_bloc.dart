@@ -12,6 +12,18 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   final logger = Logger();
   UserBloc(UserUseCase userUseCase, ReviewUseCase reviewUseCase) : super(UserState(UserDataState.serviceStartState)) {
 
+    on<CreateFirebaseTokenEvent>((event, emit) async {
+      try {
+        await userUseCase.createFirebaseToken(event.token!, event.messagingToken!, event.userId!, event.deviceType!);
+      } catch (e){
+        logger.e(e);
+        emit(UserState(UserDataState.errorState));
+      }
+    });
+    on<RemoveFirebaseTokenEvent>((event, emit) async {
+      await userUseCase.deleteFirebaseToken(event.token!, event.messagingToken!, event.userId!);
+    });
+
     on<RequestUserDataEvent>((event, emit) async {
       emit(UserState(UserDataState.loadingState));
       logger.i('user state : loading state');

@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -13,6 +15,7 @@ import 'package:test_us_app/presentation/bloc/review_bloc/review_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:test_us_app/presentation/pages/main_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
+import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/promotion_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
@@ -23,16 +26,25 @@ import 'package:provider/provider.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import 'domain/use_cases/base_post_usecase.dart';
+import 'domain/use_cases/firebase_messaging_usecase.dart';
 import 'domain/use_cases/promotion_post_usecase.dart';
 import 'domain/use_cases/recruit_post_usecase.dart';
 import 'domain/use_cases/review_usecase.dart';
 import 'domain/use_cases/user_usecase.dart';
 
+// 1. 백그라운드 메시지 핸들러 (앱이 꺼져있거나 백그라운드일 때 실행)
+// 반드시 main 함수 밖, 최상위에 선언해야 합니다.
+@pragma('vm:entry-point') // 릴리즈 모드에서도 함수가 트리쉐이킹 되지 않도록 설정
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+}
+
 Future<void> main() async {
   FlutterNativeSplash.preserve(widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
-  await serviceLocator();
+  await serviceLocator(_firebaseMessagingBackgroundHandler);
   runApp(MultiProvider(
     providers: [
+      ChangeNotifierProvider(create: (context) => FirebaseMessagingProvider(getIt<FirebaseMessagingUseCase>())),
       ChangeNotifierProvider(create: (context) => UserProvider(getIt<UserUseCase>())),
       ChangeNotifierProvider(create: (context) => BasePostProvider()),
       ChangeNotifierProvider(create: (context) => RecruitPostProvider(getIt<RecruitPostUseCase>())),

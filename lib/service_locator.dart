@@ -6,6 +6,7 @@ import 'dart:io';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -21,6 +22,7 @@ import 'package:test_us_app/data/data_sources/user_data/user_data_source.dart';
 import 'package:test_us_app/data/data_sources/user_data/user_data_source_impl.dart';
 import 'package:test_us_app/data/repositories/recruit_post_repository_impl.dart';
 import 'package:test_us_app/domain/use_cases/base_post_usecase.dart';
+import 'package:test_us_app/domain/use_cases/firebase_messaging_usecase.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/firebase/firebase_options.dart';
 import 'package:test_us_app/services/theme_provider.dart';
@@ -49,10 +51,11 @@ import 'domain/use_cases/review_usecase.dart';
 import 'domain/use_cases/user_usecase.dart';
 
 final getIt = GetIt.instance;
-Future<void> serviceLocator() async {
+Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebaseMessagingBackgroundHandler) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   final GoogleSignIn signIn = GoogleSignIn.instance;
 
@@ -92,6 +95,6 @@ Future<void> serviceLocator() async {
   getIt.registerLazySingleton<BasePostUseCase>(() => BasePostUseCase(getIt<BasePostRepository>()));
   getIt.registerLazySingleton<RecruitPostUseCase>(() => RecruitPostUseCase(getIt<RecruitPostRepository>()));
   getIt.registerLazySingleton<PromotionPostUseCase>(() => PromotionPostUseCase(getIt<PromotionPostRepository>()));
+  getIt.registerLazySingleton<FirebaseMessagingUseCase>(() => FirebaseMessagingUseCase());
 
-  FlutterNativeSplash.remove();
 }

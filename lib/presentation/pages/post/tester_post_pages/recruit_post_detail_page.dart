@@ -57,7 +57,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
+        body: BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state)async {
           final provider = context.read<BasePostProvider>();
           if (state.state == RecruitPostLoadState.getPostByIdCompletedState) {
           } else if (state.state == RecruitPostLoadState.postDeleteCompletedState) {
@@ -66,6 +66,30 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
           } else if (state.state == RecruitPostLoadState.postUpdateCompletedState) {
             provider.updateRecruitPost(state.post!);
             Navigator.pop(context);
+          }
+          else if (state.state == RecruitPostLoadState.errorState && state.post == null){
+            await showDialog(context: context, builder: (context) => Dialog(
+              child: Container(
+                height: 200,
+                width: MediaQuery.sizeOf(context).width,
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('게시글이 삭제 되었거나, 존재하지 않습니다.', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),),
+                    const Gap(20),
+                    SizedBox(
+                      height: 40,
+                      width: 120,
+                      child: ElevatedButton(onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      }, child: Text('뒤로가기')),
+                    )
+                  ],
+                )
+              ),
+            ));
           }
         }, builder: (context, state) {
           final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
@@ -463,6 +487,14 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                     SizedBox(
                                       child: ElevatedButton(
                                         onPressed: () async {
+                                          if(prevApp.platform == ApplicationPlatform.ios && isAndroidDevice == false ){
+                                            Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
+                                            return;
+                                          }
+                                          if(prevApp.platform == ApplicationPlatform.android && isAndroidDevice == true ){
+                                            Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
+                                            return;
+                                          }
                                           final token = context.read<UserProvider>().token ?? '';
                                           final userId = context.read<UserProvider>().user!.id;
                                           final app = ApplicationEntity(
