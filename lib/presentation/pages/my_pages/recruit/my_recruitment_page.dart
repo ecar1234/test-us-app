@@ -156,7 +156,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                     SizedBox(
                                       child: posts[idx].status == PostStatus.active
                                           ? Text('(모집 중)')
-                                          : Text('(모집기간 만료)'),
+                                          : Text('(만료)'),
                                     )
                                   ],
                                 ),

@@ -44,7 +44,6 @@
         <meta-data
             android:name="com.naver.sdk.clientName"
             android:value="@string/client_name" />
-
         <service
             android:name="com.google.firebase.messaging.FirebaseMessagingService"
             android:exported="false">

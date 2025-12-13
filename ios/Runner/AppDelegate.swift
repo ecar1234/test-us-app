@@ -15,6 +15,6 @@ import NidThirdPartyLogin
     if (NidOAuth.shared.handleURL(url) == true) { // If the URL was passed from the Naver app
        return true
     }
-    return false
+    return super.application(app, open: url, options: options)
   }
 }

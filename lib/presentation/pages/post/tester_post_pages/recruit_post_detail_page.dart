@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
@@ -179,24 +180,28 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                   : SizedBox()
             ],
             flexibleSpace: FlexibleSpaceBar(
-                background: post.images == null || post.images!.isEmpty
-                    ? SizedBox(
-                        child: Center(
-                          child: Text('이미지가 없습니다.'),
-                        ),
-                      )
-                    : CarouselSlider(
+                background:post.images!.length == 1 ? CachedNetworkImage(imageUrl: post.images![0].url!,) : CarouselSlider(
                         items: post.images!.map((e) {
                           if (e.filename == null) {
                             return Image.file(
                               File(e.url!),
-                              fit: BoxFit.cover,
+                              fit: BoxFit.fitHeight,
                               height: double.infinity,
                               width: double.infinity,
                             );
                           } else {
-                            return Image.network(e.url!,
-                                fit: BoxFit.fill, height: double.infinity, width: double.infinity);
+                            return CachedNetworkImage(imageUrl: e.url!,
+                                fit: BoxFit.fitHeight, height: double.infinity, width: double.infinity,
+                              progressIndicatorBuilder: (context, url, downloadProgress) {
+                                return Shimmer.fromColors(
+                                    baseColor: Colors.grey.shade300,
+                                    highlightColor: Colors.grey.shade100,
+                                    child: Container(
+                                      height: double.infinity,
+                                      width: double.infinity,
+                                      color: Colors.white,
+                                    ));
+                              });
                           }
                         }).toList(),
                         options: CarouselOptions(

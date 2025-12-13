@@ -17,6 +17,7 @@ import 'package:test_us_app/utils/type_conversion_util.dart';
 import '../../../../data/models/user/user_model.dart';
 import '../../../../services/theme_provider.dart';
 import '../../../bloc/user_bloc/user_bloc.dart';
+import '../../../provider/post_provider/base_post_provider.dart';
 
 class UserInfoPage extends StatefulWidget {
   final UserEntity user;
@@ -68,10 +69,32 @@ class _UserInfoPageState extends State<UserInfoPage> {
             FocusManager.instance.primaryFocus?.unfocus();
           },
           child: BlocListener<UserBloc, UserState>(
-            listener: (context, state) {
+            listener: (context, state) async {
               if (state.state == UserDataState.getUsersInfoCompletedState) {
-                context.read<UserProvider>().updateUserInfo(state.user!);
-                Get.back();
+                await showDialog(context: context, builder: (context) => Dialog(
+                  child: Container(
+                    height: 200,
+                    padding: EdgeInsets.all(10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text('정보 업데이트 완료'),
+                        SizedBox(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.read<UserProvider>().updateUserInfo(state.user!);
+                              context.read<BasePostProvider>().userInfoUpdate(state.user!);
+                              Get.back();
+                              Get.back();
+                            },
+                            child: Text('확인'),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ));
               }
             },
             child: SingleChildScrollView(
@@ -302,7 +325,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
               width: wid * 0.6,
               height: 50,
               child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     final token = context.read<UserProvider>().token ?? '';
                     final userInfo = UserEntity(
                       id: widget.user.id,
@@ -319,7 +342,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       if (widget.user.profileImg != null) {
                         userInfo.profileImg = widget.user.profileImg;
                       }
-                      context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo));
+                      final checkNickname = await context.read<UserProvider>().isNicknameAvailable(_nicknameController.text);
+                      if(checkNickname && context.mounted){
+                        context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo));
+                      }else {
+                        Get.snackbar('알림', '이미 존재하는 닉네임입니다.');
+                        return;
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(

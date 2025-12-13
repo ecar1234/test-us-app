@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../../domain/entities/promotion_post_entity.dart';
 import '../../../domain/entities/recruit_post_entity.dart';
@@ -75,47 +76,58 @@ class BasePostProvider extends ChangeNotifier {
   }
 
   void updateRecruitPost(RecruitPostEntity post) {
+    if (_favoritePost!.any((e) => e.id == post.id)) {
+      List<dynamic> removedList = _favoritePost!.where((element) => element.id != post.id).toList();
+      _favoritePost = [post, ...removedList];
+    }
     if (_recruitPosts!.any((element) => element.id == post.id)) {
       List<RecruitPostEntity> removedList = _recruitPosts!.where((element) => element.id != post.id).toList();
       _recruitPosts = [post, ...removedList];
-      notifyListeners();
-      return;
     }
+    notifyListeners();
     return;
   }
 
   void updatePromotionPost(PromotionPostEntity post) {
+    if (_favoritePost!.any((e) => e.id == post.id)) {
+      List<dynamic> removedList = _favoritePost!.where((element) => element.id != post.id).toList();
+      _favoritePost = [post, ...removedList];
+    }
     if (_promotionPosts!.any((element) => element.id == post.id)) {
       final index = _promotionPosts?.indexWhere((element) => element.id == post.id);
       if (index == null) return;
       _promotionPosts!.removeAt(index);
       _promotionPosts = [post, ..._promotionPosts!];
-      notifyListeners();
     }
+    notifyListeners();
     return;
   }
 
   void deleteRecruitPost(String id) {
+    if (_favoritePost!.any((element) => element.id == id)) {
+      _favoritePost = _favoritePost?.where((element) => element.id != id).toList();
+    }
     if (_recruitPosts!.any((element) => element.id == id)) {
       _recruitPosts = _recruitPosts?.where((element) => element.id != id).toList();
-      notifyListeners();
     }
     if (_userRecruitPosts!.any((element) => element.id == id)) {
       _userRecruitPosts = _userRecruitPosts?.where((element) => element.id != id).toList();
-      notifyListeners();
     }
+    notifyListeners();
     return;
   }
 
   void deletePromotionPost(String id) {
+    if (_favoritePost!.any((element) => element.id == id)) {
+      _favoritePost = _favoritePost?.where((element) => element.id != id).toList();
+    }
     if (_promotionPosts!.any((element) => element.id == id)) {
       _promotionPosts = _promotionPosts?.where((element) => element.id != id).toList();
-      notifyListeners();
     }
     if (_userPromotionPosts!.any((element) => element.id == id)) {
       _userPromotionPosts = _userPromotionPosts?.where((element) => element.id != id).toList();
-      notifyListeners();
     }
+    notifyListeners();
     return;
   }
 
@@ -133,5 +145,43 @@ class BasePostProvider extends ChangeNotifier {
     _userPromotionPosts!.removeAt(index);
     _userPromotionPosts = [post, ..._userPromotionPosts!];
     notifyListeners();
+  }
+
+  void userInfoUpdate(UserEntity user) {
+    _favoritePost ??= [];
+    _recruitPosts ?? [];
+    _promotionPosts ?? [];
+
+    bool updated = false;
+
+    for (final post in _promotionPosts!) {
+      if (post.author?.id == user.id) {
+        post.author = user;
+        updated = true;
+      }
+    }
+
+    for (final post in _recruitPosts!) {
+      if (post.author?.id == user.id) {
+        post.author = user;
+        updated = true;
+      }
+    }
+
+    for (final post in _favoritePost!) {
+      if (post.author?.id == user.id) {
+        post.author = user;
+        updated = true;
+      }
+    }
+
+    if (updated) {
+      // 핵심 포인트
+      _promotionPosts = List<PromotionPostEntity>.from(_promotionPosts!);
+      _recruitPosts = List<RecruitPostEntity>.from(_recruitPosts!);
+      _favoritePost = List<dynamic>.from(_favoritePost!);
+
+      notifyListeners();
+    }
   }
 }

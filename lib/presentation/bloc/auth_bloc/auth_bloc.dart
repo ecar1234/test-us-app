@@ -75,7 +75,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (findUser != null) {
           final loginRes = await userUseCase.authLogin(
             googleUser.email,
-            AuthType.naver,
+            AuthType.google,
           );
 
           final user = loginRes['user'] as UserEntity;
@@ -160,8 +160,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<LogoutEvent>((event, emit) async {
       try {
-        await GetIt.I.get<GoogleSignIn>().disconnect();
         await GetIt.I.get<GoogleSignIn>().signOut();
+        await GetIt.I.get<GoogleSignIn>().disconnect();
         await FlutterNaverLogin.logOut();
 
         await pref.removeToken();

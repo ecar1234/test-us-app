@@ -39,7 +39,7 @@ class RecruitPostProvider with ChangeNotifier {
       _recruitmentPosts = posts;
     }
     if(page > 1){
-      _recruitmentPosts!.addAll(posts);
+      _recruitmentPosts = [..._recruitmentPosts!, ...posts];
     }
     notifyListeners();
   }

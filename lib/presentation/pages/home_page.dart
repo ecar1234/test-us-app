@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
@@ -155,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                   child: Center(
-                    child: Text("지원 현황"),
+                    child: Text("사이드\n프로젝트", textAlign: TextAlign.center,),
                   ))),
           const Gap(10),
           SizedBox(
@@ -214,9 +215,7 @@ class _HomePageState extends State<HomePage> {
                 // decoration: BoxDecoration(
                 //     border: Border.all()
                 // ),
-                child: favoritePost.isEmpty
-                    ? const Center(child: Text("아직 HOT 게시글이 없습니다."))
-                    : ListView.separated(
+                child: ListView.separated(
                         shrinkWrap: true,
                         padding: EdgeInsets.only(left: 20),
                         scrollDirection: Axis.horizontal,
@@ -247,23 +246,20 @@ class _HomePageState extends State<HomePage> {
                                           border: favoritePost[idx].images!.isEmpty ? Border.all() : null,
                                           borderRadius: BorderRadius.circular(10),
                                         ),
-                                        child: favoritePost[idx].images!.isEmpty
-                                            ? SizedBox(
-                                                child: Center(
-                                                  child: Text('이미지가 없습니다.'),
-                                                ),
-                                              )
-                                            : ClipRRect(
+                                        child: ClipRRect(
                                                 borderRadius: BorderRadius.circular(10),
                                                 child: CachedNetworkImage(
                                                   imageUrl: favoritePost[idx].images![0].url ?? '',
                                                   fit: BoxFit.cover,
-                                                  progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-                                                      child: SizedBox(
-                                                          height: 50,
-                                                          width: 50,
-                                                          child: CircularProgressIndicator(
-                                                              value: downloadProgress.progress))),
+                                                  progressIndicatorBuilder: (context, url, downloadProgress) {
+                                                    return Shimmer.fromColors(
+                                                      baseColor: Colors.grey.shade300,
+                                                      highlightColor: Colors.grey.shade100,
+                                                      child: Container(
+                                                        color: Colors.white,
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
                                               ),
                                       );
@@ -277,7 +273,40 @@ class _HomePageState extends State<HomePage> {
                                         fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
                                     maxLines: 2,
                                   )),
-                                  const Gap(10),
+                                  if (favoritePost[idx].platform!.length > 1)
+                                    SizedBox(
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              favoritePost[idx].platform![0],
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.grey.shade600,
+                                                  overflow: TextOverflow.ellipsis),
+                                            ),
+                                            const Gap(10),
+                                            Text(
+                                              favoritePost[idx].platform![1],
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.grey.shade600,
+                                                  overflow: TextOverflow.ellipsis),
+                                            ),
+                                          ],
+                                        ))
+                                  else
+                                    SizedBox(
+                                      child: Text(
+                                        favoritePost[idx].platform![0],
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.grey.shade600,
+                                            overflow: TextOverflow.ellipsis),
+                                      ),
+                                    ),
                                   SizedBox(
                                       child: Text(
                                     "${favoritePost[idx].author!.nickname}",
@@ -367,17 +396,20 @@ class _HomePageState extends State<HomePage> {
                                             border: posts[idx].images!.isEmpty ? Border.all() : null,
                                             borderRadius: BorderRadius.circular(10),
                                           ),
-                                          child: posts[idx].images!.isEmpty
-                                              ? SizedBox(
-                                                  child: Center(
-                                                    child: Text('이미지가 없습니다.'),
-                                                  ),
-                                                )
-                                              : ClipRRect(
+                                          child: ClipRRect(
                                                   borderRadius: BorderRadius.circular(10),
-                                                  child: Image.network(
-                                                    posts[idx].images![0].url ?? '',
+                                                  child: CachedNetworkImage(
+                                                    imageUrl:posts[idx].images![0].url ?? '',
                                                     fit: BoxFit.cover,
+                                                    progressIndicatorBuilder: (context, url, downloadProgress) {
+                                                      return Shimmer.fromColors(
+                                                        baseColor: Colors.grey.shade300,
+                                                        highlightColor: Colors.grey.shade100,
+                                                        child: Container(
+                                                          color: Colors.white,
+                                                        ),
+                                                      );
+                                                    }
                                                   ),
                                                 ),
                                         );
@@ -517,17 +549,20 @@ class _HomePageState extends State<HomePage> {
                                             border: posts[idx].images!.isEmpty ? Border.all() : null,
                                             borderRadius: BorderRadius.circular(10),
                                           ),
-                                          child: posts[idx].images!.isEmpty
-                                              ? SizedBox(
-                                                  child: Center(
-                                                    child: Text('이미지가 없습니다.'),
-                                                  ),
-                                                )
-                                              : ClipRRect(
+                                          child: ClipRRect(
                                                   borderRadius: BorderRadius.circular(10),
-                                                  child: Image.network(
-                                                    posts[idx].images![0].url ?? '',
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: posts[idx].images![0].url ?? '',
                                                     fit: BoxFit.cover,
+                                                    progressIndicatorBuilder: (context, url, pro){
+                                                      return Shimmer.fromColors(
+                                                        baseColor: Colors.grey.shade300,
+                                                        highlightColor: Colors.grey.shade100,
+                                                        child: Container(
+                                                          color: Colors.white,
+                                                        )
+                                                      );
+                                                    },
                                                   ),
                                                 ),
                                         );
