@@ -169,14 +169,11 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
               if (messagingToken == null) {
                 return;
               }
-              final savedToken = await firebasePref.getFirebaseToken();
-              if (messagingToken != savedToken) {
-                final deviceType = Platform.isAndroid ? 'android' : 'ios';
-                userBloc.add(CreateFirebaseTokenEvent(state.token, messagingToken, state.user!.id, deviceType));
-                firebaseProvider.setFirebaseToken(messagingToken);
-                return;
-              }
-              firebaseProvider.getFirebaseToken();
+
+              final deviceType = Platform.isAndroid ? 'android' : 'ios';
+              userBloc.add(CreateFirebaseTokenEvent(state.token, messagingToken, state.user!.id, deviceType));
+              firebaseProvider.setFirebaseToken(messagingToken);
+              firebaseProvider.getNotification();
             }
           },
         ),

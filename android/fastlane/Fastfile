@@ -61,7 +61,7 @@ platform :android do
     build_aab
 
     upload_to_play_store(
-      json_key: "testus-android-7dd81a41b425.json",
+      json_key: "testus-app-5e814bb57a59.json",
       package_name: "com.testus.devon.studio.app",
       track: "alpha",
       release_status: "draft",

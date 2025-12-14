@@ -2,4 +2,4 @@ cd android/
 fastlane beta
 cd ..
 cd ios/
-fastlane bata
+fastlane beta

@@ -4,10 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
+import 'package:test_us_app/domain/entities/firebase_messaging_entity.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
@@ -15,6 +17,7 @@ import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promoti
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
 import 'package:test_us_app/presentation/pages/post/post_main_page.dart';
 import 'package:test_us_app/presentation/pages/setting_page.dart';
+import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
@@ -54,20 +57,48 @@ class _HomePageState extends State<HomePage> {
             // 추후 로고 이미지로 변경
             actions: [
               Selector<UserProvider, bool>(
-                selector: (context, provider) => provider.isLogged ?? false,
-                builder: (context, isLogin, child) => !isLogin
-                    ? TextButton(
-                        onPressed: () {
-                          Get.to(() => LoginPage());
-                        },
-                        child: Text('로그인', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)))
-                    : SizedBox()
+                  selector: (context, provider) => provider.isLogged ?? false,
+                  builder: (context, isLogin, child) => !isLogin
+                      ? TextButton(
+                          onPressed: () {
+                            Get.to(() => LoginPage());
+                          },
+                          child: Text('로그인', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)))
+                      : Selector<FirebaseMessagingProvider, List<FirebaseMessagingEntity>>(
+                          selector: (context, provider) => provider.notifications ?? [],
+                          builder: (context, notifications, child) => Stack(
+                                children: [
+                                  IconButton(
+                                      onPressed: () {},
+                                      style: IconButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                      icon: Icon(
+                                        Symbols.notifications,
+                                        fill: 1,
+                                        size: 30,
+                                      )),
+                                  if (notifications.isNotEmpty && notifications.any((e) => e.isRead == false))
+                                    Positioned(
+                                      top: 10,
+                                      right: 12,
+                                      child: Icon(
+                                        Symbols.circle,
+                                        size: 10,
+                                        color: Colors.red,
+                                        fill: 1,
+                                      ),
+                                    )
+                                ],
+                              ))),
+              Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: IconButton(
+                    onPressed: () {
+                      Get.to(() => SettingPage());
+                    },
+                    icon: const Icon(Icons.settings, size: 30)),
               ),
-              IconButton(
-                  onPressed: () {
-                    Get.to(() => SettingPage());
-                  },
-                  icon: const Icon(Icons.settings)),
             ],
           ),
           body: SizedBox(
@@ -156,7 +187,10 @@ class _HomePageState extends State<HomePage> {
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                   child: Center(
-                    child: Text("사이드\n프로젝트", textAlign: TextAlign.center,),
+                    child: Text(
+                      "사이드\n프로젝트",
+                      textAlign: TextAlign.center,
+                    ),
                   ))),
           const Gap(10),
           SizedBox(
@@ -175,158 +209,157 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _favoritePostList(BuildContext context) {
-    return Selector<BasePostProvider, List<dynamic>>(
-        selector: (context, provider) {
-          List<dynamic> posts = [];
-          if (provider.favoritePost != null) {
-            if(provider.favoritePost!.isEmpty){
-              return posts;
+    return Selector<BasePostProvider, List<dynamic>>(selector: (context, provider) {
+      List<dynamic> posts = [];
+      if (provider.favoritePost != null) {
+        if (provider.favoritePost!.isEmpty) {
+          return posts;
+        }
+        for (var post in provider.favoritePost!) {
+          if (post is RecruitPostEntity) {
+            if (post.status == PostStatus.active) {
+              posts.add(post);
             }
-            for(var post in provider.favoritePost!){
-              if(post is RecruitPostEntity){
-                if(post.status == PostStatus.active){
-                  posts.add(post);
-                }
-              }else {
-                if(post.status == PostStatus.active){
-                  posts.add(post);
-                }
-              }
+          } else {
+            if (post.status == PostStatus.active) {
+              posts.add(post);
             }
           }
-          return posts;
-        },
-        builder: (context, favoritePost, child) {
-          if (favoritePost.isNotEmpty) {
-          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Icon(Icons.local_fire_department, color: Colors.red),
-                  Text("HOT", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                ],
-              ),
+        }
+      }
+      return posts;
+    }, builder: (context, favoritePost, child) {
+      if (favoritePost.isNotEmpty) {
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                Icon(Icons.local_fire_department, color: Colors.red),
+                Text("HOT", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              ],
             ),
-            SizedBox(
-                height: 220,
-                width: MediaQuery.sizeOf(context).width,
-                // padding: EdgeInsets.all(10),
-                // decoration: BoxDecoration(
-                //     border: Border.all()
-                // ),
-                child: ListView.separated(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.only(left: 20),
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, idx) {
-                          return GestureDetector(
-                            onTap: () async {
-                              favoritePost[idx].postType == "RecruitmentPostEntity"
-                                  ? Get.to(() => RecruitPostDetailPage(postId: favoritePost[idx].id!))
-                                  : Get.to(() => PromotionPostDetailPage(postId: favoritePost[idx].id!));
-                            },
-                            child: SizedBox(
-                              height: 210,
-                              width: 160,
-                              // decoration: BoxDecoration(
-                              //   color: Theme.of(context).colorScheme.surface,
-                              // ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ConstrainedBox(
-                                    constraints: BoxConstraints(maxHeight: 210, maxWidth: 180),
-                                    child: LayoutBuilder(builder: (context, constraints) {
-                                      return Container(
-                                        width: constraints.maxWidth,
-                                        height: constraints.maxHeight * 0.55,
-                                        decoration: BoxDecoration(
-                                          // color: Colors.green,
-                                          border: favoritePost[idx].images!.isEmpty ? Border.all() : null,
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(10),
-                                                child: CachedNetworkImage(
-                                                  imageUrl: favoritePost[idx].images![0].url ?? '',
-                                                  fit: BoxFit.cover,
-                                                  progressIndicatorBuilder: (context, url, downloadProgress) {
-                                                    return Shimmer.fromColors(
-                                                      baseColor: Colors.grey.shade300,
-                                                      highlightColor: Colors.grey.shade100,
-                                                      child: Container(
-                                                        color: Colors.white,
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                      );
-                                    }),
+          ),
+          SizedBox(
+              height: 220,
+              width: MediaQuery.sizeOf(context).width,
+              // padding: EdgeInsets.all(10),
+              // decoration: BoxDecoration(
+              //     border: Border.all()
+              // ),
+              child: ListView.separated(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.only(left: 20),
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, idx) {
+                    return GestureDetector(
+                      onTap: () async {
+                        favoritePost[idx].postType == "RecruitmentPostEntity"
+                            ? Get.to(() => RecruitPostDetailPage(postId: favoritePost[idx].id!))
+                            : Get.to(() => PromotionPostDetailPage(postId: favoritePost[idx].id!));
+                      },
+                      child: SizedBox(
+                        height: 210,
+                        width: 160,
+                        // decoration: BoxDecoration(
+                        //   color: Theme.of(context).colorScheme.surface,
+                        // ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxHeight: 210, maxWidth: 180),
+                              child: LayoutBuilder(builder: (context, constraints) {
+                                return Container(
+                                  width: constraints.maxWidth,
+                                  height: constraints.maxHeight * 0.55,
+                                  decoration: BoxDecoration(
+                                    // color: Colors.green,
+                                    border: favoritePost[idx].images!.isEmpty ? Border.all() : null,
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  const Gap(10),
-                                  SizedBox(
-                                      child: Text(
-                                    "${favoritePost[idx].title}",
-                                    style: TextStyle(
-                                        fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
-                                    maxLines: 2,
-                                  )),
-                                  if (favoritePost[idx].platform!.length > 1)
-                                    SizedBox(
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              favoritePost[idx].platform![0],
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: Colors.grey.shade600,
-                                                  overflow: TextOverflow.ellipsis),
-                                            ),
-                                            const Gap(10),
-                                            Text(
-                                              favoritePost[idx].platform![1],
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: Colors.grey.shade600,
-                                                  overflow: TextOverflow.ellipsis),
-                                            ),
-                                          ],
-                                        ))
-                                  else
-                                    SizedBox(
-                                      child: Text(
-                                        favoritePost[idx].platform![0],
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.normal,
-                                            color: Colors.grey.shade600,
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      imageUrl: favoritePost[idx].images![0].url ?? '',
+                                      fit: BoxFit.cover,
+                                      progressIndicatorBuilder: (context, url, downloadProgress) {
+                                        return Shimmer.fromColors(
+                                          baseColor: Colors.grey.shade300,
+                                          highlightColor: Colors.grey.shade100,
+                                          child: Container(
+                                            color: Colors.white,
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  SizedBox(
-                                      child: Text(
-                                    "${favoritePost[idx].author!.nickname}",
+                                  ),
+                                );
+                              }),
+                            ),
+                            const Gap(10),
+                            SizedBox(
+                                child: Text(
+                              "${favoritePost[idx].title}",
+                              style:
+                                  TextStyle(fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
+                              maxLines: 2,
+                            )),
+                            if (favoritePost[idx].platform!.length > 1)
+                              SizedBox(
+                                  child: Row(
+                                children: [
+                                  Text(
+                                    favoritePost[idx].platform![0],
                                     style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
                                         color: Colors.grey.shade600,
                                         overflow: TextOverflow.ellipsis),
-                                    maxLines: 1,
-                                  )),
+                                  ),
+                                  const Gap(10),
+                                  Text(
+                                    favoritePost[idx].platform![1],
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey.shade600,
+                                        overflow: TextOverflow.ellipsis),
+                                  ),
                                 ],
+                              ))
+                            else
+                              SizedBox(
+                                child: Text(
+                                  favoritePost[idx].platform![0],
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.grey.shade600,
+                                      overflow: TextOverflow.ellipsis),
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        separatorBuilder: (context, idx) => const Gap(10),
-                        itemCount: favoritePost.length)),
-          ]);}
-          return SizedBox();
-        });
+                            SizedBox(
+                                child: Text(
+                              "${favoritePost[idx].author!.nickname}",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey.shade600,
+                                  overflow: TextOverflow.ellipsis),
+                              maxLines: 1,
+                            )),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, idx) => const Gap(10),
+                  itemCount: favoritePost.length)),
+        ]);
+      }
+      return SizedBox();
+    });
   }
 
   Widget _testerList(BuildContext context) {
@@ -348,7 +381,9 @@ class _HomePageState extends State<HomePage> {
                       Get.to(() => PostMainPage(type: 'recruit'));
                     },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                    child: Text("전체 보기", ))
+                    child: Text(
+                      "전체 보기",
+                    ))
               ],
             ),
           ),
@@ -397,21 +432,20 @@ class _HomePageState extends State<HomePage> {
                                             borderRadius: BorderRadius.circular(10),
                                           ),
                                           child: ClipRRect(
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  child: CachedNetworkImage(
-                                                    imageUrl:posts[idx].images![0].url ?? '',
-                                                    fit: BoxFit.cover,
-                                                    progressIndicatorBuilder: (context, url, downloadProgress) {
-                                                      return Shimmer.fromColors(
-                                                        baseColor: Colors.grey.shade300,
-                                                        highlightColor: Colors.grey.shade100,
-                                                        child: Container(
-                                                          color: Colors.white,
-                                                        ),
-                                                      );
-                                                    }
-                                                  ),
-                                                ),
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: CachedNetworkImage(
+                                                imageUrl: posts[idx].images![0].url ?? '',
+                                                fit: BoxFit.cover,
+                                                progressIndicatorBuilder: (context, url, downloadProgress) {
+                                                  return Shimmer.fromColors(
+                                                    baseColor: Colors.grey.shade300,
+                                                    highlightColor: Colors.grey.shade100,
+                                                    child: Container(
+                                                      color: Colors.white,
+                                                    ),
+                                                  );
+                                                }),
+                                          ),
                                         );
                                       }),
                                     ),
@@ -550,21 +584,20 @@ class _HomePageState extends State<HomePage> {
                                             borderRadius: BorderRadius.circular(10),
                                           ),
                                           child: ClipRRect(
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  child: CachedNetworkImage(
-                                                    imageUrl: posts[idx].images![0].url ?? '',
-                                                    fit: BoxFit.cover,
-                                                    progressIndicatorBuilder: (context, url, pro){
-                                                      return Shimmer.fromColors(
-                                                        baseColor: Colors.grey.shade300,
-                                                        highlightColor: Colors.grey.shade100,
-                                                        child: Container(
-                                                          color: Colors.white,
-                                                        )
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: CachedNetworkImage(
+                                              imageUrl: posts[idx].images![0].url ?? '',
+                                              fit: BoxFit.cover,
+                                              progressIndicatorBuilder: (context, url, pro) {
+                                                return Shimmer.fromColors(
+                                                    baseColor: Colors.grey.shade300,
+                                                    highlightColor: Colors.grey.shade100,
+                                                    child: Container(
+                                                      color: Colors.white,
+                                                    ));
+                                              },
+                                            ),
+                                          ),
                                         );
                                       }),
                                     ),
