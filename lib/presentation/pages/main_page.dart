@@ -66,7 +66,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
     MessagingService().init(context.read<FirebaseMessagingProvider>());
     Future.microtask(() async {
       await _init();
-      _initializeNotification();
+      await _initializeNotification();
     });
   }
 
@@ -119,6 +119,10 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         isRead: false,
       );
       MessagingService().saveNotification(notification);
+    });
+    // 토큰 업데이트
+    FirebaseMessaging.instance.onTokenRefresh.listen((messagingToken) {
+      MessagingService().saveToken(messagingToken);
     });
   }
 

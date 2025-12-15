@@ -49,7 +49,7 @@ app.*.map.json
 android/app/.cxx
 *.jks
 android/app/*.json
-android/testus-app-5e814bb57a59.json
+android/testus-app-486c0f5ad499.json
 GoogleService-info.plist
 report.xml
 firebase_options.dart

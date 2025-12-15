@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/firebase_messaging_entity.dart';
 import '../../domain/use_cases/firebase_messaging_usecase.dart';
 
-class FirebaseMessagingProvider extends ChangeNotifier{
+class FirebaseMessagingProvider with ChangeNotifier{
   final FirebaseMessagingUseCase useCase;
   FirebaseMessagingProvider(this.useCase);
 
