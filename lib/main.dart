@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:get_it/get_it.dart';
 import 'package:test_us_app/domain/use_cases/application_usecase.dart';
 import 'package:test_us_app/domain/use_cases/image_usecase.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
@@ -44,8 +45,8 @@ Future<void> main() async {
   await serviceLocator(_firebaseMessagingBackgroundHandler);
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => FirebaseMessagingProvider(getIt<FirebaseMessagingUseCase>())),
-      ChangeNotifierProvider(create: (context) => UserProvider(getIt<UserUseCase>())),
+      ChangeNotifierProvider(create: (context) => GetIt.I.get<FirebaseMessagingProvider>()),
+      ChangeNotifierProvider(create: (context) => GetIt.I.get<UserProvider>()),
       ChangeNotifierProvider(create: (context) => BasePostProvider()),
       ChangeNotifierProvider(create: (context) => RecruitPostProvider(getIt<RecruitPostUseCase>())),
       ChangeNotifierProvider(create: (context) => PromotionPostProvider()),

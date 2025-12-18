@@ -5,33 +5,37 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/firebase_messaging_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
-import 'package:test_us_app/presentation/pages/post/post_main_page.dart';
-import 'package:test_us_app/presentation/pages/purchase_page.dart';
-import 'package:test_us_app/presentation/pages/search_page.dart';
+import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
+import 'package:test_us_app/presentation/pages/home/purchase_page.dart';
+import 'package:test_us_app/presentation/pages/home/search_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/promotion_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
-import 'package:test_us_app/presentation/pages/user_page.dart';
+import 'package:test_us_app/presentation/pages/home/user_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import '../../data/sharedPreferences/auth_preference.dart';
 import '../../data/sharedPreferences/firebase_messaging_preference.dart';
+import '../../domain/entities/user_entity.dart';
 import '../../services/firebase/messaging_service.dart';
+import '../../services/notification/notification_service.dart';
 import '../bloc/app_bloc/app_event.dart';
 import '../bloc/app_bloc/app_state.dart';
 import '../bloc/auth_bloc/auth_bloc.dart';
@@ -43,7 +47,7 @@ import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../bloc/user_bloc/user_event.dart';
 import '../components/custom_bottom_bar.dart';
 import '../provider/firebase_messaging_provider.dart';
-import 'home_page.dart';
+import 'home/home_page.dart';
 
 class MetaDataSetting extends StatefulWidget {
   const MetaDataSetting({super.key});
@@ -66,6 +70,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
     MessagingService().init(context.read<FirebaseMessagingProvider>());
     Future.microtask(() async {
       await _init();
+      NotificationService().init();
       await _initializeNotification();
     });
   }
@@ -94,8 +99,9 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         isRead: false,
       );
       MessagingService().saveNotification(notification);
+      NotificationService().showNotification(message);
     });
-    // 앱이 꺼져 있을 때
+    // 알림 클릭으로 앱이 열렸을 때 처리
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       final notification = FirebaseMessagingEntity(
         id: message.messageId!,
@@ -107,9 +113,9 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
       );
       MessagingService().saveNotification(notification);
     });
-    // 앱이 백그라운드 상태일 때
+    // 앱이 꺼져 있을때.
     FirebaseMessaging.instance.getInitialMessage().then((message) {
-      if(message == null) return;
+      if (message == null) return;
       final notification = FirebaseMessagingEntity(
         id: message.messageId!,
         title: message.notification?.title,
@@ -119,7 +125,9 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         isRead: false,
       );
       MessagingService().saveNotification(notification);
+      NotificationService().showNotification(message);
     });
+
     // 토큰 업데이트
     FirebaseMessaging.instance.onTokenRefresh.listen((messagingToken) {
       MessagingService().saveToken(messagingToken);
@@ -133,25 +141,21 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
       listeners: [
         BlocListener<BasePostBloc, BasePostState>(
           listener: (context, state) async {
-            if (state.state == BasePostLoadState.getInitPostCompletedState) {
-              context.read<AuthBloc>().add(TokenCheckEvent());
-              context
-                  .read<BasePostProvider>()
-                  .getInitPosts(state.favoritePosts!, state.recruitPosts!, state.promotionPosts!);
-              context.read<RecruitPostProvider>().getInitPosts(state.recruitPosts!);
-              context.read<PromotionPostProvider>().getInitPromotionPosts(state.promotionPosts!);
-              FlutterNativeSplash.remove();
-            }
+            context.read<AuthBloc>().add(TokenCheckEvent());
+            context
+                .read<BasePostProvider>()
+                .getInitPosts(state.favoritePosts!, state.recruitPosts!, state.promotionPosts!);
+            context.read<RecruitPostProvider>().getInitPosts(state.recruitPosts!);
+            context.read<PromotionPostProvider>().getInitPromotionPosts(state.promotionPosts!);
+            FlutterNativeSplash.remove();
           },
           listenWhen: (preState, state) => state.state == BasePostLoadState.getInitPostCompletedState,
         ),
         BlocListener<BasePostBloc, BasePostState>(
           listener: (context, state) async {
-            if (state.state == BasePostLoadState.getUserInitPostsCompletedState) {
-              final recruit = state.initData!['recruitPosts'];
-              final promotion = state.initData!['promotionPosts'];
-              context.read<BasePostProvider>().setUserInitData(recruit, promotion);
-            }
+            final recruit = state.initData!['recruitPosts'];
+            final promotion = state.initData!['promotionPosts'];
+            context.read<BasePostProvider>().setUserInitData(recruit, promotion);
           },
           listenWhen: (preState, state) => state.state == BasePostLoadState.getUserInitPostsCompletedState,
         ),
@@ -163,39 +167,53 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             final applicationBloc = context.read<AppBloc>();
             final userBloc = context.read<UserBloc>();
 
-            if (state.state == UserAuthState.loginCompletedState) {
-              await userProvider.autoLogin(state.token!, state.user!);
-              basePostBloc.add(RequestUserInItDataEvent(state.token!, state.user!.id!));
-              applicationBloc.add(RequestMyApplicationsEvent(state.token!, state.user!.id!));
-
-              final messagingToken = await _firebaseMessaging.getToken();
-              logger.d('firebase token : $messagingToken');
-              if (messagingToken == null) {
-                return;
-              }
-
-              final deviceType = Platform.isAndroid ? 'android' : 'ios';
-              userBloc.add(CreateFirebaseTokenEvent(state.token, messagingToken, state.user!.id, deviceType));
-              firebaseProvider.setFirebaseToken(messagingToken);
-              firebaseProvider.getNotification();
+            await userProvider.autoLogin(state.token!, state.user!);
+            basePostBloc.add(RequestUserInItDataEvent(state.token!, state.user!.id!));
+            applicationBloc.add(RequestMyApplicationsEvent(state.token!, state.user!.id!));
+            if (state.user!.method != AuthType.email) {
+              userBloc.add(RequestUserDataEvent(state.token!, state.user!.id!));
             }
-          },
-        ),
-        BlocListener<AppBloc, AppState>(listener: (context, state) async {
-          if (state.state == UserAppState.getUserApplicationsCompletedState) {
-            context.read<ApplicationProvider>().getMyApplications(state.applications!);
 
-            final postIds = state.applications!.map((e) => e.postId!).toList();
-            final token = context.read<UserProvider>().token ?? '';
-            context.read<RecruitPostBloc>().add(RequestAppRecruitPosts(token, postIds));
-          }
-        }),
+            final messagingToken = await _firebaseMessaging.getToken();
+            logger.d('firebase token : $messagingToken');
+            if (messagingToken == null) {
+              return;
+            }
+
+            final deviceType = Platform.isAndroid ? 'android' : 'ios';
+            userBloc.add(CreateFirebaseTokenEvent(state.token, messagingToken, state.user!.id, deviceType));
+            firebaseProvider.setFirebaseToken(messagingToken);
+            firebaseProvider.getNotification();
+          },
+          listenWhen: (preState, state) => state.state == UserAuthState.loginCompletedState,
+        ),
+        BlocListener<AppBloc, AppState>(
+            listener: (context, state) async {
+              context.read<ApplicationProvider>().getMyApplications(state.applications!);
+
+              final postIds = state.applications!.map((e) => e.postId!).toList();
+              final token = context.read<UserProvider>().token ?? '';
+              context.read<RecruitPostBloc>().add(RequestAppRecruitPosts(token, postIds));
+            },
+            listenWhen: (prev, state) => state.state == UserAppState.getUserApplicationsCompletedState),
         BlocListener<RecruitPostBloc, RecruitPostState>(
           listener: (context, state) async {
-            if (state.state == RecruitPostLoadState.getAppRecruitPostsCompletedState) {
-              context.read<ApplicationProvider>().setUserApplicationPosts(state.posts!);
+            context.read<ApplicationProvider>().setUserApplicationPosts(state.posts!);
+          },
+          listenWhen: (preState, state) => state.state == RecruitPostLoadState.getAppRecruitPostsCompletedState,
+        ),
+        BlocListener<UserBloc, UserState>(
+          listener: (context, state) async {
+            final savedUser = context.read<UserProvider>().user!;
+            if (savedUser.nickname != state.user!.nickname) {
+              savedUser.nickname = state.user!.nickname;
+              savedUser.profileImg = state.user!.profileImg;
+              savedUser.userType = state.user!.userType;
+              savedUser.role = state.user!.role;
+              context.read<UserProvider>().updateUserInfo(savedUser);
             }
           },
+          listenWhen: (prevState, state) => state.state == UserDataState.getUserDataLoadedState,
         )
       ],
       child: GetMaterialApp(
@@ -229,10 +247,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             useMaterial3: true,
             swapLegacyOnMaterial3: true,
             fontFamily: GoogleFonts.notoSans().fontFamily),
-        //     .copyWith(
-        //         inputDecorationTheme: InputDecorationTheme(
-        //   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        // )),
         darkTheme: FlexThemeData.dark(
             scheme: FlexScheme.damask,
             subThemesData: const FlexSubThemesData(
@@ -267,10 +281,10 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
     );
   }
 
-  Future<void> _firebaseMessagingTokenLogic(BuildContext context) async {
-    final token = context.read<UserProvider>().token ?? '';
-    final userId = context.read<UserProvider>().user?.id ?? '';
-  }
+// Future<void> _firebaseMessagingTokenLogic(BuildContext context) async {
+//   final token = context.read<UserProvider>().token ?? '';
+//   final userId = context.read<UserProvider>().user?.id ?? '';
+// }
 }
 
 class MainPage extends StatefulWidget {

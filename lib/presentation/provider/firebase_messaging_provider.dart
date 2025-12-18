@@ -34,7 +34,7 @@ class FirebaseMessagingProvider with ChangeNotifier{
   Future<void> saveNotification(FirebaseMessagingEntity notification) async {
     await useCase.saveNotification(notification);
     _notifications ??= [];
-    _notifications = [..._notifications!, notification];
+    _notifications = [notification, ..._notifications!];
     notifyListeners();
   }
   Future<void> getNotification() async {
@@ -42,9 +42,9 @@ class FirebaseMessagingProvider with ChangeNotifier{
     _notifications = notifications;
     notifyListeners();
   }
-  Future<void> removeNotification(int id) async {
+  Future<void> removeNotification(String id) async {
     await useCase.removeNotification(id);
-    _notifications = _notifications!.where((element) => element.id != id).toList();
+    _notifications = _notifications!.where((element) => element.id! != id).toList();
     notifyListeners();
   }
   Future<void> removeAllNotification() async {
@@ -69,6 +69,24 @@ class FirebaseMessagingProvider with ChangeNotifier{
 
     await useCase.saveNotification(updated);
 
+    notifyListeners();
+  }
+  Future<void> readAllNotification() async {
+    if (_notifications == null || _notifications!.isEmpty) {
+      return;
+    }
+    final allReadNotifications = _notifications!.map((notification) {
+      return FirebaseMessagingEntity(
+        id: notification.id,
+        title: notification.title,
+        body: notification.body,
+        createdAt: notification.createdAt,
+        data: notification.data,
+        isRead: true
+      );
+    }).toList();
+    _notifications = allReadNotifications;
+    await useCase.allReadChangeSaveNotification(_notifications!);
     notifyListeners();
   }
 }

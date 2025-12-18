@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/core/net_driver.dart';
 import 'package:test_us_app/data/models/application/application_model.dart';
@@ -10,6 +11,7 @@ import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 import 'application_datasource.dart';
 
 class ApplicationDataSourceImpl implements ApplicationDataSource {
+  final logger = Logger();
   final NetDriver netDriver;
   ApplicationDataSourceImpl(this.netDriver);
 
@@ -74,13 +76,19 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
 
   @override
   Future<Map<String, dynamic>> updateApplication(String token, ApplicationModel application) async {
-    final res = await netDriver.requestPutJson(token, ApplicationApi.update, application.toJson());
-    if(res['status'] == 200){
-      final applicationData = ApplicationModel.fromJson(res['application']);
-      final post = RecruitPostModel.fromJson(res['post']);
-      return {'application': applicationData, 'post': post};
-    }else {
-      throw Exception('Error');
+    try {
+      final res = await netDriver.requestPutJson(token, ApplicationApi.update, application.toJson());
+      if(res['status'] == 200){
+        final applicationData = ApplicationModel.fromJson(res['application']);
+        final post = RecruitPostModel.fromJson(res['post']);
+        return {'application': applicationData, 'post': post};
+      }else {
+        throw Exception('Error');
+      }
+    } on Exception catch (e) {
+      // TODO
+      logger.e(e.toString());
+      rethrow;
     }
   }
 

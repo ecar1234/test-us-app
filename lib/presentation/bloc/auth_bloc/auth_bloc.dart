@@ -66,7 +66,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           googleUser = await GetIt.I.get<GoogleSignIn>().authenticate(scopeHint: ['email', 'profile']);
           logger.i('Google Sign-In: Used authenticate()');
         } else {
-          emit(AuthState(state: UserAuthState.authFailedState));
+          emit(AuthState(state: UserAuthState.authFailedState, message: '구글 로그인 정보를 가져오지 못했습니다. 다시 시도해주세요.'));
           logger.i('Google Sign-In: Used signIn() as fallback');
           return;
         }
@@ -93,7 +93,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } catch (e) {
         logger.e(e);
         logger.i('state : login failed state');
-        emit(AuthState(state: UserAuthState.authFailedState, message: '구글 로그인 정보를 가져오지 못했습니다. 다시 시도해주세요.'));
+        // emit(AuthState(state: UserAuthState.authFailedState, message: '구글 로그인 정보를 가져오지 못했습니다. 다시 시도해주세요.'));
+        emit(AuthState(state: UserAuthState.authFailedState, message: e.toString() ));
       }
     });
 
@@ -103,7 +104,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
         final NaverLoginResult naverUser = await FlutterNaverLogin.logIn();
         if (naverUser.status == NaverLoginStatus.error) {
-          emit(AuthState(state: UserAuthState.authFailedState, message: '네이버 로그인 정보를 가져오지 못했습니다. 다시 시도해주세요.'));
+          emit(AuthState(state: UserAuthState.authFailedState, message: naverUser.errorMessage));
           return;
         }
 

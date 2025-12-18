@@ -8,7 +8,6 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
-import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/firebase_messaging_entity.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
@@ -16,24 +15,18 @@ import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_pos
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
 import 'package:test_us_app/presentation/pages/post/post_main_page.dart';
-import 'package:test_us_app/presentation/pages/setting_page.dart';
+import 'package:test_us_app/presentation/pages/home/setting_page.dart';
 import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
-
-import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 
-import '../../data/sharedPreferences/auth_preference.dart';
-import '../../domain/entities/recruit_post_entity.dart';
-import '../../services/common_height_provider.dart';
-import '../bloc/auth_bloc/auth_bloc.dart';
-import '../bloc/auth_bloc/auth_event.dart';
-import '../bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
-import '../bloc/post_blocs/promotion_bloc/promotion_event.dart';
-import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
-import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
-import '../provider/application_provider.dart';
-import 'login_page.dart';
+import '../../../data/sharedPreferences/auth_preference.dart';
+import '../../../domain/entities/recruit_post_entity.dart';
+import '../../../services/common_height_provider.dart';
+import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import '../../components/notifications_page.dart';
+import '../auth/login_page.dart';
 
 class HomePage extends StatefulWidget {
   final Function(int) onTap;
@@ -66,31 +59,24 @@ class _HomePageState extends State<HomePage> {
                           child: Text('로그인', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)))
                       : Selector<FirebaseMessagingProvider, List<FirebaseMessagingEntity>>(
                           selector: (context, provider) => provider.notifications ?? [],
-                          builder: (context, notifications, child) => Stack(
-                                children: [
-                                  IconButton(
-                                      onPressed: () {},
-                                      style: IconButton.styleFrom(
-                                        padding: EdgeInsets.zero,
-                                      ),
-                                      icon: Icon(
-                                        Symbols.notifications,
-                                        fill: 1,
-                                        size: 30,
-                                      )),
-                                  if (notifications.isNotEmpty && notifications.any((e) => e.isRead == false))
-                                    Positioned(
-                                      top: 10,
-                                      right: 12,
-                                      child: Icon(
-                                        Symbols.circle,
-                                        size: 10,
-                                        color: Colors.red,
-                                        fill: 1,
-                                      ),
-                                    )
-                                ],
-                              ))),
+                          builder: (context, notifications, child) {
+                            final count = notifications.where((e) => e.isRead == false).length;
+                            if(count == 0){
+                              return IconButton(
+                                onPressed: () {},
+                                icon: Icon(Symbols.notifications, size: 30),
+                              );
+                            }
+                            return IconButton(
+                              onPressed: () {
+                                Get.to(() => NotificationsPage());
+                              },
+                              icon: Badge.count(
+                                count: count,
+                                child: Icon(Symbols.notifications, size: 30),
+                              ),
+                            );
+                          })),
               Padding(
                 padding: const EdgeInsets.only(right: 20),
                 child: IconButton(

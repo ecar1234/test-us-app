@@ -9,7 +9,7 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
 
-import '../../data/models/user/user_model.dart';
+import '../../../data/models/user/user_model.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});

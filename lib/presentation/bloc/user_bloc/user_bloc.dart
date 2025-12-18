@@ -29,7 +29,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       logger.i('user state : loading state');
       try {
         final user = await userUseCase.getUserById(event.token, event.userId);
-        emit(UserState(UserDataState.getUsersInfoCompletedState, user: user));
+        emit(UserState(UserDataState.getUserDataLoadedState, user: user));
         logger.i('user state : getUsersInfoCompletedState');
       } catch (e) {
         emit(UserState(UserDataState.errorState));
@@ -44,7 +44,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       try {
         final users = await userUseCase.getUsersByIds(event.token, event.ids);
         // final reviews = await reviewUseCase.getTestersReviewOnPost(event.token, event.ids, event.postId);
-        emit(UserState(UserDataState.getUsersInfoCompletedState,users: users));
+        emit(UserState(UserDataState.getUserDataLoadedState,users: users));
         } catch (e) {
         emit(UserState(UserDataState.errorState));
         logger.i('user state : error state');
@@ -66,7 +66,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
             user = await userUseCase.updateUserInfoWithImage(event.token, event.userInfo, event.profileImage!);
           }
         }
-        emit(UserState(UserDataState.getUsersInfoCompletedState, user: user));
+        emit(UserState(UserDataState.userInfoUpdateCompletedState, user: user));
         logger.i('user state : getUsersInfoCompletedState');
       } catch (e) {
         emit(UserState(UserDataState.errorState));
@@ -79,7 +79,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserState(UserDataState.loadingState));
       logger.i('user state : loading state');
       final user = await userUseCase.getUserByEmail(event.email);
-      emit(UserState(UserDataState.getUsersInfoCompletedState, user: user));
+      emit(UserState(UserDataState.getUsersInfoByEmailCompletedState, user: user));
     });
 
     on<UserRequestCompleteEvent>((event, emit) {

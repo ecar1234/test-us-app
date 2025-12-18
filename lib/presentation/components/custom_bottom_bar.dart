@@ -75,7 +75,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                           });
                           widget.onTap(_selectedIndex);
                         },
-                        icon: Icon(Icons.home,
+                        icon: Icon(_selectedIndex == 0 ? Icons.home : Icons.home_outlined,
                             color: _selectedIndex == 0 ? Theme.of(context).colorScheme.primary : null)),
                     IconButton(
                         onPressed: () async {
@@ -85,7 +85,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                           });
                           widget.onTap(_selectedIndex);
                         },
-                        icon: Icon(Icons.search,
+                        icon: Icon(_selectedIndex == 1 ? Icons.search : Icons.search_outlined,
                             color: _selectedIndex == 1 ? Theme.of(context).colorScheme.primary : null)),
                   ],
                 ),
@@ -141,7 +141,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                         });
                         widget.onTap(_selectedIndex);
                       },
-                      icon: Icon(Icons.person,
+                      icon: Icon(_selectedIndex == 2 ? Icons.person : Icons.person_outlined,
                           color: _selectedIndex == 2 ? Theme.of(context).colorScheme.primary : null)),
                   IconButton(
                       onPressed: () {

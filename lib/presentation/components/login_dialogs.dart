@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 
-import '../pages/login_page.dart';
+import '../pages/auth/login_page.dart';
 
 class LoginDialog extends StatelessWidget {
   const LoginDialog({super.key});

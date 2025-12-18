@@ -70,7 +70,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
           },
           child: BlocListener<UserBloc, UserState>(
             listener: (context, state) async {
-              if (state.state == UserDataState.getUsersInfoCompletedState) {
+              if (state.state == UserDataState.userInfoUpdateCompletedState) {
                 await showDialog(context: context, builder: (context) => Dialog(
                   child: Container(
                     height: 200,

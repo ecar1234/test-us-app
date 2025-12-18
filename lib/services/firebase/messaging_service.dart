@@ -20,7 +20,7 @@ class MessagingService {
   factory MessagingService() => _instance;
   MessagingService._();
 
-  late FirebaseMessagingProvider provider;
+  final FirebaseMessagingProvider provider = GetIt.I.get<FirebaseMessagingProvider>();
   late UserProvider userProvider;
 
 

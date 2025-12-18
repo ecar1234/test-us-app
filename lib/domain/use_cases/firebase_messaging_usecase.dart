@@ -24,12 +24,17 @@ class FirebaseMessagingUseCase {
     notifications.add(FirebaseMessagingEntity.toJson(notification));
     await pref.saveNotifications(notifications);
   }
+  Future<void> allReadChangeSaveNotification(List<FirebaseMessagingEntity> notifications) async {
+    List<String> notificationsString = notifications.map((e) => FirebaseMessagingEntity.toJson(e)).toList();
+    await pref.saveNotifications(notificationsString);
+  }
   Future<List<FirebaseMessagingEntity>> getNotification() async {
     final notifications = await pref.getNotifications();
     final res = notifications.map((e) => FirebaseMessagingEntity.fromJson(e)).toList();
+    res.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
     return res;
   }
-  Future<void> removeNotification(int id) async {
+  Future<void> removeNotification(String id) async {
     List<String> notifications = await pref.getNotifications();
     notifications.removeWhere((element) => FirebaseMessagingEntity.fromJson(element).id == id);
     await pref.saveNotifications(notifications);

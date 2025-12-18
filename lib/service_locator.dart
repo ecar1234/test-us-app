@@ -1,13 +1,8 @@
-
-
 import 'dart:async';
-import 'dart:io';
 
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:test_us_app/core/api_names.dart';
@@ -23,9 +18,11 @@ import 'package:test_us_app/data/data_sources/user_data/user_data_source_impl.da
 import 'package:test_us_app/data/repositories/recruit_post_repository_impl.dart';
 import 'package:test_us_app/domain/use_cases/base_post_usecase.dart';
 import 'package:test_us_app/domain/use_cases/firebase_messaging_usecase.dart';
+import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
+import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/firebase/firebase_options.dart';
-import 'package:test_us_app/services/theme_provider.dart';
+import 'package:test_us_app/services/notification/notification_service.dart';
 
 import 'core/net_driver.dart';
 import 'data/data_sources/post_data/base_post_datasource.dart';
@@ -51,6 +48,7 @@ import 'domain/use_cases/review_usecase.dart';
 import 'domain/use_cases/user_usecase.dart';
 
 final getIt = GetIt.instance;
+
 Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebaseMessagingBackgroundHandler) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -58,14 +56,14 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   final GoogleSignIn signIn = GoogleSignIn.instance;
-
-  // await signIn.initialize();
-
+  await signIn.initialize();
 
   getIt.registerLazySingleton<GoogleSignIn>(() => signIn);
-
-
-  getIt.registerLazySingleton<NetDriver>(() => NetDriver(Host.baseDevUrl));
+  // NOTE: 아직 서버의 이분화가 안되어 있음.
+  String host = kDebugMode ? Host.baseDevUrl : Host.baseProdUrl;
+  print('접속 URL : $host');
+  // TODO: 이분화 후 baseUrl 분리
+  getIt.registerLazySingleton<NetDriver>(() => NetDriver(host));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());
   // getIt.registerSingleton<ThemeProvider>(ThemeProvider());
 
@@ -85,7 +83,8 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   // getIt.registerLazySingleton<ImageRepository>(() => ImageRepositoryImpl(getIt<ImageDataSource>()));
   getIt.registerLazySingleton<BasePostRepository>(() => BasePostRepositoryImpl(getIt<BasePostDataSource>()));
   getIt.registerLazySingleton<RecruitPostRepository>(() => RecruitPostRepositoryImpl(getIt<RecruitPostDatasource>()));
-  getIt.registerLazySingleton<PromotionPostRepository>(() => PromotionPostRepositoryImpl(getIt<PromotionPostDataSource>()));
+  getIt.registerLazySingleton<PromotionPostRepository>(
+      () => PromotionPostRepositoryImpl(getIt<PromotionPostDataSource>()));
 
   // use case
   getIt.registerLazySingleton<UserUseCase>(() => UserUseCase(getIt<UserRepository>()));
@@ -96,5 +95,9 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   getIt.registerLazySingleton<RecruitPostUseCase>(() => RecruitPostUseCase(getIt<RecruitPostRepository>()));
   getIt.registerLazySingleton<PromotionPostUseCase>(() => PromotionPostUseCase(getIt<PromotionPostRepository>()));
   getIt.registerLazySingleton<FirebaseMessagingUseCase>(() => FirebaseMessagingUseCase());
+
+  //provider
+  getIt.registerSingleton<FirebaseMessagingProvider>(FirebaseMessagingProvider(getIt<FirebaseMessagingUseCase>()));
+  getIt.registerSingleton<UserProvider>(UserProvider(getIt<UserUseCase>()));
 
 }

@@ -30,7 +30,7 @@ class UserDataSourceImpl implements UserDataSource {
   Future<UserModel?> getUserById(String token, String id) async {
     final res = await netDriver.requestGetJson("", UserApi.getUserById, param: id);
     if (res['status'] == 200) {
-      return UserModel.fromJson(res['data']);
+      return UserModel.fromJson(res['user']);
     } else {
       return null;
     }

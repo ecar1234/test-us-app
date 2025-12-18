@@ -7,7 +7,10 @@ enum UserDataState {
   serviceStartState,
   userInitDataLoadCompletedState,
   loadingState,
+  userInfoUpdateCompletedState,
+  getUserDataLoadedState,
   getUsersInfoCompletedState,
+  getUsersInfoByEmailCompletedState,
   userDataLoadedState,
   errorState
 }

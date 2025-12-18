@@ -10,7 +10,7 @@ import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
-import 'package:test_us_app/presentation/pages/login_page.dart';
+import 'package:test_us_app/presentation/pages/auth/login_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/application/my_applications_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/user_info/user_info_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
@@ -20,16 +20,16 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
-import '../../data/models/application/application_model.dart';
-import '../../data/models/post/recruit_post_model.dart';
-import '../../data/models/user/user_model.dart';
-import '../bloc/auth_bloc/auth_bloc.dart';
-import '../bloc/auth_bloc/auth_event.dart';
-import '../bloc/user_bloc/user_event.dart';
-import '../components/login_dialogs.dart';
-import 'my_pages/recruit/my_recruitment_page.dart';
-import 'my_pages/promotion/my_promotion_page.dart';
-import 'my_pages/reviews/review_page.dart';
+import '../../../data/models/application/application_model.dart';
+import '../../../data/models/post/recruit_post_model.dart';
+import '../../../data/models/user/user_model.dart';
+import '../../bloc/auth_bloc/auth_bloc.dart';
+import '../../bloc/auth_bloc/auth_event.dart';
+import '../../bloc/user_bloc/user_event.dart';
+import '../../components/login_dialogs.dart';
+import '../my_pages/recruit/my_recruitment_page.dart';
+import '../my_pages/promotion/my_promotion_page.dart';
+import '../my_pages/reviews/review_page.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});

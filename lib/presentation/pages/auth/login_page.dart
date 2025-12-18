@@ -8,13 +8,13 @@ import 'package:logger/logger.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_state.dart';
-import 'package:test_us_app/presentation/pages/signup_page.dart';
+import 'package:test_us_app/presentation/pages/auth/signup_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
 
-import '../../data/models/user/user_model.dart';
-import '../../data/sharedPreferences/auth_preference.dart';
-import '../bloc/auth_bloc/auth_event.dart';
+import '../../../data/models/user/user_model.dart';
+import '../../../data/sharedPreferences/auth_preference.dart';
+import '../../bloc/auth_bloc/auth_event.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
