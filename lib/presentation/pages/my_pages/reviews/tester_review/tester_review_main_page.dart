@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/tester_review/tester_review_page.dart';
 
 import '../../../../../data/models/application/application_model.dart';
@@ -10,7 +11,9 @@ import '../../../../../data/models/post/recruit_post_model.dart';
 import '../../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../../services/theme_provider.dart';
 import '../../../../../utils/time_util.dart';
+import '../../../../bloc/app_bloc/app_bloc.dart';
 import '../../../../provider/post_provider/base_post_provider.dart';
+import '../../../../provider/user_provider.dart';
 
 class TesterReviewMainPage extends StatefulWidget {
   const TesterReviewMainPage({super.key});
@@ -20,6 +23,15 @@ class TesterReviewMainPage extends StatefulWidget {
 }
 
 class _TesterReviewMainPageState extends State<TesterReviewMainPage> {
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: application 정보가 담긴 새로운 posts 를 받아오거나...
+    // TODO: post를 받아 올때, pending, accept만 받아와서 applications.length > 0 페이지 이동.
+    // TODo: 신청인원은 accept 상관 없이 보여주고, 상세페이지에서 State에 따라서 다른게 표시.
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +131,7 @@ class _TesterReviewMainPageState extends State<TesterReviewMainPage> {
                                   Text('테스터 수 : '),
                                   const Gap(10),
                                   Text(
-                                      '${posts[idx].applications!.map((item) => item.status == ApplicationStatus.accepted).length} 명',
+                                      '${posts[idx].applications!.length} 명',
                                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))
                                 ])),
                         SizedBox(
@@ -136,9 +148,7 @@ class _TesterReviewMainPageState extends State<TesterReviewMainPage> {
                           width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
                           child: ElevatedButton(
                               onPressed: posts[idx]
-                                  .applications!
-                                  .map((item) => item.status == ApplicationStatus.accepted)
-                                  .isEmpty
+                                  .applications!.isEmpty
                                   ? null
                                   : () {
                                 Get.to(() => TesterReviewPage(

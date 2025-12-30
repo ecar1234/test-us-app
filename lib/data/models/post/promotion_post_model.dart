@@ -24,7 +24,7 @@ class PromotionPostModel {
   List<ImageModel>? images;
   List<String>? domain;
   String? postType;
-  List<PostReviewModel>? reviews;
+  List<String>? reviews;
   DateTime? createdAt;
   DateTime? updatedAt;
 

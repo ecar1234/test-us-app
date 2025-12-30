@@ -7,13 +7,14 @@ import 'package:test_us_app/domain/use_cases/recruit_post_usecase.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 
 import '../../../data/sharedPreferences/auth_preference.dart';
+import '../../../domain/use_cases/user_usecase.dart';
 import 'app_event.dart';
 import 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState>{
   final pref = AuthPreference.instance;
   final logger = Logger();
-  AppBloc(ApplicationUseCase applicationUseCase, RecruitPostUseCase recruitPostUseCase): super(AppState()) {
+  AppBloc(ApplicationUseCase applicationUseCase, RecruitPostUseCase recruitPostUseCase, UserUseCase userUseCase): super(AppState()) {
 
     // on<ApplyRejectEvent>((event, emit) {
     //   emit(AppState(state: UserAppState.requestCompletedState));
@@ -31,7 +32,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       emit(AppState(state: UserAppState.loadingState));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.requestApply(event.token, event.application);
-      emit(AppState(state: UserAppState.applicationCompletedState, newPost: res['post'], application: res['application']));
+      emit(AppState(state: UserAppState.applicationCompletedState, application: res));
       logger.i('application state: applicationCompletedState');
     });
 
@@ -39,7 +40,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       emit(AppState(state: UserAppState.loadingState));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.updateApplication(event.token, event.application);
-      emit(AppState(state: UserAppState.applicationUpdateCompletedState, newPost: res['post'], application: res['application']));
+      emit(AppState(state: UserAppState.applicationUpdateCompletedState, application: res));
       logger.i('application state: applicationUpdateCompletedState');
     });
 
@@ -47,7 +48,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       emit(AppState(state: UserAppState.loadingState));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.rejectApplication(event.token, event.userId, event.postId);
-      emit(AppState(state: UserAppState.applicationRejectCompletedState, newPost: res));
+      emit(AppState(state: UserAppState.applicationRejectCompletedState, application: res));
       logger.i('application state: applicationRejectCompletedState');
     });
 
@@ -55,7 +56,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       emit(AppState(state: UserAppState.loadingState));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.completeApplication(event.token, event.userId, event.postId);
-      emit(AppState(state: UserAppState.applicationCompletedState, newPost: res));
+      emit(AppState(state: UserAppState.applicationCompletedState, application: res));
       logger.i('application state: applicationCompletedState');
     });
 
@@ -63,8 +64,28 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       emit(AppState(state: UserAppState.loadingState));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.cancelApply(event.token, event.appId);
-      emit(AppState(state: UserAppState.applicationCancelCompletedState, newPost: res['post'], application: res['application']));
+      emit(AppState(state: UserAppState.applicationCancelCompletedState, application: res));
       logger.i('application state: applicationCancelCompletedState');
+    });
+
+    on<RequestRecruitApplicationsEvent>((event, emit) async {
+      try {
+        emit(AppState(state: UserAppState.loadingState));
+        logger.i('application state: loadingState');
+        final res = await applicationUseCase.getRecruitApplications(event.token, event.applicationIds);
+        if(res.isEmpty){
+          emit(GetRecruitApplicationsState(users: [], apps: []));
+        }else {
+          final ids = res.map((e) => e.applicantId!).toList();
+          final users = await userUseCase.getUsersByIds(event.token, ids);
+          emit(GetRecruitApplicationsState(users: users, apps: res));
+        }
+      } on Exception catch (e) {
+        // TODO
+        logger.e(e.toString());
+        emit(AppState(state: UserAppState.errorState));
+        emit(GetRecruitApplicationsState(users: [], apps: []));
+      }
     });
 
     // on<RequestPostByApplicationIdsEvent>((event, emit) async {

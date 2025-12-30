@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
+import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_event.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_state.dart';
 
@@ -41,14 +42,12 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
       try {
         final res = await useCase.getPostReviews(event.token, event.postId);
         if (res.isNotEmpty) {
-          double sum = 0;
-          for (int i = 0; i < res.length; i++) {
-            sum += res[i].rating!;
-          }
-          double avg = sum / res.length;
-          emit(GetPostReviewState(res, avg));
+          final userIds = res.map((e) => e.reviewerUserId!).toList();
+          final users = await userUseCase.getUsersByIds(event.token, userIds);
+
+          emit(GetPostReviewState(res, users));
         } else {
-          emit(GetPostReviewState(res, 0.0));
+          emit(GetPostReviewState([], []));
         }
       } catch(e) {
         emit(ReviewState(ReviewDataState.errorState));
@@ -70,6 +69,33 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
         logger.e('Review State: Error State');
       }
     });
+
+    on<RequestReviewByPostReviewIdEvent>((event, emit) async {
+      emit(ReviewState(ReviewDataState.loadingState));
+      logger.i('Review State: Start Loading');
+      try {
+        final res = await useCase.getReviewByPostReviewId(event.token, event.reviewId);
+        emit(GetReviewByPostReviewIdCompletedState(res));
+        logger.i('Review State: Get Review By Post Review Id Completed');
+      } catch(error) {
+        emit(ReviewState(ReviewDataState.errorState));
+        logger.e('Review State: Error State');
+      }
+    });
+
+    on<RequestReviewByUserReviewIdEvent>((event, emit) async {
+      emit(ReviewState(ReviewDataState.loadingState));
+      logger.i('Review State: Start Loading');
+      try {
+        final res = await useCase.getReviewByUserReviewId(event.token, event.reviewId);
+        emit(GetReviewByUserReviewIdCompletedState(res));
+        logger.i('Review State: Get Review By User Review Id Completed');
+      } catch(error) {
+        emit(ReviewState(ReviewDataState.errorState));
+        logger.e('Review State: Error State');
+      }
+    });
+
 
     on<CreateUserReviewEvent>((event, emit) async {
       emit(ReviewState(ReviewDataState.loadingState));

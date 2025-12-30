@@ -9,6 +9,8 @@ enum UserType {
   individuals,
   @JsonValue('COMPANIES')
   companies,
+  @JsonValue('NORMAL')
+  normal
 }
 
 enum UserRole {
@@ -33,7 +35,9 @@ enum UserRole {
   @JsonValue('QA')
   qa,
   @JsonValue('CS')
-  cs
+  cs,
+  @JsonValue('USER')
+  user
 }
 enum AuthType {
   @JsonValue('EMAIL')
@@ -56,7 +60,7 @@ class UserModel {
   String? userName;
   DateTime? birth;
   AuthType? method;
-  List<ApplicationModel>? applications;
+  List<int>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
 

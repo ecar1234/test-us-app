@@ -187,7 +187,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                 height: 40,
                                 width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
                                 child: ElevatedButton(
-                                  onPressed: _getApplicantLength(posts[idx]) == 0
+                                  onPressed: posts[idx].applications!.isEmpty
                                       ? null
                                       : () {
                                           Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
@@ -203,7 +203,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text('신청 인원', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                                      Text(' ( ${_getApplicantLength(posts[idx])} / 8 )'),
+                                      Text(' ( ${posts[idx].applications!.isEmpty ? 0 : posts[idx].applications!.length} / 8 )'),
                                     ],
                                   ),
                                 ),
@@ -221,15 +221,15 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
     );
   }
 
-  int _getApplicantLength(RecruitPostEntity post) {
-    int length = 0;
-    if (post.applications != null && post.applications!.isNotEmpty) {
-      for (final application in post.applications!) {
-        if (application.status != ApplicationStatus.cancel || application.status == null) {
-          length++;
-        }
-      }
-    }
-    return length;
-  }
+  // int _getApplicantLength(RecruitPostEntity post) {
+  //   int length = 0;
+  //   if (post.applications != null && post.applications!.isNotEmpty) {
+  //     for (final application in post.applications!) {
+  //       if (application.status != ApplicationStatus.cancel || application.status == null) {
+  //         length++;
+  //       }
+  //     }
+  //   }
+  //   return length;
+  // }
 }

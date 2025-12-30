@@ -16,7 +16,7 @@ class UserEntity {
   String? userName;
   DateTime? birth;
   AuthType? method;
-  List<ApplicationEntity>? applications;
+  List<int>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -37,7 +37,7 @@ class UserEntity {
   });
 
   static UserEntity toEntity(UserModel model) {
-    final applications = model.applications?.map((e) => ApplicationEntity.toEntity(e)).toList();
+    // final applications = model.applications?.map((e) => ApplicationEntity.toEntity(e)).toList();
     final profileImage = model.profileImg != null ? ImageEntity.toImageEntity(model.profileImg!) : null;
     return UserEntity(
         id: model.userId,
@@ -50,14 +50,14 @@ class UserEntity {
         userName: model.userName,
         birth: model.birth,
         method: model.method,
-        applications: applications,
+        applications: model.applications,
         createdAt: model.createdAt,
         updatedAt: model.updatedAt
     );
   }
 
   static UserModel toModel(UserEntity entity) {
-    final applications = entity.applications?.map((e) => ApplicationEntity.toModel(e)).toList();
+    // final applications = entity.applications?.map((e) => ApplicationEntity.toModel(e)).toList();
     final profileImage = entity.profileImg != null ? ImageEntity.toImageModel(entity.profileImg!) : null;
     return UserModel(
       userId: entity.id,
@@ -70,7 +70,7 @@ class UserEntity {
       userName: entity.userName,
       birth: entity.birth,
       method: entity.method,
-      applications: applications,
+      applications: entity.applications,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt
     );

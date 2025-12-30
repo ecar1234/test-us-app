@@ -11,6 +11,7 @@ import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/domain/entities/user_review_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
+import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
@@ -20,6 +21,9 @@ import '../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../services/theme_provider.dart';
 import '../../../bloc/app_bloc/app_bloc.dart';
 import '../../../bloc/app_bloc/app_state.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../../../bloc/user_bloc/user_bloc.dart';
 import '../../../bloc/user_bloc/user_event.dart';
 import '../../../bloc/user_bloc/user_state.dart';
@@ -37,6 +41,8 @@ class ApplicationManagementPage extends StatefulWidget {
 
 class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
   List<GlobalKey<TooltipState>> _toolKeys = [];
+
+  List<ApplicationEntity>? _applications;
   final logger = Logger();
 
   @override
@@ -44,10 +50,10 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
     // TODO: implement initState
     super.initState();
     final post = context.read<BasePostProvider>().userRecruitPosts!.firstWhere((e) => e.id == widget.postId);
-    final ids = post.applications!.map((e) => e.applicantId!).toList();
+    // final ids = post.applications!.map((e) => e.applicantId!).toList();
 
     final token = context.read<UserProvider>().token ?? '';
-    context.read<UserBloc>().add(RequestUsersDataEvent(token, ids));
+    context.read<AppBloc>().add(RequestRecruitApplicationsEvent(token, post.applications!));
   }
 
   @override
@@ -57,7 +63,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
             appBar: AppBar(
               title: Text("신청 관리"),
             ),
-            body: BlocConsumer<UserBloc, UserState>(listener: (context, state) {
+            body: BlocConsumer<AppBloc, AppState>(listener: (context, state) {
               // if (state.state == UserDataState.getUsersInfoCompletedState) {
               //   if (_toolKeys.length != state.usersAddAverage!.length) {
               //     setState(() {
@@ -65,14 +71,30 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
               //     });
               //   }
               // }
+              if (state.state == UserAppState.errorState) {
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(title: Text('유저 정보를 가져 올 수 없습니다.'), actions: [
+                          TextButton(
+                              onPressed: () {
+                                Get.back();
+                                Get.back();
+                              },
+                              child: Text('확인'))
+                        ]));
+                return;
+              }
             }, builder: (context, state) {
               final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
-              if (state.state == UserDataState.loadingState) {
+              if (state.state == UserAppState.loadingState) {
                 return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
+              } else if (state is GetRecruitApplicationsState) {
+                setState(() {
+                  _applications = state.apps;
+                });
+                return _mainBuilder(state.users);
               }
-
-              return _mainBuilder(state.users!);
-              // return SizedBox(height: hei, child: Center(child: CircularProgressIndicator()));
+              return SizedBox(height: hei, child: Center(child: Text('유져 정보를 가져 올 수 없습니다.')));
             })));
   }
 
@@ -83,6 +105,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
         child: ListView.separated(
             padding: EdgeInsets.symmetric(vertical: 20),
             itemBuilder: (context, idx) {
+              final application = _applications!.firstWhere((a) => a.applicantId == users[idx].id);
               return Container(
                   // height: 100,
                   width: MediaQuery.sizeOf(context).width - 60,
@@ -105,7 +128,6 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                       selector: (context, provider) =>
                           provider.userRecruitPosts!.firstWhere((e) => e.id == widget.postId),
                       builder: (context, post, child) {
-                        DateTime appDate = post.applications![idx].updatedAt!;
                         return Row(
                           children: [
                             Flexible(
@@ -131,18 +153,18 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                         ),
                                         const Gap(5),
                                         // email
-                                        if (post.applications![idx].status == ApplicationStatus.accepted)
+                                        if (application.status == ApplicationStatus.accepted)
                                           SizedBox(
                                               child: SelectableText(
                                             users[idx].email!,
                                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
                                             enableInteractiveSelection: true,
                                           ))
-                                        else if (post.applications![idx].status == ApplicationStatus.rejected)
+                                        else if (application.status == ApplicationStatus.rejected)
                                           SizedBox(
                                             child: Text('승인거부 된 유저 입니다.'),
                                           )
-                                        else if (post.applications![idx].status == ApplicationStatus.pending)
+                                        else if (application.status == ApplicationStatus.pending)
                                           SizedBox(
                                               child: Text(
                                             '초대 메일주소는 승인 후 표시됩니다.',
@@ -189,39 +211,6 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                                       )),
                                                 ),
                                               ),
-                                              // const Gap(10),
-                                              // GestureDetector(
-                                              //   onTap: post.applications![idx].status == ApplicationStatus.rejected
-                                              //       ? null
-                                              //       : () {
-                                              //           _toolKeys[idx].currentState!.ensureTooltipVisible();
-                                              //         },
-                                              //   child: Tooltip(
-                                              //     key: _toolKeys.isEmpty ? null : _toolKeys[idx],
-                                              //     message: "완료한 테스터 수 : ${averages['']}",
-                                              //     child: Container(
-                                              //       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                              //       decoration: BoxDecoration(
-                                              //           border: Border.all(color: Colors.grey.shade400),
-                                              //           borderRadius: BorderRadius.circular(20)),
-                                              //       child: Row(
-                                              //         children: [
-                                              //           SizedBox(
-                                              //             child: Icon(Symbols.star,
-                                              //                 fill: 1, size: 16, color: Colors.yellow),
-                                              //           ),
-                                              //           const Gap(5),
-                                              //           SizedBox(
-                                              //             child: Text(
-                                              //               '${users[idx]['average']}',
-                                              //               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                              //             ),
-                                              //           ),
-                                              //         ],
-                                              //       ),
-                                              //     ),
-                                              //   ),
-                                              // )
                                             ],
                                           ),
                                         ),
@@ -229,9 +218,9 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                         // createdAt
                                         SizedBox(
                                           child: Text(
-                                              'update : ${appDate.year}년 '
-                                              '${appDate.month}월 '
-                                              '${appDate.day}일',
+                                              'update : ${application.updatedAt!.year}년 '
+                                              '${application.updatedAt!.month}월 '
+                                              '${application.updatedAt!.day}일',
                                               style: TextStyle(
                                                   // color: post.applications![idx].status == ApplicationStatus.rejected
                                                   //     ? Colors.grey
@@ -242,103 +231,112 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                     ))),
                             Flexible(
                                 flex: 3,
-                                child: BlocConsumer<AppBloc, AppState>(
-                                  listener: (context, state) {
-                                    if (state.state == UserAppState.applicationCompletedState) {
-                                      context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
-                                      context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
-                                    } else if (state.state == UserAppState.applicationRejectCompletedState) {
-                                      context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
-                                      context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
-                                      // Get.back();
-                                    } else if (state.state == UserAppState.applicationUpdateCompletedState) {
-                                      context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
-                                      // context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
-                                    }
-                                  },
-                                  builder: (context, state) {
-                                    ApplicationStatus appState = post.applications![idx].status!;
-                                    if (state.newPost != null) {
-                                      appState = state.newPost!.applications![idx].status!;
-                                    }
-                                    if (appState == ApplicationStatus.accepted) {
-                                      return Column(
-                                        children: [
-                                          // SizedBox(
-                                          //   width: MediaQuery.sizeOf(context).width * 0.3,
-                                          //   child: ElevatedButton(
-                                          //       onPressed: () {
-                                          //         Clipboard.setData(ClipboardData(text: users[idx]['user'].email));
-                                          //         Get.snackbar('알림', '이메일이 클립보드에 복사되었습니다.',
-                                          //             snackPosition: SnackPosition.BOTTOM,
-                                          //             backgroundColor: Colors.grey.shade300,
-                                          //             colorText: Colors.black);
-                                          //         return;
-                                          //       },
-                                          //       style: ElevatedButton.styleFrom(
-                                          //           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                          //       child: Text('주소 복사')),
-                                          // ),
-                                          SizedBox(
-                                            width: MediaQuery.sizeOf(context).width * 0.3,
-                                            child: ElevatedButton(
-                                                onPressed: () {
-                                                  final token = context.read<UserProvider>().token ?? '';
-                                                  ApplicationEntity app = post.applications![idx];
-                                                  app.status = ApplicationStatus.pending;
-                                                  app.postId = post.id;
-                                                  context
-                                                      .read<AppBloc>()
-                                                      .add(RequestUpdateApplicationEvent(token, app));
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(10))),
-                                                child: Text('승인 취소')),
-                                          ),
-                                        ],
-                                      );
-                                    } else if (appState == ApplicationStatus.rejected) {
-                                      return SizedBox(
-                                        width: MediaQuery.sizeOf(context).width * 0.3,
-                                        child: Center(child: Text('승인거부 유져')),
-                                      );
-                                    }
-
-                                    return SizedBox(
-                                        width: MediaQuery.sizeOf(context).width * 0.3,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                child: MultiBlocListener(
+                                  listeners: [
+                                    BlocListener<AppBloc, AppState>(
+                                      listener: (context, state) {
+                                        if (state.state == UserAppState.applicationCompletedState ||
+                                            state.state == UserAppState.applicationRejectCompletedState ||
+                                            state.state == UserAppState.applicationUpdateCompletedState) {
+                                          setState(() {
+                                            for (var e in _applications!) {
+                                              if (e.applicantId == state.application!.applicantId) {
+                                                e.status = state.application!.status;
+                                                e.updatedAt = state.application!.updatedAt;
+                                                if (state.application!.platform == ApplicationPlatform.mobile) {
+                                                  e.mobileOs = state.application!.mobileOs;
+                                                }
+                                              }
+                                            }
+                                          });
+                                        }
+                                        final token = context.read<UserProvider>().token ?? '';
+                                        context
+                                            .read<RecruitPostBloc>()
+                                            .add(RequestPostDataEvent(token, state.application!.postId!));
+                                      },
+                                    ),
+                                    BlocListener<RecruitPostBloc, RecruitPostState>(
+                                        listener: (context, state) {
+                                          context.read<BasePostProvider>().updateRecruitPost(state.post!);
+                                          context.read<BasePostProvider>().updateUserRecruitPosts(state.post!);
+                                        },
+                                        listenWhen: (previous, current) =>
+                                            current.state == RecruitPostLoadState.getPostByIdCompletedState)
+                                  ],
+                                  child: Selector<ApplicationProvider, ApplicationEntity>(
+                                    selector: (context, provider) {
+                                      return provider.userApplications![0];
+                                    },
+                                    builder: (context, application, child) {
+                                      ApplicationStatus appState = application.status!;
+                                      // if (application != null) {
+                                      // appState = state.applications![idx].status!;
+                                      // }
+                                      if (appState == ApplicationStatus.accepted) {
+                                        return Column(
                                           children: [
                                             SizedBox(
                                               width: MediaQuery.sizeOf(context).width * 0.3,
                                               child: ElevatedButton(
                                                   onPressed: () {
                                                     final token = context.read<UserProvider>().token ?? '';
-                                                    // TODO: 신청자 승인/거부 로직 확인 필요함.
-                                                    context.read<AppBloc>().add(RequestCompleteApplicationEvent(
-                                                        token, post.applications![idx].applicantId!, widget.postId!));
+                                                    ApplicationEntity app = application;
+                                                    app.status = ApplicationStatus.pending;
+                                                    app.postId = post.id;
+                                                    context
+                                                        .read<AppBloc>()
+                                                        .add(RequestUpdateApplicationEvent(token, app));
                                                   },
                                                   style: ElevatedButton.styleFrom(
                                                       shape: RoundedRectangleBorder(
                                                           borderRadius: BorderRadius.circular(10))),
-                                                  child: Text('승인')),
-                                            ),
-                                            const Gap(4),
-                                            SizedBox(
-                                              width: MediaQuery.sizeOf(context).width * 0.3,
-                                              child: ElevatedButton(
-                                                  onPressed: () {
-                                                    _userRejectDialog(context, post.applications![idx]);
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(10))),
-                                                  child: Text('거부')),
+                                                  child: Text('승인 취소')),
                                             ),
                                           ],
-                                        ));
-                                  },
+                                        );
+                                      } else if (appState == ApplicationStatus.rejected) {
+                                        return SizedBox(
+                                          width: MediaQuery.sizeOf(context).width * 0.3,
+                                          child: Center(child: Text('승인거부 유져')),
+                                        );
+                                      }
+
+                                      return SizedBox(
+                                          width: MediaQuery.sizeOf(context).width * 0.3,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                width: MediaQuery.sizeOf(context).width * 0.3,
+                                                child: ElevatedButton(
+                                                    onPressed: () {
+                                                      final token = context.read<UserProvider>().token ?? '';
+                                                      // TODO: 신청자 승인/거부 로직 확인 필요함.
+                                                      context.read<AppBloc>().add(RequestCompleteApplicationEvent(
+                                                          token, application.applicantId!, widget.postId!));
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(10))),
+                                                    child: Text('승인')),
+                                              ),
+                                              const Gap(4),
+                                              SizedBox(
+                                                width: MediaQuery.sizeOf(context).width * 0.3,
+                                                child: ElevatedButton(
+                                                    onPressed: () {
+                                                      _userRejectDialog(context, application);
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(10))),
+                                                    child: Text('거부')),
+                                              ),
+                                            ],
+                                          ));
+                                    },
+                                  ),
                                 ))
                           ],
                         );
@@ -421,6 +419,8 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
         return 'QA';
       case UserRole.cs:
         return 'CS';
+      case UserRole.user:
+        return '유져';
     }
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
+import '../../data/models/review/post_review_model.dart';
 import '../../domain/entities/post_review_entity.dart';
 import '../../domain/use_cases/application_usecase.dart';
 
@@ -44,7 +45,7 @@ class ApplicationProvider with ChangeNotifier{
     }
     notifyListeners();
   }
-  void cancelApplication(ApplicationEntity newApp, RecruitPostEntity post)  {
+  void cancelApplication(ApplicationEntity newApp)  {
     _userApplications ??= [];
     _userApplicationPosts ??= [];
 
@@ -52,8 +53,8 @@ class ApplicationProvider with ChangeNotifier{
       _userApplications = _userApplications!.where((element) => element.id != newApp.id).toList();
       _userApplications!.add(newApp);
     }
-    if(_userApplicationPosts!.any((element) => element.id == post.id)){
-      _userApplicationPosts = _userApplicationPosts!.where((element) => element.id != post.id).toList();
+    if(_userApplicationPosts!.any((element) => element.id == newApp.postId)){
+      _userApplicationPosts = _userApplicationPosts!.where((element) => element.id != newApp.postId).toList();
     }
     notifyListeners();
   }
@@ -78,7 +79,13 @@ class ApplicationProvider with ChangeNotifier{
     if(_userApplicationPosts!.any((e) => e.id == review.postId)) {
       final idx = _userApplicationPosts!.indexWhere((e) => e.id == review.postId);
       final post = _userApplicationPosts![idx];
-      post.reviews = [...post.reviews!, review];
+      final reviewEntity = RecruitReviewEntity(
+        reviewId: review.reviewId,
+        postId: review.postId,
+        reviewerUserId: review.reviewerUserId,
+        rating: review.rating,
+      );
+      post.reviews = [...post.reviews!, reviewEntity];
       _userApplicationPosts = [..._userApplicationPosts!];
     }
 

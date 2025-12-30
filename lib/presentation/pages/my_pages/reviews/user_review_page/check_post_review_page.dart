@@ -4,16 +4,20 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
 import 'package:test_us_app/domain/entities/post_review_entity.dart';
+import 'package:test_us_app/presentation/bloc/review_bloc/review_state.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_event.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 
+import '../../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../../services/common_height_provider.dart';
 import '../../../../../services/theme_provider.dart';
+import '../../../../bloc/review_bloc/review_bloc.dart';
+import '../../../../bloc/review_bloc/review_event.dart';
 import '../../../../bloc/user_bloc/user_bloc.dart';
 import '../../../../bloc/user_bloc/user_state.dart';
 
 class CheckPostReviewPage extends StatefulWidget {
-  final List<PostReviewEntity> reviews;
+  final List<RecruitReviewEntity> reviews;
 
   const CheckPostReviewPage({super.key, required this.reviews});
 
@@ -26,9 +30,8 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    final userIds = widget.reviews.map((e) => e.reviewerUserId!).toList();
     final token = context.read<UserProvider>().token!;
-    context.read<UserBloc>().add(RequestUsersDataEvent(token, userIds));
+    context.read<ReviewBloc>().add(RequestPostReviewEvent(token, widget.reviews[0].postId!));
   }
 
   @override
@@ -40,17 +43,26 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
       appBar: AppBar(
         title: Text("프로덕트 리뷰"),
       ),
-      body: BlocConsumer<UserBloc, UserState>(listener: (context, state) {
-        if (state.state == UserDataState.getUsersInfoCompletedState) {}
+      body: BlocConsumer<ReviewBloc, ReviewState>(listener: (context, state) {
+
       }, builder: (context, state) {
-        if(state.state == UserDataState.loadingState){
+        if(state.state == ReviewDataState.loadingState){
           return SizedBox(
             height: hei,
             width: MediaQuery.sizeOf(context).width,
             child: Center(child: CircularProgressIndicator()),
           );
         }
-        else if(state.state == UserDataState.getUsersInfoCompletedState){
+        else if(state is GetPostReviewState){
+          if(state.reviews.isEmpty){
+            return SizedBox(
+              height: hei,
+              width: MediaQuery.sizeOf(context).width,
+              child: Center(
+                child: Text("리뷰가 없습니다."),
+              ),
+            );
+          }
           return Container(
             height: hei,
             width: MediaQuery.sizeOf(context).width,
@@ -63,7 +75,7 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
                     physics: BouncingScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, idx) {
-                      final user = state.users!.firstWhere((element) => element.id == widget.reviews[idx].reviewerUserId);
+                      final user = state.users.firstWhere((element) => element.id == widget.reviews[idx].reviewerUserId);
                       return Container(
                           padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -122,7 +134,7 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
                                   mainAxisAlignment: MainAxisAlignment.start,
 
                                   children: [
-                                    Text(widget.reviews[idx].comment!, style: TextStyle(fontSize: 16)),
+                                    Text(state.reviews[idx].comment!, style: TextStyle(fontSize: 16)),
                                   ],
                                 ),
                               )
@@ -130,12 +142,20 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
                           ));
                     },
                     separatorBuilder: (context, idx) => const Gap(10),
-                    itemCount: widget.reviews.length),
+                    itemCount: state.reviews.length),
               ],
             ),
           );
         }
-        return SizedBox();
+        else{
+          return SizedBox(
+            height: hei,
+            width: MediaQuery.sizeOf(context).width,
+            child: Center(
+              child: Text("리뷰를 불러올 수 없습니다."),
+            ),
+          );
+        }
 
       }),
     ));

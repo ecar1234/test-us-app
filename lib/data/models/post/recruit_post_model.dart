@@ -6,6 +6,7 @@ import '../user/user_model.dart';
 import '../image/image_model.dart';
 
 part 'recruit_post_model.g.dart';
+// part 'recruit_review_model.g.dart';
 
 enum PostStatus {
   @JsonValue('active')
@@ -18,12 +19,76 @@ enum PostStatus {
   delete
 }
 
+enum PostCategory {
+  @JsonValue('game')
+  game,
+  @JsonValue('travel')
+  travel,
+  @JsonValue('developer_tool')
+  developerTool,
+  @JsonValue('health')
+  health,
+  @JsonValue('education')
+  education,
+  @JsonValue('finance')
+  finance,
+  @JsonValue('weather')
+  weather,
+  @JsonValue('news')
+  news,
+  @JsonValue('books')
+  books,
+  @JsonValue('life')
+  life,
+  @JsonValue('business')
+  business,
+  @JsonValue('photography')
+  photography,
+  @JsonValue('social')
+  social,
+  @JsonValue('shopping')
+  shopping,
+  @JsonValue('entertainment')
+  entertainment,
+  @JsonValue('sports')
+  sports,
+  @JsonValue('utility')
+  utility,
+  @JsonValue('food')
+  food,
+  @JsonValue('music')
+  music,
+  @JsonValue('medical')
+  medical,
+  @JsonValue('magazine')
+  magazine,
+  @JsonValue('etc')
+  etc,
+}
+
+@JsonSerializable()
+class RecruitReviewModel {
+  String? reviewId;
+  String? postId;
+  String? reviewerUserId;
+  double? rating;
+
+  RecruitReviewModel({
+    this.reviewId,
+    this.postId,
+    this.reviewerUserId,
+    this.rating
+  });
+  factory RecruitReviewModel.fromJson(Map<String, dynamic> json) => _$RecruitReviewModelFromJson(json);
+}
+
 @JsonSerializable()
 class RecruitPostModel {
   String? id;
   String? title;
   String? subtitle;
-  List<String>? platform;
+  String? platform;
+  String? mobileOs;
   String? contents;
   PostStatus? status;
   int? period;
@@ -31,8 +96,8 @@ class RecruitPostModel {
   int? views;
   List<ImageModel>? images;
   String? postType;
-  List<PostReviewModel>? reviews;
-  List<ApplicationModel>? applications;
+  List<RecruitReviewModel>? reviews;
+  List<int>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -43,6 +108,7 @@ class RecruitPostModel {
     this.subtitle,
     this.contents,
     this.platform,
+    this.mobileOs,
     this.status,
     this.period,
     this.applications,

@@ -6,6 +6,22 @@ part of 'recruit_post_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+RecruitReviewModel _$RecruitReviewModelFromJson(Map<String, dynamic> json) =>
+    RecruitReviewModel(
+      reviewId: json['reviewId'] as String?,
+      postId: json['postId'] as String?,
+      reviewerUserId: json['reviewerUserId'] as String?,
+      rating: (json['rating'] as num?)?.toDouble(),
+    );
+
+Map<String, dynamic> _$RecruitReviewModelToJson(RecruitReviewModel instance) =>
+    <String, dynamic>{
+      'reviewId': instance.reviewId,
+      'postId': instance.postId,
+      'reviewerUserId': instance.reviewerUserId,
+      'rating': instance.rating,
+    };
+
 RecruitPostModel _$RecruitPostModelFromJson(Map<String, dynamic> json) =>
     RecruitPostModel(
       id: json['id'] as String?,
@@ -15,13 +31,12 @@ RecruitPostModel _$RecruitPostModelFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String?,
       subtitle: json['subtitle'] as String?,
       contents: json['contents'] as String?,
-      platform: (json['platform'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
+      platform: json['platform'] as String?,
+      mobileOs: json['mobileOs'] as String?,
       status: $enumDecodeNullable(_$PostStatusEnumMap, json['status']),
       period: (json['period'] as num?)?.toInt(),
       applications: (json['applications'] as List<dynamic>?)
-          ?.map((e) => ApplicationModel.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => (e as num).toInt())
           .toList(),
       views: (json['views'] as num?)?.toInt(),
       images: (json['images'] as List<dynamic>?)
@@ -29,7 +44,7 @@ RecruitPostModel _$RecruitPostModelFromJson(Map<String, dynamic> json) =>
           .toList(),
       postType: json['postType'] as String?,
       reviews: (json['reviews'] as List<dynamic>?)
-          ?.map((e) => PostReviewModel.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => RecruitReviewModel.fromJson(e as Map<String, dynamic>))
           .toList(),
       createdAt: json['createdAt'] == null
           ? null
@@ -45,6 +60,7 @@ Map<String, dynamic> _$RecruitPostModelToJson(RecruitPostModel instance) =>
       'title': instance.title,
       'subtitle': instance.subtitle,
       'platform': instance.platform,
+      'mobileOs': instance.mobileOs,
       'contents': instance.contents,
       'status': _$PostStatusEnumMap[instance.status],
       'period': instance.period,

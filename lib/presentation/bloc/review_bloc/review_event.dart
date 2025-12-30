@@ -34,6 +34,19 @@ class RequestTestersReviewEvent extends ReviewEvent {
 
   RequestTestersReviewEvent(this.token, this.testerIds, this.appId);
 }
+// note: 리뷰 아이디로 리뷰 가져오기
+class RequestReviewByPostReviewIdEvent extends ReviewEvent {
+  final String token;
+  final String reviewId;
+
+  RequestReviewByPostReviewIdEvent(this.token, this.reviewId);
+}
+class RequestReviewByUserReviewIdEvent extends ReviewEvent {
+  final String token;
+  final String reviewId;
+
+  RequestReviewByUserReviewIdEvent(this.token, this.reviewId);
+}
 
 class CreateUserReviewEvent extends ReviewEvent {
   final String token;

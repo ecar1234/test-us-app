@@ -20,7 +20,6 @@ class PostReviewModel {
   String? comment;
   PostReviewType? reviewType;
   String? reviewerUserId;
-  // String? reviewedId;
   DateTime? createdAt;
   String? postId;
 
@@ -30,7 +29,6 @@ class PostReviewModel {
     this.comment,
     this.reviewType,
     this.reviewerUserId,
-    // this.reviewedId,
     this.createdAt,
     this.postId,
   });

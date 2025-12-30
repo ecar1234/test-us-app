@@ -5,12 +5,14 @@ part 'application_model.g.dart';
 enum ApplicationPlatform {
   @JsonValue('web')
   web,
+  @JsonValue('mobile')
+  mobile,
+}
+enum MobileOsType {
   @JsonValue('ios')
   ios,
   @JsonValue('android')
   android,
-  @JsonValue('game')
-  game
 }
 
 enum ApplicationStatus {
@@ -28,6 +30,7 @@ enum ApplicationStatus {
 class ApplicationModel {
   int? id;
   ApplicationPlatform? platform;
+  MobileOsType? mobileOs;
   ApplicationStatus? status;
   DateTime? appliedAt;
   DateTime? updatedAt;
@@ -37,6 +40,7 @@ class ApplicationModel {
   ApplicationModel({
     this.id,
     this.platform,
+    this.mobileOs,
     this.status,
     this.appliedAt,
     this.updatedAt,

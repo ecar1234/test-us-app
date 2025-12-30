@@ -22,6 +22,16 @@ class ReviewUseCase {
     return res;
   }
 
+  Future<PostReviewEntity> getReviewByPostReviewId(String token, String reviewId) async {
+    final res = await repository.getReviewByPostReviewId(token, reviewId);
+    return res;
+  }
+
+  Future<UserReviewEntity> getReviewByUserReviewId(String token, String reviewId) async {
+    final res = await repository.getReviewByUserReviewId(token, reviewId);
+    return res;
+  }
+
   Future<List<PostReviewEntity>> getPostReviews (String token, String userId) async {
     final res = await repository.getPostReviews(token, userId);
     return res;

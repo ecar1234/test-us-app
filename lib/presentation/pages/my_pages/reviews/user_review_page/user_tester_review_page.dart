@@ -8,7 +8,6 @@ import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/domain/entities/user_review_entity.dart';
 import 'package:test_us_app/presentation/provider/review_provider.dart';
 
-import '../../../../../data/models/application/application_model.dart';
 import '../../../../../services/theme_provider.dart';
 import '../../../../../utils/time_util.dart';
 import '../../../../provider/application_provider.dart';
@@ -76,7 +75,7 @@ class _UserTesterReviewPageState extends State<UserTesterReviewPage> {
                           final reviewFromPost = userReviews.firstWhere((e) {
                             for (var app in posts[idx].applications!) {
                               for (var review in userReviews) {
-                                if (review.applicationId == app.id) {
+                                if (review.applicationId == app) {
                                   return true;
                                 } else {
                                   return false;
@@ -161,7 +160,7 @@ class _UserTesterReviewPageState extends State<UserTesterReviewPage> {
                                                       Text('테스터 수 : '),
                                                       const Gap(10),
                                                       Text(
-                                                          '${posts[idx].applications!.map((item) => item.status == ApplicationStatus.accepted).length} 명',
+                                                          '${posts[idx].applications!.length} 명',
                                                           style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))
                                                     ])),
                                             SizedBox(

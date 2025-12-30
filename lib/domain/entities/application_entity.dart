@@ -3,6 +3,7 @@ import '../../data/models/application/application_model.dart';
 class ApplicationEntity {
   int? id;
   ApplicationPlatform? platform;
+  MobileOsType? mobileOs;
   ApplicationStatus? status;
   DateTime? appliedAt;
   DateTime? updatedAt;
@@ -12,6 +13,7 @@ class ApplicationEntity {
   ApplicationEntity({
     this.id,
     this.platform,
+    this.mobileOs,
     this.status,
     this.appliedAt,
     this.updatedAt,
@@ -23,6 +25,7 @@ class ApplicationEntity {
     return ApplicationEntity(
       id: model.id,
       platform: model.platform,
+      mobileOs: model.mobileOs,
       status: model.status,
       appliedAt: model.appliedAt,
       updatedAt: model.updatedAt,
@@ -35,6 +38,7 @@ class ApplicationEntity {
     return ApplicationModel(
       id: entity.id,
       platform: entity.platform,
+      mobileOs: entity.mobileOs,
       status: entity.status,
       appliedAt: entity.appliedAt,
       updatedAt: entity.updatedAt,

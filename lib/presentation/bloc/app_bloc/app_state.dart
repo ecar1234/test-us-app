@@ -1,4 +1,5 @@
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
+import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../../domain/entities/application_entity.dart';
 
@@ -17,9 +18,14 @@ enum UserAppState {
 
 class AppState {
   UserAppState state;
-  RecruitPostEntity? newPost;
   ApplicationEntity? application;
   List<ApplicationEntity>? applications;
 
-  AppState({this.state = UserAppState.startServiceState, this.newPost, this.application, this.applications});
+  AppState({this.state = UserAppState.startServiceState, this.application, this.applications});
+}
+
+class GetRecruitApplicationsState extends AppState {
+  List<UserEntity> users;
+  List<ApplicationEntity> apps;
+  GetRecruitApplicationsState({required this.users, required this.apps});
 }

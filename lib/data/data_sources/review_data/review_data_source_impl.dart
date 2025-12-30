@@ -92,4 +92,23 @@ class ReviewDataSourceImpl implements ReviewDataSource {
     }
   }
 
+  @override
+  Future<PostReviewModel> getReviewByPostReviewId(String token, String reviewId) async {
+    final res = await netDriver.requestGetJson(token, ReviewApi.getReviewByPostReviewId, param: reviewId);
+    if(res['status'] == 200) {
+      return PostReviewModel.fromJson(res['review']);
+    } else {
+      throw Exception(res['message']);
+    }
+  }
+
+  @override
+  Future<UserReviewModel> getReviewByUserReviewId(String token, String reviewId) async {
+    final res = await netDriver.requestGetJson(token, ReviewApi.getReviewByUserReviewId, param: reviewId);
+    if(res['status'] == 200) {
+      return UserReviewModel.fromJson(res['review']);
+    } else {
+      throw Exception(res['message']);
+    }
+  }
 }

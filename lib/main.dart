@@ -62,7 +62,7 @@ Future<void> main() async {
         BlocProvider(create: (context) => RecruitPostBloc(getIt<RecruitPostUseCase>())),
         BlocProvider(create: (context) => PromotionBloc(getIt<PromotionPostUseCase>())),
         BlocProvider(create: (context) => ImageBloc(getIt<ImageUseCase>())),
-        BlocProvider(create: (context) => AppBloc(getIt<ApplicationUseCase>(), getIt<RecruitPostUseCase>())),
+        BlocProvider(create: (context) => AppBloc(getIt<ApplicationUseCase>(), getIt<RecruitPostUseCase>(), getIt<UserUseCase>())),
         BlocProvider(create: (context) => ReviewBloc(getIt<ReviewUseCase>(), getIt<UserUseCase>())),
       ], child: const MetaDataSetting(),
     ),

@@ -8,6 +8,8 @@ abstract class ReviewDataSource {
   Future<List<UserReviewModel>> getReviews(String token, String userId);
   Future<List<PostReviewModel>> getPostReviews(String token, String postId);
   Future<List<UserReviewModel>> getTestersReviews(String token, List<String> ids, int appId);
+  Future<PostReviewModel> getReviewByPostReviewId(String token, String reviewId);
+  Future<UserReviewModel> getReviewByUserReviewId(String token, String reviewId);
   Future<PostReviewModel> addRecruitPostReview(String token, PostReviewModel review);
   Future<PostReviewModel> addPromotionPostReview(String token, PostReviewModel review);
   Future<UserReviewModel> addTesterReview(String token, UserReviewModel review);

@@ -9,6 +9,8 @@ enum ReviewDataState {
   getUserReviewCompletedState,
   getPostReviewCompletedState,
   getTestersReviewCompletedState,
+  getPostReviewByReviewIdCompletedState,
+  getUserReviewByReviewIdCompletedState,
   createUserReviewCompletedState,
   createRecruitPostReviewCompletedState,
   createPromotionPostReviewCompletedState,
@@ -32,10 +34,20 @@ class GetUserReviewDataCompletedState extends ReviewState {
 
 class GetPostReviewState extends ReviewState {
   final List<PostReviewEntity> reviews;
-  final double averageRating;
+  final List<UserEntity> users;
 
-  GetPostReviewState(this.reviews, this.averageRating)
+  GetPostReviewState(this.reviews, this.users)
       : super(ReviewDataState.getPostReviewCompletedState);
+}
+class GetReviewByUserReviewIdCompletedState extends ReviewState {
+  final UserReviewEntity review;
+
+  GetReviewByUserReviewIdCompletedState(this.review): super(ReviewDataState.getUserReviewByReviewIdCompletedState);
+}
+
+class GetReviewByPostReviewIdCompletedState extends ReviewState {
+  final PostReviewEntity review;
+  GetReviewByPostReviewIdCompletedState(this.review): super(ReviewDataState.getPostReviewByReviewIdCompletedState);
 }
 
 

@@ -1,5 +1,3 @@
-
-
 import '../data/models/user/user_model.dart';
 
 class TypeConversionUtil {
@@ -27,6 +25,8 @@ class TypeConversionUtil {
         return "cs";
       case UserRole.manager:
         return "manager";
+      case UserRole.user:
+        return "user";
     }
   }
 
@@ -36,6 +36,8 @@ class TypeConversionUtil {
         return "INDIVIDUALS";
       case UserType.companies:
         return "COMPANIES";
+      case UserType.normal:
+        return "NORMAL";
     }
   }
 

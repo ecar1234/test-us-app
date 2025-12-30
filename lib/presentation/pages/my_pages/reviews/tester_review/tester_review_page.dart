@@ -23,7 +23,7 @@ import '../../../../bloc/review_bloc/review_event.dart';
 import 'add_tester_review_page.dart';
 
 class TesterReviewPage extends StatefulWidget {
-  final List<ApplicationEntity> applications;
+  final List<int> applications;
   final String postId;
 
   const TesterReviewPage({super.key, required this.applications, required this.postId});
@@ -39,11 +39,19 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    final testersId = widget.applications.map((e) => e.applicantId!).toList();
-    final token = context.read<UserProvider>().token!;
-    context.read<ReviewBloc>().add(RequestTestersReviewEvent(token, testersId, widget.applications[0].id!));
+
+    // 1. applications == application ID list
+    // 2. user 정보가 필요함.
+    // 3. 유져의 리뷰 정보도 필요함.
+    // 4. 리뷰 정보는 업데이트 되는것이 즉시 반영 되어야함.
+
+    // 1. user 정보는 변수에 저장,
+    // 2. 리뷰 정보는 실제 업데이트..
+
+    // final testersId = widget.applications.map((e) => e.applicantId!).toList();
+    // final token = context.read<UserProvider>().token!;
+    // context.read<ReviewBloc>().add(RequestTestersReviewEvent(token, testersId, widget.applications[0].id!));
   }
 
   @override
@@ -84,8 +92,8 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                     physics: BouncingScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, idx) {
-                      final application =
-                          widget.applications.firstWhere((element) => element.applicantId == state.users[idx].id!);
+                      // final application =
+                      //     widget.applications.firstWhere((element) => element.applicantId == state.users[idx].id!);
                       // UserReviewEntity? review = _testersReviewData[idx]['review'];
                       return Stack(
                         children: [
@@ -128,8 +136,8 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                                             Text(state.users[idx].nickname!,
                                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                             const Gap(10),
-                                            Text('( ${_getPlatform(application.platform!)} )',
-                                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                            // Text('( ${_getPlatform(application.)} )',
+                                            //     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                           ],
                                         ),
                                         Text(state.users[idx].email!, style: TextStyle(fontSize: 14)),
@@ -153,8 +161,8 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                                       width: 200,
                                       child: ElevatedButton(
                                           onPressed: () {
-                                            Get.to(() => AddTesterReviewPage(
-                                                tester: state.users[idx], application: application));
+                                            // Get.to(() => AddTesterReviewPage(
+                                            //     tester: state.users[idx], application: application));
                                           },
                                           style: ElevatedButton.styleFrom(
                                               padding: EdgeInsets.zero,
@@ -222,14 +230,10 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
 
   String _getPlatform(ApplicationPlatform platform) {
     switch (platform) {
-      case ApplicationPlatform.android:
-        return 'ANDROID';
-      case ApplicationPlatform.ios:
-        return 'IOS';
       case ApplicationPlatform.web:
         return 'WEB';
-      case ApplicationPlatform.game:
-        return 'GAME';
+      case ApplicationPlatform.mobile:
+        return 'MOBILE';
     }
   }
 

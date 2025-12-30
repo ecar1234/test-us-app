@@ -27,9 +27,8 @@ PromotionPostModel _$PromotionPostModelFromJson(Map<String, dynamic> json) =>
       domain:
           (json['domain'] as List<dynamic>?)?.map((e) => e as String).toList(),
       postType: json['postType'] as String?,
-      reviews: (json['reviews'] as List<dynamic>?)
-          ?.map((e) => PostReviewModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      reviews:
+          (json['reviews'] as List<dynamic>?)?.map((e) => e as String).toList(),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),

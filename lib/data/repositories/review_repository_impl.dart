@@ -49,4 +49,16 @@ class ReviewRepositoryImpl implements ReviewRepository {
     if(res.isEmpty) return [];
     return res.map((e) => PostReviewEntity.toEntity(e)).toList();
   }
+
+  @override
+  Future<PostReviewEntity> getReviewByPostReviewId(String token, String reviewId) async {
+    final res = await remote.getReviewByPostReviewId(token, reviewId);
+    return PostReviewEntity.toEntity(res);
+  }
+
+  @override
+  Future<UserReviewEntity> getReviewByUserReviewId(String token, String reviewId) async {
+    final res = await remote.getReviewByUserReviewId(token, reviewId);
+    return UserReviewEntity.toEntity(res);
+  }
 }

@@ -6,9 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/user_review_page/check_post_review_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 
-import '../../../../../data/models/application/application_model.dart';
 import '../../../../../data/models/post/recruit_post_model.dart';
-import '../../../../../domain/entities/post_review_entity.dart';
 import '../../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../../services/theme_provider.dart';
 import '../../../../../utils/time_util.dart';
@@ -116,10 +114,10 @@ class _RecruitPostReviewPageState extends State<RecruitPostReviewPage> {
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                    Text('테스터 수 : '),
+                                    Text('신청 : '),
                                     const Gap(10),
                                     Text(
-                                        '${posts[idx].applications!.map((item) => item.status == ApplicationStatus.accepted).length} 명',
+                                        '${posts[idx].applications!.length} 명',
                                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))
                                   ])),
                               SizedBox(
@@ -214,7 +212,7 @@ class _RecruitPostReviewPageState extends State<RecruitPostReviewPage> {
           })),
     );
   }
-  double _getAverageRating(List<PostReviewEntity> reviews) {
+  double _getAverageRating(List<RecruitReviewEntity> reviews) {
     if (reviews.isEmpty) {
       return 0.0;
     }

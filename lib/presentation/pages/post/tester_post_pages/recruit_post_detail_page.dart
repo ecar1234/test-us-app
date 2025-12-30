@@ -58,7 +58,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state)async {
+        body: BlocConsumer<RecruitPostBloc, RecruitPostState>(listener: (context, state) async {
           final provider = context.read<BasePostProvider>();
           if (state.state == RecruitPostLoadState.getPostByIdCompletedState) {
           } else if (state.state == RecruitPostLoadState.postDeleteCompletedState) {
@@ -67,30 +67,35 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
           } else if (state.state == RecruitPostLoadState.postUpdateCompletedState) {
             provider.updateRecruitPost(state.post!);
             Navigator.pop(context);
-          }
-          else if (state.state == RecruitPostLoadState.errorState && state.post == null){
-            await showDialog(context: context, builder: (context) => Dialog(
-              child: Container(
-                height: 200,
-                width: MediaQuery.sizeOf(context).width,
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('게시글이 삭제 되었거나, 존재하지 않습니다.', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),),
-                    const Gap(20),
-                    SizedBox(
-                      height: 40,
-                      width: 120,
-                      child: ElevatedButton(onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      }, child: Text('뒤로가기')),
-                    )
-                  ],
-                )
-              ),
-            ));
+          } else if (state.state == RecruitPostLoadState.errorState && state.post == null) {
+            await showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                      child: Container(
+                          height: 200,
+                          width: MediaQuery.sizeOf(context).width,
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '게시글이 삭제 되었거나, 존재하지 않습니다.',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                              const Gap(20),
+                              SizedBox(
+                                height: 40,
+                                width: 120,
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text('뒤로가기')),
+                              )
+                            ],
+                          )),
+                    ));
           }
         }, builder: (context, state) {
           final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
@@ -180,7 +185,11 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                   : SizedBox()
             ],
             flexibleSpace: FlexibleSpaceBar(
-                background:post.images!.length == 1 ? CachedNetworkImage(imageUrl: post.images![0].url!,) : CarouselSlider(
+                background: post.images!.length == 1
+                    ? CachedNetworkImage(
+                        imageUrl: post.images![0].url!,
+                      )
+                    : CarouselSlider(
                         items: post.images!.map((e) {
                           if (e.filename == null) {
                             return Image.file(
@@ -190,18 +199,21 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                               width: double.infinity,
                             );
                           } else {
-                            return CachedNetworkImage(imageUrl: e.url!,
-                                fit: BoxFit.fitHeight, height: double.infinity, width: double.infinity,
-                              progressIndicatorBuilder: (context, url, downloadProgress) {
-                                return Shimmer.fromColors(
-                                    baseColor: Colors.grey.shade300,
-                                    highlightColor: Colors.grey.shade100,
-                                    child: Container(
-                                      height: double.infinity,
-                                      width: double.infinity,
-                                      color: Colors.white,
-                                    ));
-                              });
+                            return CachedNetworkImage(
+                                imageUrl: e.url!,
+                                fit: BoxFit.fitHeight,
+                                height: double.infinity,
+                                width: double.infinity,
+                                progressIndicatorBuilder: (context, url, downloadProgress) {
+                                  return Shimmer.fromColors(
+                                      baseColor: Colors.grey.shade300,
+                                      highlightColor: Colors.grey.shade100,
+                                      child: Container(
+                                        height: double.infinity,
+                                        width: double.infinity,
+                                        color: Colors.white,
+                                      ));
+                                });
                           }
                         }).toList(),
                         options: CarouselOptions(
@@ -255,47 +267,47 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                       if (post.author == null)
                         SizedBox(
                             child: Row(
-                              children: [
-                                SizedBox(
-                                  height: 30,
-                                  width: 30,
-                                  child: CircleAvatar(
-                                      radius: 40,
-                                      backgroundImage:( user!.profileImg!.url!.isNotEmpty ? CachedNetworkImageProvider(
-                                        user.profileImg!.url!,
-                                      ) : const AssetImage('assets/images/Generic Profile.png')) as ImageProvider
-                                  ),
-                                ),
-                                const Gap(5),
-                                Text(
-                                  '${context.read<UserProvider>().user!.nickname}',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ))
+                          children: [
+                            SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage: (user!.profileImg!.url!.isNotEmpty
+                                      ? CachedNetworkImageProvider(
+                                          user.profileImg!.url!,
+                                        )
+                                      : const AssetImage('assets/images/Generic Profile.png')) as ImageProvider),
+                            ),
+                            const Gap(5),
+                            Text(
+                              '${context.read<UserProvider>().user!.nickname}',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ))
                       else
                         SizedBox(
                             child: Row(
-                              children: [
-                                SizedBox(
-                                  height: 30,
-                                  width: 30,
-                                  child: CircleAvatar(
-                                      radius: 40,
-                                      backgroundImage: post.author!.profileImg == null
-                                          ? const AssetImage('assets/images/Generic avatar.png')
-                                          : CachedNetworkImageProvider(
-                                        post.author!.profileImg!.url!,
-                                      ) as ImageProvider
-                                  ),
-                                ),
-                                const Gap(5),
-                                Text(
-                                  '${post.author!.nickname}',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            )),
+                          children: [
+                            SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage: post.author!.profileImg == null
+                                      ? const AssetImage('assets/images/Generic avatar.png')
+                                      : CachedNetworkImageProvider(
+                                          post.author!.profileImg!.url!,
+                                        ) as ImageProvider),
+                            ),
+                            const Gap(5),
+                            Text(
+                              '${post.author!.nickname}',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        )),
                       const Gap(10),
                       SizedBox(
                         child: post.platform!.length == 1
@@ -335,22 +347,22 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                 ),
                 const Gap(40),
                 if (post.author != null && post.author!.id != user?.id)
-                  BlocListener<AppBloc, AppState>(listener: (context, state) {
-                    if (state.state == UserAppState.applicationCompletedState) {
-                      context.read<ApplicationProvider>().requestApply(state.application!);
-                      context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
-                      // context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
-                    } else if (state.state == UserAppState.applicationUpdateCompletedState) {
-                      context.read<ApplicationProvider>().requestUpdateApplication(state.application!);
-                      context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
-                      // context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
-                    } else if (state.state == UserAppState.applicationCancelCompletedState) {
-                      context.read<BasePostProvider>().updateRecruitPost(state.newPost!);
-                      context.read<ApplicationProvider>().cancelApplication(state.application!, state.newPost!);
-                      // context.read<BasePostProvider>().updateUserRecruitPosts(state.newPost!);
-                    }
-                  }, child: _applicationSection(context))
-
+                  MultiBlocListener(listeners: [
+                    BlocListener<AppBloc, AppState>(listener: (context, state) {
+                      if (state.state == UserAppState.applicationCompletedState ||
+                          state.state == UserAppState.applicationUpdateCompletedState ||
+                          state.state == UserAppState.applicationCancelCompletedState) {
+                        //Todo : application 업데이트 수정 필요
+                        context.read<ApplicationProvider>().requestApply(state.application!);
+                        context.read<RecruitPostBloc>().add(RequestPostDataEvent(context.read<UserProvider>().token!, post.id!));
+                      }
+                    }),
+                    BlocListener<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
+                      context.read<BasePostProvider>().updateRecruitPost(state.post!);
+                    },
+                      listenWhen: (previous, current) => current.state == RecruitPostLoadState.getPostByIdCompletedState,
+                    ),
+                  ], child: _applicationSection(context))
               ],
             ),
           ),
@@ -431,11 +443,11 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                               return element.postId == post.id &&
                                   element.applicantId == context.read<UserProvider>().user!.id;
                             });
-                            if (prevApp.platform == ApplicationPlatform.ios) {
+                            if (prevApp.mobileOs == MobileOsType.ios) {
                               isIos = true;
                               isAndroid = false;
                             }
-                            if (prevApp.platform == ApplicationPlatform.android) {
+                            if (prevApp.mobileOs == MobileOsType.android) {
                               isAndroid = true;
                               isIos = false;
                             }
@@ -452,7 +464,6 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                     SizedBox(
                                         child: Text(' (Device와 동일한 OS만 선택이 가능합니다.)',
                                             style: TextStyle(fontSize: 14, color: Colors.grey))),
-
                                     const Gap(20),
                                     SizedBox(
                                         child: Row(
@@ -462,28 +473,35 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                           child: Row(children: [
                                             Checkbox(
                                                 value: isIos,
-                                                onChanged: isAndroidDevice ? null : (value) {
-                                                  state(() {
-                                                    isIos = value!;
-                                                    isAndroid = false;
-                                                  });
-                                                }),
-                                            Text("IOS", style: TextStyle(fontSize: 16,
-                                                color: isAndroidDevice ? Colors.grey : Colors.black))
+                                                onChanged: isAndroidDevice
+                                                    ? null
+                                                    : (value) {
+                                                        state(() {
+                                                          isIos = value!;
+                                                          isAndroid = false;
+                                                        });
+                                                      }),
+                                            Text("IOS",
+                                                style: TextStyle(
+                                                    fontSize: 16, color: isAndroidDevice ? Colors.grey : Colors.black))
                                           ]),
                                         ),
                                         SizedBox(
                                           child: Row(children: [
                                             Checkbox(
                                                 value: isAndroid,
-                                                onChanged: isAndroidDevice ? (value) {
-                                                  state(() {
-                                                    isAndroid = value!;
-                                                    isIos = false;
-                                                  });
-                                                } : null),
-                                            Text("Android", style: TextStyle(fontSize: 16,
-                                                color: isAndroidDevice ? Colors.black87 : Colors.grey))
+                                                onChanged: isAndroidDevice
+                                                    ? (value) {
+                                                        state(() {
+                                                          isAndroid = value!;
+                                                          isIos = false;
+                                                        });
+                                                      }
+                                                    : null),
+                                            Text("Android",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: isAndroidDevice ? Colors.black87 : Colors.grey))
                                           ]),
                                         )
                                       ],
@@ -492,11 +510,11 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                     SizedBox(
                                       child: ElevatedButton(
                                         onPressed: () async {
-                                          if(prevApp.platform == ApplicationPlatform.ios && isAndroidDevice == false ){
+                                          if (prevApp.mobileOs == MobileOsType.ios && isAndroidDevice == false) {
                                             Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
                                             return;
                                           }
-                                          if(prevApp.platform == ApplicationPlatform.android && isAndroidDevice == true ){
+                                          if (prevApp.mobileOs == MobileOsType.android && isAndroidDevice == true) {
                                             Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
                                             return;
                                           }
@@ -504,8 +522,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                           final userId = context.read<UserProvider>().user!.id;
                                           final app = ApplicationEntity(
                                               id: prevApp.id,
-                                              platform:
-                                                  isAndroid ? ApplicationPlatform.android : ApplicationPlatform.ios,
+                                              platform: prevApp.platform,
+                                              mobileOs: isAndroid ? MobileOsType.android : MobileOsType.ios,
                                               status: ApplicationStatus.pending,
                                               postId: post.id,
                                               applicantId: userId);
@@ -561,7 +579,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
 
                 context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
               } else {
-                final platform = post.platform!.contains('WEB') ? ApplicationPlatform.web : ApplicationPlatform.game;
+                final platform = post.platform!.contains('WEB') ? ApplicationPlatform.web : ApplicationPlatform.mobile;
                 // context.read<AppBloc>().add(ApplicationDataLoadEvent());
                 final app = ApplicationEntity(
                     platform: platform, status: ApplicationStatus.pending, postId: post.id, applicantId: userId);
@@ -594,12 +612,14 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                   child: Row(children: [
                                     Checkbox(
                                         value: isAndroidDevice ? false : isIos,
-                                        onChanged: isAndroidDevice ? null : (value) {
-                                          state(() {
-                                            isIos = value!;
-                                            isAndroid = false;
-                                          });
-                                        }),
+                                        onChanged: isAndroidDevice
+                                            ? null
+                                            : (value) {
+                                                state(() {
+                                                  isIos = value!;
+                                                  isAndroid = false;
+                                                });
+                                              }),
                                     Text("IOS")
                                   ]),
                                 ),
@@ -607,12 +627,14 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                   child: Row(children: [
                                     Checkbox(
                                         value: isAndroidDevice ? isAndroid : false,
-                                        onChanged: isAndroidDevice ? (value) {
-                                          state(() {
-                                            isAndroid = value!;
-                                            isIos = false;
-                                          });
-                                        } : null),
+                                        onChanged: isAndroidDevice
+                                            ? (value) {
+                                                state(() {
+                                                  isAndroid = value!;
+                                                  isIos = false;
+                                                });
+                                              }
+                                            : null),
                                     Text("Android")
                                   ]),
                                 )
@@ -628,7 +650,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
 
                                     final app = ApplicationEntity(
                                         id: prevApp.id,
-                                        platform: isAndroid ? ApplicationPlatform.android : ApplicationPlatform.ios,
+                                        platform: prevApp.platform,
+                                        mobileOs: isAndroid ? MobileOsType.android : MobileOsType.ios,
                                         postId: post.id,
                                         status: ApplicationStatus.pending,
                                         applicantId: userId);
@@ -636,7 +659,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                     context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
                                   } else {
                                     final app = ApplicationEntity(
-                                        platform: isAndroid ? ApplicationPlatform.android : ApplicationPlatform.ios,
+                                        mobileOs: isAndroid ? MobileOsType.android : MobileOsType.ios,
                                         postId: post.id,
                                         applicantId: userId);
 

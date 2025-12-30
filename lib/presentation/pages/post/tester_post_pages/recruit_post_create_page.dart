@@ -43,7 +43,11 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
 
   final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
-  List<String> _selectedCategory = [];
+  String? _selectedPlatform;
+  String? _selectedOs;
+  String? _selectedCategory;
+
+
 
   @override
   void initState() {
@@ -52,7 +56,8 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
       titleController.text = widget.post!.title!;
       subtitleController.text = widget.post!.subtitle!;
       contentController.text = widget.post!.contents!;
-      _selectedCategory = List<String>.from(widget.post!.platform!);
+      _selectedPlatform = widget.post!.platform!;
+      _selectedOs = widget.post!.mobileOs ?? "";
       if (widget.post!.images != null && widget.post!.images!.isNotEmpty) {
         _existedImages = widget.post!.images!;
       }
@@ -75,25 +80,12 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
     titleController.dispose();
     subtitleController.dispose();
     contentController.dispose();
+    periodController.dispose();
   }
 
   void _onPlatformSelected(bool? checked, String platform) {
     setState(() {
-      if (checked == true) {
-        if (platform == 'WEB' || platform == 'GAME') {
-          _selectedCategory.clear();
-          _selectedCategory.add(platform);
-        } else {
-          // IOS or Android
-          _selectedCategory.remove('WEB');
-          _selectedCategory.remove('GAME');
-          if (!_selectedCategory.contains(platform)) {
-            _selectedCategory.add(platform);
-          }
-        }
-      } else {
-        _selectedCategory.remove(platform);
-      }
+
     });
   }
 
@@ -327,7 +319,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                                         width: 30,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: Colors.black.withOpacity(0.5),
+                                          color: Colors.black.withAlpha(124),
                                         ),
                                         child: Center(
                                           child: Icon(Icons.close),
@@ -411,9 +403,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
   Widget _categorySection() {
     final platforms = {
       'WEB': 'WEB',
-      'GAME': 'GAME',
-      'IOS': 'IOS',
-      'Android': 'Android',
+      'MOBILE': 'MOBILE'
     };
 
     return SizedBox(
@@ -435,7 +425,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
               children: platforms.entries.map((entry) {
                 final platformKey = entry.key;
                 final platformName = entry.value;
-                final isSelected = _selectedCategory.contains(platformKey);
+                final isSelected = _selectedCategory == null ? false : _selectedCategory!.contains(platformKey);
 
                 return SizedBox(
                   height: 30,
@@ -519,8 +509,18 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         Get.snackbar("알림", "모든 항목을 입력해주세요.");
                         return;
                       }
-                      if (_selectedCategory.isEmpty) {
-                        Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                      if (_selectedPlatform == null || _selectedPlatform!.isEmpty) {
+                        Get.snackbar("알림", "플랫폼 선택해주세요.");
+                        return;
+                      }else {
+                        if(_selectedOs == null || _selectedOs!.isEmpty){
+                          Get.snackbar("알림", "OS 선택해주세요.");
+                          return;
+                        }
+                      }
+
+                      if (_selectedCategory == null || _selectedCategory!.isEmpty) {
+                        Get.snackbar("알림", "카테고리를 선택해주세요.");
                         return;
                       }
 
@@ -561,7 +561,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         Get.snackbar("알림", "모든 항목을 입력해주세요.");
                         return;
                       }
-                      if (_selectedCategory.isEmpty) {
+                      if (_selectedCategory == null || _selectedCategory!.isEmpty) {
                         Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }

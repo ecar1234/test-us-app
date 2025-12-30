@@ -11,6 +11,7 @@ ApplicationModel _$ApplicationModelFromJson(Map<String, dynamic> json) =>
       id: (json['id'] as num?)?.toInt(),
       platform:
           $enumDecodeNullable(_$ApplicationPlatformEnumMap, json['platform']),
+      mobileOs: $enumDecodeNullable(_$MobileOsTypeEnumMap, json['mobileOs']),
       status: $enumDecodeNullable(_$ApplicationStatusEnumMap, json['status']),
       appliedAt: json['appliedAt'] == null
           ? null
@@ -26,6 +27,7 @@ Map<String, dynamic> _$ApplicationModelToJson(ApplicationModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'platform': _$ApplicationPlatformEnumMap[instance.platform],
+      'mobileOs': _$MobileOsTypeEnumMap[instance.mobileOs],
       'status': _$ApplicationStatusEnumMap[instance.status],
       'appliedAt': instance.appliedAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
@@ -35,9 +37,12 @@ Map<String, dynamic> _$ApplicationModelToJson(ApplicationModel instance) =>
 
 const _$ApplicationPlatformEnumMap = {
   ApplicationPlatform.web: 'web',
-  ApplicationPlatform.ios: 'ios',
-  ApplicationPlatform.android: 'android',
-  ApplicationPlatform.game: 'game',
+  ApplicationPlatform.mobile: 'mobile',
+};
+
+const _$MobileOsTypeEnumMap = {
+  MobileOsType.ios: 'ios',
+  MobileOsType.android: 'android',
 };
 
 const _$ApplicationStatusEnumMap = {

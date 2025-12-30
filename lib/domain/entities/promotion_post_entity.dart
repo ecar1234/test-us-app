@@ -21,7 +21,7 @@ class PromotionPostEntity {
   List<ImageEntity>? images;
   List<String>? domain;
   String? postType;
-  List<PostReviewEntity>? reviews;
+  List<String>? reviews;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -50,7 +50,7 @@ class PromotionPostEntity {
       profileImg: ImageEntity.toImageEntity(model.author!.profileImg!),
     );
     final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
-    final reviews = model.reviews!.map((e) => PostReviewEntity.toEntity(e)).toList();
+    // final reviews = model.reviews!.map((e) => PostReviewEntity.toEntity(e)).toList();
     return PromotionPostEntity(
       id: model.id,
       title: model.title,
@@ -64,7 +64,7 @@ class PromotionPostEntity {
       images: images,
       domain: model.domain,
       postType: model.postType,
-      reviews: reviews,
+      reviews: model.reviews,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt
     );

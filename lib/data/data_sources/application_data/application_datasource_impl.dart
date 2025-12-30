@@ -16,34 +16,33 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
   ApplicationDataSourceImpl(this.netDriver);
 
   @override
-  Future<RecruitPostModel> applicationReject(String token, String userId, String postId) async {
+  Future<ApplicationModel> applicationReject(String token, String userId, String postId) async {
     final res = await netDriver.requestPutJson(token, ApplicationApi.rejectUser, {'userId': userId, 'postId': postId});
     if(res['status'] == 200){
-      final post = RecruitPostModel.fromJson(res['updatePost']);
-      return post;
+      final application = ApplicationModel.fromJson(res['application']);
+      return application;
     }else {
       throw Exception('Error');
     }
   }
 
   @override
-  Future<Map<String, dynamic>> applyCancel(String token, int appId) async {
+  Future<ApplicationModel> applyCancel(String token, int appId) async {
     final res = await netDriver.requestPutJson(token, ApplicationApi.cancel, {'applicationId': appId.toString()});
     if(res['status'] == 200){
       final application = ApplicationModel.fromJson(res['application']);
-      final post = RecruitPostModel.fromJson(res['post']);
-      return {'application': application, 'post': post};
+      return application;
     }else {
       throw Exception('Error');
     }
   }
 
   @override
-  Future<RecruitPostModel> completeApplications(String token, String userId, String postId) async {
+  Future<ApplicationModel> completeApplications(String token, String userId, String postId) async {
     final res = await netDriver.requestPutJson(token, ApplicationApi.acceptUser, {'userId': userId, 'postId': postId});
     if(res['status'] == 200){
-      final post = RecruitPostModel.fromJson(res['updatePost']);
-      return post;
+      final application = ApplicationModel.fromJson(res['application']);
+      return application;
     }else {
       throw Exception('Error');
     }
@@ -62,12 +61,11 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> requestApply(String token, ApplicationModel application) async {
+  Future<ApplicationModel> requestApply(String token, ApplicationModel application) async {
     final res = await netDriver.requestPostJson(token, ApplicationApi.application, application.toJson());
     if(res['status'] == 200){
       final applicationData = ApplicationModel.fromJson(res['application']);
-      final post = RecruitPostModel.fromJson(res['post']);
-      return {'application': applicationData, 'post': post};
+      return applicationData;
     }else {
       throw Exception('Error');
     }
@@ -75,13 +73,12 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> updateApplication(String token, ApplicationModel application) async {
+  Future<ApplicationModel> updateApplication(String token, ApplicationModel application) async {
     try {
       final res = await netDriver.requestPutJson(token, ApplicationApi.update, application.toJson());
       if(res['status'] == 200){
         final applicationData = ApplicationModel.fromJson(res['application']);
-        final post = RecruitPostModel.fromJson(res['post']);
-        return {'application': applicationData, 'post': post};
+        return applicationData;
       }else {
         throw Exception('Error');
       }
@@ -103,4 +100,16 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
       }});
     return controller.future;
   }
+
+  @override
+  Future<List<ApplicationModel>> getRecruitApplications(String token, List<int> applicationIds) async {
+    final res = await netDriver.requestPostJson(token, ApplicationApi.getRecruitApplications, {'applicationIds': applicationIds});
+    if(res['status'] == 200){
+      final applications = (res['applications'] as List).map<ApplicationModel>((e) => ApplicationModel.fromJson(e)).toList();
+      return applications;
+    }else {
+      throw Exception('Error');
+    }
+  }
+
 }
