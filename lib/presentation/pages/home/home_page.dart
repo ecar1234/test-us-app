@@ -19,6 +19,7 @@ import 'package:test_us_app/presentation/pages/home/setting_page.dart';
 import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
+import 'package:test_us_app/utils/type_conversion_util.dart';
 
 import '../../../data/sharedPreferences/auth_preference.dart';
 import '../../../domain/entities/recruit_post_entity.dart';
@@ -61,7 +62,7 @@ class _HomePageState extends State<HomePage> {
                           selector: (context, provider) => provider.notifications ?? [],
                           builder: (context, notifications, child) {
                             final count = notifications.where((e) => e.isRead == false).length;
-                            if(count == 0){
+                            if (count == 0) {
                               return IconButton(
                                 onPressed: () {},
                                 icon: Icon(Symbols.notifications, size: 30),
@@ -227,7 +228,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(
-              height: 220,
+              height: 250,
               width: MediaQuery.sizeOf(context).width,
               // padding: EdgeInsets.all(10),
               // decoration: BoxDecoration(
@@ -235,9 +236,18 @@ class _HomePageState extends State<HomePage> {
               // ),
               child: ListView.separated(
                   shrinkWrap: true,
-                  padding: EdgeInsets.only(left: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, idx) {
+                    final isRecruit = favoritePost[idx] is RecruitPostEntity;
+
+                    final bgColor = isRecruit
+                        ? const Color(0xFFFFE0B2)
+                        : const Color(0xFFE3F2FD);
+
+                    final textColor = isRecruit
+                        ? const Color(0xFFBF360C)
+                        : const Color(0xFF0D47A1);
                     return GestureDetector(
                       onTap: () async {
                         favoritePost[idx].postType == "RecruitmentPostEntity"
@@ -245,8 +255,8 @@ class _HomePageState extends State<HomePage> {
                             : Get.to(() => PromotionPostDetailPage(postId: favoritePost[idx].id!));
                       },
                       child: SizedBox(
-                        height: 210,
-                        width: 160,
+                        // height: 220,
+                        // width: 200,
                         // decoration: BoxDecoration(
                         //   color: Theme.of(context).colorScheme.surface,
                         // ),
@@ -254,32 +264,50 @@ class _HomePageState extends State<HomePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ConstrainedBox(
-                              constraints: BoxConstraints(maxHeight: 210, maxWidth: 180),
+                              constraints: BoxConstraints(maxHeight: 240, maxWidth: 200),
                               child: LayoutBuilder(builder: (context, constraints) {
-                                return Container(
-                                  width: constraints.maxWidth,
-                                  height: constraints.maxHeight * 0.55,
-                                  decoration: BoxDecoration(
-                                    // color: Colors.green,
-                                    border: favoritePost[idx].images!.isEmpty ? Border.all() : null,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: CachedNetworkImage(
-                                      imageUrl: favoritePost[idx].images![0].url ?? '',
-                                      fit: BoxFit.cover,
-                                      progressIndicatorBuilder: (context, url, downloadProgress) {
-                                        return Shimmer.fromColors(
-                                          baseColor: Colors.grey.shade300,
-                                          highlightColor: Colors.grey.shade100,
-                                          child: Container(
-                                            color: Colors.white,
-                                          ),
-                                        );
-                                      },
+                                return Stack(
+                                  children: [
+                                    Container(
+                                      width: constraints.maxWidth,
+                                      height: constraints.maxHeight * 0.55,
+                                      decoration: BoxDecoration(
+                                        // color: Colors.green,
+                                        border: favoritePost[idx].images!.isEmpty ? Border.all() : null,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: CachedNetworkImage(
+                                          imageUrl: favoritePost[idx].images![0].url ?? '',
+                                          fit: BoxFit.cover,
+                                          progressIndicatorBuilder: (context, url, downloadProgress) {
+                                            return Shimmer.fromColors(
+                                              baseColor: Colors.grey.shade300,
+                                              highlightColor: Colors.grey.shade100,
+                                              child: Container(
+                                                color: Colors.white,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    Positioned(
+                                      // top: 5,
+                                      bottom: 5,
+                                      right: 5,
+                                      child: Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: bgColor,
+                                        border: Border.all(color: Colors.grey.shade300),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Text(isRecruit ? "모집" : "홍보",
+                                        style: TextStyle(fontSize: 14, color: textColor),),
+                                    ),)
+                                  ],
                                 );
                               }),
                             ),
@@ -291,46 +319,42 @@ class _HomePageState extends State<HomePage> {
                                   TextStyle(fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
                               maxLines: 2,
                             )),
-                            if (favoritePost[idx].platform!.length > 1)
-                              SizedBox(
-                                  child: Row(
-                                children: [
-                                  Text(
-                                    favoritePost[idx].platform![0],
+                            Row(
+                              children: [
+                                SizedBox(
+                                  child: Text(
+                                    favoritePost[idx].platform!.toUpperCase(),
                                     style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
                                         color: Colors.grey.shade600,
                                         overflow: TextOverflow.ellipsis),
                                   ),
-                                  const Gap(10),
-                                  Text(
-                                    favoritePost[idx].platform![1],
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.grey.shade600,
-                                        overflow: TextOverflow.ellipsis),
-                                  ),
-                                ],
-                              ))
-                            else
-                              SizedBox(
-                                child: Text(
-                                  favoritePost[idx].platform![0],
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.grey.shade600,
-                                      overflow: TextOverflow.ellipsis),
                                 ),
-                              ),
+                                if (favoritePost[idx].platform! == 'MOBILE')
+                                  SizedBox(
+                                    child: Text(
+                                      "( ${_getOs(favoritePost[idx].mobileOs)} )",
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.grey.shade600,
+                                          overflow: TextOverflow.ellipsis),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            SizedBox(
+                                child: Text(
+                                  TypeConversionUtil().postCategoryToString(favoritePost[idx].category),
+                                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                                )),
                             SizedBox(
                                 child: Text(
                               "${favoritePost[idx].author!.nickname}",
                               style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
                                   color: Colors.grey.shade600,
                                   overflow: TextOverflow.ellipsis),
                               maxLines: 1,
@@ -384,7 +408,7 @@ class _HomePageState extends State<HomePage> {
             Selector<BasePostProvider, List<RecruitPostEntity>>(
               selector: (context, provider) => provider.recruitPosts ?? [],
               builder: (context, posts, child) => SizedBox(
-                  height: 230,
+                  height: 240,
                   width: MediaQuery.sizeOf(context).width,
                   // padding: EdgeInsets.all(10),
                   // decoration: BoxDecoration(
@@ -402,7 +426,7 @@ class _HomePageState extends State<HomePage> {
                                 Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
                               },
                               child: SizedBox(
-                                height: 230,
+                                height: 240,
                                 width: 160,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -435,7 +459,6 @@ class _HomePageState extends State<HomePage> {
                                         );
                                       }),
                                     ),
-                                    const Gap(10),
                                     SizedBox(
                                         child: Text(
                                       "${posts[idx].title}",
@@ -443,48 +466,48 @@ class _HomePageState extends State<HomePage> {
                                           fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
                                       maxLines: 2,
                                     )),
-                                    const Gap(5),
-                                    if (posts[idx].platform!.length > 1)
-                                      SizedBox(
-                                          child: Row(
-                                        children: [
-                                          Text(
-                                            posts[idx].platform![0],
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          child: Text(
+                                            posts[idx].platform!.toUpperCase(),
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                                 color: Colors.grey.shade600,
                                                 overflow: TextOverflow.ellipsis),
                                           ),
-                                          const Gap(10),
-                                          Text(
-                                            posts[idx].platform![1],
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                                color: Colors.grey.shade600,
-                                                overflow: TextOverflow.ellipsis),
-                                          ),
-                                        ],
-                                      ))
-                                    else
-                                      SizedBox(
-                                        child: Text(
-                                          posts[idx].platform![0],
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.grey.shade600,
-                                              overflow: TextOverflow.ellipsis),
                                         ),
+                                        if (posts[idx].platform == 'MOBILE')
+                                          SizedBox(
+                                            child: Text(
+                                              _getOs(posts[idx].mobileOs!),
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.grey.shade600,
+                                                  overflow: TextOverflow.ellipsis),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      child: Text(
+                                        TypeConversionUtil().postCategoryToString(posts[idx].category!),
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.grey.shade600,
+                                            overflow: TextOverflow.ellipsis),
                                       ),
+                                    ),
                                     const Gap(5),
                                     SizedBox(
                                         child: Text(
                                       posts[idx].author!.nickname ?? context.read<UserProvider>().user!.nickname ?? '',
                                       style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
                                           color: Colors.grey.shade600,
                                           overflow: TextOverflow.ellipsis),
                                       maxLines: 1,
@@ -536,7 +559,7 @@ class _HomePageState extends State<HomePage> {
             Selector<BasePostProvider, List<PromotionPostEntity>>(
               selector: (context, provider) => provider.promotionPosts ?? [],
               builder: (context, posts, child) => SizedBox(
-                  height: 230,
+                  height: 240,
                   width: MediaQuery.sizeOf(context).width,
                   // padding: EdgeInsets.all(10),
                   // decoration: BoxDecoration(
@@ -587,7 +610,7 @@ class _HomePageState extends State<HomePage> {
                                         );
                                       }),
                                     ),
-                                    const Gap(10),
+                                    const Gap(5),
                                     SizedBox(
                                         child: Text(
                                       "${posts[idx].title}",
@@ -595,48 +618,48 @@ class _HomePageState extends State<HomePage> {
                                           fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
                                       maxLines: 2,
                                     )),
-                                    const Gap(5),
-                                    if (posts[idx].platform!.length > 1)
-                                      SizedBox(
-                                          child: Row(
-                                        children: [
-                                          Text(
-                                            posts[idx].platform![0],
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          child: Text(
+                                            posts[idx].platform!.toUpperCase(),
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
                                                 color: Colors.grey.shade600,
                                                 overflow: TextOverflow.ellipsis),
                                           ),
-                                          const Gap(10),
-                                          Text(
-                                            posts[idx].platform![1],
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.normal,
-                                                color: Colors.grey.shade600,
-                                                overflow: TextOverflow.ellipsis),
-                                          ),
-                                        ],
-                                      ))
-                                    else
-                                      SizedBox(
-                                        child: Text(
-                                          posts[idx].platform![0],
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                              color: Colors.grey.shade600,
-                                              overflow: TextOverflow.ellipsis),
                                         ),
+                                        if (posts[idx].platform == 'MOBILE')
+                                          SizedBox(
+                                            child: Text(
+                                              _getOs(posts[idx].mobileOs!),
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.grey.shade600,
+                                                  overflow: TextOverflow.ellipsis),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      child: Text(
+                                        TypeConversionUtil().postCategoryToString(posts[idx].category!),
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.grey.shade600,
+                                            overflow: TextOverflow.ellipsis),
                                       ),
+                                    ),
                                     const Gap(5),
                                     SizedBox(
                                         child: Text(
                                       posts[idx].author!.nickname ?? context.read<UserProvider>().user!.nickname ?? '',
                                       style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
                                           color: Colors.grey.shade600,
                                           overflow: TextOverflow.ellipsis),
                                       maxLines: 1,
@@ -652,5 +675,14 @@ class _HomePageState extends State<HomePage> {
         ],
       );
     });
+  }
+
+  String _getOs(List<String> os) {
+    if (os.length == 1) {
+      return os[0].toUpperCase();
+    } else if (os.length == 2) {
+      return '${os[0].toUpperCase()} / ${os[1].toUpperCase()}';
+    }
+    return '';
   }
 }

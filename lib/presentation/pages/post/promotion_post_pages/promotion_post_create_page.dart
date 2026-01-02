@@ -37,24 +37,24 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
   List<ImageEntity> _existedImages = [];
   final List<ImageEntity> _deleteImages = [];
 
-  TextEditingController _titleController = TextEditingController();
-  TextEditingController _subtitleController = TextEditingController();
-  TextEditingController _contentController = TextEditingController();
-  TextEditingController _periodController = TextEditingController(text: "7");
-  TextEditingController _webUrlController = TextEditingController();
-  TextEditingController _gameUrlController = TextEditingController();
-  TextEditingController _iosUrlController = TextEditingController();
-  TextEditingController _androidUrlController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _subtitleController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
+  final TextEditingController _periodController = TextEditingController(text: "7");
+  final TextEditingController _webUrlController = TextEditingController();
+  final TextEditingController _gameUrlController = TextEditingController();
+  final TextEditingController _iosUrlController = TextEditingController();
+  final TextEditingController _androidUrlController = TextEditingController();
 
   final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
-  // final _categoryList = ['WEB', 'IOS', 'ANDROID'];
-  List<String> _selectedCategory = [];
+  // final _categoryList = ['WEB', 'Mobile'];
+  String? _selectedPlatform;
 
   bool _webCheck = false;
-  bool _iosCheck = false;
-  bool _androidCheck = false;
-  bool _gameCheck = false;
+  // bool _iosCheck = false;
+  // bool _androidCheck = false;
+  bool _mobileCheck = false;
 
   @override
   void initState() {
@@ -81,18 +81,12 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
         }
       }
 
-      _selectedCategory = widget.post!.platform!;
-      if (_selectedCategory.contains('WEB')) {
+      _selectedPlatform = widget.post!.platform!;
+      if (_selectedPlatform == 'WEB') {
         _webCheck = true;
       }
-      if (_selectedCategory.contains('IOS')) {
-        _iosCheck = true;
-      }
-      if (_selectedCategory.contains('Android')) {
-        _androidCheck = true;
-      }
-      if (_selectedCategory.contains('GAME')) {
-        _gameCheck = true;
+      if (_selectedPlatform == 'Mobile') {
+        _mobileCheck = true;
       }
       if (widget.post!.images != null && widget.post!.images!.isNotEmpty) {
         _existedImages = widget.post!.images!;
@@ -471,22 +465,10 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                             onChanged: (value) {
                               setState(() {
                                 _webCheck = value!;
-                                if (_webCheck) {
-                                  _selectedCategory.add('WEB');
-                                  if (_iosCheck) {
-                                    _selectedCategory.remove('IOS');
-                                    _iosCheck = false;
-                                  }
-                                  if (_androidCheck) {
-                                    _selectedCategory.remove('Android');
-                                    _androidCheck = false;
-                                  }
-                                  if (_gameCheck) {
-                                    _selectedCategory.remove('GAME');
-                                    _gameCheck = false;
-                                  }
-                                } else {
-                                  _selectedCategory.remove('WEB');
+                                if(_webCheck) {
+                                  _selectedPlatform = 'WEB';
+                                }else {
+                                  _selectedPlatform = null;
                                 }
                               });
                             },
@@ -502,26 +484,15 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       child: Row(
                         children: [
                           Checkbox(
-                            value: _gameCheck,
+                            value: _mobileCheck,
                             onChanged: (value) {
                               setState(() {
-                                _gameCheck = value!;
-                                if (_gameCheck) {
-                                  _selectedCategory.add('GAME');
-                                  if (_webCheck) {
-                                    _selectedCategory.remove('WEB');
-                                    _webCheck = false;
-                                  }
-                                  if (_iosCheck) {
-                                    _selectedCategory.remove('IOS');
-                                    _iosCheck = false;
-                                  }
-                                  if (_androidCheck) {
-                                    _selectedCategory.remove('Android');
-                                    _androidCheck = false;
-                                  }
+                                _mobileCheck = value!;
+                                if (_mobileCheck) {
+                                  _selectedPlatform = 'Mobile';
+
                                 } else {
-                                  _selectedCategory.remove('GAME');
+                                  _selectedPlatform = null;
                                 }
                               });
                             },
@@ -529,73 +500,11 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                           Text(
                             "GAME",
                             style:
-                                TextStyle(fontSize: 14, fontWeight: _gameCheck ? FontWeight.bold : FontWeight.normal),
+                                TextStyle(fontSize: 14, fontWeight: _mobileCheck ? FontWeight.bold : FontWeight.normal),
                           )
                         ],
                       )),
-                  SizedBox(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: _iosCheck,
-                            onChanged: (value) {
-                              setState(() {
-                                _iosCheck = value!;
-                                if (_iosCheck) {
-                                  _selectedCategory.add('IOS');
-                                  if (_webCheck) {
-                                    _selectedCategory.remove('WEB');
-                                    _webCheck = false;
-                                  }
-                                  if (_gameCheck) {
-                                    _selectedCategory.remove('GAME');
-                                    _gameCheck = false;
-                                  }
-                                } else {
-                                  _selectedCategory.remove('IOS');
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            "IOS",
-                            style: TextStyle(fontSize: 14, fontWeight: _iosCheck ? FontWeight.bold : FontWeight.normal),
-                          )
-                        ],
-                      )),
-                  SizedBox(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: _androidCheck,
-                            onChanged: (value) {
-                              setState(() {
-                                _androidCheck = value!;
-                                if (_androidCheck) {
-                                  _selectedCategory.add('Android');
-                                  if (_webCheck) {
-                                    _selectedCategory.remove('WEB');
-                                    _webCheck = false;
-                                  }
-                                  if (_gameCheck) {
-                                    _selectedCategory.remove('GAME');
-                                    _gameCheck = false;
-                                  }
-                                } else {
-                                  _selectedCategory.remove('Android');
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            "Android",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: _androidCheck ? FontWeight.bold : FontWeight.normal),
-                          )
-                        ],
-                      )),
+                  //
                 ]))
           ],
         ));
@@ -615,19 +524,20 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
           SizedBox(
             child: Column(
               children: [
-                if (!_webCheck && !_iosCheck && !_androidCheck && !_gameCheck)
+                if (!_webCheck && _mobileCheck)
                   SizedBox(
                       height: 60,
                       width: MediaQuery.sizeOf(context).width - 40,
                       child: Center(child: Text('플랫폼을 선택해 주세요.', style: TextStyle(fontSize: 16, color: Colors.grey)))),
                 if (_webCheck)
                   _urlTextFiled(context, '웹사이트', _webUrlController),
-                if (_gameCheck)
+                if (_mobileCheck)
                   _urlTextFiled(context, 'URL', _gameUrlController),
-                if (_iosCheck)
-                  _urlTextFiled(context, 'App Store', _iosUrlController),
-                if (_androidCheck)
-                  _urlTextFiled(context, 'Play Store', _androidUrlController),
+                // Todo : iOS, Android 추가 및 카테고리 추가
+                // if (_iosCheck)
+                //   _urlTextFiled(context, 'App Store', _iosUrlController),
+                // if (_androidCheck)
+                //   _urlTextFiled(context, 'Play Store', _androidUrlController),
               ],
             ),
           )
@@ -697,30 +607,30 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "모든 항목을 입력해주세요.");
                         return;
                       }
-                      if (_selectedCategory.isEmpty) {
+                      if (_selectedPlatform == null) {
                         Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }
                       if (_webCheck && _webUrlController.text.isEmpty ||
-                          _gameCheck && _gameUrlController.text.isEmpty ||
-                          _iosCheck && _iosUrlController.text.isEmpty ||
-                          _androidCheck && _androidUrlController.text.isEmpty) {
+
+                          _mobileCheck && _androidUrlController.text.isEmpty) {
+                        // todo : 모바일 선택시 os 선택하는 기능 추가 필요.
                         Get.snackbar("알림", "URL을 입력해주세요.");
                         return;
                       }
                       final domain = <String>[];
-                      if (_webCheck) {
-                        domain.add(_webUrlController.text);
-                      } else if (_gameCheck) {
-                        domain.add(_gameUrlController.text);
-                      } else {
-                        if (_iosCheck) {
-                          domain.add(_iosUrlController.text);
-                        }
-                        if (_androidCheck) {
-                          domain.add(_androidUrlController.text);
-                        }
-                      }
+                      // if (_webCheck) {
+                      //   domain.add(_webUrlController.text);
+                      // } else if (_gameCheck) {
+                      //   domain.add(_gameUrlController.text);
+                      // } else {
+                      //   if (_iosCheck) {
+                      //     domain.add(_iosUrlController.text);
+                      //   }
+                      //   if (_androidCheck) {
+                      //     domain.add(_androidUrlController.text);
+                      //   }
+                      // }
 
                       List<ImageEntity> postImage = [];
                       if (_selectedImages.isNotEmpty) {
@@ -737,7 +647,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         title: _titleController.text,
                         subtitle: _subtitleController.text,
                         contents: _contentController.text,
-                        platform: _selectedCategory,
+                        platform: _selectedPlatform,
                         domain: domain,
                         images: postImage,
                       );
@@ -760,7 +670,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "모든 항목을 입력해주세요.");
                         return;
                       }
-                      if (_selectedCategory.isEmpty) {
+                      if (_selectedPlatform == null) {
                         Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }
@@ -768,35 +678,35 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
                         return;
                       }
-                      if (_webCheck && _webUrlController.text.isEmpty ||
-                          _gameCheck && _gameUrlController.text.isEmpty ||
-                          _iosCheck && _iosUrlController.text.isEmpty ||
-                          _androidCheck && _androidUrlController.text.isEmpty) {
-                        Get.snackbar("알림", "URL을 입력해주세요.");
-                        return;
-                      }
+                      // if (_webCheck && _webUrlController.text.isEmpty ||
+                      //     _gameCheck && _gameUrlController.text.isEmpty ||
+                      //     _iosCheck && _iosUrlController.text.isEmpty ||
+                      //     _androidCheck && _androidUrlController.text.isEmpty) {
+                      //   Get.snackbar("알림", "URL을 입력해주세요.");
+                      //   return;
+                      // }
 
                       try {
                         // context.read<RecruitPostBloc>().add(PostDataLoadEvent());
                         // final token = context.read<UserProvider>().token!;
                         final domain = <String>[];
-                        if (_webCheck) {
-                          domain.add(_webUrlController.text);
-                        } else if (_gameCheck) {
-                          domain.add(_gameUrlController.text);
-                        } else {
-                          if (_iosCheck) {
-                            domain.add(_iosUrlController.text);
-                          }
-                          if (_androidCheck) {
-                            domain.add(_androidUrlController.text);
-                          }
-                        }
+                        // if (_webCheck) {
+                        //   domain.add(_webUrlController.text);
+                        // } else if (_gameCheck) {
+                        //   domain.add(_gameUrlController.text);
+                        // } else {
+                        //   if (_iosCheck) {
+                        //     domain.add(_iosUrlController.text);
+                        //   }
+                        //   if (_androidCheck) {
+                        //     domain.add(_androidUrlController.text);
+                        //   }
+                        // }
                         final post = PromotionPostEntity(
                           title: _titleController.text,
                           subtitle: _subtitleController.text,
                           contents: _contentController.text,
-                          platform: _selectedCategory,
+                          platform: _selectedPlatform,
                           author: context.read<UserProvider>().user!,
                           domain: domain,
                           period: 7,
@@ -825,7 +735,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "모든 항목을 입력해주세요.");
                         return;
                       }
-                      if (_selectedCategory.isEmpty) {
+                      if (_selectedPlatform == null) {
                         Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }
@@ -833,35 +743,35 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       //   Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
                       //   return;
                       // }
-                      if (_webCheck && _webUrlController.text.isEmpty ||
-                          _gameCheck && _gameUrlController.text.isEmpty ||
-                          _iosCheck && _iosUrlController.text.isEmpty ||
-                          _androidCheck && _androidUrlController.text.isEmpty) {
-                        Get.snackbar("알림", "URL을 입력해주세요.");
-                        return;
-                      }
+                      // if (_webCheck && _webUrlController.text.isEmpty ||
+                      //     _gameCheck && _gameUrlController.text.isEmpty ||
+                      //     _iosCheck && _iosUrlController.text.isEmpty ||
+                      //     _androidCheck && _androidUrlController.text.isEmpty) {
+                      //   Get.snackbar("알림", "URL을 입력해주세요.");
+                      //   return;
+                      // }
 
                       try {
                         final domain = <String>[];
-                        if (_webCheck) {
-                          domain.add(_webUrlController.text);
-                        } else if (_gameCheck) {
-                          domain.add(_gameUrlController.text);
-                        } else {
-                          if (_iosCheck) {
-                            domain.add(_iosUrlController.text);
-                          }
-                          if (_androidCheck) {
-                            domain.add(_androidUrlController.text);
-                          }
-                        }
+                        // if (_webCheck) {
+                        //   domain.add(_webUrlController.text);
+                        // } else if (_gameCheck) {
+                        //   domain.add(_gameUrlController.text);
+                        // } else {
+                        //   if (_iosCheck) {
+                        //     domain.add(_iosUrlController.text);
+                        //   }
+                        //   if (_androidCheck) {
+                        //     domain.add(_androidUrlController.text);
+                        //   }
+                        // }
 
                         final post = PromotionPostEntity(
                             id: widget.post!.id,
                             title: _titleController.text,
                             subtitle: _subtitleController.text,
                             contents: _contentController.text,
-                            platform: _selectedCategory,
+                            platform: _selectedPlatform,
                             status: widget.post!.status,
                             period: widget.post!.period,
                             domain: domain,

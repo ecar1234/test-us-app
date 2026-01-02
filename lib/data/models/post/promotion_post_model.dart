@@ -15,7 +15,9 @@ class PromotionPostModel {
   String? id;
   String? title;
   String? subtitle;
-  List<String>? platform;
+  String? platform;
+  List<String>? mobileOs;
+  PostCategory? category;
   String? contents;
   PostStatus? status;
   int? period;
@@ -33,6 +35,8 @@ class PromotionPostModel {
     this.title,
     this.subtitle,
     this.platform,
+    this.mobileOs,
+    this.category,
     this.contents,
     this.status,
     this.period,

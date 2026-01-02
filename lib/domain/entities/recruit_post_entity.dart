@@ -26,7 +26,8 @@ class RecruitPostEntity {
   String? title;
   String? subtitle;
   String? platform;
-  String? mobileOs;
+  List<String>? mobileOs;
+  PostCategory? category;
   String? contents;
   PostStatus? status;
   int? period;
@@ -47,6 +48,7 @@ class RecruitPostEntity {
     this.applications,
     this.platform,
     this.mobileOs,
+    this.category,
     this.contents,
     this.status,
     this.period,
@@ -81,6 +83,7 @@ class RecruitPostEntity {
       applications: model.applications,
       platform: model.platform,
       mobileOs: model.mobileOs,
+      category: model.category,
       contents: model.contents,
       status: model.status,
       period: model.period,
@@ -110,6 +113,7 @@ class RecruitPostEntity {
       applications: entity.applications,
       platform: entity.platform,
       mobileOs: entity.mobileOs,
+      category: entity.category,
       contents: entity.contents,
       status: entity.status,
       period: entity.period,

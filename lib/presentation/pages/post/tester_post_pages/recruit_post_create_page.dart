@@ -44,7 +44,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
   final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
   String? _selectedPlatform;
-  String? _selectedOs;
+  List<String>? _selectedOs;
   String? _selectedCategory;
 
 
@@ -57,7 +57,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
       subtitleController.text = widget.post!.subtitle!;
       contentController.text = widget.post!.contents!;
       _selectedPlatform = widget.post!.platform!;
-      _selectedOs = widget.post!.mobileOs ?? "";
+      _selectedOs = widget.post!.mobileOs ?? [];
       if (widget.post!.images != null && widget.post!.images!.isNotEmpty) {
         _existedImages = widget.post!.images!;
       }
@@ -119,7 +119,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                       _periodSection(),
                       const Gap(20),
                       // 카테고리
-                      _categorySection(),
+                      _platformSection(),
                       const Gap(20),
                       // 서비스 설명
                       _contentSection(),
@@ -400,10 +400,10 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
         ));
   }
 
-  Widget _categorySection() {
+  Widget _platformSection() {
     final platforms = {
-      'WEB': 'WEB',
-      'MOBILE': 'MOBILE'
+      'WEB': 'web',
+      'MOBILE': 'mobile'
     };
 
     return SizedBox(
@@ -425,7 +425,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
               children: platforms.entries.map((entry) {
                 final platformKey = entry.key;
                 final platformName = entry.value;
-                final isSelected = _selectedCategory == null ? false : _selectedCategory!.contains(platformKey);
+                final isSelected = _selectedPlatform == null ? false : _selectedPlatform == platformKey;
 
                 return SizedBox(
                   height: 30,
@@ -433,7 +433,14 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                     children: [
                       Checkbox(
                         value: isSelected,
-                        onChanged: (value) => _onPlatformSelected(value, platformKey),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedPlatform = platformKey;
+                            if(platformKey == 'WEB'){
+                              _selectedOs = null;
+                            }
+                          });
+                        }
                       ),
                       Text(
                         platformName,

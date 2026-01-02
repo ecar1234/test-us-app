@@ -1,3 +1,4 @@
+import '../data/models/post/recruit_post_model.dart';
 import '../data/models/user/user_model.dart';
 
 class TypeConversionUtil {
@@ -76,6 +77,55 @@ class TypeConversionUtil {
         return UserType.companies;
       default:
         return UserType.individuals;
+    }
+  }
+
+  String postCategoryToString(PostCategory category) {
+    switch (category) {
+      case PostCategory.game:
+        return "게임";
+      case PostCategory.travel:
+        return "여행";
+      case PostCategory.developerTool:
+        return "개발 도구";
+      case PostCategory.health:
+        return "건강";
+      case PostCategory.education:
+        return "교육";
+      case PostCategory.finance:
+        return "금융";
+      case PostCategory.weather:
+        return "날씨";
+      case PostCategory.news:
+        return "뉴스";
+      case PostCategory.books:
+        return "도서";
+      case PostCategory.life:
+        return "생활";
+      case PostCategory.business:
+        return "사업";
+      case PostCategory.photography:
+        return "사진";
+      case PostCategory.social:
+        return "사회";
+      case PostCategory.shopping:
+        return "쇼핑";
+      case PostCategory.entertainment:
+        return "엔터테인먼트";
+      case PostCategory.sports:
+        return "스포츠";
+      case PostCategory.utility:
+        return "유틸리티";
+      case PostCategory.food:
+        return "음식";
+      case PostCategory.music:
+        return "음악";
+      case PostCategory.medical:
+        return "의료";
+      case PostCategory.magazine:
+        return "매거진";
+      case PostCategory.etc:
+        return "기타";
     }
   }
 }

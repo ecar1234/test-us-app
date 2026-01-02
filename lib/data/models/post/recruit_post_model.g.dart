@@ -32,7 +32,10 @@ RecruitPostModel _$RecruitPostModelFromJson(Map<String, dynamic> json) =>
       subtitle: json['subtitle'] as String?,
       contents: json['contents'] as String?,
       platform: json['platform'] as String?,
-      mobileOs: json['mobileOs'] as String?,
+      mobileOs: (json['mobileOs'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
+      category: $enumDecodeNullable(_$PostCategoryEnumMap, json['category']),
       status: $enumDecodeNullable(_$PostStatusEnumMap, json['status']),
       period: (json['period'] as num?)?.toInt(),
       applications: (json['applications'] as List<dynamic>?)
@@ -61,6 +64,7 @@ Map<String, dynamic> _$RecruitPostModelToJson(RecruitPostModel instance) =>
       'subtitle': instance.subtitle,
       'platform': instance.platform,
       'mobileOs': instance.mobileOs,
+      'category': _$PostCategoryEnumMap[instance.category],
       'contents': instance.contents,
       'status': _$PostStatusEnumMap[instance.status],
       'period': instance.period,
@@ -73,6 +77,31 @@ Map<String, dynamic> _$RecruitPostModelToJson(RecruitPostModel instance) =>
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };
+
+const _$PostCategoryEnumMap = {
+  PostCategory.game: 'game',
+  PostCategory.travel: 'travel',
+  PostCategory.developerTool: 'developer_tool',
+  PostCategory.health: 'health',
+  PostCategory.education: 'education',
+  PostCategory.finance: 'finance',
+  PostCategory.weather: 'weather',
+  PostCategory.news: 'news',
+  PostCategory.books: 'books',
+  PostCategory.life: 'life',
+  PostCategory.business: 'business',
+  PostCategory.photography: 'photography',
+  PostCategory.social: 'social',
+  PostCategory.shopping: 'shopping',
+  PostCategory.entertainment: 'entertainment',
+  PostCategory.sports: 'sports',
+  PostCategory.utility: 'utility',
+  PostCategory.food: 'food',
+  PostCategory.music: 'music',
+  PostCategory.medical: 'medical',
+  PostCategory.magazine: 'magazine',
+  PostCategory.etc: 'etc',
+};
 
 const _$PostStatusEnumMap = {
   PostStatus.active: 'active',

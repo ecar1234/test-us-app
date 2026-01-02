@@ -12,7 +12,9 @@ class PromotionPostEntity {
   String? id;
   String? title;
   String? subtitle;
-  List<String>? platform;
+  String? platform;
+  List<String>? mobileOs;
+  PostCategory? category;
   String? contents;
   PostStatus? status;
   int? period;
@@ -30,6 +32,8 @@ class PromotionPostEntity {
     this.title,
     this.subtitle,
     this.platform,
+    this.mobileOs,
+    this.category,
     this.contents,
     this.status,
     this.period,
@@ -56,6 +60,8 @@ class PromotionPostEntity {
       title: model.title,
       subtitle: model.subtitle,
       platform: model.platform,
+      mobileOs: model.mobileOs,
+      category: model.category,
       contents: model.contents,
       status: model.status,
       period: model.period,
@@ -81,6 +87,8 @@ class PromotionPostEntity {
       title: entity.title,
       subtitle: entity.subtitle,
       platform: entity.platform,
+      mobileOs: entity.mobileOs,
+      category: entity.category,
       contents: entity.contents,
       status: entity.status,
       period: entity.period,

@@ -88,7 +88,8 @@ class RecruitPostModel {
   String? title;
   String? subtitle;
   String? platform;
-  String? mobileOs;
+  List<String>? mobileOs;
+  PostCategory? category;
   String? contents;
   PostStatus? status;
   int? period;
@@ -109,6 +110,7 @@ class RecruitPostModel {
     this.contents,
     this.platform,
     this.mobileOs,
+    this.category,
     this.status,
     this.period,
     this.applications,
