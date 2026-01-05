@@ -269,11 +269,7 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                             )),
                       const Gap(10),
                       SizedBox(
-                        child: post.platform!.length == 1
-                            ? Text(post.platform![0])
-                            : Row(
-                                children: [Text(post.platform![0]), const Gap(10), Text(post.platform![1])],
-                              ),
+                        child: Text(post.platform!.name.toUpperCase())
                       ),
                     ],
                   ),

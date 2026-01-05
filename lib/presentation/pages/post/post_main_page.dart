@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_event.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_state.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
@@ -15,6 +16,7 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 import '../../../domain/entities/promotion_post_entity.dart';
 import '../../../domain/entities/recruit_post_entity.dart';
 import '../../../services/common_height_provider.dart';
+import '../../../utils/type_conversion_util.dart';
 import '../../bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
 import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
@@ -111,8 +113,8 @@ class _PostMainPageState extends State<PostMainPage> {
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 30,
-                      mainAxisSpacing: 30,
-                      mainAxisExtent: 280,
+                      // mainAxisSpacing: 10,
+                      mainAxisExtent: 300,
                       // childAspectRatio: 0.5
                     ),
                     itemBuilder: (context, idx) {
@@ -128,9 +130,9 @@ class _PostMainPageState extends State<PostMainPage> {
                           child: Column(
                             children: [
                               Flexible(
-                                  flex: 1,
+                                  flex: 4,
                                   child: Container(
-                                    height: 138,
+                                    height: 120,
                                     width: double.infinity,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
@@ -140,20 +142,22 @@ class _PostMainPageState extends State<PostMainPage> {
                                             child: CachedNetworkImage(
                                               imageUrl: posts[idx].images![0].url!,
                                               fit: BoxFit.cover,
-                                              progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-                                                  child: SizedBox(
-                                                      height: 50,
-                                                      width: 50,
-                                                      child:
-                                                          CircularProgressIndicator(value: downloadProgress.progress))),
+                                              progressIndicatorBuilder: (context, url, downloadProgress) {
+                                                return Shimmer.fromColors(
+                                                  baseColor: Colors.grey.shade300,
+                                                  highlightColor: Colors.grey.shade100,
+                                                  child: Container(
+                                                    color: Colors.white,
+                                                  ),
+                                                );
+                                              },
                                             ),
                                           ),
                                   )),
-                              const Gap(4),
                               Flexible(
-                                  flex: 1,
+                                  flex: 6,
                                   child: SizedBox(
-                                    height: 137,
+                                    height: 170,
                                     width: double.infinity,
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,13 +167,30 @@ class _PostMainPageState extends State<PostMainPage> {
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                        const Gap(4),
                                         Text("${posts[idx].subtitle}",
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
-                                        const Gap(4),
-                                        Text("${posts[idx].author!.nickname}")
+                                        Row(
+                                          children: [
+                                            Text("${posts[idx].platform!.toUpperCase()}",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.normal,
+                                                    color: Colors.grey.shade600)),
+                                            if (posts[idx].platform == 'MOBILE')
+                                              Text("(${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)})",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.normal,
+                                                      color: Colors.grey.shade600))
+                                          ],
+                                        ),
+                                        Text(TypeConversionUtil().postCategoryToString(posts[idx].category),
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.grey.shade600)),
+                                        const Gap(5),
+                                        Text("${posts[idx].author!.nickname}",
+                                          style: TextStyle(color: Colors.grey.shade600, fontSize: 15, fontWeight: FontWeight.w500),)
                                       ],
                                     ),
                                   )),

@@ -10,8 +10,9 @@ class ImageEntity {
   int? size;
   String? url;
   PostType? postType;
+  bool? isLocal;
   DateTime? createdAt;
-  ImageEntity({this.id, this.filename, this.originalname, this.mimetype, this.size, this.postType, this.url, this.createdAt});
+  ImageEntity({this.id, this.filename, this.originalname, this.mimetype, this.size, this.postType, this.isLocal, this.url, this.createdAt});
 
   static ImageEntity toImageEntity (ImageModel model){
     return ImageEntity(

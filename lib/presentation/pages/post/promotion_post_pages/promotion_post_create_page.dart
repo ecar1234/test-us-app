@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
+import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
 
@@ -49,7 +50,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
   final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
   // final _categoryList = ['WEB', 'Mobile'];
-  String? _selectedPlatform;
+  ApplicationPlatform? _selectedPlatform;
 
   bool _webCheck = false;
   // bool _iosCheck = false;
@@ -65,7 +66,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
       _subtitleController.text = widget.post!.subtitle!;
       _contentController.text = widget.post!.contents!;
       if(widget.post!.domain!.length < 2){
-        if (widget.post!.platform!.contains('WEB')) {
+        if (widget.post!.platform == ApplicationPlatform.web) {
           _webUrlController.text = widget.post!.domain!.isNotEmpty ? widget.post!.domain![0] : '';
  ;
         }else {
@@ -466,7 +467,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                               setState(() {
                                 _webCheck = value!;
                                 if(_webCheck) {
-                                  _selectedPlatform = 'WEB';
+                                  _selectedPlatform = ApplicationPlatform.web;
                                 }else {
                                   _selectedPlatform = null;
                                 }
@@ -489,7 +490,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                               setState(() {
                                 _mobileCheck = value!;
                                 if (_mobileCheck) {
-                                  _selectedPlatform = 'Mobile';
+                                  _selectedPlatform = ApplicationPlatform.mobile;
 
                                 } else {
                                   _selectedPlatform = null;

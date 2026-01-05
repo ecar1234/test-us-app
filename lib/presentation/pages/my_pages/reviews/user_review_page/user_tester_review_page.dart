@@ -146,9 +146,7 @@ class _UserTesterReviewPageState extends State<UserTesterReviewPage> {
                                               crossAxisAlignment: CrossAxisAlignment.center,
                                               children: [
                                                 SizedBox(
-                                                  child: posts[idx].platform!.length == 1
-                                                      ? Text('플랫폼 : ${posts[idx].platform![0]}')
-                                                      : Text('플랫폼 : ${posts[idx].platform![0]} / ${posts[idx].platform![1]}'),
+                                                    child: Text('플랫폼 : ${posts[idx].platform!.name.toUpperCase()}')
                                                 ),
                                               ],
                                             ),

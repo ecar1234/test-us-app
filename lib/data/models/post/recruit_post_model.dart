@@ -87,8 +87,8 @@ class RecruitPostModel {
   String? id;
   String? title;
   String? subtitle;
-  String? platform;
-  List<String>? mobileOs;
+  ApplicationPlatform? platform;
+  List<MobileOsType>? mobileOs;
   PostCategory? category;
   String? contents;
   PostStatus? status;

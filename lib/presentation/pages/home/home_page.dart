@@ -7,6 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 import 'package:test_us_app/domain/entities/firebase_messaging_entity.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
@@ -323,7 +324,9 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 SizedBox(
                                   child: Text(
-                                    favoritePost[idx].platform!.toUpperCase(),
+                                    favoritePost[idx].platform! == ApplicationPlatform.web
+                                        ? "WEB"
+                                        : "Mobile",
                                     style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
@@ -331,10 +334,10 @@ class _HomePageState extends State<HomePage> {
                                         overflow: TextOverflow.ellipsis),
                                   ),
                                 ),
-                                if (favoritePost[idx].platform! == 'MOBILE')
+                                if (favoritePost[idx].platform! == ApplicationPlatform.mobile)
                                   SizedBox(
                                     child: Text(
-                                      "( ${_getOs(favoritePost[idx].mobileOs)} )",
+                                      "( ${TypeConversionUtil().getPostOs(favoritePost[idx].mobileOs!)} )",
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.normal,
@@ -470,7 +473,7 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         SizedBox(
                                           child: Text(
-                                            posts[idx].platform!.toUpperCase(),
+                                            posts[idx].platform!.name.toUpperCase(),
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
@@ -478,10 +481,10 @@ class _HomePageState extends State<HomePage> {
                                                 overflow: TextOverflow.ellipsis),
                                           ),
                                         ),
-                                        if (posts[idx].platform == 'MOBILE')
+                                        if (posts[idx].platform == ApplicationPlatform.mobile)
                                           SizedBox(
                                             child: Text(
-                                              _getOs(posts[idx].mobileOs!),
+                                              "( ${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)} )",
                                               style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.normal,
@@ -622,7 +625,7 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         SizedBox(
                                           child: Text(
-                                            posts[idx].platform!.toUpperCase(),
+                                            posts[idx].platform!.name.toUpperCase(),
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.normal,
@@ -633,7 +636,7 @@ class _HomePageState extends State<HomePage> {
                                         if (posts[idx].platform == 'MOBILE')
                                           SizedBox(
                                             child: Text(
-                                              _getOs(posts[idx].mobileOs!),
+                                              "( ${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)} )",
                                               style: TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.normal,
@@ -675,14 +678,5 @@ class _HomePageState extends State<HomePage> {
         ],
       );
     });
-  }
-
-  String _getOs(List<String> os) {
-    if (os.length == 1) {
-      return os[0].toUpperCase();
-    } else if (os.length == 2) {
-      return '${os[0].toUpperCase()} / ${os[1].toUpperCase()}';
-    }
-    return '';
   }
 }

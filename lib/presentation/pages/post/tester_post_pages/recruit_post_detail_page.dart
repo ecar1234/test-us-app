@@ -23,8 +23,10 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/linkfy_util.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../domain/entities/image_entity.dart';
 import '../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../domain/entities/user_entity.dart';
+import '../../../../utils/type_conversion_util.dart';
 import '../../../bloc/app_bloc/app_bloc.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
@@ -185,43 +187,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                   : SizedBox()
             ],
             flexibleSpace: FlexibleSpaceBar(
-                background: post.images!.length == 1
-                    ? CachedNetworkImage(
-                        imageUrl: post.images![0].url!,
-                      )
-                    : CarouselSlider(
-                        items: post.images!.map((e) {
-                          if (e.filename == null) {
-                            return Image.file(
-                              File(e.url!),
-                              fit: BoxFit.fitHeight,
-                              height: double.infinity,
-                              width: double.infinity,
-                            );
-                          } else {
-                            return CachedNetworkImage(
-                                imageUrl: e.url!,
-                                fit: BoxFit.fitHeight,
-                                height: double.infinity,
-                                width: double.infinity,
-                                progressIndicatorBuilder: (context, url, downloadProgress) {
-                                  return Shimmer.fromColors(
-                                      baseColor: Colors.grey.shade300,
-                                      highlightColor: Colors.grey.shade100,
-                                      child: Container(
-                                        height: double.infinity,
-                                        width: double.infinity,
-                                        color: Colors.white,
-                                      ));
-                                });
-                          }
-                        }).toList(),
-                        options: CarouselOptions(
-                          autoPlay: false,
-                          viewportFraction: 1.0,
-                          height: 250,
-                        ),
-                      ))),
+                background: _buildImages(post.images!))),
         SliverToBoxAdapter(
           key: const ValueKey("postValue"),
           child: Container(
@@ -236,96 +202,68 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                   post.title!,
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 )),
-                const Gap(10),
+                const Gap(5),
                 SizedBox(child: Text(post.subtitle!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                const Gap(5),
+                Row(
+                  children: [
+                    Text("카테고리"),
+                    const Gap(10),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                        child: Text(
+                          TypeConversionUtil().postCategoryToString(post.category!),
+                        )),
+                  ],
+                ),
+                Row(
+                    children: [
+                      Text("플랫폼"),
+                      const Gap(10),
+                      Text(post.platform!.name.toUpperCase()),
+                      const Gap(5),
+                      if (post.platform! == ApplicationPlatform.mobile)
+                        SizedBox(
+                          child: Text(
+                            "( ${TypeConversionUtil().getPostOs(post.mobileOs!)} )",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.grey.shade600,
+                                overflow: TextOverflow.ellipsis),
+                          ),
+                        ),
+                    ]
+                ),
                 const Gap(10),
                 SizedBox(
                   child: Row(
                     children: [
-                      // if (isAuthor)
-                      //   SizedBox(
-                      //       child: Row(
-                      //         children: [
-                      //           SizedBox(
-                      //             height: 30,
-                      //             width: 30,
-                      //             child: CircleAvatar(
-                      //                 radius: 40,
-                      //                 backgroundImage: user!.profileImg!.url!.isNotEmpty
-                      //                     ? CachedNetworkImageProvider(
-                      //                   user.profileImg!.url!,
-                      //                 ) : const AssetImage('assets/images/Generic avatar.png')
-                      //             ),
-                      //           ),
-                      //           const Gap(5),
-                      //           Text(
-                      //             '${post.author!.nickname}',
-                      //             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      //           ),
-                      //         ],
-                      //       ))
-                      if (post.author == null)
-                        SizedBox(
-                            child: Row(
-                          children: [
-                            SizedBox(
-                              height: 30,
-                              width: 30,
-                              child: CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: (user!.profileImg!.url!.isNotEmpty
-                                      ? CachedNetworkImageProvider(
-                                          user.profileImg!.url!,
-                                        )
-                                      : const AssetImage('assets/images/Generic Profile.png')) as ImageProvider),
-                            ),
-                            const Gap(5),
-                            Text(
-                              '${context.read<UserProvider>().user!.nickname}',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ))
-                      else
-                        SizedBox(
-                            child: Row(
-                          children: [
-                            SizedBox(
-                              height: 30,
-                              width: 30,
-                              child: CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: post.author!.profileImg == null
-                                      ? const AssetImage('assets/images/Generic avatar.png')
-                                      : CachedNetworkImageProvider(
-                                          post.author!.profileImg!.url!,
-                                        ) as ImageProvider),
-                            ),
-                            const Gap(5),
-                            Text(
-                              '${post.author!.nickname}',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        )),
-                      const Gap(10),
                       SizedBox(
-                        child: post.platform!.length == 1
-                            ? Text(post.platform![0])
-                            : Row(
-                                children: [Text(post.platform![0]), const Gap(10), Text(post.platform![1])],
-                              ),
-                      ),
-                      // const Gap(10),
-                      // SizedBox(
-                      //     child: _post!.createdAt != null
-                      //         ? Text(
-                      //             '게시일 : ${_post!.createdAt!.year} - ${_post!.createdAt!.month < 10 ?
-                      //             '0${_post!.createdAt!.month}' : _post!.createdAt!.month} - ${_post!.createdAt!.day < 10 ?
-                      //             '0${_post!.createdAt!.day}' : '${_post!.createdAt!.day}'}',
-                      //             style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-                      //           )
-                      //         : SizedBox()),
+                          child: Row(
+                        children: [
+                          SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: CircleAvatar(
+                                radius: 40,
+                                backgroundImage: post.author!.profileImg == null
+                                    ? const AssetImage('assets/images/Generic avatar.png')
+                                    : CachedNetworkImageProvider(
+                                        post.author!.profileImg!.url!,
+                                      ) as ImageProvider),
+                          ),
+                          const Gap(5),
+                          Text(
+                            '${post.author!.nickname}',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      )),
                     ],
                   ),
                 ),
@@ -354,13 +292,17 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                           state.state == UserAppState.applicationCancelCompletedState) {
                         //Todo : application 업데이트 수정 필요
                         context.read<ApplicationProvider>().requestApply(state.application!);
-                        context.read<RecruitPostBloc>().add(RequestPostDataEvent(context.read<UserProvider>().token!, post.id!));
+                        context
+                            .read<RecruitPostBloc>()
+                            .add(RequestPostDataEvent(context.read<UserProvider>().token!, post.id!));
                       }
                     }),
-                    BlocListener<RecruitPostBloc, RecruitPostState>(listener: (context, state) {
-                      context.read<BasePostProvider>().updateRecruitPost(state.post!);
-                    },
-                      listenWhen: (previous, current) => current.state == RecruitPostLoadState.getPostByIdCompletedState,
+                    BlocListener<RecruitPostBloc, RecruitPostState>(
+                      listener: (context, state) {
+                        context.read<BasePostProvider>().updateRecruitPost(state.post!);
+                      },
+                      listenWhen: (previous, current) =>
+                          current.state == RecruitPostLoadState.getPostByIdCompletedState,
                     ),
                   ], child: _applicationSection(context))
               ],
@@ -425,7 +367,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
               ),
             ),
             const Gap(20),
-            if (post.platform!.contains('IOS') || post.platform!.contains('ANDROID'))
+            if (post.platform! == ApplicationPlatform.mobile)
               SizedBox(
                 width: 200,
                 height: 50,
@@ -567,7 +509,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                 .userApplications!
                 .firstWhere((e) => e.postId == post.id! && e.applicantId == userId, orElse: () => ApplicationEntity());
 
-            if (post.platform!.contains('WEB') || post.platform!.contains('GAME')) {
+            if (post.platform == ApplicationPlatform.mobile) {
               if (application.id != null && application.status == ApplicationStatus.cancel) {
                 final prevApp = application;
                 final app = ApplicationEntity(
@@ -579,7 +521,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
 
                 context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
               } else {
-                final platform = post.platform!.contains('WEB') ? ApplicationPlatform.web : ApplicationPlatform.mobile;
+                final platform = post.platform;
                 // context.read<AppBloc>().add(ApplicationDataLoadEvent());
                 final app = ApplicationEntity(
                     platform: platform, status: ApplicationStatus.pending, postId: post.id, applicantId: userId);
@@ -708,6 +650,57 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       Get.snackbar('알림', '존재하지 않는 주소입니다.');
+    }
+  }
+
+  Widget _buildImages (List<ImageEntity> images){
+    if(images.length == 1){
+      if(images[0].isLocal == true){
+        return Image.file(File(images[0].url!), fit: BoxFit.fitHeight,
+          height: double.infinity,
+          width: double.infinity,);
+      }else {
+        return CachedNetworkImage(
+          imageUrl: images[0].url!,
+          fit: BoxFit.fitHeight,
+          height: double.infinity,
+          width: double.infinity,
+        );
+      }
+    } else {
+      return CarouselSlider(
+        items: images.map((e) {
+          if (e.isLocal == true) {
+            return Image.file(
+              File(e.url!),
+              fit: BoxFit.fitHeight,
+              height: double.infinity,
+              width: double.infinity,
+            );
+          } else {
+            return CachedNetworkImage(
+                imageUrl: e.url!,
+                fit: BoxFit.fitHeight,
+                height: double.infinity,
+                width: double.infinity,
+                progressIndicatorBuilder: (context, url, downloadProgress) {
+                  return Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        height: double.infinity,
+                        width: double.infinity,
+                        color: Colors.white,
+                      ));
+                });
+          }
+        }).toList(),
+        options: CarouselOptions(
+          autoPlay: false,
+          viewportFraction: 1.0,
+          height: 250,
+        ),
+      );
     }
   }
 }

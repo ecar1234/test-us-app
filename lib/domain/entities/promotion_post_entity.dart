@@ -1,3 +1,4 @@
+import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/data/models/post/promotion_post_model.dart';
 import 'package:test_us_app/domain/entities/image_entity.dart';
 import 'package:test_us_app/domain/entities/post_review_entity.dart';
@@ -12,8 +13,8 @@ class PromotionPostEntity {
   String? id;
   String? title;
   String? subtitle;
-  String? platform;
-  List<String>? mobileOs;
+  ApplicationPlatform? platform;
+  List<MobileOsType>? mobileOs;
   PostCategory? category;
   String? contents;
   PostStatus? status;

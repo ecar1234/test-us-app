@@ -1,3 +1,4 @@
+import '../data/models/application/application_model.dart';
 import '../data/models/post/recruit_post_model.dart';
 import '../data/models/user/user_model.dart';
 
@@ -127,5 +128,18 @@ class TypeConversionUtil {
       case PostCategory.etc:
         return "기타";
     }
+  }
+  String getPostOs(List<MobileOsType> os) {
+    if(os.length == 1){
+      switch(os[0]){
+        case MobileOsType.android:
+          return "Android";
+        case MobileOsType.ios:
+          return "iOS";
+      }
+    }else if(os.length == 2){
+     return "AOS / IOS";
+    }
+    return "";
   }
 }

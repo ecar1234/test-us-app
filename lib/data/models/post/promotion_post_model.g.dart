@@ -11,9 +11,10 @@ PromotionPostModel _$PromotionPostModelFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String?,
       title: json['title'] as String?,
       subtitle: json['subtitle'] as String?,
-      platform: json['platform'] as String?,
+      platform:
+          $enumDecodeNullable(_$ApplicationPlatformEnumMap, json['platform']),
       mobileOs: (json['mobileOs'] as List<dynamic>?)
-          ?.map((e) => e as String)
+          ?.map((e) => $enumDecode(_$MobileOsTypeEnumMap, e))
           .toList(),
       category: $enumDecodeNullable(_$PostCategoryEnumMap, json['category']),
       contents: json['contents'] as String?,
@@ -44,8 +45,9 @@ Map<String, dynamic> _$PromotionPostModelToJson(PromotionPostModel instance) =>
       'id': instance.id,
       'title': instance.title,
       'subtitle': instance.subtitle,
-      'platform': instance.platform,
-      'mobileOs': instance.mobileOs,
+      'platform': _$ApplicationPlatformEnumMap[instance.platform],
+      'mobileOs':
+          instance.mobileOs?.map((e) => _$MobileOsTypeEnumMap[e]!).toList(),
       'category': _$PostCategoryEnumMap[instance.category],
       'contents': instance.contents,
       'status': _$PostStatusEnumMap[instance.status],
@@ -59,6 +61,16 @@ Map<String, dynamic> _$PromotionPostModelToJson(PromotionPostModel instance) =>
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };
+
+const _$ApplicationPlatformEnumMap = {
+  ApplicationPlatform.web: 'web',
+  ApplicationPlatform.mobile: 'mobile',
+};
+
+const _$MobileOsTypeEnumMap = {
+  MobileOsType.ios: 'ios',
+  MobileOsType.android: 'android',
+};
 
 const _$PostCategoryEnumMap = {
   PostCategory.game: 'game',
