@@ -7,13 +7,17 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
 
+import '../../../../data/models/post/recruit_post_model.dart';
 import '../../../../domain/entities/image_entity.dart';
 import '../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../services/common_height_provider.dart';
+import '../../../../utils/type_conversion_util.dart';
 import '../../../bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
 import '../../../bloc/post_blocs/promotion_bloc/promotion_event.dart';
 import '../../../bloc/post_blocs/promotion_bloc/promotion_state.dart';
@@ -53,9 +57,12 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
   ApplicationPlatform? _selectedPlatform;
 
   bool _webCheck = false;
-  // bool _iosCheck = false;
-  // bool _androidCheck = false;
   bool _mobileCheck = false;
+  bool _iosCheck = false;
+  bool _androidCheck = false;
+
+  List<MobileOsType> _selectedOs = [];
+  PostCategory? _selectedCategory = PostCategory.game;
 
   @override
   void initState() {
@@ -65,15 +72,16 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
       _titleController.text = widget.post!.title!;
       _subtitleController.text = widget.post!.subtitle!;
       _contentController.text = widget.post!.contents!;
-      if(widget.post!.domain!.length < 2){
+
+      if (widget.post!.domain!.length < 2) {
         if (widget.post!.platform == ApplicationPlatform.web) {
           _webUrlController.text = widget.post!.domain!.isNotEmpty ? widget.post!.domain![0] : '';
- ;
-        }else {
+          ;
+        } else {
           _gameUrlController.text = widget.post!.domain!.isNotEmpty ? widget.post!.domain![0] : '';
         }
-      }else {
-        for(int i = 0; i < widget.post!.domain!.length; i++) {
+      } else {
+        for (int i = 0; i < widget.post!.domain!.length; i++) {
           if (widget.post!.domain![i].contains('apps.apple.com')) {
             _iosUrlController.text = widget.post!.domain![i];
           } else if (i == 1) {
@@ -83,12 +91,17 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
       }
 
       _selectedPlatform = widget.post!.platform!;
-      if (_selectedPlatform == 'WEB') {
+      if (_selectedPlatform == ApplicationPlatform.web) {
         _webCheck = true;
       }
-      if (_selectedPlatform == 'Mobile') {
+      if (_selectedPlatform == ApplicationPlatform.mobile) {
         _mobileCheck = true;
+        _selectedOs = widget.post!.mobileOs!;
       }
+      if(widget.post!.category != null) {
+        _selectedCategory = widget.post!.category!;
+      }
+
       if (widget.post!.images != null && widget.post!.images!.isNotEmpty) {
         _existedImages = widget.post!.images!;
       }
@@ -149,6 +162,9 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       const Gap(20),
                       // 카테고리
                       _categorySection(),
+                      const Gap(20),
+                      // 플랫폼
+                      _platformSection(),
                       const Gap(20),
                       // 서비스 URL
                       _serviceUrlSection(),
@@ -440,6 +456,43 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
   Widget _categorySection() {
     return SizedBox(
         width: MediaQuery.sizeOf(context).width - 40,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+                child: Text(
+                  "카테고리",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                )
+            ),
+            const Gap(10),
+            SizedBox(
+                child: DropdownMenu(
+                    menuHeight: 200,
+                    initialSelection: _selectedCategory,
+                    onSelected: (value) {
+                      setState(() {
+                        _selectedCategory = value;
+                      });
+                    },
+                    dropdownMenuEntries: List.generate(
+                        PostCategory.values.length,
+                            (index) {
+                          return DropdownMenuEntry(
+                            value: PostCategory.values[index],
+                            label: TypeConversionUtil().postCategoryToString(PostCategory.values[index]),
+                          );
+                        }
+                    ))
+            )
+          ],
+        )
+    );
+  }
+
+  Widget _platformSection() {
+    return SizedBox(
+        width: MediaQuery.sizeOf(context).width - 40,
         // height: 150,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,65 +503,221 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             )),
             const Gap(10),
-            SizedBox(
-                child: GridView.count(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    crossAxisCount: 2,
-                    childAspectRatio: 3.5,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SizedBox(
+                  height: 50,
+                  child: Row(
                     children: [
-                  SizedBox(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: _webCheck,
-                            onChanged: (value) {
-                              setState(() {
-                                _webCheck = value!;
-                                if(_webCheck) {
-                                  _selectedPlatform = ApplicationPlatform.web;
-                                }else {
-                                  _selectedPlatform = null;
-                                }
+                      Checkbox(
+                          value: _webCheck,
+                          onChanged: (value) {
+                            setState(() {
+                              _webCheck = value!;
+                              _selectedPlatform = ApplicationPlatform.web;
+                              if (value == true && _mobileCheck == true) {
+                                _mobileCheck = false;
+                                _androidCheck = false;
+                                _iosCheck = false;
+                              }
+                            });
+                          }),
+                      Text(
+                        'Web Service',
+                        style: TextStyle(fontSize: 14, fontWeight: _webCheck ? FontWeight.bold : FontWeight.normal),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                  child: Row(
+                    children: [
+                      Checkbox(
+                          value: _mobileCheck,
+                          onChanged: (value) async {
+                            setState(() {
+                              _mobileCheck = value!;
+                              _selectedPlatform = ApplicationPlatform.mobile;
+                              if (value == true && _webCheck == true) {
+                                _webCheck = false;
+                              }
+                            });
+                            if (value == true) {
+                             final res = await showModalBottomSheet(
+                              context: context,
+                              isDismissible: false,
+                              builder: (context) {
+                                return _mobileOsSection();
                               });
-                            },
-                          ),
-                          Text(
-                            "WEB",
-                            style: TextStyle(fontSize: 14, fontWeight: _webCheck ? FontWeight.bold : FontWeight.normal),
-                          )
-                        ],
-                      )),
-                  SizedBox(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: _mobileCheck,
-                            onChanged: (value) {
+                             if(res['android'] == true) {
+                               setState(() {
+                                  _androidCheck = true;
+                                });
+                             }
+                             if(res['ios'] == true) {
+                               setState(() {
+                                  _iosCheck = true;
+                                });
+                             }
+                            } else {
                               setState(() {
-                                _mobileCheck = value!;
-                                if (_mobileCheck) {
-                                  _selectedPlatform = ApplicationPlatform.mobile;
+                                _selectedOs = [];
+                                _androidCheck = false;
+                                _iosCheck = false;
+                              });
+                            }
+                            setState(() {
+                              if (_androidCheck == true) {
+                                _selectedOs.add(MobileOsType.ios);
+                              } else {
+                                _selectedOs.remove(MobileOsType.ios);
+                              }
 
-                                } else {
-                                  _selectedPlatform = null;
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            "GAME",
-                            style:
-                                TextStyle(fontSize: 14, fontWeight: _mobileCheck ? FontWeight.bold : FontWeight.normal),
-                          )
-                        ],
-                      )),
-                  //
-                ]))
+                              if (_iosCheck == true) {
+                                _selectedOs.add(MobileOsType.android);
+                              } else {
+                                _selectedOs.remove(MobileOsType.android);
+                              }
+                            });
+                          }),
+                      Text(
+                        'Mobile Service',
+                        style: TextStyle(fontSize: 14, fontWeight: _mobileCheck ? FontWeight.bold : FontWeight.normal),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            )
           ],
         ));
+  }
+
+  Widget _mobileOsSection() {
+    bool android = false;
+    bool ios = false;
+    return StatefulBuilder(
+      builder: (context, setState) => Container(
+        height: 280,
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+                child: Text(
+              "모바일 OS",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            )),
+            const Gap(10),
+            SizedBox(
+                width: MediaQuery.sizeOf(context).width - 40,
+                height: 180,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 40),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            height: 50,
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                    value: android,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        android = value!;
+                                      });
+                                    }),
+                                Text(
+                                  'Android OS',
+                                  style: TextStyle(
+                                      fontSize: 14, fontWeight: android ? FontWeight.bold : FontWeight.normal),
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 30,
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                    value: ios,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        ios = value!;
+                                      });
+                                    }),
+                                Text(
+                                  'IOS',
+                                  style: TextStyle(
+                                      fontSize: 14, fontWeight: ios ? FontWeight.bold : FontWeight.normal),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          flex: 3,
+                          child: SizedBox(
+                            height: 50,
+                            width: (MediaQuery.sizeOf(context).width - 40) * 0.3,
+                            child: OutlinedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: Theme.of(context).primaryColor),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)
+                                )
+                              ),
+                              child: Text("취소"),
+                            ),
+                          ),
+                        ),
+                        const Gap(20),
+                        Flexible(
+                          flex: 7,
+                          child: SizedBox(
+                            height: 50,
+                            width: (MediaQuery.sizeOf(context).width - 40) * 0.7,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (!ios && !android) {
+                                  Get.snackbar("알림", "OS를 선택해주세요.");
+                                  return;
+                                }
+
+                                Navigator.pop(context, {'android': android, 'ios': ios});
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)
+                                )
+                              ),
+                              child: Text("확인", style: TextStyle(color: Colors.white)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                )),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _serviceUrlSection() {
@@ -525,20 +734,20 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
           SizedBox(
             child: Column(
               children: [
-                if (!_webCheck && _mobileCheck)
+                if (!_webCheck && !_mobileCheck)
                   SizedBox(
                       height: 60,
                       width: MediaQuery.sizeOf(context).width - 40,
                       child: Center(child: Text('플랫폼을 선택해 주세요.', style: TextStyle(fontSize: 16, color: Colors.grey)))),
-                if (_webCheck)
-                  _urlTextFiled(context, '웹사이트', _webUrlController),
+                if (_webCheck) _urlTextFiled(context, '웹사이트', _webUrlController),
                 if (_mobileCheck)
-                  _urlTextFiled(context, 'URL', _gameUrlController),
-                // Todo : iOS, Android 추가 및 카테고리 추가
-                // if (_iosCheck)
-                //   _urlTextFiled(context, 'App Store', _iosUrlController),
-                // if (_androidCheck)
-                //   _urlTextFiled(context, 'Play Store', _androidUrlController),
+                  Column(
+                    children: [
+                      if(_androidCheck)
+                      _urlTextFiled(context, 'Play Store', _androidUrlController),
+                      if(_iosCheck)
+                      _urlTextFiled(context, 'App Store', _iosUrlController)
+                    ])
               ],
             ),
           )
@@ -601,7 +810,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                   height: 50,
                   width: 150,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_titleController.text.isEmpty ||
                           _subtitleController.text.isEmpty ||
                           _contentController.text.isEmpty) {
@@ -612,35 +821,51 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }
-                      if (_webCheck && _webUrlController.text.isEmpty ||
-
-                          _mobileCheck && _androidUrlController.text.isEmpty) {
-                        // todo : 모바일 선택시 os 선택하는 기능 추가 필요.
-                        Get.snackbar("알림", "URL을 입력해주세요.");
+                      if (_webCheck && _webUrlController.text.isEmpty) {
+                        Get.snackbar("알림", "Web Service URL을 입력해주세요.");
                         return;
                       }
+                      if (_mobileCheck) {
+                        if(_androidCheck && _androidUrlController.text.isEmpty){
+                          Get.snackbar("알림", "Play Store URL을 입력해주세요.");
+                          return;
+                        }
+                        if(_iosCheck && _iosUrlController.text.isEmpty){
+                          Get.snackbar("알림", "App Store URL을 입력해주세요.");
+                          return;
+                        }
+                      }
                       final domain = <String>[];
-                      // if (_webCheck) {
-                      //   domain.add(_webUrlController.text);
-                      // } else if (_gameCheck) {
-                      //   domain.add(_gameUrlController.text);
-                      // } else {
-                      //   if (_iosCheck) {
-                      //     domain.add(_iosUrlController.text);
-                      //   }
-                      //   if (_androidCheck) {
-                      //     domain.add(_androidUrlController.text);
-                      //   }
-                      // }
+                      if (_webCheck) {
+                        domain.add(_webUrlController.text);
+                      } else {
+                        if (_iosCheck) {
+                          domain.add(_iosUrlController.text);
+                        }
+                        if (_androidCheck) {
+                          domain.add(_androidUrlController.text);
+                        }
+                      }
 
                       List<ImageEntity> postImage = [];
+                      final dir = await getTemporaryDirectory();
+
                       if (_selectedImages.isNotEmpty) {
-                        postImage = _selectedImages.map((e) => ImageEntity(url: e.path)).toList();
+                        postImage = await Future.wait(
+                          _selectedImages.map((e) async {
+                            final newPath = '${dir.path}/${path.basename(e.path)}';
+                            final copiedFile = await File(e.path).copy(newPath);
+                            return ImageEntity(
+                              isLocal: true,
+                              url: copiedFile.path, // 실제 존재하는 파일 경로
+                            );
+                          }),
+                        );
                       }
-                      if(widget.post != null){
+                      if (widget.post != null) {
                         postImage.addAll(widget.post!.images!);
                       }
-                      if(_deleteImages.isNotEmpty) {
+                      if (_deleteImages.isNotEmpty) {
                         postImage.removeWhere((element) => _deleteImages.contains(element));
                       }
 
@@ -648,7 +873,10 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         title: _titleController.text,
                         subtitle: _subtitleController.text,
                         contents: _contentController.text,
+                        category: _selectedCategory,
                         platform: _selectedPlatform,
+                        mobileOs: _mobileCheck ? _selectedOs : null,
+                        author: context.read<UserProvider>().user!,
                         domain: domain,
                         images: postImage,
                       );
@@ -679,35 +907,42 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
                         return;
                       }
-                      // if (_webCheck && _webUrlController.text.isEmpty ||
-                      //     _gameCheck && _gameUrlController.text.isEmpty ||
-                      //     _iosCheck && _iosUrlController.text.isEmpty ||
-                      //     _androidCheck && _androidUrlController.text.isEmpty) {
-                      //   Get.snackbar("알림", "URL을 입력해주세요.");
-                      //   return;
-                      // }
+                      if (_webCheck && _webUrlController.text.isEmpty) {
+                        Get.snackbar("알림", "Web Service URL을 입력해주세요.");
+                        return;
+                      }
+                      if (_mobileCheck) {
+                        if(_androidCheck && _androidUrlController.text.isEmpty){
+                          Get.snackbar("알림", "Play Store URL을 입력해주세요.");
+                          return;
+                        }
+                        if(_iosCheck && _iosUrlController.text.isEmpty){
+                          Get.snackbar("알림", "App Store URL을 입력해주세요.");
+                          return;
+                        }
+                      }
+                      final domain = <String>[];
+                      if (_webCheck) {
+                        domain.add(_webUrlController.text);
+                      } else {
+                        if (_iosCheck) {
+                          domain.add(_iosUrlController.text);
+                        }
+                        if (_androidCheck) {
+                          domain.add(_androidUrlController.text);
+                        }
+                      }
 
                       try {
                         // context.read<RecruitPostBloc>().add(PostDataLoadEvent());
                         // final token = context.read<UserProvider>().token!;
-                        final domain = <String>[];
-                        // if (_webCheck) {
-                        //   domain.add(_webUrlController.text);
-                        // } else if (_gameCheck) {
-                        //   domain.add(_gameUrlController.text);
-                        // } else {
-                        //   if (_iosCheck) {
-                        //     domain.add(_iosUrlController.text);
-                        //   }
-                        //   if (_androidCheck) {
-                        //     domain.add(_androidUrlController.text);
-                        //   }
-                        // }
                         final post = PromotionPostEntity(
                           title: _titleController.text,
                           subtitle: _subtitleController.text,
                           contents: _contentController.text,
+                          category: _selectedCategory,
                           platform: _selectedPlatform,
+                          mobileOs: _mobileCheck ? _selectedOs : null,
                           author: context.read<UserProvider>().user!,
                           domain: domain,
                           period: 7,
@@ -740,39 +975,46 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }
-                      // if (_selectedImages.isEmpty) {
-                      //   Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
-                      //   return;
-                      // }
-                      // if (_webCheck && _webUrlController.text.isEmpty ||
-                      //     _gameCheck && _gameUrlController.text.isEmpty ||
-                      //     _iosCheck && _iosUrlController.text.isEmpty ||
-                      //     _androidCheck && _androidUrlController.text.isEmpty) {
-                      //   Get.snackbar("알림", "URL을 입력해주세요.");
-                      //   return;
-                      // }
+                      if (_existedImages.isEmpty && _selectedImages.isEmpty) {
+                        Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
+                        return;
+                      }
+                      if (_webCheck && _webUrlController.text.isEmpty) {
+                        Get.snackbar("알림", "Web Service URL을 입력해주세요.");
+                        return;
+                      }
+                      if (_mobileCheck) {
+                        if(_androidCheck && _androidUrlController.text.isEmpty){
+                          Get.snackbar("알림", "Play Store URL을 입력해주세요.");
+                          return;
+                        }
+                        if(_iosCheck && _iosUrlController.text.isEmpty){
+                          Get.snackbar("알림", "App Store URL을 입력해주세요.");
+                          return;
+                        }
+                      }
+                      final domain = <String>[];
+                      if (_webCheck) {
+                        domain.add(_webUrlController.text);
+                      } else {
+                        if (_iosCheck) {
+                          domain.add(_iosUrlController.text);
+                        }
+                        if (_androidCheck) {
+                          domain.add(_androidUrlController.text);
+                        }
+                      }
 
                       try {
-                        final domain = <String>[];
-                        // if (_webCheck) {
-                        //   domain.add(_webUrlController.text);
-                        // } else if (_gameCheck) {
-                        //   domain.add(_gameUrlController.text);
-                        // } else {
-                        //   if (_iosCheck) {
-                        //     domain.add(_iosUrlController.text);
-                        //   }
-                        //   if (_androidCheck) {
-                        //     domain.add(_androidUrlController.text);
-                        //   }
-                        // }
 
                         final post = PromotionPostEntity(
                             id: widget.post!.id,
                             title: _titleController.text,
                             subtitle: _subtitleController.text,
                             contents: _contentController.text,
+                            category: _selectedCategory,
                             platform: _selectedPlatform,
+                            mobileOs: _mobileCheck ? _selectedOs : null,
                             status: widget.post!.status,
                             period: widget.post!.period,
                             domain: domain,

@@ -108,7 +108,7 @@ class TypeConversionUtil {
       case PostCategory.photography:
         return "사진";
       case PostCategory.social:
-        return "사회";
+        return "소셜/커뮤니티";
       case PostCategory.shopping:
         return "쇼핑";
       case PostCategory.entertainment:

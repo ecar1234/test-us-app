@@ -19,8 +19,11 @@ import 'package:test_us_app/presentation/provider/post_provider/base_post_provid
 import 'package:url_launcher/url_launcher.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../data/models/application/application_model.dart';
+import '../../../../domain/entities/image_entity.dart';
 import '../../../../services/common_height_provider.dart';
 import '../../../../utils/linkfy_util.dart';
+import '../../../../utils/type_conversion_util.dart';
 import '../../../bloc/post_blocs/promotion_bloc/promotion_event.dart';
 import '../../../provider/user_provider.dart';
 
@@ -152,39 +155,7 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                   : SizedBox()
             ],
             flexibleSpace: FlexibleSpaceBar(
-                background: post.images!.length == 1 ? CachedNetworkImage(imageUrl: post.images![0].url!,
-                    fit: BoxFit.fitHeight, height: double.infinity, width: double.infinity) :CarouselSlider(
-                        items: post.images!.map((e) {
-                          if (e.filename == null) {
-                            return Image.file(
-                              File(e.url!),
-                              fit: BoxFit.fitHeight,
-                              height: double.infinity,
-                              width: double.infinity,
-                            );
-                          } else {
-                            return CachedNetworkImage(imageUrl: e.url!,
-                                fit: BoxFit.fitHeight, height: double.infinity, width: double.infinity,
-                              progressIndicatorBuilder: (context, url, downloadProgress) {
-                                return Shimmer.fromColors(
-                                  baseColor: Colors.grey.shade300,
-                                  highlightColor: Colors.grey.shade100,
-                                  child: Container(
-                                    height: double.infinity,
-                                    width: double.infinity,
-                                    color: Colors.white,
-                                  ),
-                                );
-                              }
-                            );
-                          }
-                        }).toList(),
-                        options: CarouselOptions(
-                          autoPlay: false,
-                          viewportFraction: 1.0,
-                          height: 250,
-                        ),
-                      ))),
+                background: _buildImages(post.images!))),
         SliverToBoxAdapter(
           key: const ValueKey("postValue"),
           child: Container(
@@ -199,78 +170,68 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                   post.title!,
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 )),
-                const Gap(10),
+                const Gap(5),
                 SizedBox(child: Text(post.subtitle!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                const Gap(5),
+                Row(
+                  children: [
+                    Text("카테고리"),
+                    const Gap(10),
+                    Container(
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          TypeConversionUtil().postCategoryToString(post.category!),
+                        )),
+                  ],
+                ),
+                Row(
+                    children: [
+                      Text("플랫폼"),
+                      const Gap(10),
+                      Text(post.platform!.name.toUpperCase()),
+                      const Gap(5),
+                      if (post.platform! == ApplicationPlatform.mobile)
+                        SizedBox(
+                          child: Text(
+                            "( ${TypeConversionUtil().getPostOs(post.mobileOs!)} )",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.grey.shade600,
+                                overflow: TextOverflow.ellipsis),
+                          ),
+                        ),
+                    ]
+                ),
                 const Gap(10),
                 SizedBox(
                   child: Row(
                     children: [
-                      // if (isAuthor)
-                      //   SizedBox(
-                      //       child: Row(
-                      //     children: [
-                      //       SizedBox(
-                      //         height: 30,
-                      //         width: 30,
-                      //         child: CircleAvatar(
-                      //           radius: 40,
-                      //           backgroundImage:post.author!.profileImg!.url!.isNotEmpty ? CachedNetworkImageProvider(
-                      //             post.author!.profileImg!.url!,
-                      //           ) : const AssetImage('assets/images/Generic Profile.png')
-                      //         ),
-                      //       ),
-                      //       Text(
-                      //         '${post.author!.nickname}',
-                      //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      //       ),
-                      //     ],
-                      //   ))
-                      if (post.author == null)
-                        SizedBox(
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  height: 30,
-                                  width: 30,
-                                  child: CircleAvatar(
-                                      radius: 40,
-                                      backgroundImage:( user!.profileImg!.url!.isNotEmpty ? CachedNetworkImageProvider(
-                                        user.profileImg!.url!,
-                                      ) : const AssetImage('assets/images/Generic Profile.png')) as ImageProvider
-                                  ),
-                                ),
-                                const Gap(5),
-                                Text(
-                                  '${context.read<UserProvider>().user!.nickname}',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ))
-                      else
-                        SizedBox(
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  height: 30,
-                                  width: 30,
-                                  child: CircleAvatar(
-                                      radius: 40,
-                                      backgroundImage: post.author!.profileImg!.url!.isNotEmpty ? CachedNetworkImageProvider(
-                                        post.author!.profileImg!.url!,
-                                      ) : const AssetImage('assets/images/Generic avatar.png') as ImageProvider
-                                  ),
-                                ),
-                                const Gap(5),
-                                Text(
-                                  '${post.author!.nickname}',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            )),
-                      const Gap(10),
                       SizedBox(
-                        child: Text(post.platform!.name.toUpperCase())
-                      ),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                height: 30,
+                                width: 30,
+                                child: CircleAvatar(
+                                    radius: 40,
+                                    backgroundImage: post.author!.profileImg == null
+                                        ? const AssetImage('assets/images/Generic avatar.png')
+                                        : CachedNetworkImageProvider(
+                                      post.author!.profileImg!.url!,
+                                    ) as ImageProvider),
+                              ),
+                              const Gap(5),
+                              Text(
+                                '${post.author!.nickname}',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          )),
                     ],
                   ),
                 ),
@@ -352,6 +313,57 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       Get.snackbar('알림', '존재하지 않는 주소입니다.');
+    }
+  }
+
+  Widget _buildImages (List<ImageEntity> images){
+    if(images.length == 1){
+      if(images[0].isLocal == true){
+        return Image.file(File(images[0].url!), fit: BoxFit.fitHeight,
+          height: double.infinity,
+          width: double.infinity,);
+      }else {
+        return CachedNetworkImage(
+          imageUrl: images[0].url!,
+          fit: BoxFit.fitHeight,
+          height: double.infinity,
+          width: double.infinity,
+        );
+      }
+    } else {
+      return CarouselSlider(
+        items: images.map((e) {
+          if (e.isLocal == true) {
+            return Image.file(
+              File(e.url!),
+              fit: BoxFit.fitHeight,
+              height: double.infinity,
+              width: double.infinity,
+            );
+          } else {
+            return CachedNetworkImage(
+                imageUrl: e.url!,
+                fit: BoxFit.fitHeight,
+                height: double.infinity,
+                width: double.infinity,
+                progressIndicatorBuilder: (context, url, downloadProgress) {
+                  return Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        height: double.infinity,
+                        width: double.infinity,
+                        color: Colors.white,
+                      ));
+                });
+          }
+        }).toList(),
+        options: CarouselOptions(
+          autoPlay: false,
+          viewportFraction: 1.0,
+          height: 250,
+        ),
+      );
     }
   }
 }

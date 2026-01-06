@@ -633,7 +633,7 @@ class _HomePageState extends State<HomePage> {
                                                 overflow: TextOverflow.ellipsis),
                                           ),
                                         ),
-                                        if (posts[idx].platform == 'MOBILE')
+                                        if (posts[idx].platform == ApplicationPlatform.mobile)
                                           SizedBox(
                                             child: Text(
                                               "( ${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)} )",

@@ -67,10 +67,16 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
       subtitleController.text = widget.post!.subtitle!;
       contentController.text = widget.post!.contents!;
       _selectedPlatform = widget.post!.platform!;
-      _selectedOs = widget.post!.mobileOs != null ? widget.post!.mobileOs! : [];
+      _selectedOs = widget.post!.platform != ApplicationPlatform.mobile ? widget.post!.mobileOs! : [];
       _selectedCategory = widget.post!.category;
       if (widget.post!.images != null && widget.post!.images!.isNotEmpty) {
         _existedImages = widget.post!.images!;
+      }
+      if (_selectedPlatform == ApplicationPlatform.web) {
+        _webCheck = true;
+      }
+      if (_selectedPlatform == ApplicationPlatform.mobile) {
+        _mobileCheck = true;
       }
     }
   }
@@ -721,7 +727,6 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                             );
                           }),
                         );
-
                       }
                       if(widget.post != null){
                         postImage.addAll(widget.post!.images!);
