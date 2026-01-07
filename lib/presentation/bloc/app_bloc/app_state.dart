@@ -20,8 +20,9 @@ class AppState {
   UserAppState state;
   ApplicationEntity? application;
   List<ApplicationEntity>? applications;
+  RecruitPostEntity? post;
 
-  AppState({this.state = UserAppState.startServiceState, this.application, this.applications});
+  AppState({this.state = UserAppState.startServiceState, this.application, this.applications, this.post});
 }
 
 class GetRecruitApplicationsState extends AppState {

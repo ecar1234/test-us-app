@@ -9,17 +9,17 @@ class ApplicationUseCase {
   final ApplicationRepository repository;
   ApplicationUseCase(this.repository);
 
-  Future<ApplicationEntity> requestApply(String token, ApplicationEntity app) async {
+  Future<Map<String, dynamic>> requestApply(String token, ApplicationEntity app) async {
     final res = await repository.requestApply(token, app);
     return res;
   }
 
-  Future<ApplicationEntity> cancelApply(String token, int appId) async {
+  Future<Map<String, dynamic>> cancelApply(String token, int appId) async {
     final res = await repository.applyCancel(token, appId);
     return res;
   }
 
-  Future<ApplicationEntity> updateApplication(String token, ApplicationEntity app) async {
+  Future<Map<String, dynamic>> updateApplication(String token, ApplicationEntity app) async {
     final res = await repository.updateApplication(token, app);
     return res;
   }

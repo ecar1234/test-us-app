@@ -189,7 +189,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         ),
         BlocListener<AppBloc, AppState>(
             listener: (context, state) async {
-              context.read<ApplicationProvider>().getMyApplications(state.applications!);
+              context.read<ApplicationProvider>().setMyApplications(state.applications!);
 
               final postIds = state.applications!.map((e) => e.postId!).toList();
               final token = context.read<UserProvider>().token ?? '';

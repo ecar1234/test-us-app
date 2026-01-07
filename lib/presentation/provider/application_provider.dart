@@ -17,7 +17,7 @@ class ApplicationProvider with ChangeNotifier{
   List<RecruitPostEntity>? get userApplicationPosts => _userApplicationPosts;
 
 
-  void getMyApplications(List<ApplicationEntity> applications) async {
+  void setMyApplications(List<ApplicationEntity> applications) async {
     _userApplications ??= applications;
     notifyListeners();
   }

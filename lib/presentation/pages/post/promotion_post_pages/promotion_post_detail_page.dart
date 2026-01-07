@@ -154,8 +154,20 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                     )
                   : SizedBox()
             ],
-            flexibleSpace: FlexibleSpaceBar(
-                background: _buildImages(post.images!))),
+            flexibleSpace: LayoutBuilder(
+              builder: (context, constraints) {
+                final percent = (constraints.biggest.height - kToolbarHeight) / 100;
+                final opacity = percent.clamp(0.0, 1.0);
+                return FlexibleSpaceBar(
+                    title: Opacity(
+                        opacity: 1 - opacity,
+                        child: Text(
+                          post.title!,
+                          overflow: TextOverflow.ellipsis,
+                        )),
+                    background: _buildImages(post.images!));
+              },
+            )),
         SliverToBoxAdapter(
           key: const ValueKey("postValue"),
           child: Container(
@@ -188,50 +200,48 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                         )),
                   ],
                 ),
-                Row(
-                    children: [
-                      Text("플랫폼"),
-                      const Gap(10),
-                      Text(post.platform!.name.toUpperCase()),
-                      const Gap(5),
-                      if (post.platform! == ApplicationPlatform.mobile)
-                        SizedBox(
-                          child: Text(
-                            "( ${TypeConversionUtil().getPostOs(post.mobileOs!)} )",
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.grey.shade600,
-                                overflow: TextOverflow.ellipsis),
-                          ),
-                        ),
-                    ]
-                ),
+                Row(children: [
+                  Text("플랫폼"),
+                  const Gap(10),
+                  Text(post.platform!.name.toUpperCase()),
+                  const Gap(5),
+                  if (post.platform! == ApplicationPlatform.mobile)
+                    SizedBox(
+                      child: Text(
+                        "( ${TypeConversionUtil().getPostOs(post.mobileOs!)} )",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.grey.shade600,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                ]),
                 const Gap(10),
                 SizedBox(
                   child: Row(
                     children: [
                       SizedBox(
                           child: Row(
-                            children: [
-                              SizedBox(
-                                height: 30,
-                                width: 30,
-                                child: CircleAvatar(
-                                    radius: 40,
-                                    backgroundImage: post.author!.profileImg == null
-                                        ? const AssetImage('assets/images/Generic avatar.png')
-                                        : CachedNetworkImageProvider(
-                                      post.author!.profileImg!.url!,
-                                    ) as ImageProvider),
-                              ),
-                              const Gap(5),
-                              Text(
-                                '${post.author!.nickname}',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          )),
+                        children: [
+                          SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: CircleAvatar(
+                                radius: 40,
+                                backgroundImage: post.author!.profileImg == null
+                                    ? const AssetImage('assets/images/Generic avatar.png')
+                                    : CachedNetworkImageProvider(
+                                        post.author!.profileImg!.url!,
+                                      ) as ImageProvider),
+                          ),
+                          const Gap(5),
+                          Text(
+                            '${post.author!.nickname}',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      )),
                     ],
                   ),
                 ),
@@ -316,13 +326,16 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
     }
   }
 
-  Widget _buildImages (List<ImageEntity> images){
-    if(images.length == 1){
-      if(images[0].isLocal == true){
-        return Image.file(File(images[0].url!), fit: BoxFit.fitHeight,
+  Widget _buildImages(List<ImageEntity> images) {
+    if (images.length == 1) {
+      if (images[0].isLocal == true) {
+        return Image.file(
+          File(images[0].url!),
+          fit: BoxFit.fitHeight,
           height: double.infinity,
-          width: double.infinity,);
-      }else {
+          width: double.infinity,
+        );
+      } else {
         return CachedNetworkImage(
           imageUrl: images[0].url!,
           fit: BoxFit.fitHeight,

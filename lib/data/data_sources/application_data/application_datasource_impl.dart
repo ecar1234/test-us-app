@@ -27,11 +27,13 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
   }
 
   @override
-  Future<ApplicationModel> applyCancel(String token, int appId) async {
+  Future<Map<String, dynamic>> applyCancel(String token, int appId) async {
     final res = await netDriver.requestPutJson(token, ApplicationApi.cancel, {'applicationId': appId.toString()});
     if(res['status'] == 200){
-      final application = ApplicationModel.fromJson(res['application']);
-      return application;
+      final applicationData = ApplicationModel.fromJson(res['application']);
+      final post = RecruitPostModel.fromJson(res['newPost']);
+
+      return {'application': applicationData, 'post': post};
     }else {
       throw Exception('Error');
     }
@@ -61,11 +63,13 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
   }
 
   @override
-  Future<ApplicationModel> requestApply(String token, ApplicationModel application) async {
+  Future<Map<String, dynamic>> requestApply(String token, ApplicationModel application) async {
     final res = await netDriver.requestPostJson(token, ApplicationApi.application, application.toJson());
     if(res['status'] == 200){
       final applicationData = ApplicationModel.fromJson(res['application']);
-      return applicationData;
+      final post = RecruitPostModel.fromJson(res['newPost']);
+
+      return {'application': applicationData, 'post': post};
     }else {
       throw Exception('Error');
     }
@@ -73,12 +77,14 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
   }
 
   @override
-  Future<ApplicationModel> updateApplication(String token, ApplicationModel application) async {
+  Future<Map<String, dynamic>> updateApplication(String token, ApplicationModel application) async {
     try {
       final res = await netDriver.requestPutJson(token, ApplicationApi.update, application.toJson());
       if(res['status'] == 200){
         final applicationData = ApplicationModel.fromJson(res['application']);
-        return applicationData;
+        final post = RecruitPostModel.fromJson(res['newPost']);
+
+        return {'application': applicationData, 'post': post};
       }else {
         throw Exception('Error');
       }

@@ -186,8 +186,18 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                     )
                   : SizedBox()
             ],
-            flexibleSpace: FlexibleSpaceBar(
-                background: _buildImages(post.images!))),
+            flexibleSpace: LayoutBuilder(
+              builder: (context, constraints) {
+                final percent =
+                    (constraints.biggest.height - kToolbarHeight) / 100;
+                final opacity = percent.clamp(0.0, 1.0);
+                return FlexibleSpaceBar(
+                    title: Opacity(
+                      opacity: 1-opacity,
+                        child: Text(post.title!, overflow: TextOverflow.ellipsis,)),
+                    background: _buildImages(post.images!));
+              },
+            )),
         SliverToBoxAdapter(
           key: const ValueKey("postValue"),
           child: Container(
@@ -286,25 +296,29 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                 const Gap(40),
                 if (post.author != null && post.author!.id != user?.id)
                   MultiBlocListener(listeners: [
-                    BlocListener<AppBloc, AppState>(listener: (context, state) {
-                      if (state.state == UserAppState.applicationCompletedState ||
-                          state.state == UserAppState.applicationUpdateCompletedState ||
-                          state.state == UserAppState.applicationCancelCompletedState) {
-                        //Todo : application 업데이트 수정 필요
+                    //Todo : multiListener 구조를 변경해야한다.
+                    BlocListener<AppBloc, AppState>(
+                        listener: (context, state) {
+                      if (state.state == UserAppState.applicationCompletedState) {
                         context.read<ApplicationProvider>().requestApply(state.application!);
-                        context
-                            .read<RecruitPostBloc>()
-                            .add(RequestPostDataEvent(context.read<UserProvider>().token!, post.id!));
                       }
+                      if(state.state == UserAppState.applicationUpdateCompletedState ){
+                        context.read<ApplicationProvider>().requestUpdateApplication(state.application!);
+                      }
+                      if(state.state == UserAppState.applicationCancelCompletedState){
+                        context.read<ApplicationProvider>().cancelApplication(state.application!);
+                      }
+                      context.read<BasePostProvider>().updateRecruitPost(state.post!);
                     }),
-                    BlocListener<RecruitPostBloc, RecruitPostState>(
-                      listener: (context, state) {
-                        context.read<BasePostProvider>().updateRecruitPost(state.post!);
-                      },
-                      listenWhen: (previous, current) =>
-                          current.state == RecruitPostLoadState.getPostByIdCompletedState,
-                    ),
-                  ], child: _applicationSection(context))
+                    // BlocListener<RecruitPostBloc, RecruitPostState>(
+                    //   listener: (context, state) {
+                    //     context.read<BasePostProvider>().updateRecruitPost(state.post!);
+                    //   },
+                    //   listenWhen: (previous, current) =>
+                    //       current.state == RecruitPostLoadState.getPostByIdCompletedState,
+                    // ),
+                  ], child: _applicationSection(context, post)),
+                const Gap(40)
               ],
             ),
           ),
@@ -313,21 +327,22 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
     );
   }
 
-  Widget _applicationSection(BuildContext context) {
+  Widget _applicationSection(BuildContext context, RecruitPostEntity post) {
     final isLogged = context.watch<UserProvider>().isLogged ?? false;
 
     // if (app.id == null) return _beforeApplicationSection(context, initPostData);
-    return Selector<BasePostProvider, RecruitPostEntity>(selector: (context, provider) {
-      final post = provider.recruitPosts!.firstWhere((e) => e.id == widget.postId!);
+    return Selector<ApplicationProvider, ApplicationEntity>(selector: (context, provider) {
+      final post = provider.userApplications!.firstWhere((e) => e.postId == widget.postId!);
       return post;
-    }, builder: (context, post, child) {
+    }, builder: (context, application, child) {
       if (!isLogged) return _beforeApplicationSection(context, post);
 
       final applications = context.read<ApplicationProvider>().userApplications ?? [];
       final user = context.read<UserProvider>().user!;
       final app = applications.firstWhere((e) => e.postId == post.id && e.applicantId == user.id,
           orElse: () => ApplicationEntity());
-
+// todo : 신청은 정상 작동, 취소 시 새로 받아오는 post application state가 pending으로 나옴(서버 확인)
+// todo : 서버에서 mobileOs가 DB에 저장 안됨(서버확인
       switch (app.status) {
         case ApplicationStatus.pending:
         case ApplicationStatus.accepted:
@@ -341,6 +356,39 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
   }
 
   Widget _afterApplicationSection(BuildContext context, RecruitPostEntity post) {
+    if (post.platform! == ApplicationPlatform.web){
+      return SizedBox(
+          height: 60,
+          width: MediaQuery.sizeOf(context).width - 40,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Selector<ApplicationProvider, ApplicationEntity>(
+                selector: (context, provider) => provider.userApplications!.firstWhere((e) => e.postId == post.id),
+                builder: (context, app, child) => Flexible(
+                  flex:  3,
+                  child: SizedBox(
+                    width: (MediaQuery.sizeOf(context).width-40)*0.7,
+                    height: 50,
+                    child: OutlinedButton(
+                        onPressed: () async {
+                          final token = context.read<UserProvider>().token ?? '';
+                          final appId = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
+                            return element.postId == post.id;
+                          }).id!;
+
+                          context.read<AppBloc>().add(RequestCancelEvent(token, appId));
+                        },
+                        style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Theme.of(context).primaryColor),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                        child: Text('취소')),
+                  ),
+                ),
+              ),
+            ],
+          ));
+    }
     return SizedBox(
         height: 60,
         width: MediaQuery.sizeOf(context).width - 40,
@@ -349,142 +397,149 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
           children: [
             Selector<ApplicationProvider, ApplicationEntity>(
               selector: (context, provider) => provider.userApplications!.firstWhere((e) => e.postId == post.id),
-              builder: (context, app, child) => SizedBox(
-                width: 100,
-                height: 50,
-                child: ElevatedButton(
-                    onPressed: () async {
-                      final token = context.read<UserProvider>().token ?? '';
-                      final appId = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
-                        return element.postId == post.id;
-                      }).id!;
+              builder: (context, app, child) => Flexible(
+                flex:  3,
+                child: SizedBox(
+                  width: (MediaQuery.sizeOf(context).width-40)*0.3,
+                  height: 50,
+                  child: OutlinedButton(
+                      onPressed: () async {
+                        final token = context.read<UserProvider>().token ?? '';
+                        final appId = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
+                          return element.postId == post.id;
+                        }).id!;
 
-                      context.read<AppBloc>().add(RequestCancelEvent(token, appId));
-                    },
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: Text('취소')),
+                        context.read<AppBloc>().add(RequestCancelEvent(token, appId));
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Theme.of(context).primaryColor),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      child: Text('취소')),
+                ),
               ),
             ),
             const Gap(20),
-            if (post.platform! == ApplicationPlatform.mobile)
-              SizedBox(
-                width: 200,
-                height: 50,
-                child: ElevatedButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                          context: context,
-                          barrierColor: null,
-                          builder: (context) {
-                            bool isIos = false;
-                            bool isAndroid = false;
-                            bool isAndroidDevice = Platform.isAndroid;
+              Flexible(
+                flex: 7,
+                child: SizedBox(
+                  width: (MediaQuery.sizeOf(context).width-40)*0.7,
+                  height: 50,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                            context: context,
+                            barrierColor: null,
+                            builder: (context) {
+                              bool isIos = false;
+                              bool isAndroid = false;
+                              bool isAndroidDevice = Platform.isAndroid;
 
-                            final prevApp = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
-                              return element.postId == post.id &&
-                                  element.applicantId == context.read<UserProvider>().user!.id;
-                            });
-                            if (prevApp.mobileOs == MobileOsType.ios) {
-                              isIos = true;
-                              isAndroid = false;
-                            }
-                            if (prevApp.mobileOs == MobileOsType.android) {
-                              isAndroid = true;
-                              isIos = false;
-                            }
+                              final prevApp = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
+                                return element.postId == post.id &&
+                                    element.applicantId == context.read<UserProvider>().user!.id;
+                              });
+                              if (prevApp.mobileOs == MobileOsType.ios) {
+                                isIos = true;
+                                isAndroid = false;
+                              }
+                              if (prevApp.mobileOs == MobileOsType.android) {
+                                isAndroid = true;
+                                isIos = false;
+                              }
 
-                            return StatefulBuilder(
-                              builder: (context, state) => Container(
-                                  height: 300,
-                                  width: MediaQuery.sizeOf(context).width,
-                                  padding: EdgeInsets.all(20),
-                                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                    SizedBox(
-                                        child: Text('테스트 진행 할 플랫폼을 선택해 주세요.',
-                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-                                    SizedBox(
-                                        child: Text(' (Device와 동일한 OS만 선택이 가능합니다.)',
-                                            style: TextStyle(fontSize: 14, color: Colors.grey))),
-                                    const Gap(20),
-                                    SizedBox(
-                                        child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          child: Row(children: [
-                                            Checkbox(
-                                                value: isIos,
-                                                onChanged: isAndroidDevice
-                                                    ? null
-                                                    : (value) {
-                                                        state(() {
-                                                          isIos = value!;
-                                                          isAndroid = false;
-                                                        });
-                                                      }),
-                                            Text("IOS",
-                                                style: TextStyle(
-                                                    fontSize: 16, color: isAndroidDevice ? Colors.grey : Colors.black))
-                                          ]),
+                              return StatefulBuilder(
+                                builder: (context, state) => Container(
+                                    height: 300,
+                                    width: MediaQuery.sizeOf(context).width,
+                                    padding: EdgeInsets.all(20),
+                                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                      SizedBox(
+                                          child: Text('테스트 진행 할 플랫폼을 선택해 주세요.',
+                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                                      SizedBox(
+                                          child: Text(' (Device와 동일한 OS만 선택이 가능합니다.)',
+                                              style: TextStyle(fontSize: 14, color: Colors.grey))),
+                                      const Gap(20),
+                                      SizedBox(
+                                          child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            child: Row(children: [
+                                              Checkbox(
+                                                  value: isIos,
+                                                  onChanged: isAndroidDevice
+                                                      ? null
+                                                      : (value) {
+                                                          state(() {
+                                                            isIos = value!;
+                                                            isAndroid = false;
+                                                          });
+                                                        }),
+                                              Text("IOS",
+                                                  style: TextStyle(
+                                                      fontSize: 16, color: isAndroidDevice ? Colors.grey : Colors.black))
+                                            ]),
+                                          ),
+                                          SizedBox(
+                                            child: Row(children: [
+                                              Checkbox(
+                                                  value: isAndroid,
+                                                  onChanged: isAndroidDevice
+                                                      ? (value) {
+                                                          state(() {
+                                                            isAndroid = value!;
+                                                            isIos = false;
+                                                          });
+                                                        }
+                                                      : null),
+                                              Text("Android",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: isAndroidDevice ? Colors.black87 : Colors.grey))
+                                            ]),
+                                          )
+                                        ],
+                                      )),
+                                      const Gap(20),
+                                      SizedBox(
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            if (prevApp.mobileOs == MobileOsType.ios && isAndroidDevice == false) {
+                                              Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
+                                              return;
+                                            }
+                                            if (prevApp.mobileOs == MobileOsType.android && isAndroidDevice == true) {
+                                              Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
+                                              return;
+                                            }
+                                            final token = context.read<UserProvider>().token ?? '';
+                                            final userId = context.read<UserProvider>().user!.id;
+                                            final app = ApplicationEntity(
+                                                id: prevApp.id,
+                                                platform: prevApp.platform,
+                                                mobileOs: isAndroid ? MobileOsType.android : MobileOsType.ios,
+                                                status: ApplicationStatus.pending,
+                                                postId: post.id,
+                                                applicantId: userId);
+
+                                            context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
+                                            if (context.mounted) Navigator.pop(context);
+                                          },
+                                          child: Text("변경하기"),
                                         ),
-                                        SizedBox(
-                                          child: Row(children: [
-                                            Checkbox(
-                                                value: isAndroid,
-                                                onChanged: isAndroidDevice
-                                                    ? (value) {
-                                                        state(() {
-                                                          isAndroid = value!;
-                                                          isIos = false;
-                                                        });
-                                                      }
-                                                    : null),
-                                            Text("Android",
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: isAndroidDevice ? Colors.black87 : Colors.grey))
-                                          ]),
-                                        )
-                                      ],
-                                    )),
-                                    const Gap(20),
-                                    SizedBox(
-                                      child: ElevatedButton(
-                                        onPressed: () async {
-                                          if (prevApp.mobileOs == MobileOsType.ios && isAndroidDevice == false) {
-                                            Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
-                                            return;
-                                          }
-                                          if (prevApp.mobileOs == MobileOsType.android && isAndroidDevice == true) {
-                                            Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
-                                            return;
-                                          }
-                                          final token = context.read<UserProvider>().token ?? '';
-                                          final userId = context.read<UserProvider>().user!.id;
-                                          final app = ApplicationEntity(
-                                              id: prevApp.id,
-                                              platform: prevApp.platform,
-                                              mobileOs: isAndroid ? MobileOsType.android : MobileOsType.ios,
-                                              status: ApplicationStatus.pending,
-                                              postId: post.id,
-                                              applicantId: userId);
-
-                                          context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
-                                          if (context.mounted) Navigator.pop(context);
-                                        },
-                                        child: Text("변경하기"),
                                       ),
-                                    ),
-                                  ])),
-                            );
-                          });
-                    },
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: Text('플랫폼 변경')),
+                                    ])),
+                              );
+                            });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      child: Text('플랫폼 변경', style: TextStyle(color: Colors.white),)),
+                ),
               ),
-            const Gap(20)
+            // const Gap(20)
           ],
         ));
   }
@@ -509,12 +564,13 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                 .userApplications!
                 .firstWhere((e) => e.postId == post.id! && e.applicantId == userId, orElse: () => ApplicationEntity());
 
-            if (post.platform == ApplicationPlatform.mobile) {
+            if (post.platform == ApplicationPlatform.web) {
               if (application.id != null && application.status == ApplicationStatus.cancel) {
                 final prevApp = application;
                 final app = ApplicationEntity(
                     id: prevApp.id,
                     platform: prevApp.platform,
+                    mobileOs: null,
                     postId: post.id,
                     status: ApplicationStatus.pending,
                     applicantId: userId);

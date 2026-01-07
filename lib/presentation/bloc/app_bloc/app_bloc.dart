@@ -32,7 +32,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       emit(AppState(state: UserAppState.loadingState));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.requestApply(event.token, event.application);
-      emit(AppState(state: UserAppState.applicationCompletedState, application: res));
+      emit(AppState(state: UserAppState.applicationCompletedState, application: res['application'], post: res['post']));
       logger.i('application state: applicationCompletedState');
     });
 
@@ -40,7 +40,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       emit(AppState(state: UserAppState.loadingState));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.updateApplication(event.token, event.application);
-      emit(AppState(state: UserAppState.applicationUpdateCompletedState, application: res));
+      emit(AppState(state: UserAppState.applicationUpdateCompletedState, application: res['application'], post: res['post']));
       logger.i('application state: applicationUpdateCompletedState');
     });
 
@@ -64,7 +64,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       emit(AppState(state: UserAppState.loadingState));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.cancelApply(event.token, event.appId);
-      emit(AppState(state: UserAppState.applicationCancelCompletedState, application: res));
+      emit(AppState(state: UserAppState.applicationCancelCompletedState, application: res['application'], post: res['post']));
       logger.i('application state: applicationCancelCompletedState');
     });
 

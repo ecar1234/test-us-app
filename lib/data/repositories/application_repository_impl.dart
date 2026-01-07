@@ -16,9 +16,9 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   }
 
   @override
-  Future<ApplicationEntity> applyCancel(String token, int appId) async {
+  Future<Map<String, dynamic>> applyCancel(String token, int appId) async {
     final res = await remote.applyCancel(token, appId);
-    return ApplicationEntity.toEntity(res);
+    return {'application': ApplicationEntity.toEntity(res['application']), 'post': RecruitPostEntity.toPostEntity(res['post'])};
   }
 
   @override
@@ -34,17 +34,17 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   }
 
   @override
-  Future<ApplicationEntity> requestApply(String token, ApplicationEntity application) async {
+  Future<Map<String, dynamic>> requestApply(String token, ApplicationEntity application) async {
     final appData = ApplicationEntity.toModel(application);
     final res = await remote.requestApply(token, appData);
-    return ApplicationEntity.toEntity(res);
+    return {'application': ApplicationEntity.toEntity(res['application']), 'post': RecruitPostEntity.toPostEntity(res['post'])};
   }
 
   @override
-  Future<ApplicationEntity> updateApplication(String token, ApplicationEntity application) async {
+  Future<Map<String, dynamic>> updateApplication(String token, ApplicationEntity application) async {
     final appData = ApplicationEntity.toModel(application);
     final res = await remote.updateApplication(token, appData);
-    return ApplicationEntity.toEntity(res);
+    return {'application': ApplicationEntity.toEntity(res['application']), 'post': RecruitPostEntity.toPostEntity(res['post'])};
   }
 
   @override
