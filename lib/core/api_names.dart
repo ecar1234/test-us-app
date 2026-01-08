@@ -51,6 +51,7 @@ class RecruitPostApi {
   static const String getPostsPagination = '/api/v1/post/getRecruitPostPagination';
   static const String getUserRecruitmentPosts = '/api/v1/post/getUserRecruitPosts';
   static const String getAppRecruitPosts = '/api/v1/post/getAppRecruitPosts';
+  static const String getRecruitApplicationsByPostId = '/api/v1/post/getRecruitApplicationsByPostId';
 }
 
 class PromotionApi {

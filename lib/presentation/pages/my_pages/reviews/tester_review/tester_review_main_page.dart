@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/tester_review/tester_review_page.dart';
 
 import '../../../../../data/models/application/application_model.dart';
@@ -11,9 +10,8 @@ import '../../../../../data/models/post/recruit_post_model.dart';
 import '../../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../../services/theme_provider.dart';
 import '../../../../../utils/time_util.dart';
-import '../../../../bloc/app_bloc/app_bloc.dart';
+import '../../../../../utils/type_conversion_util.dart';
 import '../../../../provider/post_provider/base_post_provider.dart';
-import '../../../../provider/user_provider.dart';
 
 class TesterReviewMainPage extends StatefulWidget {
   const TesterReviewMainPage({super.key});
@@ -116,9 +114,10 @@ class _TesterReviewMainPageState extends State<TesterReviewMainPage> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SizedBox(
-                                child: Text('플랫폼 : ${posts[idx].platform!.name.toUpperCase()}')
-                            ),
+                            Text(posts[idx].platform!.name.toUpperCase()),
+                            if (posts[idx].platform == ApplicationPlatform.mobile)
+                              Text(
+                                "( ${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)} )",)
                           ],
                         ),
                         SizedBox(

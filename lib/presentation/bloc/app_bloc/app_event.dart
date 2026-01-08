@@ -43,12 +43,12 @@ class RequestMyApplicationsEvent extends AppEvent {
   RequestMyApplicationsEvent(this.token, this.userId);
 }
 
-class RequestRecruitApplicationsEvent extends AppEvent {
-  final String token;
-  final List<int> applicationIds;
-
-  RequestRecruitApplicationsEvent(this.token, this.applicationIds);
-}
+// class RequestRecruitApplicationsEvent extends AppEvent {
+//   final String token;
+//   final List<int> applicationIds;
+//
+//   RequestRecruitApplicationsEvent(this.token, this.applicationIds);
+// }
 
 
 // class RequestPostByApplicationIdsEvent extends AppEvent {

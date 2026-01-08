@@ -1,6 +1,7 @@
 
 
 import 'package:image_picker/image_picker.dart';
+import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 
 import '../../models/image/image_model.dart';
 import '../../models/post/recruit_post_model.dart';
@@ -15,4 +16,5 @@ abstract class RecruitPostDatasource {
   Future<RecruitPostModel> endPost(String token, String id);
   Future<bool> deletePost(String token, String id);
   Future<List<RecruitPostModel>> getAppRecruitPosts(String token, List<String> ids);
+  Future<List<TResRecruitPostApplicationsInfo>> getPostApplicationsInfo(String token, String postId);
 }

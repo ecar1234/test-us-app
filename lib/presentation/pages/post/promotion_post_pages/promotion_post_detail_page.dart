@@ -54,11 +54,15 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
     final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
     return SafeArea(
       child: Scaffold(
-        body: BlocConsumer<PromotionBloc, PromotionPostState>(listener: (context, state) {
+        body: BlocConsumer<PromotionBloc, PromotionPostState>(
+            listener: (context, state) {
           final provider = context.read<BasePostProvider>();
           if (state.state == PromotionPostLoadState.postDeleteCompletedState) {
             provider.deletePromotionPost(state.postId!);
             Get.back();
+          }
+          else if(state.state == PromotionPostLoadState.getPostByIdCompletedState){
+            provider.updateUserPromotionPosts(state.post!);
           }
         }, builder: (context, state) {
           if (widget.post != null) {

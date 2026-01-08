@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
 
+import '../../../../data/models/application/application_model.dart';
 import '../../../../data/models/post/recruit_post_model.dart';
 import '../../../../services/common_height_provider.dart';
+import '../../../../services/theme_provider.dart';
+import '../../../../utils/type_conversion_util.dart';
 import '../../../provider/post_provider/base_post_provider.dart';
 
 class MyPromotionPage extends StatefulWidget {
@@ -22,6 +26,7 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
+    final isDarkMode = context.read<ThemeProvider>().isDarkMode;
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
@@ -45,11 +50,11 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                       ),
                     );
                   }
-                  return _itemBuilder(context, posts);
+                  return _itemBuilder(context, posts, isDarkMode);
                 })));
   }
 
-  Widget _itemBuilder(BuildContext context, List<PromotionPostEntity> posts) {
+  Widget _itemBuilder(BuildContext context, List<PromotionPostEntity> posts, bool isDarkMode) {
     return SizedBox(
       width: MediaQuery.sizeOf(context).width,
       child: Container(
@@ -61,7 +66,7 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                   padding: EdgeInsets.symmetric(vertical: 20),
                   itemBuilder: (context, idx) {
                     return SizedBox(
-                      height: 110,
+                      // height: 110,
                       width: MediaQuery.sizeOf(context).width,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,14 +74,25 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              Get.to(() => PromotionPostDetailPage(post: posts[idx]));
+                              Get.to(() => PromotionPostDetailPage(postId: posts[idx].id));
                             },
                             child: Container(
                               width: (MediaQuery.sizeOf(context).width - 50),
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                // border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                                  color: isDarkMode ? Colors.grey.shade800 : Colors.white,
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: isDarkMode
+                                      ? null
+                                      : [
+                                    BoxShadow(
+                                      color: Colors.grey.withAlpha(84),
+                                      spreadRadius: 2,
+                                      blurRadius: 9,
+                                      offset: Offset(0, 3), // changes position of shadow
+                                    ),
+                                  ]),
                               child: Row(
                                 children: [
                                   Flexible(
@@ -93,9 +109,10 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                                   Flexible(
                                     flex: 7,
                                     child: SizedBox(
-
                                       width: (MediaQuery.sizeOf(context).width - 50) * 0.7,
-                                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                      child: Column(mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
                                         // title
                                         SizedBox(
                                           height: 30,
@@ -106,7 +123,7 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                                               Text(
                                                 posts[idx].title!,
                                                 style: TextStyle(
-                                                    fontSize: 16,
+                                                    fontSize: 18,
                                                     fontWeight: FontWeight.bold,
                                                     overflow: TextOverflow.ellipsis),
                                                 maxLines: 1,
@@ -115,27 +132,36 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                                           ),
                                         ),
                                         // platform
-                                        SizedBox(
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              SizedBox(
-                                                child: Text('플랫폼 : ${posts[idx].platform!.name.toUpperCase()}')
-                                              ),
-                                            ],
-                                          ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Text(posts[idx].platform!.name.toUpperCase()),
+                                            const Gap(5),
+                                            if (posts[idx].platform == ApplicationPlatform.mobile)
+                                              Text('(${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)})')
+                                          ],
                                         ),
+                                        // view
+                                            Row(
+                                              children: [
+                                                SizedBox(
+                                                  child: Icon(Symbols.visibility_sharp, size: 20,),
+                                                ),
+                                                const Gap(5),
+                                                Text(posts[idx].views.toString())
+                                              ],
+                                            ),
                                         // created at
                                         SizedBox(
                                           child: Row(
                                               mainAxisAlignment: MainAxisAlignment.start,
-                                              children: [Text('게시일 : '), Text(_getDate(posts[idx].createdAt!))]),
+                                              children: [Text('게시 '), Text(_getDate(posts[idx].createdAt!))]),
                                         ),
                                         // expire at
                                         SizedBox(
                                           child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                                            Text('만료일 : '),
+                                            Text('만료 '),
                                             Text(_getDate(posts[idx].createdAt!.add(Duration(days: 7))))
                                           ]),
                                         )

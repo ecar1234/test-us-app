@@ -1,4 +1,5 @@
 import 'package:image_picker/image_picker.dart';
+import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 
 import '../entities/image_entity.dart';
 import '../entities/recruit_post_entity.dart';
@@ -55,6 +56,11 @@ class RecruitPostUseCase {
 
   Future<List<RecruitPostEntity>> getAppRecruitPosts(String token, List<String> ids) async {
     final res = await repository.getAppRecruitPosts(token, ids);
+    return res;
+  }
+
+  Future<List<TResRecruitPostApplicationsInfo>> getPostApplicationsInfoByPostId(String token, String postId) async {
+    final res = await repository.getPostApplicationsInfo(token, postId);
     return res;
   }
 }

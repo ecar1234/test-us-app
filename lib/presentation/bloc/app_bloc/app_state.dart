@@ -25,8 +25,8 @@ class AppState {
   AppState({this.state = UserAppState.startServiceState, this.application, this.applications, this.post});
 }
 
-class GetRecruitApplicationsState extends AppState {
-  List<UserEntity> users;
-  List<ApplicationEntity> apps;
-  GetRecruitApplicationsState({required this.users, required this.apps});
-}
+// class GetRecruitApplicationsState extends AppState {
+//   List<UserEntity> users;
+//   List<ApplicationEntity> apps;
+//   GetRecruitApplicationsState({required this.users, required this.apps});
+// }

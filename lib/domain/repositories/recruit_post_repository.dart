@@ -3,6 +3,7 @@
 import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
+import '../../data/models/package/recruit_post_applications_model.dart';
 import '../entities/image_entity.dart';
 
 abstract class RecruitPostRepository{
@@ -16,4 +17,5 @@ abstract class RecruitPostRepository{
   Future<RecruitPostEntity> endPost(String token, String id);
   Future<bool> deletePost(String token, String id);
   Future<List<RecruitPostEntity>> getAppRecruitPosts(String token, List<String> ids);
+  Future<List<TResRecruitPostApplicationsInfo>> getPostApplicationsInfo(String token, String postId);
 }

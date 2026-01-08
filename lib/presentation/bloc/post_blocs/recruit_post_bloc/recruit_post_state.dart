@@ -3,6 +3,8 @@
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
+import '../../../../data/models/package/recruit_post_applications_model.dart';
+
 enum RecruitPostLoadState {
   serviceStartState,
   beforeDataLoadState,
@@ -31,9 +33,7 @@ class RecruitPostState {
   RecruitPostState({this.state = RecruitPostLoadState.serviceStartState, this.page = 1, this.post, this.images, this.posts});
 }
 
-// class InitPostsLoadCompletedState extends RecruitPostState {
-//   List<RecruitPostEntity> recruitPosts;
-//   List<PromotionPostEntity> promotionPosts;
-//   List<dynamic> favoritePosts;
-//   InitPostsLoadCompletedState(this.recruitPosts, this.promotionPosts, this.favoritePosts);
-// }
+class GetPostApplicationsInfoState extends RecruitPostState {
+  List<TResRecruitPostApplicationsInfo>? info;
+  GetPostApplicationsInfoState({this.info});
+}

@@ -59,6 +59,12 @@ class RequestAppRecruitPosts extends RecruitPostEvent {
   RequestAppRecruitPosts(this.token, this.postIds);
 }
 //
+class RequestPostApplicationsInfoEvent extends RecruitPostEvent {
+  final String token;
+  final String postId;
+  RequestPostApplicationsInfoEvent(this.token, this.postId);
+}
+//
 class PostDataLoadEvent extends RecruitPostEvent {
   PostDataLoadEvent();
 }

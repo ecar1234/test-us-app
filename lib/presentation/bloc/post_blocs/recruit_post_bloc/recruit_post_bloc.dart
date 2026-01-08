@@ -136,7 +136,20 @@ class RecruitPostBloc extends Bloc<RecruitPostEvent, RecruitPostState> {
       }
     });
     //
-
+    on<RequestPostApplicationsInfoEvent>((event, emit) async {
+      try {
+        emit(RecruitPostState(state: RecruitPostLoadState.dataLoadState));
+        logger.i("data state : dataLoadState");
+        final res = await postUseCase.getPostApplicationsInfoByPostId(event.token, event.postId);
+        emit(GetPostApplicationsInfoState(info: res));
+        logger.i("data state : getPostApplicationsInfoCompletedState");
+      } on Exception catch (e) {
+        // TODO
+        emit(RecruitPostState(state: RecruitPostLoadState.errorState));
+        logger.e("data state : errorState");
+      }
+    });
+    //
     on<PostDataLoadEvent>((event, emit) {
       emit(RecruitPostState(state: RecruitPostLoadState.dataLoadState));
       logger.i("data state : dataLoadState");

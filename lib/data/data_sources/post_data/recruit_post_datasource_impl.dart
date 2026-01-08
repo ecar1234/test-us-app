@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/post_data/recruit_post_datasource.dart';
+import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 import 'package:test_us_app/data/models/post/promotion_post_model.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
@@ -115,6 +116,23 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
       final res = await netDriver.requestPostJson(token, RecruitPostApi.getAppRecruitPosts, {'ids': ids});
       if(res['status'] == 200){
         return (res['posts'] as List).map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();
+      }else {
+        return [];
+      }
+    } on Exception catch (e) {
+      // TODO
+      logger.d(e);
+      return [];
+    }
+  }
+
+  @override
+  Future<List<TResRecruitPostApplicationsInfo>> getPostApplicationsInfo(String token, String postId) async {
+    try {
+      final res = await netDriver.requestPostJson(token, RecruitPostApi.getRecruitApplicationsByPostId, {'postId': postId});
+      if(res['status'] == 200){
+        final infos = (res['applications'] as List).map<TResRecruitPostApplicationsInfo>((e) => TResRecruitPostApplicationsInfo.fromJson(e)).toList();
+        return infos;
       }else {
         return [];
       }

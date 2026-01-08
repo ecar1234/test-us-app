@@ -12,6 +12,7 @@ import 'package:test_us_app/utils/time_util.dart';
 import '../../../../data/models/application/application_model.dart';
 import '../../../../data/models/post/recruit_post_model.dart';
 import '../../../../services/common_height_provider.dart';
+import '../../../../services/theme_provider.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
@@ -85,6 +86,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
   }
 
   Widget _postsInfoBuilder(List<RecruitPostEntity> posts, double hei) {
+    final isDarkMode = context.read<ThemeProvider>().isDarkMode;
     return SizedBox(
       width: MediaQuery.sizeOf(context).width,
       child: Container(
@@ -100,9 +102,24 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                       : () {
                           Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
                         },
-                  child: SizedBox(
-                    height: 130,
+                  child: Container(
+                    height: 150,
                     width: MediaQuery.sizeOf(context).width,
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: isDarkMode ? Colors.grey.shade800 : Colors.white,
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: isDarkMode
+                            ? null
+                            : [
+                          BoxShadow(
+                            color: Colors.grey.withAlpha(84),
+                            spreadRadius: 2,
+                            blurRadius: 9,
+                            offset: Offset(0, 3), // changes position of shadow
+                          ),
+                        ]),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -110,8 +127,8 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                         Flexible(
                             flex: 3,
                             child: SizedBox(
-                                // width: (MediaQuery.sizeOf(context).width - 50) * 0.35,
-                                height: 130,
+                                width: (MediaQuery.sizeOf(context).width - 50) * 0.35,
+                                height: 150,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: CachedNetworkImage(
@@ -124,7 +141,8 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                         Flexible(
                           flex: 7,
                           child: Container(
-                            // width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
+                            height: 150,
+                            width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
                             padding: EdgeInsets.symmetric(horizontal: 10),
                             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                               SizedBox(
@@ -165,7 +183,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   // NOTE: 현재는 period가 7일로 고정 되어 있지만, 상확에 따라 변경필요, 변수로 period 포함 시키는 로직 필요.
-                                  Text('게시 만료 : ${TimeUtil().getDateTimeString(posts[idx].createdAt!, true)}'),
+                                  Text('게시 만료 : ${TimeUtil().getDateTimeString(posts[idx].createdAt!, false)}'),
                                 ],
                               )),
                               Gap(10),

@@ -188,13 +188,15 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
             ],
             flexibleSpace: LayoutBuilder(
               builder: (context, constraints) {
-                final percent =
-                    (constraints.biggest.height - kToolbarHeight) / 100;
+                final percent = (constraints.biggest.height - kToolbarHeight) / 100;
                 final opacity = percent.clamp(0.0, 1.0);
                 return FlexibleSpaceBar(
                     title: Opacity(
-                      opacity: 1-opacity,
-                        child: Text(post.title!, overflow: TextOverflow.ellipsis,)),
+                        opacity: 1 - opacity,
+                        child: Text(
+                          post.title!,
+                          overflow: TextOverflow.ellipsis,
+                        )),
                     background: _buildImages(post.images!));
               },
             )),
@@ -220,35 +222,33 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                     Text("카테고리"),
                     const Gap(10),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         child: Text(
                           TypeConversionUtil().postCategoryToString(post.category!),
                         )),
                   ],
                 ),
-                Row(
-                    children: [
-                      Text("플랫폼"),
-                      const Gap(10),
-                      Text(post.platform!.name.toUpperCase()),
-                      const Gap(5),
-                      if (post.platform! == ApplicationPlatform.mobile)
-                        SizedBox(
-                          child: Text(
-                            "( ${TypeConversionUtil().getPostOs(post.mobileOs!)} )",
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.grey.shade600,
-                                overflow: TextOverflow.ellipsis),
-                          ),
-                        ),
-                    ]
-                ),
+                Row(children: [
+                  Text("플랫폼"),
+                  const Gap(10),
+                  Text(post.platform!.name.toUpperCase()),
+                  const Gap(5),
+                  if (post.platform! == ApplicationPlatform.mobile)
+                    SizedBox(
+                      child: Text(
+                        "( ${TypeConversionUtil().getPostOs(post.mobileOs!)} )",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.grey.shade600,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                ]),
                 const Gap(10),
                 SizedBox(
                   child: Row(
@@ -295,29 +295,20 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                 ),
                 const Gap(40),
                 if (post.author != null && post.author!.id != user?.id)
-                  MultiBlocListener(listeners: [
-                    //Todo : multiListener 구조를 변경해야한다.
-                    BlocListener<AppBloc, AppState>(
-                        listener: (context, state) {
-                      if (state.state == UserAppState.applicationCompletedState) {
-                        context.read<ApplicationProvider>().requestApply(state.application!);
-                      }
-                      if(state.state == UserAppState.applicationUpdateCompletedState ){
-                        context.read<ApplicationProvider>().requestUpdateApplication(state.application!);
-                      }
-                      if(state.state == UserAppState.applicationCancelCompletedState){
-                        context.read<ApplicationProvider>().cancelApplication(state.application!);
-                      }
-                      context.read<BasePostProvider>().updateRecruitPost(state.post!);
-                    }),
-                    // BlocListener<RecruitPostBloc, RecruitPostState>(
-                    //   listener: (context, state) {
-                    //     context.read<BasePostProvider>().updateRecruitPost(state.post!);
-                    //   },
-                    //   listenWhen: (previous, current) =>
-                    //       current.state == RecruitPostLoadState.getPostByIdCompletedState,
-                    // ),
-                  ], child: _applicationSection(context, post)),
+                  BlocListener<AppBloc, AppState>(
+                      listener: (context, state) {
+                        if (state.state == UserAppState.applicationCompletedState) {
+                          context.read<ApplicationProvider>().requestApply(state.application!);
+                        }
+                        if (state.state == UserAppState.applicationUpdateCompletedState) {
+                          context.read<ApplicationProvider>().requestUpdateApplication(state.application!);
+                        }
+                        if (state.state == UserAppState.applicationCancelCompletedState) {
+                          context.read<ApplicationProvider>().cancelApplication(state.application!);
+                        }
+                        context.read<BasePostProvider>().updateRecruitPost(state.post!);
+                      },
+                      child: _applicationSection(context, post)),
                 const Gap(40)
               ],
             ),
@@ -356,7 +347,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
   }
 
   Widget _afterApplicationSection(BuildContext context, RecruitPostEntity post) {
-    if (post.platform! == ApplicationPlatform.web){
+    if (post.platform! == ApplicationPlatform.web) {
       return SizedBox(
           height: 60,
           width: MediaQuery.sizeOf(context).width - 40,
@@ -366,9 +357,9 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
               Selector<ApplicationProvider, ApplicationEntity>(
                 selector: (context, provider) => provider.userApplications!.firstWhere((e) => e.postId == post.id),
                 builder: (context, app, child) => Flexible(
-                  flex:  3,
+                  flex: 3,
                   child: SizedBox(
-                    width: (MediaQuery.sizeOf(context).width-40)*0.7,
+                    width: (MediaQuery.sizeOf(context).width - 40) * 0.7,
                     height: 50,
                     child: OutlinedButton(
                         onPressed: () async {
@@ -398,9 +389,9 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
             Selector<ApplicationProvider, ApplicationEntity>(
               selector: (context, provider) => provider.userApplications!.firstWhere((e) => e.postId == post.id),
               builder: (context, app, child) => Flexible(
-                flex:  3,
+                flex: 3,
                 child: SizedBox(
-                  width: (MediaQuery.sizeOf(context).width-40)*0.3,
+                  width: (MediaQuery.sizeOf(context).width - 40) * 0.3,
                   height: 50,
                   child: OutlinedButton(
                       onPressed: () async {
@@ -412,133 +403,136 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                         context.read<AppBloc>().add(RequestCancelEvent(token, appId));
                       },
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Theme.of(context).primaryColor),
+                          side: BorderSide(color: Theme.of(context).primaryColor),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                       child: Text('취소')),
                 ),
               ),
             ),
             const Gap(20),
-              Flexible(
-                flex: 7,
-                child: SizedBox(
-                  width: (MediaQuery.sizeOf(context).width-40)*0.7,
-                  height: 50,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                            context: context,
-                            barrierColor: null,
-                            builder: (context) {
-                              bool isIos = false;
-                              bool isAndroid = false;
-                              bool isAndroidDevice = Platform.isAndroid;
+            Flexible(
+              flex: 7,
+              child: SizedBox(
+                width: (MediaQuery.sizeOf(context).width - 40) * 0.7,
+                height: 50,
+                child: ElevatedButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                          context: context,
+                          barrierColor: null,
+                          builder: (context) {
+                            bool isIos = false;
+                            bool isAndroid = false;
+                            bool isAndroidDevice = Platform.isAndroid;
 
-                              final prevApp = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
-                                return element.postId == post.id &&
-                                    element.applicantId == context.read<UserProvider>().user!.id;
-                              });
-                              if (prevApp.mobileOs == MobileOsType.ios) {
-                                isIos = true;
-                                isAndroid = false;
-                              }
-                              if (prevApp.mobileOs == MobileOsType.android) {
-                                isAndroid = true;
-                                isIos = false;
-                              }
-
-                              return StatefulBuilder(
-                                builder: (context, state) => Container(
-                                    height: 300,
-                                    width: MediaQuery.sizeOf(context).width,
-                                    padding: EdgeInsets.all(20),
-                                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                      SizedBox(
-                                          child: Text('테스트 진행 할 플랫폼을 선택해 주세요.',
-                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-                                      SizedBox(
-                                          child: Text(' (Device와 동일한 OS만 선택이 가능합니다.)',
-                                              style: TextStyle(fontSize: 14, color: Colors.grey))),
-                                      const Gap(20),
-                                      SizedBox(
-                                          child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            child: Row(children: [
-                                              Checkbox(
-                                                  value: isIos,
-                                                  onChanged: isAndroidDevice
-                                                      ? null
-                                                      : (value) {
-                                                          state(() {
-                                                            isIos = value!;
-                                                            isAndroid = false;
-                                                          });
-                                                        }),
-                                              Text("IOS",
-                                                  style: TextStyle(
-                                                      fontSize: 16, color: isAndroidDevice ? Colors.grey : Colors.black))
-                                            ]),
-                                          ),
-                                          SizedBox(
-                                            child: Row(children: [
-                                              Checkbox(
-                                                  value: isAndroid,
-                                                  onChanged: isAndroidDevice
-                                                      ? (value) {
-                                                          state(() {
-                                                            isAndroid = value!;
-                                                            isIos = false;
-                                                          });
-                                                        }
-                                                      : null),
-                                              Text("Android",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: isAndroidDevice ? Colors.black87 : Colors.grey))
-                                            ]),
-                                          )
-                                        ],
-                                      )),
-                                      const Gap(20),
-                                      SizedBox(
-                                        child: ElevatedButton(
-                                          onPressed: () async {
-                                            if (prevApp.mobileOs == MobileOsType.ios && isAndroidDevice == false) {
-                                              Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
-                                              return;
-                                            }
-                                            if (prevApp.mobileOs == MobileOsType.android && isAndroidDevice == true) {
-                                              Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
-                                              return;
-                                            }
-                                            final token = context.read<UserProvider>().token ?? '';
-                                            final userId = context.read<UserProvider>().user!.id;
-                                            final app = ApplicationEntity(
-                                                id: prevApp.id,
-                                                platform: prevApp.platform,
-                                                mobileOs: isAndroid ? MobileOsType.android : MobileOsType.ios,
-                                                status: ApplicationStatus.pending,
-                                                postId: post.id,
-                                                applicantId: userId);
-
-                                            context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
-                                            if (context.mounted) Navigator.pop(context);
-                                          },
-                                          child: Text("변경하기"),
-                                        ),
-                                      ),
-                                    ])),
-                              );
+                            final prevApp = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
+                              return element.postId == post.id &&
+                                  element.applicantId == context.read<UserProvider>().user!.id;
                             });
-                      },
-                      style: ElevatedButton.styleFrom(
+                            if (prevApp.mobileOs == MobileOsType.ios) {
+                              isIos = true;
+                              isAndroid = false;
+                            }
+                            if (prevApp.mobileOs == MobileOsType.android) {
+                              isAndroid = true;
+                              isIos = false;
+                            }
+
+                            return StatefulBuilder(
+                              builder: (context, state) => Container(
+                                  height: 300,
+                                  width: MediaQuery.sizeOf(context).width,
+                                  padding: EdgeInsets.all(20),
+                                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                    SizedBox(
+                                        child: Text('테스트 진행 할 플랫폼을 선택해 주세요.',
+                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                                    SizedBox(
+                                        child: Text(' (Device와 동일한 OS만 선택이 가능합니다.)',
+                                            style: TextStyle(fontSize: 14, color: Colors.grey))),
+                                    const Gap(20),
+                                    SizedBox(
+                                        child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          child: Row(children: [
+                                            Checkbox(
+                                                value: isIos,
+                                                onChanged: isAndroidDevice
+                                                    ? null
+                                                    : (value) {
+                                                        state(() {
+                                                          isIos = value!;
+                                                          isAndroid = false;
+                                                        });
+                                                      }),
+                                            Text("IOS",
+                                                style: TextStyle(
+                                                    fontSize: 16, color: isAndroidDevice ? Colors.grey : Colors.black))
+                                          ]),
+                                        ),
+                                        SizedBox(
+                                          child: Row(children: [
+                                            Checkbox(
+                                                value: isAndroid,
+                                                onChanged: isAndroidDevice
+                                                    ? (value) {
+                                                        state(() {
+                                                          isAndroid = value!;
+                                                          isIos = false;
+                                                        });
+                                                      }
+                                                    : null),
+                                            Text("Android",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: isAndroidDevice ? Colors.black87 : Colors.grey))
+                                          ]),
+                                        )
+                                      ],
+                                    )),
+                                    const Gap(20),
+                                    SizedBox(
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          if (prevApp.mobileOs == MobileOsType.ios && isAndroidDevice == false) {
+                                            Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
+                                            return;
+                                          }
+                                          if (prevApp.mobileOs == MobileOsType.android && isAndroidDevice == true) {
+                                            Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
+                                            return;
+                                          }
+                                          final token = context.read<UserProvider>().token ?? '';
+                                          final userId = context.read<UserProvider>().user!.id;
+                                          final app = ApplicationEntity(
+                                              id: prevApp.id,
+                                              platform: prevApp.platform,
+                                              mobileOs: isAndroid ? MobileOsType.android : MobileOsType.ios,
+                                              status: ApplicationStatus.pending,
+                                              postId: post.id,
+                                              applicantId: userId);
+
+                                          context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
+                                          if (context.mounted) Navigator.pop(context);
+                                        },
+                                        child: Text("변경하기"),
+                                      ),
+                                    ),
+                                  ])),
+                            );
+                          });
+                    },
+                    style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).primaryColor,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      child: Text('플랫폼 변경', style: TextStyle(color: Colors.white),)),
-                ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                    child: Text(
+                      '플랫폼 변경',
+                      style: TextStyle(color: Colors.white),
+                    )),
               ),
+            ),
             // const Gap(20)
           ],
         ));
@@ -709,13 +703,16 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
     }
   }
 
-  Widget _buildImages (List<ImageEntity> images){
-    if(images.length == 1){
-      if(images[0].isLocal == true){
-        return Image.file(File(images[0].url!), fit: BoxFit.fitHeight,
+  Widget _buildImages(List<ImageEntity> images) {
+    if (images.length == 1) {
+      if (images[0].isLocal == true) {
+        return Image.file(
+          File(images[0].url!),
+          fit: BoxFit.fitHeight,
           height: double.infinity,
-          width: double.infinity,);
-      }else {
+          width: double.infinity,
+        );
+      } else {
         return CachedNetworkImage(
           imageUrl: images[0].url!,
           fit: BoxFit.fitHeight,
