@@ -75,9 +75,9 @@ class ApplicationApi {
   static const String cancel = '/api/v1/application/cancelAppUser';// 테스터 신청 수정
   static const String acceptUser = '/api/v1/application/acceptUser';
   static const String rejectUser = '/api/v1/application/rejectUser';
-
   static const String getRecruitApplications = '/api/v1/application/getRecruitApplications';
   // static const String getAppPostList = '/api/v1/application/getAppPostList';
+  static const String getTesterReviewsByAppIds = '/api/v1/application/getTesterReviewsByAppIds';
 }
 
 class ReviewApi {

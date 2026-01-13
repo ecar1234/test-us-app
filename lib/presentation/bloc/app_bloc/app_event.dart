@@ -43,6 +43,12 @@ class RequestMyApplicationsEvent extends AppEvent {
   RequestMyApplicationsEvent(this.token, this.userId);
 }
 
+class RequestRecruitPostTestersReviewEvent extends AppEvent {
+  List<int> applicationIds;
+  String token;
+
+  RequestRecruitPostTestersReviewEvent(this.applicationIds, this.token);
+}
 // class RequestRecruitApplicationsEvent extends AppEvent {
 //   final String token;
 //   final List<int> applicationIds;

@@ -9,6 +9,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
+import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_bloc.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_state.dart';
 import 'package:test_us_app/presentation/provider/review_provider.dart';
@@ -16,9 +17,11 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import '../../../../../data/models/application/application_model.dart';
+import '../../../../../data/models/package/recruit_post_applications_model.dart';
 import '../../../../../domain/entities/user_review_entity.dart';
 import '../../../../../services/common_height_provider.dart';
 import '../../../../bloc/app_bloc/app_bloc.dart';
+import '../../../../bloc/app_bloc/app_event.dart';
 import '../../../../bloc/review_bloc/review_event.dart';
 import 'add_tester_review_page.dart';
 
@@ -33,25 +36,13 @@ class TesterReviewPage extends StatefulWidget {
 }
 
 class _TesterReviewPageState extends State<TesterReviewPage> {
-  List<UserEntity> _users = [];
-
   final TextEditingController _contentController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
-    // 1. applications == application ID list
-    // 2. user 정보가 필요함.
-    // 3. 유져의 리뷰 정보도 필요함.
-    // 4. 리뷰 정보는 업데이트 되는것이 즉시 반영 되어야함.
-
-    // 1. user 정보는 변수에 저장,
-    // 2. 리뷰 정보는 실제 업데이트..
-
-    // final testersId = widget.applications.map((e) => e.applicantId!).toList();
-    // final token = context.read<UserProvider>().token!;
-    // context.read<ReviewBloc>().add(RequestTestersReviewEvent(token, testersId, widget.applications[0].id!));
+    final token = context.read<UserProvider>().token!!;
+    context.read<AppBloc>().add(RequestRecruitPostTestersReviewEvent(widget.applications, token));
   }
 
   @override
@@ -69,32 +60,19 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
             appBar: AppBar(
               title: Text("테스터 리뷰"),
             ),
-            body: BlocConsumer<ReviewBloc, ReviewState>(listener: (context, state) {
-              if (state is GetTestersReviewDataCompletedState) {
-                context.read<ReviewProvider>().setTestersReview(state.reviews);
-                if (_users.isEmpty) {
-                  setState(() {
-                    _users = state.users;
-                  });
-                }
-              } else if (state is CreateUserReviewCompletedState) {
-                context.read<ReviewProvider>().updateTesterReview(state.review);
-                context.read<ReviewBloc>().add(ChangeStateToGetTestersReview(
-                    reviews: context.read<ReviewProvider>().testersReviewOnPost!, users: _users));
+            body: BlocConsumer<AppBloc, AppState>(listener: (context, state) {
+              if(state is GetRecruitPostTestersReviewState){
+                final reviews = state.info.map((e) => e.userReview ?? UserReviewEntity()).toList();
+                context.read<ReviewProvider>().setTestersReview(reviews);
               }
-              if (state.state == ReviewDataState.errorState || state.state == ReviewDataState.failedState) {
-                return;
-              }
+
             }, builder: (context, state) {
-              if (state is GetTestersReviewDataCompletedState) {
+              if (state is GetRecruitPostTestersReviewState) {
                 return ListView.separated(
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     physics: BouncingScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, idx) {
-                      // final application =
-                      //     widget.applications.firstWhere((element) => element.applicantId == state.users[idx].id!);
-                      // UserReviewEntity? review = _testersReviewData[idx]['review'];
                       return Stack(
                         children: [
                           Container(
@@ -123,9 +101,9 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                                         height: 50,
                                         width: 50,
                                         child: CircleAvatar(
-                                            backgroundImage: state.users[idx].profileImg!.url == null
+                                            backgroundImage: state.info[idx].user!.profileImg!.url == null
                                                 ? const AssetImage('assets/images/Generic avatar.png')
-                                                : CachedNetworkImageProvider(state.users[idx].profileImg!.url!))),
+                                                : CachedNetworkImageProvider(state.info[idx].user!.profileImg!.url!))),
                                     const Gap(10),
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,36 +111,34 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
-                                            Text(state.users[idx].nickname!,
+                                            Text(state.info[idx].user!.nickname!,
                                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                             const Gap(10),
                                             // Text('( ${_getPlatform(application.)} )',
                                             //     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                           ],
                                         ),
-                                        Text(state.users[idx].email!, style: TextStyle(fontSize: 14)),
+                                        Text(state.info[idx].user!.email!, style: TextStyle(fontSize: 14)),
                                       ],
                                     ),
                                   ],
                                 ),
                                 const Gap(10),
-                                Selector<ReviewProvider, UserReviewEntity?>(selector: (context, provider) {
-                                  UserReviewEntity? review;
-                                  if (provider.testersReviewOnPost != null) {
-                                    if (provider.testersReviewOnPost!.isEmpty) return null;
-                                    review = provider.testersReviewOnPost!
-                                        .firstWhere((element) => element.reviewedId == state.users[idx].id);
-                                  }
+                                Selector<ReviewProvider, UserReviewEntity>(selector: (context, provider) {
+                                  if(provider.testersReviewOnPost == null || provider.testersReviewOnPost!.isEmpty) return UserReviewEntity();
+                                  UserReviewEntity review = provider.testersReviewOnPost!
+                                      .firstWhere((element) => element.reviewedId == state.info[idx].user!.userId, orElse: () => UserReviewEntity());
                                   return review;
                                 }, builder: (context, review, child) {
-                                  if (review == null) {
+                                  if (review.reviewId == null) {
                                     return SizedBox(
                                       height: 40,
                                       width: 200,
                                       child: ElevatedButton(
                                           onPressed: () {
-                                            // Get.to(() => AddTesterReviewPage(
-                                            //     tester: state.users[idx], application: application));
+                                            // final appId = widget.applications.firstWhere((e) => e == );
+                                            Get.to(() => AddTesterReviewPage(
+                                                tester: state.info[idx].user!, appId: state.info[idx].appId!));
                                           },
                                           style: ElevatedButton.styleFrom(
                                               padding: EdgeInsets.zero,
@@ -177,7 +153,7 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                                       width: 200,
                                       child: ElevatedButton(
                                           onPressed: () {
-                                            _checkReviewedModal(context, state.users[idx], review);
+                                            _checkReviewedModal(context, state.info[idx].user!, review);
                                           },
                                           style: ElevatedButton.styleFrom(
                                               padding: EdgeInsets.zero,
@@ -192,13 +168,8 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                             ),
                           ),
                           Selector<ReviewProvider, List<UserReviewEntity>>(selector: (context, provider) {
-                            List<UserReviewEntity> review = [];
-                            if (provider.testersReviewOnPost != null) {
-                              if (provider.testersReviewOnPost!.isEmpty) return review;
-                              review = provider.testersReviewOnPost!
-                                  .where((element) => element.reviewedId == state.users[idx].id)
-                                  .toList();
-                            }
+                            if(provider.testersReviewOnPost == null || provider.testersReviewOnPost!.isEmpty) return [];
+                            List<UserReviewEntity> review = provider.testersReviewOnPost!.where((element) => element.reviewedId == state.info[idx].user!.userId).toList();
                             return review;
                           }, builder: (context, review, child) {
                             if (review.isNotEmpty) {
@@ -222,7 +193,7 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                       );
                     },
                     separatorBuilder: (context, idx) => const Gap(10),
-                    itemCount: state.users.length);
+                    itemCount: state.info.length);
               }
               return const Center(child: CircularProgressIndicator());
             })));
@@ -237,7 +208,7 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
     }
   }
 
-  Future<void> _checkReviewedModal(BuildContext context, UserEntity tester, UserReviewEntity review) {
+  Future<void> _checkReviewedModal(BuildContext context, User tester, UserReviewEntity review) {
     _contentController.text = review.comment!;
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
     return showDialog(
@@ -247,10 +218,11 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             insetPadding: EdgeInsets.symmetric(horizontal: 20),
             child: Container(
-                height: hei * 0.6,
+                height: hei * 0.7,
                 width: MediaQuery.sizeOf(context).width - 40,
                 padding: EdgeInsets.all(20),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text('${tester.nickname}께 전송된 리뷰', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     const Gap(20),

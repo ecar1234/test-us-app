@@ -20,7 +20,6 @@ class ReviewProvider extends ChangeNotifier{
   List<PostReviewEntity>? get applicationPostReviews => _applicationPostReviews;
 
 
-
   void setUserReviews(List<UserReviewEntity> reviews) async {
     _userReviews = reviews;
     notifyListeners();
@@ -31,7 +30,7 @@ class ReviewProvider extends ChangeNotifier{
     notifyListeners();
   }
   void updateTesterReview(UserReviewEntity review) async {
-    _testersReviewOnPost ??= [];
+    // _testersReviewOnPost ??= [];
     _testersReviewOnPost!.add(review);
     notifyListeners();
   }

@@ -85,10 +85,26 @@ class ApplicationProvider with ChangeNotifier{
         reviewerUserId: review.reviewerUserId,
         rating: review.rating,
       );
-      post.reviews = [...post.reviews!, reviewEntity];
-      _userApplicationPosts = [..._userApplicationPosts!];
+      final updatePost = RecruitPostEntity(
+        id: post.id,
+        title: post.title,
+        contents: post.contents,
+        author: post.author,
+        platform: post.platform,
+        mobileOs: post.mobileOs,
+        category: post.category,
+        status: post.status,
+        period: post.period,
+        views: post.views,
+        applications: post.applications,
+        images: post.images,
+        reviews: [...post.reviews!, reviewEntity],
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+      );
+      _userApplicationPosts![idx] = updatePost;
+      _userApplicationPosts = List.from(_userApplicationPosts!);
     }
-
     notifyListeners();
   }
   Future<void> completeApplication(String token, String appId) async {}

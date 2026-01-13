@@ -11,10 +11,12 @@ import 'package:test_us_app/presentation/bloc/review_bloc/review_bloc.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_event.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
+import '../../../../../data/models/application/application_model.dart';
 import '../../../../../data/models/post/recruit_post_model.dart';
 import '../../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../../services/common_height_provider.dart';
 import '../../../../../utils/time_util.dart';
+import '../../../../../utils/type_conversion_util.dart';
 import '../../../../bloc/review_bloc/review_state.dart';
 import '../../../../provider/application_provider.dart';
 import '../../../../provider/user_provider.dart';
@@ -116,7 +118,9 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
                           child: SizedBox(
                             // width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
                             // padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                            child: Column(mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                               SizedBox(
                                 height: 30,
                                 child: Row(
@@ -137,12 +141,28 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(
-                                    child: Text('플랫폼 : ${posts[idx].platform!.name.toUpperCase()}')
-                                  ),
+                                  Text(posts[idx].platform!.name.toUpperCase(), style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                  ),),
+                                  if (posts[idx].platform == ApplicationPlatform.mobile)
+                                    Text(
+                                      "( ${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)} )",
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    )
                                 ],
                               ),
-                              const Gap(5),
+                              SizedBox(
+                                child: Text(
+                                  TypeConversionUtil().postCategoryToString(posts[idx].category!),
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.grey.shade600,
+                                      overflow: TextOverflow.ellipsis),
+                                ),
+                              ),
                               SizedBox(
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -242,14 +262,16 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
             listener: (context, state){},
             builder:(context, state) {
               if(state is GetReviewByPostReviewIdCompletedState) {
+                _contentController.text = state.review.comment!;
                 return Dialog(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 insetPadding: EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
-                    height: hei * 0.6,
+                    height: hei * 0.7,
                     width: MediaQuery.sizeOf(context).width - 40,
                     padding: EdgeInsets.all(20),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           '${post.title}',
@@ -318,7 +340,9 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
                             SizedBox(
                                 height: 50,
                                 width: 100,
-                              child: ElevatedButton(onPressed: (){}, child: Text('닫기')),
+                              child: ElevatedButton(onPressed: (){
+                                Navigator.pop(context);
+                              }, child: Text('닫기')),
                             )
                           ])
                         ],

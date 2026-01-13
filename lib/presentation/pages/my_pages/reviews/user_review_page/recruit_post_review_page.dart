@@ -67,7 +67,7 @@ class _RecruitPostReviewPageState extends State<RecruitPostReviewPage> {
                         Flexible(
                             flex: 3,
                             child: SizedBox(
-                                // width: (MediaQuery.sizeOf(context).width - 50) * 0.35,
+                                width: double.infinity,
                                 height: 140,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),

@@ -4,9 +4,11 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/domain/entities/user_review_entity.dart';
+import 'package:test_us_app/presentation/provider/review_provider.dart';
 
 import '../../../../../services/common_height_provider.dart';
 import '../../../../bloc/review_bloc/review_bloc.dart';
@@ -15,9 +17,9 @@ import '../../../../bloc/review_bloc/review_state.dart';
 import '../../../../provider/user_provider.dart';
 
 class AddTesterReviewPage extends StatefulWidget {
-  final UserEntity tester;
-  final ApplicationEntity application;
-  const AddTesterReviewPage({super.key, required this.tester, required this.application});
+  final User tester;
+  final int appId;
+  const AddTesterReviewPage({super.key, required this.tester, required this.appId});
 
   @override
   State<AddTesterReviewPage> createState() => _AddTesterReviewPageState();
@@ -47,6 +49,7 @@ class _AddTesterReviewPageState extends State<AddTesterReviewPage> {
                   Get.snackbar('알림', '리뷰가 전송되지 못했어요..');
                   return;
                 }
+                context.read<ReviewProvider>().updateTesterReview(state.review);
                 await _alertDialog(context, widget.tester.nickname!);
               }
               if(state.state == ReviewDataState.errorState || state.state == ReviewDataState.failedState){
@@ -122,8 +125,8 @@ class _AddTesterReviewPageState extends State<AddTesterReviewPage> {
                                       rating: _rating,
                                       comment: _contentController.text,
                                       reviewerId: userId,
-                                      reviewedId: widget.tester.id,
-                                      applicationId: widget.application.id
+                                      reviewedId: widget.tester.userId!,
+                                      applicationId: widget.appId
                                     );
 
                                     context.read<ReviewBloc>().add(CreateUserReviewEvent(token, review));

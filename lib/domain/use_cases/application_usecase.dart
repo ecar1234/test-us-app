@@ -1,8 +1,10 @@
 
 
 import 'package:test_us_app/domain/entities/application_entity.dart';
+import 'package:test_us_app/domain/entities/package/recruit_post_tester_reviews_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
+import '../../data/models/package/recruit_post_tester_reviews_model.dart';
 import '../repositories/application_repo.dart';
 
 class ApplicationUseCase {
@@ -44,5 +46,8 @@ class ApplicationUseCase {
     return res;
   }
 
-
+  Future<List<RecruitPostTesterReviewsEntity>> getTesterReviewsByAppIds(String token, List<int> applicationIds) async {
+    final res = await repository.getTesterReviewsByAppIds(token, applicationIds);
+    return res;
+  }
 }

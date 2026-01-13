@@ -8,6 +8,7 @@ import 'package:test_us_app/core/net_driver.dart';
 import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 
+import '../../models/package/recruit_post_tester_reviews_model.dart';
 import 'application_datasource.dart';
 
 class ApplicationDataSourceImpl implements ApplicationDataSource {
@@ -115,6 +116,18 @@ class ApplicationDataSourceImpl implements ApplicationDataSource {
       return applications;
     }else {
       throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<List<RecruitPostTesterReviewsModel>> getTesterReviewsByAppIds(String token, List<int> applicationIds) async {
+    final res = await netDriver.requestPostJson(token, ApplicationApi.getTesterReviewsByAppIds, {'appIds': applicationIds});
+    if(res['status'] == 200){
+      final info = (res['info'] as List).map<RecruitPostTesterReviewsModel>((e) => RecruitPostTesterReviewsModel.fromJson(e)).toList();
+      return info;
+    }else {
+      throw Exception('Error');
+
     }
   }
 

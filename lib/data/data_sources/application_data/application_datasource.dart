@@ -1,6 +1,7 @@
 
 
 import '../../models/application/application_model.dart';
+import '../../models/package/recruit_post_tester_reviews_model.dart';
 import '../../models/post/recruit_post_model.dart';
 
 abstract class ApplicationDataSource {
@@ -11,4 +12,5 @@ abstract class ApplicationDataSource {
   Future<ApplicationModel> completeApplications(String token, String userId, String postId);
   Future<List<ApplicationModel>> getUserApplication(String token, String userId);
   Future<List<ApplicationModel>> getRecruitApplications(String token, List<int> applicationIds);
+  Future<List<RecruitPostTesterReviewsModel>> getTesterReviewsByAppIds(String token, List<int> applicationIds);
 }

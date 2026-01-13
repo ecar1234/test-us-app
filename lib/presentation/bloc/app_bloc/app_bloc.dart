@@ -68,33 +68,13 @@ class AppBloc extends Bloc<AppEvent, AppState>{
       logger.i('application state: applicationCancelCompletedState');
     });
 
-    // on<RequestRecruitApplicationsEvent>((event, emit) async {
-    //   try {
-    //     emit(AppState(state: UserAppState.loadingState));
-    //     logger.i('application state: loadingState');
-    //     final res = await applicationUseCase.getRecruitApplications(event.token, event.applicationIds);
-    //     if(res.isEmpty){
-    //       emit(GetRecruitApplicationsState(users: [], apps: []));
-    //     }else {
-    //       final ids = res.map((e) => e.applicantId!).toList();
-    //       final users = await userUseCase.getUsersByIds(event.token, ids);
-    //       emit(GetRecruitApplicationsState(users: users, apps: res));
-    //     }
-    //   } on Exception catch (e) {
-    //     // TODO
-    //     logger.e(e.toString());
-    //     emit(AppState(state: UserAppState.errorState));
-    //     emit(GetRecruitApplicationsState(users: [], apps: []));
-    //   }
-    // });
-
-    // on<RequestPostByApplicationIdsEvent>((event, emit) async {
-    //   emit(AppState(state: UserAppState.loadingState));
-    //   logger.i('application state: loadingState');
-    //
-    //   final res = await recruitPostUseCase.getAppRecruitPosts(event.token, event.applicationIds);
-    //
-    // });
+    on<RequestRecruitPostTestersReviewEvent>((event, emit) async {
+      emit(AppState(state: UserAppState.loadingState));
+      logger.i('application state: loadingState');
+      final res = await applicationUseCase.getTesterReviewsByAppIds(event.token, event.applicationIds);
+      emit(GetRecruitPostTestersReviewState(info: res));
+      logger.i('application state: getTesterReviewsCompletedState');
+    });
 
     on<RequestCompletedEvent>((event, emit) {
       emit(AppState(state: UserAppState.requestCompletedState));

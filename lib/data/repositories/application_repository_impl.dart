@@ -1,8 +1,10 @@
 
+import 'package:test_us_app/data/models/package/recruit_post_tester_reviews_model.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/domain/repositories/application_repo.dart';
 
 import '../../domain/entities/application_entity.dart';
+import '../../domain/entities/package/recruit_post_tester_reviews_entity.dart';
 import '../data_sources/application_data/application_datasource.dart';
 
 class ApplicationRepositoryImpl implements ApplicationRepository {
@@ -51,5 +53,12 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   Future<List<ApplicationEntity>> getRecruitApplications(String token, List<int> applicationIds) async {
     final res = await remote.getRecruitApplications(token, applicationIds);
     return res.map<ApplicationEntity>((e) => ApplicationEntity.toEntity(e)).toList();
+  }
+
+  @override
+  Future<List<RecruitPostTesterReviewsEntity>> getTesterReviewsByAppIds(String token, List<int> applicationIds) async {
+    final res = await remote.getTesterReviewsByAppIds(token, applicationIds);
+    return res.map<RecruitPostTesterReviewsEntity>((e) => RecruitPostTesterReviewsEntity().toEntity(e)).toList();
+
   }
 }
