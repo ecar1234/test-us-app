@@ -61,7 +61,8 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
             provider.deletePromotionPost(state.postId!);
             Get.back();
           }
-          else if(state.state == PromotionPostLoadState.getPostByIdCompletedState){
+          else if(state.state == PromotionPostLoadState.getPostByIdCompletedState||
+              state.state == PromotionPostLoadState.postUpdateCompletedState){
             provider.updateUserPromotionPosts(state.post!);
           }
         }, builder: (context, state) {

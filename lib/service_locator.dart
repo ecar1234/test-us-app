@@ -59,10 +59,8 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   await signIn.initialize();
 
   getIt.registerLazySingleton<GoogleSignIn>(() => signIn);
-  // NOTE: 아직 서버의 이분화가 안되어 있음.
   String host = kDebugMode ? Host.baseDevUrl : Host.baseProdUrl;
-  print('접속 URL : $host');
-  // TODO: 이분화 후 baseUrl 분리
+  debugPrint('접속 URL : $host');
   getIt.registerLazySingleton<NetDriver>(() => NetDriver(host));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());
   // getIt.registerSingleton<ThemeProvider>(ThemeProvider());

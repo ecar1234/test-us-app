@@ -141,8 +141,12 @@ class BasePostProvider extends ChangeNotifier {
 
   void updateUserPromotionPosts(PromotionPostEntity post) {
     final index = _userPromotionPosts?.indexWhere((element) => element.id == post.id);
-    if (index == null) return;
-    _userPromotionPosts!.removeAt(index);
+    if (index == -1) {
+      _userPromotionPosts = [post, ..._userPromotionPosts!];
+      notifyListeners();
+      return;
+    }
+    _userPromotionPosts!.removeAt(index!);
     _userPromotionPosts = [post, ..._userPromotionPosts!];
     notifyListeners();
   }

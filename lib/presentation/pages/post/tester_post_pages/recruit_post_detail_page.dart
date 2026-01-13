@@ -323,18 +323,18 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
 
     // if (app.id == null) return _beforeApplicationSection(context, initPostData);
     return Selector<ApplicationProvider, ApplicationEntity>(selector: (context, provider) {
-      final post = provider.userApplications!.firstWhere((e) => e.postId == widget.postId!);
-      return post;
+      final app = provider.userApplications!.firstWhere((e) => e.postId == widget.postId!, orElse: () => ApplicationEntity());
+      return app;
     }, builder: (context, application, child) {
       if (!isLogged) return _beforeApplicationSection(context, post);
 
-      final applications = context.read<ApplicationProvider>().userApplications ?? [];
-      final user = context.read<UserProvider>().user!;
-      final app = applications.firstWhere((e) => e.postId == post.id && e.applicantId == user.id,
-          orElse: () => ApplicationEntity());
+      // final applications = context.read<ApplicationProvider>().userApplications ?? [];
+      // final user = context.read<UserProvider>().user!;
+      // final app = applications.firstWhere((e) => e.postId == post.id && e.applicantId == user.id,
+      //     orElse: () => ApplicationEntity());
 // todo : 신청은 정상 작동, 취소 시 새로 받아오는 post application state가 pending으로 나옴(서버 확인)
 // todo : 서버에서 mobileOs가 DB에 저장 안됨(서버확인
-      switch (app.status) {
+      switch (application.status) {
         case ApplicationStatus.pending:
         case ApplicationStatus.accepted:
           return _afterApplicationSection(context, post);
