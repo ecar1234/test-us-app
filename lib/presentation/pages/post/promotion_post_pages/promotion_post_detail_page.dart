@@ -14,6 +14,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_state.dart';
+import 'package:test_us_app/presentation/pages/post/post_image_detail_page.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_create_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -231,7 +232,11 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                           post.title!,
                           overflow: TextOverflow.ellipsis,
                         )),
-                    background: _buildImages(post.images!));
+                    background: GestureDetector(
+                      onTap: (){
+                        Get.to(() => PostImageDetailPage(images: post.images!,));
+                      },
+                        child: _buildImages(post.images!)));
               },
             )),
         SliverToBoxAdapter(

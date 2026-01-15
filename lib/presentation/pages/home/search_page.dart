@@ -12,6 +12,7 @@ import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_pos
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
 
+import '../../../domain/entities/promotion_post_entity.dart';
 import '../../../domain/entities/recruit_post_entity.dart';
 import '../../../services/common_height_provider.dart';
 import '../../../services/theme_provider.dart';
@@ -61,13 +62,6 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-  //   samples.addAll(context.read<BasePostProvider>().recruitPosts as List<dynamic>);
-  //   samples.addAll(context.read<BasePostProvider>().promotionPosts as List<dynamic>);
-  // }
 
   @override
   void dispose() {
@@ -171,7 +165,7 @@ class _SearchPageState extends State<SearchPage> {
                 onTap: () {
                   if (isRecruit) {
                     Get.to(() => RecruitPostDetailPage(postId: searchResults[idx].id!));
-                  } else if (searchResults[idx].postType == 'promotion') {
+                  } else if (searchResults[idx] is PromotionPostEntity) {
                     Get.to(() => PromotionPostDetailPage(postId: searchResults[idx].id!));
                   }
                 },

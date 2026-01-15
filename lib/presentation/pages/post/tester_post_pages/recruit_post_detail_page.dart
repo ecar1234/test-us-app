@@ -33,6 +33,7 @@ import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../../../components/login_dialogs.dart';
 import '../../../provider/post_provider/base_post_provider.dart';
+import '../post_image_detail_page.dart';
 
 class RecruitPostDetailPage extends StatefulWidget {
   final RecruitPostEntity? post;
@@ -260,7 +261,12 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                           post.title!,
                           overflow: TextOverflow.ellipsis,
                         )),
-                    background: _buildImages(post.images!));
+                    background: GestureDetector(
+                      onTap: (){
+                        Get.to(() => PostImageDetailPage(images: post.images!,));
+
+                      },
+                        child: _buildImages(post.images!)));
               },
             )),
         SliverToBoxAdapter(

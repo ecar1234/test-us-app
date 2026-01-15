@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -25,6 +26,7 @@ import 'package:test_us_app/utils/type_conversion_util.dart';
 import '../../../data/sharedPreferences/auth_preference.dart';
 import '../../../domain/entities/recruit_post_entity.dart';
 import '../../../services/common_height_provider.dart';
+import '../../bloc/post_blocs/base_post_bloc/base_post_event.dart';
 import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../../components/notifications_page.dart';
@@ -41,7 +43,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final pref = AuthPreference.instance;
-
+  // bool _isRefresh = false;
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height - 120;
@@ -90,44 +92,65 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           body: SizedBox(
-              height: hei,
-              width: MediaQuery.sizeOf(context).width,
-              // padding: EdgeInsets.only(top: 10),
-              // decoration: BoxDecoration(
-              //   border: Border.all()
-              // ),
-              child: SizedBox(
-                height: hei - 20,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            const Gap(10),
-                            _mainButtonSection(context),
-                            const Gap(20),
-                            _favoritePostList(context),
-                            const Gap(20),
-                            _testerList(context),
-                            const Gap(20),
-                            _promotionList(context),
-                          ],
-                        ),
+            height: hei - 20,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: CustomRefreshIndicator(
+                    onRefresh: () async {
+                      context.read<BasePostBloc>().add(RequestInitDataEvent());
+                      Future.delayed(const Duration(milliseconds: 1500));
+                    },
+                    builder: (context, child, controller) {
+                      return Stack(
+                        alignment: Alignment.topCenter,
+                        children: [
+                          if (controller.value > 0)
+                            Positioned(
+                              top: controller.value * 30,
+                              child: Opacity(
+                                opacity: controller.value.clamp(0, 1),
+                                child: Transform.scale(
+                                  scale: controller.value.clamp(0.0, 1.0),
+                                  child: Text(
+                                    'Grow up with TESTUS',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ),
+                          Transform.translate(
+                            offset: Offset(0, 80 * controller.value),
+                            child: child,
+                          ),
+                        ],
+                      );
+                    },
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          const Gap(10),
+                          _mainButtonSection(context),
+                          const Gap(20),
+                          _favoritePostList(context),
+                          const Gap(20),
+                          _testerList(context),
+                          const Gap(20),
+                          _promotionList(context),
+                        ],
                       ),
                     ),
-                    // CustomBottomBar(
-                    //   currentIndex: 0,
-                    //   onTap: (idx) {
-                    //     setState(() {
-                    //       _currentIdx = idx;
-                    //     });
-                    //   },
-                    // )
-                  ],
+                  ),
                 ),
-              ))),
+              ],
+            ),
+          )),
     );
   }
 
