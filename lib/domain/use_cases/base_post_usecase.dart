@@ -16,4 +16,9 @@ class BasePostUseCase {
     final res = await repository.getUserInitData(token, userId);
     return res;
   }
+
+  Future<Map<String,dynamic>> searchPost(String keyword) async {
+    final res = await repository.searchPost(keyword);
+    return res;
+  }
 }

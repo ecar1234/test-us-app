@@ -14,3 +14,8 @@ class RequestUserInItDataEvent extends BasePostEvent {
   String userId;
   RequestUserInItDataEvent(this.token, this.userId);
 }
+
+class SearchPostEvent extends BasePostEvent {
+  String keyword;
+  SearchPostEvent(this.keyword);
+}

@@ -38,4 +38,12 @@ class BasePostRepositoryImpl implements BasePostRepository {
 
     return { 'favoritePosts': favoritePosts, 'recruitPosts': recruitPosts, 'promotionPosts': promotionPosts };
   }
+
+  @override
+  Future<Map<String, dynamic>> searchPost(String keyword) async {
+    final res = await remote.searchPost(keyword);
+    final recruitPosts = res['recruitPosts'].map<RecruitPostEntity>((e) => RecruitPostEntity.toPostEntity(e)).toList();
+    final promotionPosts = res['promotionPosts'].map<PromotionPostEntity>((e) => PromotionPostEntity.toEntity(e)).toList();
+    return { 'recruitPosts': recruitPosts, 'promotionPosts': promotionPosts };
+  }
 }

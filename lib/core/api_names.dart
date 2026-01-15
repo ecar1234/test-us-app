@@ -39,6 +39,7 @@ class ImageApi {
 class PostApi {
   static const String getInitPosts = '/api/v1/post/getInitPosts';
   static const String getUserInitData = '/api/v1/post/getUserInitPosts';
+  static const String searchPost = '/api/v1/post/searchPosts';
 }
 
 class RecruitPostApi {

@@ -77,6 +77,12 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
       }
       if (_selectedPlatform == ApplicationPlatform.mobile) {
         _mobileCheck = true;
+        if (_selectedOs.contains(MobileOsType.ios)) {
+          _iosCheck = true;
+        }
+        if (_selectedOs.contains(MobileOsType.android)) {
+          _androidCheck = true;
+        }
       }
     }
   }
@@ -839,7 +845,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("게시 성공"),
-          content: Text("테스터 모집글을 $content 했습니다.."),
+          content: Text("테스터 모집글을 $content 했습니다."),
           actions: [
             TextButton(
                 onPressed: () {

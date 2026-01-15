@@ -273,8 +273,9 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
               rightText: "승인",
               onRightTap: () {
                 final token = context.read<UserProvider>().token ?? '';
-                context.read<AppBloc>().add(
-                    RequestCompleteApplicationEvent(token, info.user!.userId!, info.application!.postId!));
+                context
+                    .read<AppBloc>()
+                    .add(RequestCompleteApplicationEvent(token, info.user!.userId!, info.application!.postId!));
               },
             );
         }
@@ -300,6 +301,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
               child: OutlinedButton(
                   onPressed: onLeftTap,
                   style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.zero,
                       side: BorderSide(color: Theme.of(context).colorScheme.primary),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                   child: Text(leftText)),
@@ -313,8 +315,8 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
               width: width * 0.7,
               child: ElevatedButton(
                   onPressed: onRightTap,
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                  style:
+                      ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                   child: Text(rightText)),
             ),
           )
@@ -328,13 +330,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
       child: Shimmer.fromColors(
         baseColor: Colors.grey.shade300,
         highlightColor: Colors.grey.shade100,
-        child: _buildButtons(
-            context,
-            leftText: "",
-            onLeftTap: () {},
-            rightText: "",
-            onRightTap: () {}
-        ),
+        child: _buildButtons(context, leftText: "", onLeftTap: () {}, rightText: "", onRightTap: () {}),
       ),
     );
   }

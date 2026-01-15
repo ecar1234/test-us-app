@@ -9,6 +9,7 @@ enum BasePostLoadState {
   initPostDataLoadingState,
   getInitPostCompletedState,
   getUserInitPostsCompletedState,
+  searchPostCompletedState,
   errorState,
   failedState
 }
@@ -20,4 +21,11 @@ class BasePostState {
   List<dynamic>? favoritePosts;
   Map<String, dynamic>? initData;
   BasePostState(this.state , {this.recruitPosts , this.promotionPosts , this.favoritePosts, this.initData});
+}
+
+class GetSearchPostState extends BasePostState {
+  List<RecruitPostEntity>? recruit;
+  List<PromotionPostEntity>? promotion;
+
+  GetSearchPostState(super.state, {this.recruit, this.promotion});
 }

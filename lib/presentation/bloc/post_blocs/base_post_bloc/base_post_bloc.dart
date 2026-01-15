@@ -46,5 +46,19 @@ class BasePostBloc extends Bloc<BasePostEvent, BasePostState>{
         logger.e(e);
       }
     });
+
+    on<SearchPostEvent>((event, emit) async {
+      emit(BasePostState(BasePostLoadState.dataLoadState));
+      logger.i("data state : dataLoadState");
+      try {
+        final res = await postUseCase.searchPost(event.keyword);
+        emit(GetSearchPostState(BasePostLoadState.searchPostCompletedState, recruit: res['recruitPosts'], promotion: res['promotionPosts']));
+      }
+      catch (e) {
+        emit(BasePostState(BasePostLoadState.errorState));
+        logger.e("data state : errorState");
+      }
+    });
+
   }
 }

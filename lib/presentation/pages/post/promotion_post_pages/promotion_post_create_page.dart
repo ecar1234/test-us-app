@@ -97,6 +97,12 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
       if (_selectedPlatform == ApplicationPlatform.mobile) {
         _mobileCheck = true;
         _selectedOs = widget.post!.mobileOs!;
+        if (_selectedOs.contains(MobileOsType.ios)) {
+          _iosCheck = true;
+        }
+        if (_selectedOs.contains(MobileOsType.android)) {
+          _androidCheck = true;
+        }
       }
       if(widget.post!.category != null) {
         _selectedCategory = widget.post!.category!;

@@ -132,6 +132,67 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                             return PromotionPostCreatePage(post: post);
                           }));
                         } else if (value == 2) {
+                          await showDialog(context: context, builder: (context) {
+                            return Container(
+                                height: 200,
+                                width: MediaQuery.sizeOf(context).width,
+                                padding: EdgeInsets.all(10),
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) => Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?',
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                      ),
+                                      const Gap(20),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Flexible(
+                                            flex: 3,
+                                            child: SizedBox(
+                                              width: constraints.maxWidth * 0.3,
+                                              child: OutlinedButton(
+                                                  onPressed: () {
+                                                    Get.back();
+                                                  },
+                                                  style: OutlinedButton.styleFrom(
+                                                    side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                  ),
+                                                  child: Text('취소')),
+                                            ),
+                                          ),
+                                          const Gap(10),
+                                          Flexible(
+                                            flex: 7,
+                                            child: SizedBox(
+                                              width: constraints.maxWidth * 0.7,
+                                              child: ElevatedButton(
+                                                  onPressed: () {
+                                                    final token = context.read<UserProvider>().token ?? "";
+                                                    try {
+                                                      context.read<PromotionBloc>().add(RequestPostDeleteEvent(token, post.id!));
+                                                    } on Exception catch (e) {
+                                                      Get.snackbar('알림', '삭제 실패');
+                                                      logger.e(e.toString());
+                                                      return;
+                                                    }
+                                                    Get.back();
+                                                  },
+                                                  style: OutlinedButton.styleFrom(
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                  ),
+                                                  child: Text('확인')),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ));
+                          });
                           Get.defaultDialog(title: "알림", middleText: "삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?", actions: [
                             ElevatedButton(
                               onPressed: () {

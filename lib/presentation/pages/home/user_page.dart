@@ -380,39 +380,110 @@ class _UserPageState extends State<UserPage> {
                         if (isLogged) {
                           return SizedBox(
                             height: 50,
-                            width: 350,
+                            width: MediaQuery.sizeOf(context).width * 0.7,
                             child: ElevatedButton(
-                                onPressed: () {
-                                  Get.defaultDialog(
-                                    title: '로그아웃',
-                                    middleText: '로그아웃 하시겠습니까?',
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('취소')),
-                                      TextButton(
-                                          onPressed: () async {
-                                            Navigator.pop(context);
-                                            final user = context.read<UserProvider>().user!;
-                                            if (user.method! != AuthType.email) {
-                                              final token = context.read<AuthBloc>().state.token!;
-                                              final userId = context.read<AuthBloc>().state.user!.id;
-                                              final messagingToken = context.read<FirebaseMessagingProvider>().token??'';
-                                              context.read<AuthBloc>().add(LogoutEvent());
-                                              context
-                                                  .read<UserBloc>()
-                                                  .add(RemoveFirebaseTokenEvent(token, userId, messagingToken));
-                                            }
-                                            context.read<UserProvider>().logout();
-                                            context.read<BasePostProvider>().logout();
-                                            context.read<ApplicationProvider>().logout();
-                                            // context.read<AuthBloc>().add(LogoutEvent());
-                                          },
-                                          child: const Text('확인')),
-                                    ],
+                                onPressed: () async {
+                                  await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Container(
+                                          height: 200,
+                                          width: MediaQuery.sizeOf(context).width,
+                                          padding: EdgeInsets.all(10),
+                                          child: LayoutBuilder(
+                                            builder: (context, constraints) => Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  '로그아웃 하시나요?',
+                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                                ),
+                                                const Gap(20),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Flexible(
+                                                      flex: 3,
+                                                      child: SizedBox(
+                                                        width: constraints.maxWidth * 0.3,
+                                                        child: OutlinedButton(
+                                                            onPressed: () {
+                                                              Get.back();
+                                                            },
+                                                            style: OutlinedButton.styleFrom(
+                                                              side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                            ),
+                                                            child: Text('취소')),
+                                                      ),
+                                                    ),
+                                                    const Gap(10),
+                                                    Flexible(
+                                                      flex: 7,
+                                                      child: SizedBox(
+                                                        width: constraints.maxWidth * 0.7,
+                                                        child: ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.pop(context);
+                                                              final user = context.read<UserProvider>().user!;
+                                                              if (user.method! != AuthType.email) {
+                                                                final token = context.read<AuthBloc>().state.token!;
+                                                                final userId = context.read<AuthBloc>().state.user!.id;
+                                                                final messagingToken = context.read<FirebaseMessagingProvider>().token??'';
+                                                                context.read<AuthBloc>().add(LogoutEvent());
+                                                                context
+                                                                    .read<UserBloc>()
+                                                                    .add(RemoveFirebaseTokenEvent(token, userId, messagingToken));
+                                                              }
+                                                              context.read<UserProvider>().logout();
+                                                              context.read<BasePostProvider>().logout();
+                                                              context.read<ApplicationProvider>().logout();
+                                                              // context.read<AuthBloc>().add(LogoutEvent());
+                                                            },
+                                                            style: OutlinedButton.styleFrom(
+                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                            ),
+                                                            child: Text('확인')),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ));
+                                    }
                                   );
+                                  // Get.defaultDialog(
+                                  //   title: '로그아웃',
+                                  //   titleStyle: TextStyle(),
+                                  //   middleText: '로그아웃 하시겠습니까?',
+                                  //   actions: [
+                                  //     TextButton(
+                                  //         onPressed: () {
+                                  //           Navigator.pop(context);
+                                  //         },
+                                  //         child: const Text('취소')),
+                                  //     TextButton(
+                                  //         onPressed: () async {
+                                  //           Navigator.pop(context);
+                                  //           final user = context.read<UserProvider>().user!;
+                                  //           if (user.method! != AuthType.email) {
+                                  //             final token = context.read<AuthBloc>().state.token!;
+                                  //             final userId = context.read<AuthBloc>().state.user!.id;
+                                  //             final messagingToken = context.read<FirebaseMessagingProvider>().token??'';
+                                  //             context.read<AuthBloc>().add(LogoutEvent());
+                                  //             context
+                                  //                 .read<UserBloc>()
+                                  //                 .add(RemoveFirebaseTokenEvent(token, userId, messagingToken));
+                                  //           }
+                                  //           context.read<UserProvider>().logout();
+                                  //           context.read<BasePostProvider>().logout();
+                                  //           context.read<ApplicationProvider>().logout();
+                                  //           // context.read<AuthBloc>().add(LogoutEvent());
+                                  //         },
+                                  //         child: const Text('확인')),
+                                  //   ],
+                                  // );
                                   // context.read<AuthBloc>().add(LogoutEvent(context));
                                 },
                                 style: TextButton.styleFrom(

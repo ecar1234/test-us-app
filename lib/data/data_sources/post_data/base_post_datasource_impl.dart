@@ -39,6 +39,18 @@ class BasePostDataSourceImpl implements BasePostDataSource {
     }
   }
 
+  @override
+  Future<Map<String, dynamic>> searchPost(String keyword) async {
+    final res = await netDriver.requestGetJson("", PostApi.searchPost, param: keyword);
+    if (res['status'] == 200) {
+      final recruitPosts = res['recruit'].map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();
+      final promotionPosts = res['promotion'].map<PromotionPostModel>((e) => PromotionPostModel.fromJson(e)).toList();
+      return {'recruitPosts': recruitPosts, 'promotionPosts': promotionPosts};
+    } else {
+      throw Exception('Error');
+    }
+  }
+
   Future<Map<String, List<dynamic>>> _startGetInitPosts(String jobId, String token) {
     final controller = Completer<Map<String, List<dynamic>>>();
     Timer.periodic(Duration(seconds: 2), (timer) async {
@@ -83,5 +95,4 @@ class BasePostDataSourceImpl implements BasePostDataSource {
     });
     return controller.future;
   }
-
 }
