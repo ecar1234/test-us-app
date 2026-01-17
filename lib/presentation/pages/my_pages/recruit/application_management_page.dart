@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -17,6 +19,9 @@ import '../../../bloc/app_bloc/app_state.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../../../bloc/review_bloc/review_bloc.dart';
+import '../../../bloc/review_bloc/review_event.dart';
+import '../../../bloc/review_bloc/review_state.dart';
 import '../../../provider/user_provider.dart';
 
 class ApplicationManagementPage extends StatefulWidget {
@@ -204,7 +209,157 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                           height: 30,
                           width: 100,
                           child: TextButton(
-                              onPressed: () {},
+                              onPressed: () async {
+                                final token = context.read<UserProvider>().token ?? '';
+                                context.read<ReviewBloc>().add(RequestUserReviewEvent(token, info.user!.userId!));
+                                await showDialog(
+                                    context: context,
+                                    builder: (context) => Dialog(
+                                          child: BlocConsumer<ReviewBloc, ReviewState>(
+                                              listener: (context, state) {},
+                                              builder: (context, state) {
+                                                if (state is GetUserReviewDataCompletedState) {
+                                                  final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
+                                                  return Container(
+                                                      height: MediaQuery.sizeOf(context).height * 0.5,
+                                                      width: MediaQuery.sizeOf(context).width * 0.8,
+                                                      padding: EdgeInsets.all(10),
+                                                      child: LayoutBuilder(builder: (context, constraints) {
+                                                        return Column(
+                                                          children: [
+                                                            SizedBox(
+                                                                height: constraints.maxHeight * 0.4,
+                                                                width: constraints.maxWidth,
+                                                                child: Column(
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                                    children: [
+                                                                      SizedBox(
+                                                                          height: 100,
+                                                                          width: 100,
+                                                                          child: CircleAvatar(
+                                                                            backgroundColor: Colors.grey.shade200,
+                                                                            backgroundImage: info.user!.profileImg ==
+                                                                                        null ||
+                                                                                    info.user!.profileImg!.url == null
+                                                                                ? const AssetImage(
+                                                                                    'assets/images/Generic avatar.png')
+                                                                                : CachedNetworkImageProvider(
+                                                                                    info.user!.profileImg!.url!),
+                                                                          )),
+                                                                      const Gap(5),
+                                                                      SizedBox(
+                                                                        child: Text(info.user!.nickname!,
+                                                                            style: TextStyle(
+                                                                                fontSize: 16,
+                                                                                fontWeight: FontWeight.w600)),
+                                                                      ),
+                                                                      const Gap(10),
+                                                                      Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        children: [
+                                                                          Text(
+                                                                              '리뷰 평점 : ${state.averageRating.toStringAsFixed(1)}',
+                                                                              style: TextStyle(
+                                                                                  fontSize: 16,
+                                                                                  fontWeight: FontWeight.w600)),
+                                                                          Text(' / '),
+                                                                          Text('참여 테스트 : ${state.reviews.length}',
+                                                                              style: TextStyle(
+                                                                                  fontSize: 16,
+                                                                                  fontWeight: FontWeight.w600)),
+                                                                        ],
+                                                                      )
+                                                                    ])),
+                                                            if (state.reviews.isNotEmpty)
+                                                              SizedBox(
+                                                                  height: constraints.maxHeight * 0.6,
+                                                                  width: constraints.maxWidth,
+                                                                  child: ListView.separated(
+                                                                      itemBuilder: (context, idx) {
+                                                                        return Container(
+                                                                            padding: EdgeInsets.all(10),
+                                                                            decoration: BoxDecoration(
+                                                                                color: isDarkMode
+                                                                                    ? Colors.grey.shade800
+                                                                                    : Colors.white,
+                                                                                border: Border.all(color: Colors.grey),
+                                                                                borderRadius: BorderRadius.circular(10),
+                                                                                boxShadow: isDarkMode
+                                                                                    ? null
+                                                                                    : [
+                                                                                        BoxShadow(
+                                                                                          color:
+                                                                                              Colors.grey.withAlpha(84),
+                                                                                          spreadRadius: 2,
+                                                                                          blurRadius: 9,
+                                                                                          offset: Offset(0,
+                                                                                              3), // changes position of shadow
+                                                                                        ),
+                                                                                      ]),
+                                                                            child: Column(
+                                                                              children: [
+                                                                                RatingBar.builder(
+                                                                                  initialRating:
+                                                                                      state.reviews[idx].rating!,
+                                                                                  itemBuilder: (BuildContext context,
+                                                                                      int index) {
+                                                                                    return Icon(
+                                                                                      Icons.star,
+                                                                                      color: Colors.amber,
+                                                                                    );
+                                                                                  },
+                                                                                  ignoreGestures: true,
+                                                                                  direction: Axis.horizontal,
+                                                                                  allowHalfRating: true,
+                                                                                  itemCount: 5,
+                                                                                  itemSize: 20,
+                                                                                  itemPadding: EdgeInsets.symmetric(
+                                                                                      horizontal: 4.0),
+                                                                                  onRatingUpdate: (double value) {},
+                                                                                ),
+                                                                                Text(state.reviews[idx].comment!)
+                                                                              ],
+                                                                            ));
+                                                                      },
+                                                                      separatorBuilder: (context, idx) => const Gap(10),
+                                                                      itemCount: state.reviews.length))
+                                                            else
+                                                              SizedBox(
+                                                                  height: constraints.maxHeight * 0.6,
+                                                                  width: constraints.maxWidth,
+                                                                  child: Center(
+                                                                    child: Text('리뷰가 없습니다.'),
+                                                                  ))
+                                                          ],
+                                                        );
+                                                      }));
+                                                } else if (state.state == ReviewDataState.errorState) {
+                                                  return Container(
+                                                      height: 200,
+                                                      width: MediaQuery.sizeOf(context).width * 0.8,
+                                                      padding: EdgeInsets.all(10),
+                                                      child: Column(
+                                                        children: [
+                                                          SizedBox(
+                                                            child: Text('데이터 로드 실페.'),
+                                                          ),
+                                                          SizedBox(
+                                                            child: ElevatedButton(onPressed: () {}, child: Text('확인')),
+                                                          )
+                                                        ],
+                                                      ));
+                                                } else if (state.state == ReviewDataState.loadingState) {
+                                                  return SizedBox(
+                                                    height: 200,
+                                                    width: MediaQuery.sizeOf(context).width * 0.8,
+                                                    child: Center(child: CircularProgressIndicator()),
+                                                  );
+                                                }
+                                                return SizedBox();
+                                              }),
+                                        ));
+                              },
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
                               ),

@@ -377,6 +377,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                         }
                         context.read<BasePostProvider>().updateRecruitPost(state.post!);
                       },
+                      listenWhen: (prev, current) => current.state != UserAppState.loadingState,
                       child: _applicationSection(context, post)),
                 const Gap(40)
               ],

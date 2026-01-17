@@ -9,6 +9,7 @@ import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/utils/time_util.dart';
+import 'package:test_us_app/utils/type_conversion_util.dart';
 import '../../../../data/models/application/application_model.dart';
 import '../../../../data/models/post/recruit_post_model.dart';
 import '../../../../services/common_height_provider.dart';
@@ -44,7 +45,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
       ),
       body: BlocListener<RecruitPostBloc, RecruitPostState>(
         listener: (context, state) {
-          if(state.state == RecruitPostLoadState.postEndCompletedState) {
+          if (state.state == RecruitPostLoadState.postEndCompletedState) {
             context.read<BasePostProvider>().updateRecruitPost(state.post!);
             context.read<BasePostProvider>().updateUserRecruitPosts(state.post!);
           }
@@ -52,7 +53,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
         child: Selector<BasePostProvider, List<RecruitPostEntity>>(selector: (context, provider) {
           List<RecruitPostEntity> posts = [];
           if (provider.userRecruitPosts != null) {
-            if(provider.userRecruitPosts!.isEmpty){
+            if (provider.userRecruitPosts!.isEmpty) {
               return posts;
             }
             for (int i = 0; i < provider.userRecruitPosts!.length; i++) {
@@ -113,13 +114,13 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                         boxShadow: isDarkMode
                             ? null
                             : [
-                          BoxShadow(
-                            color: Colors.grey.withAlpha(84),
-                            spreadRadius: 2,
-                            blurRadius: 9,
-                            offset: Offset(0, 3), // changes position of shadow
-                          ),
-                        ]),
+                                BoxShadow(
+                                  color: Colors.grey.withAlpha(84),
+                                  spreadRadius: 2,
+                                  blurRadius: 9,
+                                  offset: Offset(0, 3), // changes position of shadow
+                                ),
+                              ]),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -157,6 +158,10 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                           fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
                                       maxLines: 1,
                                     ),
+                                    const Gap(5),
+                                    SizedBox(
+                                      child: posts[idx].status == PostStatus.active ? Text('(모집 중)') : Text('(만료)'),
+                                    )
                                   ],
                                 ),
                               ),
@@ -165,16 +170,9 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    SizedBox(
-                                      child: Text('플랫폼 : ${posts[idx].platform!.name.toUpperCase()}')
-
-                                    ),
-                                    const Gap(10),
-                                    SizedBox(
-                                      child: posts[idx].status == PostStatus.active
-                                          ? Text('(모집 중)')
-                                          : Text('(만료)'),
-                                    )
+                                    SizedBox(child: Text(posts[idx].platform!.name.toUpperCase())),
+                                    if (posts[idx].platform == ApplicationPlatform.mobile)
+                                      Text(' (${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)})')
                                   ],
                                 ),
                               ),
@@ -183,48 +181,57 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   // NOTE: 현재는 period가 7일로 고정 되어 있지만, 상확에 따라 변경필요, 변수로 period 포함 시키는 로직 필요.
-                                  Text('게시 만료 : ${TimeUtil().getDateTimeString(posts[idx].createdAt!, false)}'),
+                                  Text('게시 만료 : ${TimeUtil().getDateTimeString(posts[idx].createdAt!
+                                      .add(Duration(days: 7)), false)}'),
                                 ],
                               )),
                               Gap(10),
-                              if(isExpired)
+                              if (isExpired)
                                 SizedBox(
                                   height: 40,
                                   width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
-                                  child: ElevatedButton(onPressed: (){
-                                    //TODO: 테스트 종료 -> status.end 로 update
-                                    //TODO: alert으로 테스트 종료 시 리뷰를 쓰도록 이동 또는 알림
-                                    final token = context.read<UserProvider>().token ?? '';
-                                    final postId = posts[idx].id!;
-                                    context.read<RecruitPostBloc>().add(RequestPostEndEvent(token, postId));
-                                  }, child: Text('테스트 종료')),
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        //TODO: 테스트 종료 -> status.end 로 update
+                                        //TODO: alert으로 테스트 종료 시 리뷰를 쓰도록 이동 또는 알림
+                                        final token = context.read<UserProvider>().token ?? '';
+                                        final postId = posts[idx].id!;
+                                        context.read<RecruitPostBloc>().add(RequestPostEndEvent(token, postId));
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          padding: EdgeInsets.zero,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          )),
+                                      child: Text('테스트 종료')),
                                 )
                               else
-                              SizedBox(
-                                height: 40,
-                                width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
-                                child: ElevatedButton(
-                                  onPressed: posts[idx].applications!.isEmpty
-                                      ? null
-                                      : () {
-                                          Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
-                                        },
-                                  style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                                SizedBox(
+                                  height: 40,
+                                  width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
+                                  child: ElevatedButton(
+                                    onPressed: posts[idx].applications!.isEmpty
+                                        ? null
+                                        : () {
+                                            Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
+                                          },
+                                    style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation: 2,
                                     ),
-                                    elevation: 2,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text('신청 인원', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                                      Text(' ( ${posts[idx].applications!.isEmpty ? 0 : posts[idx].applications!.length} / 8 )'),
-                                    ],
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text('신청 인원', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                        Text(
+                                            ' ( ${posts[idx].applications!.isEmpty ? 0 : posts[idx].applications!.length} / 8 )'),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
                             ]),
                           ),
                         ),
@@ -238,15 +245,15 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
     );
   }
 
-  // int _getApplicantLength(RecruitPostEntity post) {
-  //   int length = 0;
-  //   if (post.applications != null && post.applications!.isNotEmpty) {
-  //     for (final application in post.applications!) {
-  //       if (application.status != ApplicationStatus.cancel || application.status == null) {
-  //         length++;
-  //       }
-  //     }
-  //   }
-  //   return length;
-  // }
+// int _getApplicantLength(RecruitPostEntity post) {
+//   int length = 0;
+//   if (post.applications != null && post.applications!.isNotEmpty) {
+//     for (final application in post.applications!) {
+//       if (application.status != ApplicationStatus.cancel || application.status == null) {
+//         length++;
+//       }
+//     }
+//   }
+//   return length;
+// }
 }
