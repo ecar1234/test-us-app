@@ -223,4 +223,21 @@ class UserDataSourceImpl implements UserDataSource {
       logger.e(e.toString());
     }
   }
+
+  @override
+  Future<String> autoLogin(String token) async {
+    final res = await netDriver.requestGetJson(token, AuthApi.autoLogin);
+    if (res['status'] == 200) {
+      return token;
+    } else if(res['status'] == 401){
+      final res = await netDriver.requestPostJson('', AuthApi.refreshToken, {'token' :token});
+      if (res['status'] == 200) {
+        return res['token'];
+      }else{
+        throw Exception('Error');
+      }
+    } else {
+      throw Exception('Error');
+    }
+  }
 }

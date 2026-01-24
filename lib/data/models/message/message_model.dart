@@ -1,27 +1,23 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:test_us_app/data/models/user/user_model.dart';
 
 part 'message_model.g.dart';
 
 @JsonSerializable()
 class MessageModel {
-  String? messageId;
-  String? message;
-  String? sender;
+  String? id;
+  String? content;
+  UserModel? sender;
   String? receiver;
   bool? deleteSender;
   bool? deleteReceiver;
   DateTime? createdAt;
-  DateTime? readAt;
 
   MessageModel({
-    this.messageId,
-    this.message,
+    this.id,
+    this.content,
     this.sender,
     this.receiver,
-    this.deleteSender,
-    this.deleteReceiver,
-    this.createdAt,
-    this.readAt,
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) => _$MessageModelFromJson(json);

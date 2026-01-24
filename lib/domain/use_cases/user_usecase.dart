@@ -19,6 +19,11 @@ class UserUseCase {
     }
     return res;
   }
+  Future<String> autoLogin(String token) async {
+    final res = await repository.autoLogin(token);
+    return res;
+  }
+
   Future<int> signup(UserEntity userInfo) async {
     final res = await repository.signup(userInfo);
     return res;

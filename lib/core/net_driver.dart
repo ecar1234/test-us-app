@@ -27,6 +27,7 @@ class NetDriver {
       return status != null && status < 500;
     }));
     if (res.statusCode == 200 || res.statusCode == 202) {
+      logger.e(res.statusMessage);
       return res.data;
     } else {
       logger.e("${res.statusCode} : ${res.statusMessage}s");

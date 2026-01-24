@@ -9,6 +9,7 @@ import 'package:logger/logger.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
+import 'package:test_us_app/presentation/pages/message/message_main_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
 import '../../../../data/models/application/application_model.dart';
@@ -409,7 +410,9 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
               leftText: "승인 취소",
               onLeftTap: () => _userRejectDialog(context, info),
               rightText: "메시지 보내기",
-              onRightTap: () {},
+              onRightTap: () {
+                Get.to(() => MessageMainPage(targetUserId: info.user!.userId!));
+              },
             );
           case ApplicationStatus.rejected:
             return Container(

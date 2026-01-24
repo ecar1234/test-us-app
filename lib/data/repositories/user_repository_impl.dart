@@ -130,4 +130,10 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> updateFirebaseToken(String token, String messagingToken, String userId, String deviceType) async {
     await remote.updateFirebaseToken(token, messagingToken, userId, deviceType);
   }
+
+  @override
+  Future<String> autoLogin(String token) async {
+    final res = await remote.autoLogin(token);
+    return res;
+  }
 }

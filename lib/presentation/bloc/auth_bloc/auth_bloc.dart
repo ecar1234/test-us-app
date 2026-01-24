@@ -29,8 +29,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthState(state: UserAuthState.beforeLoginState));
         return;
       } else {
+        final serverToken = await  userUseCase.autoLogin(token);
+        if(serverToken != token) {
+          pref.setToken(serverToken);
+          logger.d('token changed!');
+        }
         final user = await pref.getUserInfo();
-        emit(AuthState(state: UserAuthState.loginCompletedState, user: user, token: token));
+        emit(AuthState(state: UserAuthState.loginCompletedState, user: user, token: serverToken));
       }
     });
 

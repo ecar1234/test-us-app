@@ -11,6 +11,7 @@ import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:test_us_app/presentation/pages/auth/login_page.dart';
+import 'package:test_us_app/presentation/pages/message/message_main_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/application/my_applications_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/user_info/user_info_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
@@ -537,6 +538,7 @@ class _UserPageState extends State<UserPage> {
     switch (idx) {
       case 0:
         debugPrint(menu[idx]);
+        Get.to(() => MessageMainPage());
         break;
       case 1:
         debugPrint(menu[idx]);

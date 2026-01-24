@@ -8,6 +8,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/application_data/application_datasource.dart';
 import 'package:test_us_app/data/data_sources/application_data/application_datasource_impl.dart';
+import 'package:test_us_app/data/data_sources/message_data/message_data_source.dart';
+import 'package:test_us_app/data/data_sources/message_data/message_data_source_impl.dart';
 import 'package:test_us_app/data/data_sources/post_data/base_post_datasource_impl.dart';
 import 'package:test_us_app/data/data_sources/post_data/recruit_post_datasource.dart';
 import 'package:test_us_app/data/data_sources/post_data/recruit_post_datasource_impl.dart';
@@ -15,7 +17,9 @@ import 'package:test_us_app/data/data_sources/review_data/review_data_source.dar
 import 'package:test_us_app/data/data_sources/review_data/review_data_source_impl.dart';
 import 'package:test_us_app/data/data_sources/user_data/user_data_source.dart';
 import 'package:test_us_app/data/data_sources/user_data/user_data_source_impl.dart';
+import 'package:test_us_app/data/repositories/message_repository_impl.dart';
 import 'package:test_us_app/data/repositories/recruit_post_repository_impl.dart';
+import 'package:test_us_app/domain/repositories/message_repository.dart';
 import 'package:test_us_app/domain/use_cases/base_post_usecase.dart';
 import 'package:test_us_app/domain/use_cases/firebase_messaging_usecase.dart';
 import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
@@ -23,15 +27,24 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/firebase/firebase_options.dart';
 import 'package:test_us_app/services/notification/notification_service.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:test_us_app/services/socket/Isocket_io_client.dart';
+import 'package:test_us_app/services/socket/socket_io_client.dart';
 
 import 'core/net_driver.dart';
 import 'data/data_sources/post_data/base_post_datasource.dart';
 import 'data/data_sources/post_data/promotion_post_datasource.dart';
 import 'data/data_sources/post_data/promotion_post_datasource_impl.dart';
+import 'data/data_sources/room_data/room_data_source.dart';
+import 'data/data_sources/room_data/room_data_source_impl.dart';
+import 'data/data_sources/room_member_data/room_member_data_source.dart';
+import 'data/data_sources/room_member_data/room_member_data_source_impl.dart';
 import 'data/repositories/application_repository_impl.dart';
 import 'data/repositories/base_post_repository_impl.dart';
 import 'data/repositories/promotion_post_repository_impl.dart';
 import 'data/repositories/review_repository_impl.dart';
+import 'data/repositories/room_member_repository_impl.dart';
+import 'data/repositories/room_repository_impl.dart';
 import 'data/repositories/user_repository_impl.dart';
 import 'domain/repositories/application_repo.dart';
 import 'domain/repositories/base_post_repository.dart';
@@ -39,9 +52,12 @@ import 'domain/repositories/image_repository.dart';
 import 'domain/repositories/promotion_post_repository.dart';
 import 'domain/repositories/recruit_post_repository.dart';
 import 'domain/repositories/review_repository.dart';
+import 'domain/repositories/room_member_repository.dart';
+import 'domain/repositories/room_repository.dart';
 import 'domain/repositories/user_repository.dart';
 import 'domain/use_cases/application_usecase.dart';
 import 'domain/use_cases/image_usecase.dart';
+import 'domain/use_cases/message_usecase.dart';
 import 'domain/use_cases/promotion_post_usecase.dart';
 import 'domain/use_cases/recruit_post_usecase.dart';
 import 'domain/use_cases/review_usecase.dart';
@@ -64,6 +80,7 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   getIt.registerLazySingleton<NetDriver>(() => NetDriver(host));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());
   // getIt.registerSingleton<ThemeProvider>(ThemeProvider());
+  getIt.registerLazySingleton<ISocketClient>(() => SocketIoClient());
 
   // data
   getIt.registerLazySingleton<UserDataSource>(() => UserDataSourceImpl(getIt<NetDriver>()));
@@ -73,6 +90,11 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   getIt.registerLazySingleton<BasePostDataSource>(() => BasePostDataSourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<RecruitPostDatasource>(() => RecruitPostDatasourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<PromotionPostDataSource>(() => PromotionPostDataSourceImpl(getIt<NetDriver>()));
+  getIt.registerLazySingleton<MessageDataSource>(() => MessageDataSourceImpl(getIt<NetDriver>()));
+  getIt.registerLazySingleton<RoomDataSource>(() => RoomDataSourceImpl(getIt<NetDriver>()));
+  getIt.registerLazySingleton<RoomMemberDataSource>(() => RoomMemberDataSourceImpl(getIt<NetDriver>()));
+
+
 
   // domain
   getIt.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(getIt<UserDataSource>()));
@@ -83,6 +105,11 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   getIt.registerLazySingleton<RecruitPostRepository>(() => RecruitPostRepositoryImpl(getIt<RecruitPostDatasource>()));
   getIt.registerLazySingleton<PromotionPostRepository>(
       () => PromotionPostRepositoryImpl(getIt<PromotionPostDataSource>()));
+  getIt.registerLazySingleton<MessageRepository>(() => MessageRepositoryImpl(getIt<MessageDataSource>()));
+  getIt.registerLazySingleton<RoomRepository>(() => RoomRepositoryImpl(getIt<RoomDataSource>()));
+  getIt.registerLazySingleton<RoomMemberRepository>(() => RoomMemberRepositoryImpl(getIt<RoomMemberDataSource>()));
+
+
 
   // use case
   getIt.registerLazySingleton<UserUseCase>(() => UserUseCase(getIt<UserRepository>()));
@@ -93,6 +120,8 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   getIt.registerLazySingleton<RecruitPostUseCase>(() => RecruitPostUseCase(getIt<RecruitPostRepository>()));
   getIt.registerLazySingleton<PromotionPostUseCase>(() => PromotionPostUseCase(getIt<PromotionPostRepository>()));
   getIt.registerLazySingleton<FirebaseMessagingUseCase>(() => FirebaseMessagingUseCase());
+  getIt.registerLazySingleton<MessageUseCase>(() => MessageUseCase(getIt<RoomRepository>(), getIt<MessageRepository>(), getIt<RoomMemberRepository>()));
+
 
   //provider
   getIt.registerSingleton<FirebaseMessagingProvider>(FirebaseMessagingProvider(getIt<FirebaseMessagingUseCase>()));

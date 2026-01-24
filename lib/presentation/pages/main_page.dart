@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -29,8 +30,10 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/pages/home/user_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:test_us_app/services/socket/Isocket_io_client.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
+import '../../core/api_names.dart';
 import '../../data/sharedPreferences/auth_preference.dart';
 import '../../data/sharedPreferences/firebase_messaging_preference.dart';
 import '../../domain/entities/user_entity.dart';
@@ -184,6 +187,10 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             userBloc.add(CreateFirebaseTokenEvent(state.token, messagingToken, state.user!.id, deviceType));
             firebaseProvider.setFirebaseToken(messagingToken);
             firebaseProvider.getNotification();
+
+            String host = kDebugMode ? Host.baseDevUrl : Host.baseProdUrl;
+
+            GetIt.I.get<ISocketClient>().init(host, state.token!);
           },
           listenWhen: (preState, state) => state.state == UserAuthState.loginCompletedState,
         ),

@@ -1,23 +1,38 @@
 
 
+import 'package:test_us_app/domain/entities/user_entity.dart';
+
+import '../../data/models/message/message_model.dart';
+
 class MessageEntity {
-  String? messageId;
+  String? id;
   String? message;
-  String? sender;
+  UserEntity? sender;
   String? receiver;
   bool? deleteSender;
   bool? deleteReceiver;
   DateTime? createdAt;
-  DateTime? readAt;
 
   MessageEntity({
-    this.messageId,
+    this.id,
     this.message,
     this.sender,
     this.receiver,
     this.deleteSender,
     this.deleteReceiver,
     this.createdAt,
-    this.readAt,
   });
+
+  static MessageEntity toEntity(MessageModel model) {
+    final sender = UserEntity.toEntity(model.sender!);
+    return MessageEntity(
+      id: model.id,
+      message: model.content,
+      sender: sender,
+      receiver: model.receiver,
+      deleteSender: model.deleteSender,
+      deleteReceiver: model.deleteReceiver,
+      createdAt: model.createdAt,
+    );
+  }
 }

@@ -53,6 +53,7 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
             padding: EdgeInsets.all(20),
             child: Selector<ApplicationProvider, List<RecruitPostEntity>>(
               selector: (context, provider) {
+                // todo: createdAt 내림차순
                 return provider.userApplicationPosts ?? [];
               },
               builder: (context, posts, child) {

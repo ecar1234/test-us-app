@@ -13,6 +13,8 @@ class AuthApi {
   static const String login = '/api/v1/auth/login';
   static const String authLogin = '/api/v1/auth/authLogin';
   static const String authSignup = '/api/v1/auth/authSignup';
+  static const String refreshToken = '/api/v1/auth/refreshToken';
+  static const String autoLogin = '/api/v1/auth/autoLogin';
 }
 
 class UserApi {
@@ -94,7 +96,10 @@ class ReviewApi {
   static const String getReviewByUserReviewId = '/api/v1/review/getReviewByUserReviewId';
 }
 
-class MessageApi {}
+class MessageApi {
+  static const String requestRoomList = '/api/v1/message/getRoomList';
+  // static const String requestRoom = '/api/v1/message/requestRoom';
+}
 
 class JobApi {
   static const String jobGetApplications = '/api/v1/jobState/jobApplicationsById';

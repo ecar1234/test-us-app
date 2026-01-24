@@ -7,28 +7,26 @@ part of 'message_model.dart';
 // **************************************************************************
 
 MessageModel _$MessageModelFromJson(Map<String, dynamic> json) => MessageModel(
-      messageId: json['messageId'] as String?,
-      message: json['message'] as String?,
-      sender: json['sender'] as String?,
+      id: json['id'] as String?,
+      content: json['content'] as String?,
+      sender: json['sender'] == null
+          ? null
+          : UserModel.fromJson(json['sender'] as Map<String, dynamic>),
       receiver: json['receiver'] as String?,
-      deleteSender: json['deleteSender'] as bool?,
-      deleteReceiver: json['deleteReceiver'] as bool?,
-      createdAt: json['createdAt'] == null
+    )
+      ..deleteSender = json['deleteSender'] as bool?
+      ..deleteReceiver = json['deleteReceiver'] as bool?
+      ..createdAt = json['createdAt'] == null
           ? null
-          : DateTime.parse(json['createdAt'] as String),
-      readAt: json['readAt'] == null
-          ? null
-          : DateTime.parse(json['readAt'] as String),
-    );
+          : DateTime.parse(json['createdAt'] as String);
 
 Map<String, dynamic> _$MessageModelToJson(MessageModel instance) =>
     <String, dynamic>{
-      'messageId': instance.messageId,
-      'message': instance.message,
+      'id': instance.id,
+      'content': instance.content,
       'sender': instance.sender,
       'receiver': instance.receiver,
       'deleteSender': instance.deleteSender,
       'deleteReceiver': instance.deleteReceiver,
       'createdAt': instance.createdAt?.toIso8601String(),
-      'readAt': instance.readAt?.toIso8601String(),
     };
