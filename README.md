@@ -19,11 +19,11 @@ It was created with the fundamental idea that each user becomes another's tester
 Upload a post recruiting testers. Describe your product and begin your adventure.  
 - Promotion Board:  
 Upload promotional posts for your product. Promote your product and set the service address and downloadable store address.  
-- Review Management:
+- Review Management:  
 Manage your written and received reviews.  
-- Tester Management:
+- Tester Management:  
 Manage tester applications.  
-- Message Management:
+- Message Management:  
 Chat with testers or product managers.  
 
 ## TESTUS 앱
