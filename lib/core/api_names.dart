@@ -98,6 +98,9 @@ class ReviewApi {
 
 class MessageApi {
   static const String requestRoomList = '/api/v1/message/getRoomList';
+  static const String requestRoomInfoById = '/api/v1/message/getRoomInfoById';
+  static const String requestMessageByRoomId = '/api/v1/message/getMessageByRoomId';
+  static const String requestMessageByPostId = '/api/v1/message/getMessageByPostId';
   // static const String requestRoom = '/api/v1/message/requestRoom';
 }
 

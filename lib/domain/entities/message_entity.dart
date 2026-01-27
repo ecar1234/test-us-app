@@ -3,35 +3,35 @@
 import 'package:test_us_app/domain/entities/user_entity.dart';
 
 import '../../data/models/message/message_model.dart';
+import '../../data/models/package/recruit_post_applications_model.dart';
 
 class MessageEntity {
-  String? id;
-  String? message;
-  UserEntity? sender;
-  String? receiver;
-  bool? deleteSender;
-  bool? deleteReceiver;
+  int? id;
+  String? content;
+  User? sender;
+  int? roomId;
   DateTime? createdAt;
+
 
   MessageEntity({
     this.id,
-    this.message,
+    this.content,
     this.sender,
-    this.receiver,
-    this.deleteSender,
-    this.deleteReceiver,
-    this.createdAt,
+    this.roomId,
+    this.createdAt
   });
 
   static MessageEntity toEntity(MessageModel model) {
-    final sender = UserEntity.toEntity(model.sender!);
+    final sender = User(
+      userId: model.sender!.userId,
+      nickname: model.sender!.nickname,
+      email: model.sender!.email,
+    );
     return MessageEntity(
       id: model.id,
-      message: model.content,
+      content: model.content,
       sender: sender,
-      receiver: model.receiver,
-      deleteSender: model.deleteSender,
-      deleteReceiver: model.deleteReceiver,
+      roomId: model.roomId,
       createdAt: model.createdAt,
     );
   }

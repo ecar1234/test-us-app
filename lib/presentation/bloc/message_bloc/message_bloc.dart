@@ -23,5 +23,32 @@ class MessageBloc extends Bloc<MessageBlocEvent, MessageBlocState> {
         logger.e("data state : errorState");
       }
     });
+
+    on<RequestRoomMessagesByPostIdEvent>((event, emit) async {
+      emit(MessageBlocState(state: MessageLoadState.dataLoadState));
+      logger.i("data state : dataLoadState");
+      try {
+        final res = await messageUseCase.requestMessageByPostId(event.token, event.postId, event.targetId);
+        emit(RoomMessagesLoadCompletedState(messageList: res));
+        logger.i("data state : getMessageListCompletedState");
+      } catch (error) {
+        emit(MessageBlocState(state: MessageLoadState.errorState));
+        logger.e("data state : errorState");
+      }
+
+    });
+    on<RequestRoomMessagesByRoomIdEvent>((event, emit) async {
+      emit(MessageBlocState(state: MessageLoadState.dataLoadState));
+      logger.i("data state : dataLoadState");
+      try {
+        final res = await messageUseCase.requestMessageByRoomId(event.token, event.roomId);
+        emit(RoomMessagesLoadCompletedState(messageList: res));
+        logger.i("data state : getMessageListCompletedState");
+      } catch (error) {
+        emit(MessageBlocState(state: MessageLoadState.errorState));
+        logger.e("data state : errorState");
+      }
+    });
+
   }
 }

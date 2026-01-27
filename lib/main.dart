@@ -57,8 +57,13 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (context) => ApplicationProvider(getIt<ApplicationUseCase>())),
       ChangeNotifierProvider(create: (context) => ReviewProvider(getIt<ReviewUseCase>())),
       ChangeNotifierProvider(create: (context) => ThemeProvider()),
-      ChangeNotifierProvider(create: (context) => SocketProvider()),
-      ChangeNotifierProvider(create: (context) => RoomProvider()),
+      ChangeNotifierProvider(create: (context) => RoomProvider(getIt<MessageUseCase>())),
+      ChangeNotifierProxyProvider<RoomProvider, SocketProvider>(
+          create: (context) => GetIt.I.get<SocketProvider>(),
+        update: (context, roomProvider, socketProvider) {
+          return socketProvider!..setRoomProvider(roomProvider);
+        },
+      ),
     ],
     child: MultiBlocProvider(
       providers: [

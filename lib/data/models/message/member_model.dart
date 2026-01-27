@@ -7,9 +7,8 @@ part 'member_model.g.dart';
 @JsonSerializable()
 class RoomMemberModel {
   int? id;
-  RoomModel? room;
+  int? roomId;
   UserModel? user;
-  String? userId;
   int? unreadCount;
   int? lastReadMessageId;
   bool? isActive;
@@ -17,9 +16,8 @@ class RoomMemberModel {
 
   RoomMemberModel({
     this.id,
-    this.room,
+    this.roomId,
     this.user,
-    this.userId,
     this.unreadCount,
     this.lastReadMessageId,
     this.isActive,

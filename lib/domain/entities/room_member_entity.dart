@@ -7,9 +7,8 @@ import '../../data/models/message/member_model.dart';
 
 class RoomMemberEntity {
   int? id;
-  RoomEntity? room;
+  int? roomId;
   UserEntity? user;
-  String? userId;
   int? unreadCount;
   int? lastReadMessageId;
   bool? isActive;
@@ -17,9 +16,8 @@ class RoomMemberEntity {
 
   RoomMemberEntity({
     this.id,
-    this.room,
+    this.roomId,
     this.user,
-    this.userId,
     this.unreadCount,
     this.lastReadMessageId,
     this.isActive,
@@ -28,12 +26,10 @@ class RoomMemberEntity {
 
   static RoomMemberEntity toEntity(RoomMemberModel model) {
     final user = UserEntity.toEntity(model.user!);
-    final room = RoomEntity.toEntity(model.room!);
     return RoomMemberEntity(
       id: model.id,
-      room: room,
+      roomId: model.roomId,
       user: user,
-      userId: model.userId,
       unreadCount: model.unreadCount,
       lastReadMessageId: model.lastReadMessageId,
       isActive: model.isActive,

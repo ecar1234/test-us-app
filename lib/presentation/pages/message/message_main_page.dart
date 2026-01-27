@@ -9,9 +9,7 @@ import '../../provider/room_provider.dart';
 import '../../provider/user_provider.dart';
 
 class MessageMainPage extends StatefulWidget {
-  final String? targetUserId;
-
-  const MessageMainPage({super.key, this.targetUserId});
+  const MessageMainPage({super.key});
 
   @override
   State<MessageMainPage> createState() => _MessageMainPageState();

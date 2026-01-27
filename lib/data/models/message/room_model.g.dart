@@ -6,12 +6,28 @@ part of 'room_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+RoomPostModel _$RoomPostModelFromJson(Map<String, dynamic> json) =>
+    RoomPostModel(
+      json['id'] as String?,
+      json['title'] as String?,
+      (json['images'] as List<dynamic>?)
+          ?.map((e) => ImageModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$RoomPostModelToJson(RoomPostModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'images': instance.images,
+    };
+
 RoomModel _$RoomModelFromJson(Map<String, dynamic> json) => RoomModel(
       id: (json['id'] as num?)?.toInt(),
       type: $enumDecodeNullable(_$RoomTypeEnumMap, json['type']),
       post: json['post'] == null
           ? null
-          : RecruitPostModel.fromJson(json['post'] as Map<String, dynamic>),
+          : RoomPostModel.fromJson(json['post'] as Map<String, dynamic>),
       targetUserId: json['targetUserId'] as String?,
       lastMessage: json['lastMessage'] == null
           ? null
@@ -22,9 +38,6 @@ RoomModel _$RoomModelFromJson(Map<String, dynamic> json) => RoomModel(
           : DateTime.parse(json['lastMessageAt'] as String),
       members: (json['members'] as List<dynamic>?)
           ?.map((e) => RoomMemberModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      messages: (json['messages'] as List<dynamic>?)
-          ?.map((e) => MessageModel.fromJson(e as Map<String, dynamic>))
           .toList(),
       createdAt: json['createdAt'] == null
           ? null
@@ -40,7 +53,6 @@ Map<String, dynamic> _$RoomModelToJson(RoomModel instance) => <String, dynamic>{
       'lastMessageContent': instance.lastMessageContent,
       'lastMessageAt': instance.lastMessageAt?.toIso8601String(),
       'members': instance.members,
-      'messages': instance.messages,
       'createdAt': instance.createdAt?.toIso8601String(),
     };
 

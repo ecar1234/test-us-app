@@ -2,54 +2,159 @@ import 'dart:async';
 
 import 'package:logger/logger.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:test_us_app/domain/entities/message_entity.dart';
 import 'package:test_us_app/services/socket/Isocket_io_client.dart';
 
-class SocketIoClient implements ISocketClient {
+import '../../data/models/message/message_model.dart';
+
+class TReqMessageEntity {
+  int? roomId;
+  String? content;
+  String? targetId;
+  String? postId;
+  TReqMessageEntity({this.roomId, this.content, this.targetId, this.postId});
+}
+
+class SocketIOClientImpl implements ISocketClient {
   final logger = Logger();
   IO.Socket? _socket;
-  final StreamController<dynamic> _streamController = StreamController<dynamic>.broadcast();
 
+  /// ✅ 반드시 broadcast
+  /// 여러 Provider / UI / UseCase에서 동시에 listen 가능
+  final StreamController<Map<String, dynamic>> _streamController =
+  StreamController<Map<String, dynamic>>.broadcast();
 
   @override
   void init(String host, String token) {
-    if (_socket != null) return; // 이미 초기화되었다면 중복 생성 방지
+    if (_socket != null) return; // ✅ 중복 생성 방지 (Singleton 보장)
 
-    _socket = IO.io(host, IO.OptionBuilder()
-        .setTransports(['websocket']) // 핵심: websocket 우선 사용
-        .disableAutoConnect()        // 수동 연결 제어를 위해 false
-        .build());
+    _socket = IO.io(
+      host,
+      IO.OptionBuilder()
+          .setTransports(['websocket']) // websocket 고정 (polling 방지)
+          .setAuth({'token': token})    // auth token
+          .disableAutoConnect()         // connect()를 수동으로 제어
+          .build(),
+    );
+
     logger.d('[SocketIO] init completed : $host');
-    // 서버로부터의 이벤트를 Stream으로 변환 (Provider/Bloc에서 듣기 위함)
+
+    /// ✅ 모든 socket 이벤트를 Stream으로 흘려보냄
+    /// 이 구조가 성립하려면 subscribeEvent와 구조가 정확히 일치해야 함
     _socket!.onAny((event, data) {
-      _streamController.add({'event': event, 'data': data});
+      logger.d('[SocketIO] onAny event=$event data=$data');
+
+      _streamController.add({
+        'event': event, // ex) chat_message
+        'data': data,   // payload
+      });
     });
-    logger.d('[SocketIO] event listener created');
+
+    /// ❗ 에러 / 연결 해제 로그는 필수 (디버깅용)
+    _socket!.onDisconnect((_) {
+      logger.w('[SocketIO] disconnected');
+    });
+
+    _socket!.onError((err) {
+      logger.e('[SocketIO] error: $err');
+    });
+
+    logger.d('[SocketIO] global event listener registered');
   }
 
   @override
-  void onConnect() {
+  void connect() {
+    if (_socket == null) {
+      logger.e('[SocketIO] connect() called before init()');
+      return;
+    }
+
+    if (_socket!.connected) {
+      logger.d('[SocketIO] already connected');
+      return;
+    }
+
+    logger.d('[SocketIO] connecting...');
     _socket!.connect();
-    logger.d('socket connected');
+  }
+
+  @override
+  void onConnect(Function(dynamic data) callback) {
+    /// ✅ 실제 연결 완료 시점
+    _socket!.onConnect((data) {
+      logger.d('✅ socket connected');
+      callback(data);
+    });
+  }
+
+  @override
+  bool connected() {
+    return _socket?.connected ?? false;
   }
 
   @override
   void disconnect() {
+    logger.d('[SocketIO] disconnect()');
     _socket?.disconnect();
   }
 
   @override
-  void onLeave() {
+  void joinRoom(int roomId) {
+    /// ❗ 반드시 connect 이후 호출
+    logger.d('[SocketIO] join_room: $roomId');
+    _socket?.emit('join_room', roomId);
+  }
+
+  @override
+  void onLeave(int roomId) {
+    logger.d('[SocketIO] leave_room: $roomId');
+    _socket?.emit('leave room', roomId);
+  }
+
+  @override
+  void sendMessage(TReqMessageEntity message) {
+    /// ❗ room join 이후에 보내야 수신 가능
+    final payload = {
+      'roomId': message.roomId,
+      'content': message.content,
+      'targetId': message.targetId,
+      'postId': message.postId,
+    };
+
+    logger.d('[SocketIO] emit chat_message: $payload');
+    _socket?.emit('chat_message', payload);
+  }
+
+  @override
+  Stream<T> subscribeEvent<T>(
+      String eventName,
+      T Function(dynamic data) mapper,
+      ) {
+    logger.d('[SocketIO] subscribeEvent: $eventName');
+
+    return _streamController.stream
+        .where((event) {
+      final match = event['event'] == eventName;
+
+      /// 🔥 디버깅 핵심 로그
+      logger.d(
+        '[SocketIO] filter event=${event['event']} '
+            'target=$eventName match=$match',
+      );
+
+      return match;
+    })
+        .map((event) {
+      logger.d('[SocketIO] map event=$eventName data=${event['data']}');
+      return mapper(event['data']);
+    });
+  }
+
+  /// ✅ 반드시 dispose 제공 (앱 종료 시)
+  void dispose() {
+    logger.d('[SocketIO] dispose');
+    _streamController.close();
     _socket?.dispose();
+    _socket = null;
   }
-
-  @override
-  void sendMessage() {
-    _socket?.emit('chat_message', {'message': 'Hello, server!'});
-  }
-
-  @override
-  Stream onEvent(String event) {
-    return _streamController.stream.where((e) => e['event'] == event);
-  }
-
 }

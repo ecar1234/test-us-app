@@ -23,6 +23,7 @@ import 'package:test_us_app/domain/repositories/message_repository.dart';
 import 'package:test_us_app/domain/use_cases/base_post_usecase.dart';
 import 'package:test_us_app/domain/use_cases/firebase_messaging_usecase.dart';
 import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
+import 'package:test_us_app/presentation/provider/socket_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/firebase/firebase_options.dart';
@@ -80,7 +81,7 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   getIt.registerLazySingleton<NetDriver>(() => NetDriver(host));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());
   // getIt.registerSingleton<ThemeProvider>(ThemeProvider());
-  getIt.registerLazySingleton<ISocketClient>(() => SocketIoClient());
+  getIt.registerLazySingleton<ISocketClient>(() => SocketIOClientImpl());
 
   // data
   getIt.registerLazySingleton<UserDataSource>(() => UserDataSourceImpl(getIt<NetDriver>()));
@@ -126,5 +127,6 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   //provider
   getIt.registerSingleton<FirebaseMessagingProvider>(FirebaseMessagingProvider(getIt<FirebaseMessagingUseCase>()));
   getIt.registerSingleton<UserProvider>(UserProvider(getIt<UserUseCase>()));
+  getIt.registerSingleton<SocketProvider>(SocketProvider());
 
 }

@@ -10,6 +10,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/pages/message/message_main_page.dart';
+import 'package:test_us_app/presentation/pages/message/message_room.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 
 import '../../../../data/models/application/application_model.dart';
@@ -411,7 +412,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
               onLeftTap: () => _userRejectDialog(context, info),
               rightText: "메시지 보내기",
               onRightTap: () {
-                Get.to(() => MessageMainPage(targetUserId: info.user!.userId!));
+                Get.to(() => MessageRoom(targetUser: info.user!, postId: info.application!.postId!));
               },
             );
           case ApplicationStatus.rejected:

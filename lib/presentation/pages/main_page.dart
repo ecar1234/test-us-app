@@ -50,6 +50,7 @@ import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../bloc/user_bloc/user_event.dart';
 import '../components/custom_bottom_bar.dart';
 import '../provider/firebase_messaging_provider.dart';
+import '../provider/socket_provider.dart';
 import 'home/home_page.dart';
 
 class MetaDataSetting extends StatefulWidget {
@@ -169,6 +170,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             final basePostBloc = context.read<BasePostBloc>();
             final applicationBloc = context.read<AppBloc>();
             final userBloc = context.read<UserBloc>();
+            final socket =  context.read<SocketProvider>();
 
             await userProvider.autoLogin(state.token!, state.user!);
             basePostBloc.add(RequestUserInItDataEvent(state.token!, state.user!.id!));
@@ -190,7 +192,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
 
             String host = kDebugMode ? Host.baseDevUrl : Host.baseProdUrl;
 
-            GetIt.I.get<ISocketClient>().init(host, state.token!);
+            socket.initializeSocket(host, state.token!);
           },
           listenWhen: (preState, state) => state.state == UserAuthState.loginCompletedState,
         ),

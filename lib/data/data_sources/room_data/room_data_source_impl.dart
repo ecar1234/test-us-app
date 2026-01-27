@@ -29,4 +29,14 @@ class RoomDataSourceImpl implements RoomDataSource {
     }
   }
 
+  @override
+  Future<RoomModel> requestRoomInfoById(int roomId) async {
+    final res = await netDriver.requestGetJson("", MessageApi.requestRoomInfoById, param: roomId.toString());
+    if (res['status'] == 200) {
+      return RoomModel.fromJson(res['room']);
+    } else {
+      return RoomModel(id: roomId);
+    }
+  }
+
 }

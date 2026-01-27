@@ -17,6 +17,7 @@ import 'package:test_us_app/presentation/pages/my_pages/user_info/user_info_page
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
+import 'package:test_us_app/presentation/provider/socket_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/theme_provider.dart';
@@ -442,6 +443,7 @@ class _UserPageState extends State<UserPage> {
                                                                       context
                                                                           .read<UserBloc>()
                                                                           .add(RemoveFirebaseTokenEvent(token, userId, messagingToken));
+                                                                      context.read<SocketProvider>().disconnect();
                                                                     }
                                                                     context.read<UserProvider>().logout();
                                                                     context.read<BasePostProvider>().logout();
@@ -464,38 +466,6 @@ class _UserPageState extends State<UserPage> {
                                       );
                                     }
                                   );
-                                  // Get.defaultDialog(
-                                  //   title: '로그아웃',
-                                  //   titleStyle: TextStyle(),
-                                  //   middleText: '로그아웃 하시겠습니까?',
-                                  //   actions: [
-                                  //     TextButton(
-                                  //         onPressed: () {
-                                  //           Navigator.pop(context);
-                                  //         },
-                                  //         child: const Text('취소')),
-                                  //     TextButton(
-                                  //         onPressed: () async {
-                                  //           Navigator.pop(context);
-                                  //           final user = context.read<UserProvider>().user!;
-                                  //           if (user.method! != AuthType.email) {
-                                  //             final token = context.read<AuthBloc>().state.token!;
-                                  //             final userId = context.read<AuthBloc>().state.user!.id;
-                                  //             final messagingToken = context.read<FirebaseMessagingProvider>().token??'';
-                                  //             context.read<AuthBloc>().add(LogoutEvent());
-                                  //             context
-                                  //                 .read<UserBloc>()
-                                  //                 .add(RemoveFirebaseTokenEvent(token, userId, messagingToken));
-                                  //           }
-                                  //           context.read<UserProvider>().logout();
-                                  //           context.read<BasePostProvider>().logout();
-                                  //           context.read<ApplicationProvider>().logout();
-                                  //           // context.read<AuthBloc>().add(LogoutEvent());
-                                  //         },
-                                  //         child: const Text('확인')),
-                                  //   ],
-                                  // );
-                                  // context.read<AuthBloc>().add(LogoutEvent(context));
                                 },
                                 style: TextButton.styleFrom(
                                   padding: EdgeInsets.zero,

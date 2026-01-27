@@ -1,9 +1,15 @@
 
+import 'package:test_us_app/domain/entities/message_entity.dart';
+import 'package:test_us_app/services/socket/socket_io_client.dart';
+
 abstract class ISocketClient {
   void init (String host, String token);
-  void onConnect ();
-  void sendMessage ();
-  void onLeave();
+  void connect();
+  void joinRoom(int roomId);
+  bool connected () => true;
+  void onConnect (Function(dynamic data) callback);
+  void sendMessage (TReqMessageEntity message);
+  void onLeave(int roomId);
   void disconnect();
-  Stream<dynamic> onEvent(String event);
+  Stream<T> subscribeEvent<T>(String eventName, T Function(dynamic data) mapper);
 }

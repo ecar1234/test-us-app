@@ -23,4 +23,10 @@ class RoomRepositoryImpl implements RoomRepository {
     return res.map((e) => RoomEntity.toEntity(e)).toList();
   }
 
+  @override
+  Future<RoomEntity> requestRoomInfoById(int roomId) async {
+    final res = await remote.requestRoomInfoById(roomId);
+    return RoomEntity.toEntity(res);
+  }
+
 }
