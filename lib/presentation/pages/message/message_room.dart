@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
@@ -33,6 +35,7 @@ class _MessageRoomState extends State<MessageRoom> {
   final FocusNode _focusNode = FocusNode();
   late int messageRoonId;
   late SocketProvider socketProvider;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -84,13 +87,13 @@ class _MessageRoomState extends State<MessageRoom> {
                   context.read<SocketProvider>().setMessages(state.messageList);
                   if (state.messageList.isNotEmpty) {
                     messageRoonId = state.messageList.first.roomId!;
-                    if(widget.roomId == null){
+                    if (widget.roomId == null) {
                       socketProvider.joinRoom(messageRoonId);
                     }
                   }
                 }
               }, builder: (context, state) {
-                if(state.state == MessageLoadState.dataLoadState){
+                if (state.state == MessageLoadState.dataLoadState) {
                   return Center(child: CircularProgressIndicator());
                 }
                 return Container(
@@ -104,8 +107,7 @@ class _MessageRoomState extends State<MessageRoom> {
                           return provider.messages ?? [];
                         }, builder: (context, messages, child) {
                           return ListView.separated(
-                            padding: EdgeInsets.only(bottom: 10),
-
+                              padding: EdgeInsets.only(bottom: 10),
                               physics: BouncingScrollPhysics(),
                               shrinkWrap: true,
                               reverse: true,
@@ -115,60 +117,48 @@ class _MessageRoomState extends State<MessageRoom> {
                                 }
                                 final message = messages[idx];
                                 final DateTime? createdAt = message.createdAt;
+                                final next = idx > 0 ? messages[idx - 1] : null;
+                                final prev = idx < messages.length - 1 ? messages[idx + 1] : null;
 
-                                // 1. 날짜 구분선을 표시해야 하는지 확인
+                                bool isSameUser(MessageEntity? a, MessageEntity? b) =>
+                                    a?.sender!.userId == b?.sender!.userId;
+
+                                bool isSameMinute(DateTime? a, DateTime? b) {
+                                  if (a == null || b == null) return false;
+                                  return a.year == b.year &&
+                                      a.month == b.month &&
+                                      a.day == b.day &&
+                                      a.hour == b.hour &&
+                                      a.minute == b.minute;
+                                }
+
+                                bool showProfile =
+                                    !isSameUser(message, prev) || !isSameMinute(message.createdAt, prev?.createdAt);
+                                bool showTime =
+                                    !isSameUser(message, next) || !isSameMinute(message.createdAt, next?.createdAt);
                                 bool showDateHeader = false;
 
                                 if (createdAt != null) {
-                                  // 1️⃣ 리스트의 첫 번째 메시지 (가장 오래된 메시지)
                                   if (idx == messages.length - 1) {
                                     showDateHeader = true;
-                                  }
-                                  // 2️⃣ 바로 이전(시간상 과거) 메시지와 날짜가 다를 때
-                                  else {
+                                  } else {
                                     final nextCreatedAt = messages[idx + 1].createdAt;
                                     if (nextCreatedAt != null) {
-                                      showDateHeader =
-                                          createdAt.year != nextCreatedAt.year ||
-                                              createdAt.month != nextCreatedAt.month ||
-                                              createdAt.day != nextCreatedAt.day;
+                                      showDateHeader = createdAt.year != nextCreatedAt.year ||
+                                          createdAt.month != nextCreatedAt.month ||
+                                          createdAt.day != nextCreatedAt.day;
                                     }
                                   }
                                 }
+
                                 return Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     if (showDateHeader) _buildDateHeader(createdAt!),
-                                    Row(
-                                      mainAxisAlignment: message.sender!.userId == widget.targetUser!.userId
-                                          ? MainAxisAlignment.start
-                                          : MainAxisAlignment.end,
-                                      children: [
-                                        //todo: 메시지 UI 만들어여 하고, 메시지 전송시 동일안 member로 추가 안되는 문제 해결해야됨.
-                                        Text(
-                                          TimeUtil().getChatDateTimeString(message.createdAt!),
-                                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                                        ),
-                                        const Gap(10),
-                                        Container(
-                                          constraints: BoxConstraints(
-                                            maxWidth: MediaQuery.sizeOf(context).width * 0.6,
-                                          ),
-                                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            color: message.sender!.userId == widget.targetUser!.userId
-                                                ? Colors.white
-                                                : Theme.of(context).colorScheme.primary,
-                                            borderRadius: BorderRadius.circular(10),
-                                            // border: Border.all(color: Colors.grey.shade600)
-                                          ),
-                                          child: Text(
-                                            messages[idx].content!,
-                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    if (message.sender!.userId == widget.targetUser!.userId)
+                                      _buildLeftMessage(message, showProfile, showTime)
+                                    else
+                                      _buildRightMessage(message)
                                   ],
                                 );
                               },
@@ -176,6 +166,7 @@ class _MessageRoomState extends State<MessageRoom> {
                               itemCount: messages.length);
                         }),
                       ),
+                      const Gap(5),
                       SizedBox(
                         // height: 50,
                         width: MediaQuery.sizeOf(context).width,
@@ -218,6 +209,7 @@ class _MessageRoomState extends State<MessageRoom> {
                                       _controller.clear();
                                     },
                                     style: ElevatedButton.styleFrom(
+                                      padding: EdgeInsets.zero,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -236,7 +228,7 @@ class _MessageRoomState extends State<MessageRoom> {
   }
 
   Widget _buildDateHeader(DateTime date) {
-    final compareData = date.compareTo(DateTime.now());
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Center(
@@ -246,23 +238,103 @@ class _MessageRoomState extends State<MessageRoom> {
             color: Colors.grey[200],
             borderRadius: BorderRadius.circular(10),
           ),
-          child: compareData == 0
-              ? Text(
-                  "오늘",
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                )
-              : (compareData == 1
-                  ? Text('어제')
-                  : Text(
-                      "${date.year}년 ${date.month}월 ${date.day}일",
+          child: Text( TimeUtil().getChatRoomLastMessageAt(date),
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     )),
         ),
-      ),
-    );
+      );
   }
 
   bool isDifferentDay(DateTime a, DateTime b) {
     return a.year != b.year || a.month != b.month || a.day != b.day;
+  }
+
+  Widget _buildLeftMessage(MessageEntity message, bool showProfile, bool showTime) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        if (showProfile)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(25),
+            child: message.sender!.profileImg?.url != null
+                ? CachedNetworkImage(
+                    imageUrl: message.sender!.profileImg!.url!,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(color: Colors.grey[200]),
+                    errorWidget: (context, url, error) =>
+                        Image.asset('assets/images/default avatar.png', fit: BoxFit.cover),
+                  )
+                : Image.asset(
+                    'assets/images/default avatar.png',
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+          )
+        else
+          SizedBox(
+            width: 50,
+          ),
+        const Gap(10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (showProfile) Text(message.sender!.nickname!, style: TextStyle(fontSize: 14, color: Colors.grey)),
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.sizeOf(context).width * 0.6,
+              ),
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey.shade600)),
+              child: Text(
+                message.content!,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        const Gap(10),
+        if (showTime)
+          Text(
+            TimeUtil().getChatDateTimeString(message.createdAt!),
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildRightMessage(MessageEntity message) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Text(
+          TimeUtil().getChatDateTimeString(message.createdAt!),
+          style: TextStyle(fontSize: 12, color: Colors.grey),
+        ),
+        const Gap(10),
+        Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.sizeOf(context).width * 0.5,
+          ),
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+          decoration: BoxDecoration(
+            color: message.sender!.userId == widget.targetUser!.userId
+                ? Colors.white
+                : Theme.of(context).colorScheme.primary,
+            borderRadius: BorderRadius.circular(10),
+            // border: Border.all(color: Colors.grey.shade600)
+          ),
+          child: Text(
+            message.content!,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ),
+      ],
+    );
   }
 }

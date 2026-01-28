@@ -18,7 +18,7 @@ class NetDriver {
 
   Future<Map<String, dynamic>> requestGetJson(String token, String url, {String? param = ""}) async {
     dio.options.headers['Content-Type'] = 'application/json';
-    if (token != "" || token != '') {
+    if (token.isNotEmpty) {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url/$param';
@@ -38,7 +38,7 @@ class NetDriver {
 
   Future<Map<String, dynamic>> requestPostJson(String token, String url, Map<String, dynamic> data) async {
     dio.options.headers['Content-Type'] = 'application/json';
-    if (token != "" || token != '') {
+    if (token.isNotEmpty) {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
@@ -61,7 +61,7 @@ class NetDriver {
 
   Future<Map<String, dynamic>> requestPutJson(String token, String url, Map<String, dynamic> data) async {
     dio.options.headers['Content-Type'] = 'application/json';
-    if (token != "" || token != '') {
+    if (token.isNotEmpty) {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
@@ -98,7 +98,7 @@ class NetDriver {
   Future<Map<String, dynamic>> requestRegisterFormData(
       String token, String url, List<XFile> data, Map<String, dynamic> post) async {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
-    if (token != "" || token != '') {
+    if (token.isNotEmpty) {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
@@ -136,7 +136,7 @@ class NetDriver {
 
   Future<Map<String, dynamic>> requestUpdateFormData(String token, String url, Map<String, dynamic> post, List<XFile> data, List<Map<String, dynamic>> deleteImages) async {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
-    if (token != "" || token != '') {
+    if (token.isNotEmpty) {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
@@ -180,7 +180,7 @@ class NetDriver {
 
   Future<Map<String, dynamic>> requestImagesDeleteFormData(String token, String url, List<Map<String, dynamic>> data) async {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
-    if (token != "" || token != '') {
+    if (token.isNotEmpty) {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
@@ -200,7 +200,7 @@ class NetDriver {
   }
 
   Future<Map<String, dynamic>> updateProfileFormData(String token, String url, Map<String, dynamic> data, Map<String, dynamic> images) async {
-    if (token != "" || token != '') {
+    if (token.isNotEmpty) {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';

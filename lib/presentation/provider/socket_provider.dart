@@ -11,11 +11,12 @@ import 'package:test_us_app/services/socket/socket_io_client.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/entities/room_entity.dart';
 
-final GetIt _getIt = GetIt.instance;
+
 
 class SocketProvider with ChangeNotifier {
   /// ✅ GetIt으로 주입된 SocketClient (Singleton)
-  final ISocketClient _socket = _getIt.get<ISocketClient>();
+  final ISocketClient _socket;
+  SocketProvider(this._socket);
 
   StreamSubscription<MessageEntity>? _chatMessageSubscription;
 
@@ -31,9 +32,9 @@ class SocketProvider with ChangeNotifier {
     _roomProvider = roomProvider;
   }
 
-  void setMessages(List<MessageEntity> messages) {
+  void setMessages(List<MessageEntity> serverMessages) {
     _messages ??= [];
-    _messages = messages;
+    _messages = serverMessages;
     notifyListeners();
   }
 
@@ -59,13 +60,9 @@ class SocketProvider with ChangeNotifier {
     ).listen(
       (event) {
         debugPrint('✅ chat_message received: ${event.id}');
-
         _messages = [event, ..._messages!];
-
-        //todo: 현재 API가 없음. 구현 후 주석 제거
         /// ❗ roomProvider는 nullable → 반드시 null 체크
-        // _roomProvider!.addRoom(event.roomId!);
-
+        _roomProvider!.addRoom(event);
         notifyListeners();
       },
       onError: (e, s) {

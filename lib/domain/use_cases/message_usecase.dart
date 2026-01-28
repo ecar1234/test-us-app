@@ -33,6 +33,10 @@ class MessageUseCase {
   }
   Future<List<MessageEntity>> requestMessageByRoomId(String token, int roomId) async {
     final res = await _messageRepo.requestMessageByRoomId(token, roomId);
+    for (var m in res) {
+      m.createdAt = m.createdAt!.toLocal();
+    }
+    res.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
     return res;
   }
 }

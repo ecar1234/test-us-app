@@ -127,6 +127,6 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   //provider
   getIt.registerSingleton<FirebaseMessagingProvider>(FirebaseMessagingProvider(getIt<FirebaseMessagingUseCase>()));
   getIt.registerSingleton<UserProvider>(UserProvider(getIt<UserUseCase>()));
-  getIt.registerSingleton<SocketProvider>(SocketProvider());
+  getIt.registerSingleton<SocketProvider>(SocketProvider(getIt<ISocketClient>()));
 
 }
