@@ -68,6 +68,8 @@ class _MessageMainPageState extends State<MessageMainPage> {
                     itemBuilder: (context, idx) {
                       final room = roomList[idx];
                       final targetUser = room.members!.firstWhere((m) => m.user!.id == room.targetUserId);
+                      final dateInfo = TimeUtil().getChatMessageCreatedAt(room.lastMessageAt!);
+
                       return Slidable(
                         endActionPane: ActionPane(
                           motion: ScrollMotion(),
@@ -131,26 +133,23 @@ class _MessageMainPageState extends State<MessageMainPage> {
                                           Row(
                                             children: [
                                               Text(
-                                                '${room.post!.title}',
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
-                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                              ),
-                                              const Gap(5),
-                                              Text('/'),
-                                              const Gap(5),
-                                              Text(
                                                 targetUser.user!.nickname!,
                                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                                               ),
                                             ],
                                           ),
-                                          const Gap(5),
                                           Text(
                                             room.lastMessageContent ?? "",
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: TextStyle(fontSize: 16, color: Colors.grey),
+                                          ),
+                                          const Gap(5),
+                                          Text(
+                                            room.post!.title!,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(fontSize: 12, color: Colors.grey),
                                           ),
                                         ]))),
                                 const Gap(5),
@@ -161,8 +160,9 @@ class _MessageMainPageState extends State<MessageMainPage> {
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.end,
                                           children: [
-                                            Text(TimeUtil().getChatRoomLastMessageAt(room.lastMessageAt!),
-                                                style: TextStyle(fontSize: 16, color: Colors.grey)),
+                                            Text('${dateInfo['dateTime']}',
+                                                textAlign: TextAlign.end,
+                                                style: TextStyle(fontSize: dateInfo['size'], color: Colors.grey)),
                                           ],
                                         )))
                               ],

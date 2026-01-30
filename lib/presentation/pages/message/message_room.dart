@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
@@ -33,24 +34,29 @@ class MessageRoom extends StatefulWidget {
 class _MessageRoomState extends State<MessageRoom> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  late int messageRoonId;
+  late int? roomId;
+  late String senderId;
   late SocketProvider socketProvider;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    roomId = widget.roomId;
+    senderId = context.read<UserProvider>().user!.id!;
+    socketProvider = context.read<SocketProvider>();
+    socketProvider.connect();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    socketProvider = context.read<SocketProvider>();
-    socketProvider.connect();
 
     final token = context.read<UserProvider>().token ?? '';
 
     if (widget.postId != null) {
+      socketProvider.joinUser(widget.targetUser!.userId!);
+      socketProvider.joinUser(senderId);
       context
           .read<MessageBloc>()
           .add(RequestRoomMessagesByPostIdEvent(token, widget.postId!, widget.targetUser!.userId!));
@@ -66,7 +72,7 @@ class _MessageRoomState extends State<MessageRoom> {
     super.dispose();
     _controller.dispose();
     _focusNode.dispose();
-    socketProvider.leaveRoom(widget.roomId ?? messageRoonId);
+    socketProvider.leaveRoom(roomId, senderId, widget.targetUser!.userId!);
   }
 
   @override
@@ -84,12 +90,9 @@ class _MessageRoomState extends State<MessageRoom> {
               },
               child: BlocConsumer<MessageBloc, MessageBlocState>(listener: (context, state) {
                 if (state is RoomMessagesLoadCompletedState) {
-                  context.read<SocketProvider>().setMessages(state.messageList);
+                  socketProvider.setMessages(state.messageList);
                   if (state.messageList.isNotEmpty) {
-                    messageRoonId = state.messageList.first.roomId!;
-                    if (widget.roomId == null) {
-                      socketProvider.joinRoom(messageRoonId);
-                    }
+                    roomId = state.messageList[0].roomId!;
                   }
                 }
               }, builder: (context, state) {
@@ -199,13 +202,17 @@ class _MessageRoomState extends State<MessageRoom> {
                                 width: (MediaQuery.sizeOf(context).width - 40) * 0.2,
                                 child: ElevatedButton(
                                     onPressed: () {
+                                      if (_controller.text.isEmpty) {
+                                        Get.snackbar('알림', '메시지를 입력해주세요.');
+                                        return;
+                                      }
                                       final req = TReqMessageEntity(
-                                        roomId: widget.roomId ?? messageRoonId,
+                                        roomId: roomId,
                                         content: _controller.text,
                                         targetId: widget.targetUser!.userId,
                                         postId: widget.postId,
                                       );
-                                      context.read<SocketProvider>().sendMessage(req);
+                                      socketProvider.sendMessage(req);
                                       _controller.clear();
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -228,21 +235,21 @@ class _MessageRoomState extends State<MessageRoom> {
   }
 
   Widget _buildDateHeader(DateTime date) {
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Center(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Text( TimeUtil().getChatRoomLastMessageAt(date),
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    )),
-        ),
-      );
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              TimeUtil().getChatRoomHeaderDate(date),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            )),
+      ),
+    );
   }
 
   bool isDifferentDay(DateTime a, DateTime b) {

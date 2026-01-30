@@ -16,7 +16,7 @@ class TReqMessageEntity {
 }
 
 class SocketIOClientImpl implements ISocketClient {
-  final logger = Logger();
+  final logger = Logger(level: Level.debug, printer: PrettyPrinter());
   IO.Socket? _socket;
 
   /// ✅ 반드시 broadcast
@@ -26,7 +26,10 @@ class SocketIOClientImpl implements ISocketClient {
 
   @override
   void init(String host, String token) {
-    if (_socket != null) return; // ✅ 중복 생성 방지 (Singleton 보장)
+    if (_socket != null) {
+      _socket!.dispose();
+      _socket = null;
+    }
 
     _socket = IO.io(
       host,
@@ -37,6 +40,7 @@ class SocketIOClientImpl implements ISocketClient {
           .build(),
     );
 
+    logger.d("SOCKET URI: ${_socket!.io.uri}");
     logger.d('[SocketIO] init completed : $host');
 
     /// ✅ 모든 socket 이벤트를 Stream으로 흘려보냄
@@ -104,11 +108,23 @@ class SocketIOClientImpl implements ISocketClient {
     logger.d('[SocketIO] join_room: $roomId');
     _socket?.emit('join_room', roomId);
   }
+  @override
+  void joinUser(String userId) {
+    /// ❗ 반드시 connect 이후 호출
+    logger.d('[SocketIO] join_user: $userId');
+    _socket?.emit('join_user', userId);
+  }
 
   @override
-  void onLeave(int roomId) {
+  void onLeave(int? roomId, String userId, String targetUserId) {
     logger.d('[SocketIO] leave_room: $roomId');
-    _socket?.emit('leave room', roomId);
+    logger.d('[SocketIO] leave_user: $userId');
+    logger.d('[SocketIO] leave_target_user: $targetUserId');
+    if(roomId != null){
+      _socket?.emit('leave room', roomId);
+    }
+    _socket?.emit('leave user', userId);
+    _socket?.emit('leave user', targetUserId);
   }
 
   @override

@@ -28,7 +28,7 @@ class RecruitPostProvider with ChangeNotifier {
   }
 
   void getUserRecruitmentPosts(List<RecruitPostEntity> posts) async {
-    _recruitmentPosts = posts;
+    _recruitmentPosts = [...posts];
     notifyListeners();
   }
 

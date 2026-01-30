@@ -24,7 +24,30 @@ class TimeUtil {
 
     return "$period $displayHour:$displayMinute";
   }
-  String getChatRoomLastMessageAt(DateTime date) {
+
+  Map<String, dynamic> getChatMessageCreatedAt(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
+    final messageDate = DateTime(date.year, date.month, date.day);
+
+    String dateTime = "";
+    double size = 16;
+    if (messageDate == today) {
+      dateTime = '${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+    } else if (messageDate == yesterday) {
+      dateTime = "어제";
+    } else {
+      dateTime = "${date.year}.${date.month}.${date.day}";
+      size = 12;
+    }
+    return {
+      "dateTime": dateTime,
+      "size": size,
+    };
+  }
+
+  String getChatRoomHeaderDate(DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
@@ -35,7 +58,7 @@ class TimeUtil {
     } else if (messageDate == yesterday) {
       return "어제";
     } else {
-      return "${date.year}년 ${date.month}월 ${date.day}일";
+      return "${date.year}.${date.month}.${date.day}";
     }
   }
 }

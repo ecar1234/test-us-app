@@ -1,8 +1,5 @@
 
 class Host {
-  // static const String baseDevUrl = 'http://192.168.45.100:3000';
-  // static const String baseDevUrl = 'http://172.30.1.100:3000';
-  // static const String baseDevUrl = 'http://testusserver.ddns.net:3000';
   static const String baseDevUrl = 'http://dev.testusserver.xyz';
   static const String baseProdUrl = 'https://main.testusserver.xyz';
 }
@@ -98,7 +95,7 @@ class ReviewApi {
 
 class MessageApi {
   static const String requestRoomList = '/api/v1/message/getRoomList';
-  static const String requestRoomInfoById = '/api/v1/message/getRoomInfoById';
+  static const String requestRoomInfoById = '/api/v1/message/getRoomById';
   static const String requestMessageByRoomId = '/api/v1/message/getMessageByRoomId';
   static const String requestMessageByPostId = '/api/v1/message/getMessageByPostId';
   // static const String requestRoom = '/api/v1/message/requestRoom';

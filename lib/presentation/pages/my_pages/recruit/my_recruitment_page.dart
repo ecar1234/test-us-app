@@ -29,10 +29,20 @@ class MyRecruitmentPage extends StatefulWidget {
 }
 
 class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
+  late RecruitPostBloc recruitPostBloc;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+  }
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    recruitPostBloc = context.read<RecruitPostBloc>();
+    final token = context.read<UserProvider>().token ?? '';
+    final userId = context.read<UserProvider>().user!.id!;
+    recruitPostBloc.add(RequestUserRecruitmentPosts(token, userId));
   }
 
   @override
@@ -48,6 +58,9 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
           if (state.state == RecruitPostLoadState.postEndCompletedState) {
             context.read<BasePostProvider>().updateRecruitPost(state.post!);
             context.read<BasePostProvider>().updateUserRecruitPosts(state.post!);
+          }
+          else if(state.state == RecruitPostLoadState.getUserRecruitmentPostsCompletedState){
+            context.read<RecruitPostProvider>().getUserRecruitmentPosts(state.posts!);
           }
         },
         child: Selector<BasePostProvider, List<RecruitPostEntity>>(selector: (context, provider) {

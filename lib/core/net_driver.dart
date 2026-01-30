@@ -127,6 +127,9 @@ class NetDriver {
     }));
 
     if (res.statusCode == 200) {
+      if(res.data is String){
+        return jsonDecode(res.data);
+      }
       return res.data;
     } else {
       logger.e("${res.statusCode} : ${res.statusMessage}s");

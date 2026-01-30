@@ -55,8 +55,10 @@
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+        <true/>
 	</dict>
+	<key>com.apple.security.network.client</key>
+    <true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>앱에서 사진을 선택하기 위해 갤러리 접근 권한이 필요합니다.</string>
 	<key>NidAppName</key>

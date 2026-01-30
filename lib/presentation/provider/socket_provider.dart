@@ -60,6 +60,9 @@ class SocketProvider with ChangeNotifier {
     ).listen(
       (event) {
         debugPrint('✅ chat_message received: ${event.id}');
+        /// 메지시 중복 방지.
+        if(_messages != null && _messages!.any((m) => m.id == event.id)) return;
+
         _messages = [event, ..._messages!];
         /// ❗ roomProvider는 nullable → 반드시 null 체크
         _roomProvider!.addRoom(event);
@@ -88,6 +91,10 @@ class SocketProvider with ChangeNotifier {
     debugPrint('[SocketProvider] joinRoom: $roomId');
     _socket.joinRoom(roomId);
   }
+  void joinUser(String userId) {
+    debugPrint('[SocketProvider] joinUser: $userId');
+    _socket.joinUser(userId);
+  }
 
   /// ✅ 메시지 전송
   /// 서버 emit → 다시 chat_message 로 내려오는 구조
@@ -97,9 +104,9 @@ class SocketProvider with ChangeNotifier {
   }
 
   /// ✅ 방 나가기
-  void leaveRoom(int roomId) {
+  void leaveRoom(int? roomId, String userId, String targetUserId) {
     debugPrint('[SocketProvider] leaveRoom: $roomId');
-    _socket.onLeave(roomId);
+    _socket.onLeave(roomId, userId, targetUserId);
   }
 
   /// ✅ 소켓 완전 종료 (로그아웃 / 앱 종료 시)
