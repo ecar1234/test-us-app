@@ -77,7 +77,7 @@ class _MessageRoomState extends State<MessageRoom> {
 
   @override
   Widget build(BuildContext context) {
-    final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
+    // final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
@@ -88,149 +88,158 @@ class _MessageRoomState extends State<MessageRoom> {
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
               },
-              child: BlocConsumer<MessageBloc, MessageBlocState>(listener: (context, state) {
-                if (state is RoomMessagesLoadCompletedState) {
-                  socketProvider.setMessages(state.messageList);
-                  if (state.messageList.isNotEmpty) {
-                    roomId = state.messageList[0].roomId!;
-                  }
-                }
-              }, builder: (context, state) {
-                if (state.state == MessageLoadState.dataLoadState) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                return Container(
-                  height: hei,
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Selector<SocketProvider, List<MessageEntity>>(selector: (context, provider) {
-                          return provider.messages ?? [];
-                        }, builder: (context, messages, child) {
-                          return ListView.separated(
-                              padding: EdgeInsets.only(bottom: 10),
-                              physics: BouncingScrollPhysics(),
-                              shrinkWrap: true,
-                              reverse: true,
-                              itemBuilder: (context, idx) {
-                                if (messages.isEmpty) {
-                                  return Center(child: Text('메시지가 없습니다.'));
-                                }
-                                final message = messages[idx];
-                                final DateTime? createdAt = message.createdAt;
-                                final next = idx > 0 ? messages[idx - 1] : null;
-                                final prev = idx < messages.length - 1 ? messages[idx + 1] : null;
+              child: BlocListener<MessageBloc, MessageBlocState>(
+                  listener: (context, state) {
+                    if (state is RoomMessagesLoadCompletedState) {
+                      socketProvider.setMessages(state.messageList);
+                      if (state.messageList.isNotEmpty) {
+                        roomId = state.messageList[0].roomId!;
+                      }
+                    }
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 20, left: 20, bottom: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Selector<SocketProvider, List<MessageEntity>>(selector: (context, provider) {
+                            if(provider.messages == null || provider.messages!.isEmpty){
+                              return [];
+                            }
+                            return provider.messages!.where((message) {
+                              if(roomId != null){
+                                return message.roomId == roomId;
+                              }
+                              return false;
+                            }).toList();
+                          }, builder: (context, messages, child) {
+                            return ListView.separated(
+                                padding: EdgeInsets.only(bottom: 10),
+                                physics: BouncingScrollPhysics(),
+                                shrinkWrap: true,
+                                reverse: true,
+                                itemBuilder: (context, idx) {
+                                  if (messages.isEmpty) {
+                                    return Center(child: Text('메시지가 없습니다.'));
+                                  }
+                                  final message = messages[idx];
+                                  final DateTime? createdAt = message.createdAt;
+                                  final next = idx > 0 ? messages[idx - 1] : null;
+                                  final prev = idx < messages.length - 1 ? messages[idx + 1] : null;
 
-                                bool isSameUser(MessageEntity? a, MessageEntity? b) =>
-                                    a?.sender!.userId == b?.sender!.userId;
+                                  bool isSameUser(MessageEntity? a, MessageEntity? b) =>
+                                      a?.sender!.userId == b?.sender!.userId;
 
-                                bool isSameMinute(DateTime? a, DateTime? b) {
-                                  if (a == null || b == null) return false;
-                                  return a.year == b.year &&
-                                      a.month == b.month &&
-                                      a.day == b.day &&
-                                      a.hour == b.hour &&
-                                      a.minute == b.minute;
-                                }
+                                  bool isSameMinute(DateTime? a, DateTime? b) {
+                                    if (a == null || b == null) return false;
+                                    return a.year == b.year &&
+                                        a.month == b.month &&
+                                        a.day == b.day &&
+                                        a.hour == b.hour &&
+                                        a.minute == b.minute;
+                                  }
 
-                                bool showProfile =
-                                    !isSameUser(message, prev) || !isSameMinute(message.createdAt, prev?.createdAt);
-                                bool showTime =
-                                    !isSameUser(message, next) || !isSameMinute(message.createdAt, next?.createdAt);
-                                bool showDateHeader = false;
+                                  bool showProfile =
+                                      !isSameUser(message, prev) || !isSameMinute(message.createdAt, prev?.createdAt);
+                                  bool showTime =
+                                      !isSameUser(message, next) || !isSameMinute(message.createdAt, next?.createdAt);
+                                  bool showDateHeader = false;
 
-                                if (createdAt != null) {
-                                  if (idx == messages.length - 1) {
-                                    showDateHeader = true;
-                                  } else {
-                                    final nextCreatedAt = messages[idx + 1].createdAt;
-                                    if (nextCreatedAt != null) {
-                                      showDateHeader = createdAt.year != nextCreatedAt.year ||
-                                          createdAt.month != nextCreatedAt.month ||
-                                          createdAt.day != nextCreatedAt.day;
+                                  if (createdAt != null) {
+                                    if (idx == messages.length - 1) {
+                                      showDateHeader = true;
+                                    } else {
+                                      final nextCreatedAt = messages[idx + 1].createdAt;
+                                      if (nextCreatedAt != null) {
+                                        showDateHeader = createdAt.year != nextCreatedAt.year ||
+                                            createdAt.month != nextCreatedAt.month ||
+                                            createdAt.day != nextCreatedAt.day;
+                                      }
                                     }
                                   }
-                                }
 
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    if (showDateHeader) _buildDateHeader(createdAt!),
-                                    if (message.sender!.userId == widget.targetUser!.userId)
-                                      _buildLeftMessage(message, showProfile, showTime)
-                                    else
-                                      _buildRightMessage(message)
-                                  ],
-                                );
-                              },
-                              separatorBuilder: (context, idx) => const Gap(10),
-                              itemCount: messages.length);
-                        }),
-                      ),
-                      const Gap(5),
-                      SizedBox(
-                        // height: 50,
-                        width: MediaQuery.sizeOf(context).width,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              flex: 8,
-                              child: SizedBox(
-                                width: (MediaQuery.sizeOf(context).width - 40) * 0.8,
-                                child: TextField(
-                                  controller: _controller,
-                                  focusNode: _focusNode,
-                                  minLines: 1,
-                                  maxLines: 2,
-                                  // 중요 ⭐
-                                  keyboardType: TextInputType.multiline,
-                                  textInputAction: TextInputAction.newline,
-                                  decoration: const InputDecoration(
-                                    counterText: "",
+                                  return Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      if (showDateHeader) _buildDateHeader(createdAt!),
+                                      if (message.sender!.userId != senderId)
+                                        _buildLeftMessage(message, showProfile, showTime)
+                                      else
+                                        _buildRightMessage(message)
+                                    ],
+                                  );
+                                },
+                                separatorBuilder: (context, idx) => const Gap(10),
+                                itemCount: messages.length);
+                          }),
+                        ),
+                        const Gap(5),
+                        SizedBox(
+                          // height: 50,
+                          width: MediaQuery.sizeOf(context).width,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                flex: 8,
+                                child: SizedBox(
+                                  height: 40,
+                                  width: (MediaQuery.sizeOf(context).width - 40) * 0.8,
+                                  child: TextField(
+                                    controller: _controller,
+                                    focusNode: _focusNode,
+                                    minLines: 1,
+                                    maxLines: 2,
+                                    // 중요 ⭐
+                                    keyboardType: TextInputType.multiline,
+                                    textInputAction: TextInputAction.newline,
+                                    decoration: const InputDecoration(
+                                      // isDense: true,
+                                      counterText: "",
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    ),
+                                    style: TextStyle(fontSize: 14),
                                   ),
                                 ),
                               ),
-                            ),
-                            const Gap(10),
-                            Flexible(
-                              flex: 2,
-                              child: SizedBox(
-                                height: 40,
-                                width: (MediaQuery.sizeOf(context).width - 40) * 0.2,
-                                child: ElevatedButton(
-                                    onPressed: () {
-                                      if (_controller.text.isEmpty) {
-                                        Get.snackbar('알림', '메시지를 입력해주세요.');
-                                        return;
-                                      }
-                                      final req = TReqMessageEntity(
-                                        roomId: roomId,
-                                        content: _controller.text,
-                                        targetId: widget.targetUser!.userId,
-                                        postId: widget.postId,
-                                      );
-                                      socketProvider.sendMessage(req);
-                                      _controller.clear();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                              const Gap(10),
+                              Flexible(
+                                flex: 2,
+                                child: SizedBox(
+                                  height: 40,
+                                  width: (MediaQuery.sizeOf(context).width - 40) * 0.2,
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        if (_controller.text.isEmpty) {
+                                          Get.snackbar('알림', '메시지를 입력해주세요.');
+                                          return;
+                                        }
+                                        final req = TReqMessageEntity(
+                                          roomId: roomId,
+                                          content: _controller.text,
+                                          targetId: widget.targetUser!.userId,
+                                          postId: widget.postId,
+                                        );
+                                        socketProvider.sendMessage(req);
+                                        _controller.clear();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
                                       ),
-                                    ),
-                                    child: Text('전송')),
+                                      child: Text('전송')),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                );
-              }),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  )),
             )));
   }
 

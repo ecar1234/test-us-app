@@ -26,13 +26,13 @@ class MessageMainPage extends StatefulWidget {
 
 class _MessageMainPageState extends State<MessageMainPage> {
 
-
+  late String userId;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     final token = context.read<UserProvider>().token ?? '';
-    final userId = context.read<UserProvider>().user!.id ?? '';
+    userId = context.read<UserProvider>().user!.id ?? '';
     context.read<MessageBloc>().add(RequestRoomListEvent(token, userId));
   }
 
@@ -56,7 +56,7 @@ class _MessageMainPageState extends State<MessageMainPage> {
                   return Center(child: Text("에러가 발생했습니다."));
                 }
                 return Selector<RoomProvider, List<RoomEntity>>(selector: (context, provider) {
-                  return provider.roomList!;
+                  return provider.roomList??[];
                 }, builder: (context, roomList, child) {
                   if (roomList.isEmpty) {
                     return Center(child: Text("아직 대화방이 없습니다 😯"));
@@ -67,12 +67,13 @@ class _MessageMainPageState extends State<MessageMainPage> {
                     shrinkWrap: true,
                     itemBuilder: (context, idx) {
                       final room = roomList[idx];
-                      final targetUser = room.members!.firstWhere((m) => m.user!.id == room.targetUserId);
+                      final targetUser = room.members!.firstWhere((m) => m.user!.id != userId);
                       final dateInfo = TimeUtil().getChatMessageCreatedAt(room.lastMessageAt!);
 
                       return Slidable(
                         endActionPane: ActionPane(
                           motion: ScrollMotion(),
+                          extentRatio: 0.25,
                           children: [
                             SlidableAction(
                               onPressed: (_) {

@@ -117,7 +117,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                           Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
                         },
                   child: Container(
-                    height: 150,
+                    height: 155,
                     width: MediaQuery.sizeOf(context).width,
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -142,7 +142,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                             flex: 3,
                             child: SizedBox(
                                 width: (MediaQuery.sizeOf(context).width - 50) * 0.35,
-                                height: 150,
+                                // height: 140,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: CachedNetworkImage(
@@ -155,50 +155,51 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                         Flexible(
                           flex: 7,
                           child: Container(
-                            height: 150,
+                            // height: 140,
                             width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
                             padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                              SizedBox(
-                                height: 30,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      posts[idx].title!,
-                                      style: TextStyle(
-                                          fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
-                                      maxLines: 1,
-                                    ),
-                                    const Gap(5),
-                                    SizedBox(
-                                      child: posts[idx].status == PostStatus.active ? Text('(모집 중)') : Text('(만료)'),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(child: Text(posts[idx].platform!.name.toUpperCase())),
-                                    if (posts[idx].platform == ApplicationPlatform.mobile)
-                                      Text(' (${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)})')
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                  child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                            child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  // NOTE: 현재는 period가 7일로 고정 되어 있지만, 상확에 따라 변경필요, 변수로 period 포함 시키는 로직 필요.
-                                  Text('게시 만료 : ${TimeUtil().getDateTimeString(posts[idx].createdAt!
-                                      .add(Duration(days: 7)), false)}'),
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    height: 30,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          posts[idx].title!,
+                                          style: TextStyle(
+                                              fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
+                                          maxLines: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        SizedBox(child: Text(posts[idx].platform!.name.toUpperCase())),
+                                        if (posts[idx].platform == ApplicationPlatform.mobile)
+                                          Text(' (${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)})')
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      // NOTE: 현재는 period가 7일로 고정 되어 있지만, 상확에 따라 변경필요, 변수로 period 포함 시키는 로직 필요.
+                                      Text('게시 만료 : ${TimeUtil().getDateTimeString(posts[idx].createdAt!
+                                          .add(Duration(days: 7)), false)}'),
+                                    ],
+                                  )),
                                 ],
-                              )),
-                              Gap(10),
+                              ),
+                              // const Gap(10),
                               if (isExpired)
                                 SizedBox(
                                   height: 40,
