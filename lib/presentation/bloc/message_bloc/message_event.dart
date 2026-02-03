@@ -19,8 +19,10 @@ class RequestRoomMessagesByPostIdEvent extends MessageBlocEvent {
 class RequestRoomMessagesByRoomIdEvent extends MessageBlocEvent {
   final String token;
   final int roomId;
+  final String userId;
 
-  RequestRoomMessagesByRoomIdEvent(this.token, this.roomId);
+
+  RequestRoomMessagesByRoomIdEvent(this.token, this.roomId, this.userId);
 }
 
 class DeleteRoomEvent extends MessageBlocEvent {

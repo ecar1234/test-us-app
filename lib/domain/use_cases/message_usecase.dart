@@ -31,8 +31,8 @@ class MessageUseCase {
     final res = await _messageRepo.requestMessageByPostId(token, postId, targetId);
     return res;
   }
-  Future<List<MessageEntity>> requestMessageByRoomId(String token, int roomId) async {
-    final res = await _messageRepo.requestMessageByRoomId(token, roomId);
+  Future<List<MessageEntity>> requestMessageByRoomId(String token, int roomId, String userId) async {
+    final res = await _messageRepo.requestMessageByRoomId(token, roomId, userId);
     for (var m in res) {
       m.createdAt = m.createdAt!.toLocal();
     }

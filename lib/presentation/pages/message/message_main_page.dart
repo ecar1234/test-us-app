@@ -69,6 +69,8 @@ class _MessageMainPageState extends State<MessageMainPage> {
                       final room = roomList[idx];
                       final targetUser = room.members!.firstWhere((m) => m.user!.id != userId);
                       final dateInfo = TimeUtil().getChatMessageCreatedAt(room.lastMessageAt!);
+                      final unreadCount = room.members!.firstWhere((member) => member.user!.id == userId).unreadCount;
+
 
                       return Slidable(
                         endActionPane: ActionPane(
@@ -157,15 +159,38 @@ class _MessageMainPageState extends State<MessageMainPage> {
                                 Flexible(
                                     flex: 2,
                                     child: SizedBox(
-                                        width: MediaQuery.sizeOf(context).width * 0.2,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            Text('${dateInfo['dateTime']}',
-                                                textAlign: TextAlign.end,
-                                                style: TextStyle(fontSize: dateInfo['size'], color: Colors.grey)),
-                                          ],
-                                        )))
+                                      width: MediaQuery.sizeOf(context).width * 0.2,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              Text('${dateInfo['dateTime']}',
+                                                  textAlign: TextAlign.end,
+                                                  style: TextStyle(fontSize: dateInfo['size'], color: Colors.grey)),
+                                            ],
+                                          ),
+                                          if(unreadCount != null && unreadCount > 0)
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                Container(
+                                                  width: 25,
+                                                  height: 25,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(unreadCount.toString(), style: TextStyle(color: Colors.white),),
+                                                  )
+                                                ),
+                                              ],
+                                            )
+                                        ],
+                                      ),
+                                    ))
                               ],
                             ),
                           ),

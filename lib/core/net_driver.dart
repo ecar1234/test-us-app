@@ -24,7 +24,7 @@ class NetDriver {
     final api = '$baseUrl$url/$param';
     // logger.d(api);
     final res = await dio.get(api, options: Options(validateStatus: (status) {
-      return status != null && status < 500;
+      return status != null && status < 501;
     }));
     if (res.statusCode == 200 || res.statusCode == 202) {
       // logger.e(res.statusMessage);

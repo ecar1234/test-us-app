@@ -116,6 +116,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         isRead: false,
       );
       MessagingService().saveNotification(notification);
+      // 이동 로직 추가 (권장)
     });
     // 앱이 꺼져 있을때.
     FirebaseMessaging.instance.getInitialMessage().then((message) {
@@ -129,7 +130,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         isRead: false,
       );
       MessagingService().saveNotification(notification);
-      NotificationService().showNotification(message);
+      // NotificationService().showNotification(message);
     });
 
     // 토큰 업데이트

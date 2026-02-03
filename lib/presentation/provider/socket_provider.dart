@@ -78,6 +78,9 @@ class SocketProvider with ChangeNotifier {
     );
   }
 
+  void resetUnreadCount(int roomId) {
+    _roomProvider!.resetMemberCount(roomId);
+  }
   /// ✅ 실제 socket 연결 (UI initState / didChangeDependencies 에서 호출)
   void connect() {
     if (_socket.connected()) return;

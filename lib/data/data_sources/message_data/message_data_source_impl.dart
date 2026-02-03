@@ -25,8 +25,8 @@ class MessageDataSourceImpl implements MessageDataSource {
   }
 
   @override
-  Future<List<MessageModel>> requestMessageByRoomId(String token, int roomId) async {
-    final res = await netDriver.requestPostJson(token, MessageApi.requestMessageByRoomId, {'roomId': roomId});
+  Future<List<MessageModel>> requestMessageByRoomId(String token, int roomId, String userId) async {
+    final res = await netDriver.requestPostJson(token, MessageApi.requestMessageByRoomId, {'roomId': roomId, 'userId': userId});
     if (res['status'] == 200){
       if((res['messages'] as List<dynamic>).isEmpty){
         return [];

@@ -9,6 +9,8 @@ import 'package:test_us_app/presentation/pages/my_pages/application/my_applicati
 import 'package:test_us_app/presentation/pages/my_pages/recruit/my_recruitment_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/review_page.dart';
 
+import '../../presentation/pages/message/message_main_page.dart';
+
 class NotificationService {
   // 싱글톤 인스턴스
   static final NotificationService _instance = NotificationService._internal();
@@ -71,7 +73,7 @@ class NotificationService {
     }else if(res.data['type'] == 'review'){
       Get.to(() => ReviewPage());
     }else if(res.data['type'] == 'chat') {
-      // 채팅 페이지로 이동
+      Get.to(() => MessageMainPage());
     }
     // payload를 확인하여 특정 화면으로 이동
   }

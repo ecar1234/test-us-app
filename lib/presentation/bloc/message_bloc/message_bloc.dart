@@ -41,7 +41,7 @@ class MessageBloc extends Bloc<MessageBlocEvent, MessageBlocState> {
       emit(MessageBlocState(state: MessageLoadState.dataLoadState));
       logger.i("data state : dataLoadState");
       try {
-        final res = await messageUseCase.requestMessageByRoomId(event.token, event.roomId);
+        final res = await messageUseCase.requestMessageByRoomId(event.token, event.roomId, event.userId);
         emit(RoomMessagesLoadCompletedState(messageList: res));
         logger.i("data state : getMessageListCompletedState");
       } catch (error) {

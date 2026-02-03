@@ -37,7 +37,7 @@ class _MessageRoomState extends State<MessageRoom> {
   late int? roomId;
   late String senderId;
   late SocketProvider socketProvider;
-
+  bool _isInitialized = false;
   @override
   void initState() {
     // TODO: implement initState
@@ -45,25 +45,33 @@ class _MessageRoomState extends State<MessageRoom> {
     roomId = widget.roomId;
     senderId = context.read<UserProvider>().user!.id!;
     socketProvider = context.read<SocketProvider>();
-    socketProvider.connect();
+
+    _initializeData();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
 
+  void _initializeData() {
+    if (_isInitialized) return;
+
+    socketProvider.connect();
     final token = context.read<UserProvider>().token ?? '';
 
     if (widget.postId != null) {
+      // 신규 방 생성 시나리오
       socketProvider.joinUser(widget.targetUser!.userId!);
       socketProvider.joinUser(senderId);
-      context
-          .read<MessageBloc>()
-          .add(RequestRoomMessagesByPostIdEvent(token, widget.postId!, widget.targetUser!.userId!));
-    } else {
+      context.read<MessageBloc>().add(
+          RequestRoomMessagesByPostIdEvent(token, widget.postId!, widget.targetUser!.userId!)
+      );
+    } else if (widget.roomId != null) {
+      // 기존 방 입장 시나리오
       socketProvider.joinRoom(widget.roomId!);
-      context.read<MessageBloc>().add(RequestRoomMessagesByRoomIdEvent(token, widget.roomId!));
+      context.read<MessageBloc>().add(
+          RequestRoomMessagesByRoomIdEvent(token, widget.roomId!, senderId)
+      );
     }
+
+    _isInitialized = true;
   }
 
   @override
@@ -95,6 +103,7 @@ class _MessageRoomState extends State<MessageRoom> {
                       if (state.messageList.isNotEmpty) {
                         roomId = state.messageList[0].roomId!;
                       }
+                      socketProvider.resetUnreadCount(state.messageList.first.roomId!);
                     }
                   },
                   child: Padding(

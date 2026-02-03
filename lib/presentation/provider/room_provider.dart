@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/message_entity.dart';
@@ -8,6 +6,7 @@ import '../../domain/use_cases/message_usecase.dart';
 
 class RoomProvider with ChangeNotifier {
   final MessageUseCase _messageUseCase;
+
   RoomProvider(this._messageUseCase);
 
   List<RoomEntity>? _roomList;
@@ -19,7 +18,7 @@ class RoomProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addRoom(MessageEntity message)async{
+  Future<void> addRoom(MessageEntity message) async {
     _roomList ??= [];
 
     final existingIndex = _roomList!.indexWhere((e) => e.id == message.roomId);
@@ -38,14 +37,23 @@ class RoomProvider with ChangeNotifier {
         lastMessageContent: message.content,
       );
 
-      _roomList = [
-        updatedRoom,
-        ..._roomList!.where((e) => e.id != message.roomId)
-      ];
+      _roomList = [updatedRoom, ..._roomList!.where((e) => e.id != message.roomId)];
     } else {
       final newRoom = await _messageUseCase.requestRoomInfoById(message.roomId!);
       _roomList = [newRoom, ..._roomList!];
     }
     notifyListeners();
+  }
+
+  void resetMemberCount(int roomId) {
+    final index = _roomList!.indexWhere((e) => e.id == roomId);
+    if (index != -1) {
+      final room = _roomList![index];
+      for (var member in room.members!) {
+        member.unreadCount = 0;
+      }
+      _roomList = List.from(_roomList!)..[index] = room;
+      notifyListeners();
+    }
   }
 }
