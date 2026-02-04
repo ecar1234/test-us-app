@@ -49,7 +49,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             builder:(context, notifications, child) {
               final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
               if(notifications.isEmpty){
-                return Center(child: Text('알림이 없습니다.'));
+                return Center(child: Text('알림이 없습니다 ✉️'));
               }
               return Column(
                 children: [

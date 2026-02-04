@@ -65,18 +65,14 @@ class _HomePageState extends State<HomePage> {
                           selector: (context, provider) => provider.notifications ?? [],
                           builder: (context, notifications, child) {
                             final count = notifications.where((e) => e.isRead == false).length;
-                            if (count == 0) {
-                              return IconButton(
-                                onPressed: () {},
-                                icon: Icon(Symbols.notifications, size: 30),
-                              );
-                            }
+                            
                             return IconButton(
                               onPressed: () {
                                 Get.to(() => NotificationsPage());
                               },
                               icon: Badge.count(
                                 count: count,
+                                isLabelVisible: count > 0,
                                 child: Icon(Symbols.notifications, size: 30),
                               ),
                             );

@@ -60,6 +60,8 @@ class SocketProvider with ChangeNotifier {
     ).listen(
       (event) {
         debugPrint('✅ chat_message received: ${event.id}');
+        _messages ??= [];
+        debugPrint('received messages: ${event.id}, ${event.content}, ${event.sender ?? 'none'}, ${event.sender?.nickname}, ${event.sender?.profileImg}');
         /// 메지시 중복 방지.
         if(_messages != null && _messages!.any((m) => m.id == event.id)) return;
 

@@ -38,6 +38,7 @@ class _MessageRoomState extends State<MessageRoom> {
   late String senderId;
   late SocketProvider socketProvider;
   bool _isInitialized = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -49,7 +50,6 @@ class _MessageRoomState extends State<MessageRoom> {
     _initializeData();
   }
 
-
   void _initializeData() {
     if (_isInitialized) return;
 
@@ -60,15 +60,15 @@ class _MessageRoomState extends State<MessageRoom> {
       // 신규 방 생성 시나리오
       socketProvider.joinUser(widget.targetUser!.userId!);
       socketProvider.joinUser(senderId);
-      context.read<MessageBloc>().add(
-          RequestRoomMessagesByPostIdEvent(token, widget.postId!, widget.targetUser!.userId!)
-      );
+      context
+          .read<MessageBloc>()
+          .add(RequestRoomMessagesByPostIdEvent(token, widget.postId!, widget.targetUser!.userId!));
     } else if (widget.roomId != null) {
       // 기존 방 입장 시나리오
+      socketProvider.joinUser(widget.targetUser!.userId!);
+      socketProvider.joinUser(senderId);
       socketProvider.joinRoom(widget.roomId!);
-      context.read<MessageBloc>().add(
-          RequestRoomMessagesByRoomIdEvent(token, widget.roomId!, senderId)
-      );
+      context.read<MessageBloc>().add(RequestRoomMessagesByRoomIdEvent(token, widget.roomId!, senderId));
     }
 
     _isInitialized = true;
@@ -113,11 +113,11 @@ class _MessageRoomState extends State<MessageRoom> {
                       children: [
                         Expanded(
                           child: Selector<SocketProvider, List<MessageEntity>>(selector: (context, provider) {
-                            if(provider.messages == null || provider.messages!.isEmpty){
+                            if (provider.messages == null || provider.messages!.isEmpty) {
                               return [];
                             }
                             return provider.messages!.where((message) {
-                              if(roomId != null){
+                              if (roomId != null) {
                                 return message.roomId == roomId;
                               }
                               return false;
@@ -277,6 +277,7 @@ class _MessageRoomState extends State<MessageRoom> {
   Widget _buildLeftMessage(MessageEntity message, bool showProfile, bool showTime) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showProfile)
           ClipRRect(
@@ -284,8 +285,8 @@ class _MessageRoomState extends State<MessageRoom> {
             child: message.sender!.profileImg?.url != null
                 ? CachedNetworkImage(
                     imageUrl: message.sender!.profileImg!.url!,
-                    width: 50,
-                    height: 50,
+                    width: 40,
+                    height: 40,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Container(color: Colors.grey[200]),
                     errorWidget: (context, url, error) =>
@@ -293,42 +294,49 @@ class _MessageRoomState extends State<MessageRoom> {
                   )
                 : Image.asset(
                     'assets/images/default avatar.png',
-                    width: 50,
-                    height: 50,
+                    width: 40,
+                    height: 40,
                     fit: BoxFit.cover,
                   ),
           )
         else
           SizedBox(
-            width: 50,
+            width: 40,
           ),
         const Gap(10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (showProfile) Text(message.sender!.nickname!, style: TextStyle(fontSize: 14, color: Colors.grey)),
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.sizeOf(context).width * 0.6,
-              ),
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.grey.shade600)),
-              child: Text(
-                message.content!,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  key: ValueKey(message.id),
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.sizeOf(context).width * 0.4,
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey.shade600)),
+                  child: Text(
+                    message.content!,
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                ),
+                if (showTime) ...[
+                  const Gap(5),
+                  Text(
+                    TimeUtil().getChatDateTimeString(message.createdAt!),
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ]
+              ],
             ),
           ],
         ),
-        const Gap(10),
-        if (showTime)
-          Text(
-            TimeUtil().getChatDateTimeString(message.createdAt!),
-            style: TextStyle(fontSize: 12, color: Colors.grey),
-          ),
       ],
     );
   }
@@ -336,6 +344,7 @@ class _MessageRoomState extends State<MessageRoom> {
   Widget _buildRightMessage(MessageEntity message) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           TimeUtil().getChatDateTimeString(message.createdAt!),
@@ -343,8 +352,9 @@ class _MessageRoomState extends State<MessageRoom> {
         ),
         const Gap(10),
         Container(
+          key: ValueKey(message.id),
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.sizeOf(context).width * 0.5,
+            maxWidth: MediaQuery.sizeOf(context).width * 0.4,
           ),
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
           decoration: BoxDecoration(
@@ -356,7 +366,7 @@ class _MessageRoomState extends State<MessageRoom> {
           ),
           child: Text(
             message.content!,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ),
       ],
