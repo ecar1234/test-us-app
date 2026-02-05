@@ -37,6 +37,21 @@ class LoginCompletedEvent extends AuthEvent {
   LoginCompletedEvent(this.user);
 }
 
+class PasswordUpdateEvent extends AuthEvent {
+  final String token;
+  final String userId;
+  final String oldPw;
+  final String newPw;
+
+  PasswordUpdateEvent(this.token, this.userId, this.oldPw, this.newPw);
+}
+
+class RequestUserDeleteEvent extends AuthEvent {
+  final String token;
+  final String userId;
+  RequestUserDeleteEvent(this.token, this.userId);
+}
+
 class LogoutEvent extends AuthEvent {
   LogoutEvent();
 }

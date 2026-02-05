@@ -12,6 +12,8 @@ class AuthApi {
   static const String authSignup = '/api/v1/auth/authSignup';
   static const String refreshToken = '/api/v1/auth/refreshToken';
   static const String autoLogin = '/api/v1/auth/autoLogin';
+  static const String updatePassword = '/api/v1/auth/updatePassword';
+  static const String logout = '/api/v1/auth/logout';
 }
 
 class UserApi {

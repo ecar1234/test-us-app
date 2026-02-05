@@ -188,7 +188,7 @@ class _SignupPageState extends State<SignupPage> {
                                     });
                                 Get.back();
                               }else if(state == 409){
-                                Get.snackbar("회원 가입 실패", "이미 가입된 Email 입니다.");
+                                Get.snackbar("회원 가입 실패", "존재 하거나, 사용 할 수 없는 이메일 입니다.\n다른 이메일을 사용해 주세요.");
                                 return;
                               }
                             }
@@ -577,6 +577,7 @@ class _SignupPageState extends State<SignupPage> {
                           DropdownMenuEntry(
                               value: "INDIVIDUALS", label: "1인 개발자"),
                           DropdownMenuEntry(value: "COMPANIES", label: "기업"),
+                          DropdownMenuEntry(value: "NORMAL", label: "일반(비개발자)"),
                         ]),
                   )
                 ],

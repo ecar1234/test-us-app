@@ -71,8 +71,8 @@ class UserDataSourceImpl implements UserDataSource {
   }
 
   @override
-  Future<bool> isPasswordValid(String password) async {
-    final res = await netDriver.requestGetJson("", UserApi.isPasswordValid, param: password);
+  Future<bool> isPasswordValid(String token, String userId, String password) async {
+    final res = await netDriver.requestPostJson("", UserApi.isPasswordValid, {'userId': userId, 'password': password});
     if (res['status'] == 200) {
       return true;
     } else if (res['status'] == 404) {
@@ -87,14 +87,8 @@ class UserDataSourceImpl implements UserDataSource {
     final res = await netDriver.requestPostJson("", AuthApi.login, {"email": email, "password": password});
     if (res['status'] == 200) {
       return {'user': UserModel.fromJson(res['user']), 'token': res['token']};
-    } else if (res['error'] != null) {
-      String message = '';
-      if (res['error'] == 'User not found') {
-        message = '이메일을 찾을 수 없습니다.';
-      } else {
-        message = '비밀번호가 일치 하지 않습니다.';
-      }
-      return {'user': UserModel(), 'message': message};
+    } else if (res['status'] == 404 || res['status'] == 401) {
+      return {'user': UserModel(), 'message': '이메일 또는 비밀번호가 올바르지 않습니다.'};
     } else {
       throw Exception('Server 500 Error');
     }
@@ -112,12 +106,22 @@ class UserDataSourceImpl implements UserDataSource {
   }
 
   @override
-  Future<bool> updatePassword(String newPassword) async {
-    final res = await netDriver.requestPutJson("", UserApi.updatePassword, {"newPassword": newPassword});
+  Future<bool> updatePassword(String token, String userId, String newPassword) async {
+    final res = await netDriver.requestPutJson(token, UserApi.updatePassword, {"userId": userId, "newPassword": newPassword});
     if (res['status'] == 200) {
       return true;
     } else {
       throw Exception('Error');
+    }
+  }
+
+  @override
+  Future<bool> deleteUser(String token, String userId) async {
+    final res = await netDriver.requestPostJson(token, AuthApi.delete, {"userId": userId});
+    if (res['status'] == 200) {
+      return true;
+    } else {
+      return false;
     }
   }
 

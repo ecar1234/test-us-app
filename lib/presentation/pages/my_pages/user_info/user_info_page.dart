@@ -10,6 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_event.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
+import 'package:test_us_app/presentation/pages/my_pages/user_info/password_update_page.dart';
+import 'package:test_us_app/presentation/pages/my_pages/user_info/user_delete_page.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
@@ -127,7 +129,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   Widget _profileSection(BuildContext context, double hei, double wid) {
     return SizedBox(
-        height: hei * 0.3,
+        height: hei * 0.25,
         width: wid,
         child: SizedBox(
           width: wid,
@@ -384,7 +386,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
         child: Column(
           children: [
             GestureDetector(
-              onTap: (){},
+              onTap: (){
+                Get.to(() => PasswordUpdatePage());
+              },
               child: SizedBox(
                 height: 40,
                 width: wid-40,
@@ -401,7 +405,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
               color: Colors.grey.shade200,
             ),
             GestureDetector(
-              onTap: (){},
+              onTap: (){
+                Get.to(() => UserDeletePage());
+              },
               child: SizedBox(
                 height: 40,
                 width: wid-40,

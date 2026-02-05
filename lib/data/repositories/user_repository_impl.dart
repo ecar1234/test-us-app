@@ -46,8 +46,8 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<bool> isPasswordValid(String password) async {
-    return await remote.isPasswordValid(password);
+  Future<bool> isPasswordValid(String token, String userId, String password) async {
+    return await remote.isPasswordValid(token, userId, password);
   }
 
   @override
@@ -67,8 +67,8 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<bool> updatePassword(String newPassword) async {
-    return await remote.updatePassword(newPassword);
+  Future<bool> updatePassword(String token, String userId, String newPassword) async {
+    return await remote.updatePassword(token, userId, newPassword);
   }
 
   @override
@@ -132,8 +132,14 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
+  Future<bool> deleteUser(String token, String userId) async {
+    return await remote.deleteUser(token, userId);
+  }
+
+  @override
   Future<String> autoLogin(String token) async {
     final res = await remote.autoLogin(token);
     return res;
   }
+
 }

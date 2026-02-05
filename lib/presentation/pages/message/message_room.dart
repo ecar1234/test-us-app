@@ -17,6 +17,7 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 
 import '../../../services/common_height_provider.dart';
 import '../../../services/socket/socket_io_client.dart';
+import '../../../services/theme_provider.dart';
 import '../../../utils/time_util.dart';
 import '../../bloc/message_bloc/message_bloc.dart';
 
@@ -275,6 +276,7 @@ class _MessageRoomState extends State<MessageRoom> {
   }
 
   Widget _buildLeftMessage(MessageEntity message, bool showProfile, bool showTime) {
+    final isDarkMode = context.read<ThemeProvider>().isDarkMode;
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,12 +320,13 @@ class _MessageRoomState extends State<MessageRoom> {
                   ),
                   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDarkMode ? Colors.grey.shade800 : Colors.white,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Colors.grey.shade600)),
                   child: Text(
                     message.content!,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                 ),
                 if (showTime) ...[

@@ -390,10 +390,10 @@ class _UserPageState extends State<UserPage> {
                                           child: Container(
                                               height: 200,
                                               width: MediaQuery.sizeOf(context).width,
-                                              padding: EdgeInsets.all(10),
+                                              padding: EdgeInsets.all(20),
                                               decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(10),
-                                                color: Colors.white
+                                                // color: Colors.white
                                               ),
                                               child: Column(
                                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -23,9 +23,6 @@ class UserProvider with ChangeNotifier {
 
   bool? get isLogged => _isLogged;
 
-
-
-
   Future<void> autoLogin(String token, UserEntity user) async {
     if (token.isEmpty || token == "") {
       _token = null;
@@ -103,11 +100,11 @@ class UserProvider with ChangeNotifier {
     return await useCase.isEmailAvailable(email);
   }
 
-  Future<bool> isPasswordValid(String password) async {
-    return await useCase.isPasswordValid(password);
-  }
+  // Future<bool> isPasswordValid(String password) async {
+  //   return await useCase.isPasswordValid(password);
+  // }
 
-  Future<bool> updatePassword(String newPassword) async {
-    return await useCase.updatePassword(newPassword);
-  }
+  // Future<bool> updatePassword(String newPassword) async {
+  //   return await useCase.updatePassword(newPassword);
+  // }
 }

@@ -58,13 +58,17 @@ class UserUseCase {
     return res;
   }
 
-  Future<bool> isPasswordValid(String password) async {
-    final res = await repository.isPasswordValid(password);
+  Future<bool> isPasswordValid(String token, String userId, String password) async {
+    final res = await repository.isPasswordValid(token, userId, password);
     return res;
   }
 
-  Future<bool> updatePassword(String newPassword) async {
-    final res = await repository.updatePassword(newPassword);
+  Future<bool> updatePassword(String token, String userId, String newPassword) async {
+    final res = await repository.updatePassword(token, userId, newPassword);
+    return res;
+  }
+  Future<bool> deleteUser(String token, String userId) async {
+    final res = await repository.deleteUser(token, userId);
     return res;
   }
 

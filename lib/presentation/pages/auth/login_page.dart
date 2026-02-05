@@ -336,6 +336,9 @@ class _LoginPageState extends State<LoginPage> {
                                       .read<AuthBloc>()
                                       .add(EmailLoginEvent(emailController.text, passwordController.text));
                                 },
+                                style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
                                 child: Text("로그인")),
                           ),
                           const Gap(40),

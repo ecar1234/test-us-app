@@ -15,11 +15,12 @@ abstract class UserDataSource {
   Future<UserModel?> getUserById(String token, String id);
   Future<bool> isNicknameAvailable(String nickname);
   Future<bool> isEmailAvailable(String email);
-  Future<bool> isPasswordValid(String password);
-  Future<bool> updatePassword(String newPassword);
+  Future<bool> isPasswordValid(String token, String userId, String password);
+  Future<bool> updatePassword(String token, String userId, String newPassword);
   Future<List<UserModel>> getUsersByIds(String token, List<String> ids);
   Future<UserModel> updateUserInfo(String token, UserModel userInfo);
   Future<UserModel> updateUserInfoWithImage(String token, UserModel userInfo, XFile image, {ImageModel? oldImage});
+  Future<bool> deleteUser(String token, String userId);
   Future<Map<String, dynamic>> authLogin(String email, AuthType authType);
   Future<Map<String, dynamic>> authSignup(UserModel userInfo);
   Future<void> createFirebaseToken(String token, String messagingToken, String userId, String deviceType);
