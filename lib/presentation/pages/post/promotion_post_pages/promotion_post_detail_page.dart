@@ -21,6 +21,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../data/models/application/application_model.dart';
+import '../../../../data/models/user/user_model.dart';
 import '../../../../domain/entities/image_entity.dart';
 import '../../../../services/common_height_provider.dart';
 import '../../../../utils/linkfy_util.dart';
@@ -105,6 +106,7 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
 
   Widget _buildPostInfo(BuildContext context, PromotionPostEntity post, double hei) {
     final user = context.read<UserProvider>().isLogged ?? false ? context.read<UserProvider>().user : null;
+    final isActive = post.author!.status == UserStatus.active;
     final isAuthor = post.author != null && post.author!.id == user?.id;
     return CustomScrollView(
       slivers: [
@@ -300,11 +302,12 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                             width: 30,
                             child: CircleAvatar(
                                 radius: 40,
-                                backgroundImage: post.author!.profileImg == null
+                                backgroundImage: isActive ? ( post.author!.profileImg == null
                                     ? const AssetImage('assets/images/Generic avatar.png')
                                     : CachedNetworkImageProvider(
                                         post.author!.profileImg!.url!,
-                                      ) as ImageProvider),
+                                      ) as ImageProvider) : const AssetImage('assets/images/Generic avatar.png')
+                            ),
                           ),
                           const Gap(5),
                           Text(
@@ -333,6 +336,7 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                   )),
                 ),
                 const Gap(40),
+                if(isActive)
                 SizedBox(
                     child: ListView.separated(
                         padding: EdgeInsets.symmetric(vertical: 20),

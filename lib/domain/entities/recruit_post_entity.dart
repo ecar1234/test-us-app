@@ -66,6 +66,7 @@ class RecruitPostEntity {
       id: model.author!.userId,
       nickname: model.author!.nickname,
       profileImg: model.author!.profileImg == null ? null : ImageEntity.toImageEntity(model.author!.profileImg!),
+      status: model.author!.status,
     );
     final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
     // final applications = model.applications!.map((e) => ApplicationEntity.toEntity(e)).toList();

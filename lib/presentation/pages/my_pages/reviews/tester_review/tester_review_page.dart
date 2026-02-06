@@ -18,6 +18,7 @@ import 'package:test_us_app/services/theme_provider.dart';
 
 import '../../../../../data/models/application/application_model.dart';
 import '../../../../../data/models/package/recruit_post_applications_model.dart';
+import '../../../../../data/models/user/user_model.dart';
 import '../../../../../domain/entities/user_review_entity.dart';
 import '../../../../../services/common_height_provider.dart';
 import '../../../../bloc/app_bloc/app_bloc.dart';
@@ -61,11 +62,10 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
               title: Text("테스터 리뷰"),
             ),
             body: BlocConsumer<AppBloc, AppState>(listener: (context, state) {
-              if(state is GetRecruitPostTestersReviewState){
+              if (state is GetRecruitPostTestersReviewState) {
                 final reviews = state.info.map((e) => e.userReview ?? UserReviewEntity()).toList();
                 context.read<ReviewProvider>().setTestersReview(reviews);
               }
-
             }, builder: (context, state) {
               if (state is GetRecruitPostTestersReviewState) {
                 return ListView.separated(
@@ -73,6 +73,7 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                     physics: BouncingScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, idx) {
+                      final isActive = state.info[idx].user!.status == UserStatus.active;
                       return Stack(
                         children: [
                           Container(
@@ -101,7 +102,7 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                                         height: 50,
                                         width: 50,
                                         child: CircleAvatar(
-                                            backgroundImage: state.info[idx].user!.profileImg!.url == null
+                                            backgroundImage: state.info[idx].user!.profileImg!.url == null && !isActive
                                                 ? const AssetImage('assets/images/Generic avatar.png')
                                                 : CachedNetworkImageProvider(state.info[idx].user!.profileImg!.url!))),
                                     const Gap(10),
@@ -111,7 +112,7 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
-                                            Text(state.info[idx].user!.nickname!,
+                                            Text(isActive ? state.info[idx].user!.nickname! : '알 수 없는 유져',
                                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                             const Gap(10),
                                             // Text('( ${_getPlatform(application.)} )',
@@ -123,53 +124,62 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                                     ),
                                   ],
                                 ),
-                                const Gap(10),
-                                Selector<ReviewProvider, UserReviewEntity>(selector: (context, provider) {
-                                  if(provider.testersReviewOnPost == null || provider.testersReviewOnPost!.isEmpty) return UserReviewEntity();
-                                  UserReviewEntity review = provider.testersReviewOnPost!
-                                      .firstWhere((element) => element.reviewedId == state.info[idx].user!.userId, orElse: () => UserReviewEntity());
-                                  return review;
-                                }, builder: (context, review, child) {
-                                  if (review.reviewId == null) {
-                                    return SizedBox(
-                                      height: 40,
-                                      width: 200,
-                                      child: ElevatedButton(
-                                          onPressed: () {
-                                            // final appId = widget.applications.firstWhere((e) => e == );
-                                            Get.to(() => AddTesterReviewPage(
-                                                tester: state.info[idx].user!, appId: state.info[idx].appId!));
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                              padding: EdgeInsets.zero,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                              )),
-                                          child: Text('리뷰 남겨주기')),
-                                    );
-                                  } else {
-                                    return SizedBox(
-                                      height: 40,
-                                      width: 200,
-                                      child: ElevatedButton(
-                                          onPressed: () {
-                                            _checkReviewedModal(context, state.info[idx].user!, review);
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                              padding: EdgeInsets.zero,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                              )),
-                                          child: Text('작성 리뷰 확인하기')),
-                                    );
-                                  }
-                                })
+                                if (isActive) ...[
+                                  const Gap(10),
+                                  Selector<ReviewProvider, UserReviewEntity>(selector: (context, provider) {
+                                    if (provider.testersReviewOnPost == null || provider.testersReviewOnPost!.isEmpty) {
+                                      return UserReviewEntity();
+                                    }
+                                    UserReviewEntity review = provider.testersReviewOnPost!.firstWhere(
+                                        (element) => element.reviewedId == state.info[idx].user!.userId,
+                                        orElse: () => UserReviewEntity());
+                                    return review;
+                                  }, builder: (context, review, child) {
+                                    if (review.reviewId == null) {
+                                      return SizedBox(
+                                        height: 40,
+                                        width: 200,
+                                        child: ElevatedButton(
+                                            onPressed: () {
+                                              // final appId = widget.applications.firstWhere((e) => e == );
+                                              Get.to(() => AddTesterReviewPage(
+                                                  tester: state.info[idx].user!, appId: state.info[idx].appId!));
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                                padding: EdgeInsets.zero,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                )),
+                                            child: Text('리뷰 남겨주기')),
+                                      );
+                                    } else {
+                                      return SizedBox(
+                                        height: 40,
+                                        width: 200,
+                                        child: ElevatedButton(
+                                            onPressed: () {
+                                              _checkReviewedModal(context, state.info[idx].user!, review);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                                padding: EdgeInsets.zero,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                )),
+                                            child: Text('작성 리뷰 확인하기')),
+                                      );
+                                    }
+                                  })
+                                ]
                               ],
                             ),
                           ),
                           Selector<ReviewProvider, List<UserReviewEntity>>(selector: (context, provider) {
-                            if(provider.testersReviewOnPost == null || provider.testersReviewOnPost!.isEmpty) return [];
-                            List<UserReviewEntity> review = provider.testersReviewOnPost!.where((element) => element.reviewedId == state.info[idx].user!.userId).toList();
+                            if (provider.testersReviewOnPost == null || provider.testersReviewOnPost!.isEmpty) {
+                              return [];
+                            }
+                            List<UserReviewEntity> review = provider.testersReviewOnPost!
+                                .where((element) => element.reviewedId == state.info[idx].user!.userId)
+                                .toList();
                             return review;
                           }, builder: (context, review, child) {
                             if (review.isNotEmpty) {
@@ -211,6 +221,7 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
   Future<void> _checkReviewedModal(BuildContext context, User tester, UserReviewEntity review) {
     _contentController.text = review.comment!;
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
+    final isActive = tester.status == UserStatus.active;
     return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -224,7 +235,8 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('${tester.nickname}께 전송된 리뷰', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text('${isActive ? tester.nickname : '알 수 없는 유져'} 전송된 리뷰',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     const Gap(20),
                     RatingBar.builder(
                       initialRating: review.rating!,

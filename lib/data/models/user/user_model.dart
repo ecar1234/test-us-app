@@ -47,6 +47,14 @@ enum AuthType {
   @JsonValue('NAVER')
   naver
 }
+enum UserStatus {
+  @JsonValue('ACTIVE')
+  active,
+  @JsonValue('INACTIVE')
+  inactive,
+  @JsonValue('DELETE')
+  delete
+}
 
 @JsonSerializable()
 class UserModel {
@@ -55,6 +63,7 @@ class UserModel {
   String? password;
   String? nickname;
   ImageModel? profileImg;
+  UserStatus? status;
   UserType? userType;
   UserRole? role;
   String? userName;
@@ -70,6 +79,7 @@ class UserModel {
     this.password,
     this.nickname,
     this.profileImg,
+    this.status,
     this.userType,
     this.role,
     this.userName,

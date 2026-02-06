@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 import 'package:test_us_app/domain/entities/room_entity.dart';
 
+import '../../../data/models/user/user_model.dart';
 import '../../../utils/time_util.dart';
 import '../../bloc/message_bloc/message_bloc.dart';
 import '../../bloc/message_bloc/message_event.dart';
@@ -25,8 +26,8 @@ class MessageMainPage extends StatefulWidget {
 }
 
 class _MessageMainPageState extends State<MessageMainPage> {
-
   late String userId;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -56,7 +57,7 @@ class _MessageMainPageState extends State<MessageMainPage> {
                   return Center(child: Text("에러가 발생했습니다."));
                 }
                 return Selector<RoomProvider, List<RoomEntity>>(selector: (context, provider) {
-                  return provider.roomList??[];
+                  return provider.roomList ?? [];
                 }, builder: (context, roomList, child) {
                   if (roomList.isEmpty) {
                     return Center(child: Text("아직 대화방이 없습니다 😯"));
@@ -70,25 +71,21 @@ class _MessageMainPageState extends State<MessageMainPage> {
                       final targetUser = room.members!.firstWhere((m) => m.user!.id != userId);
                       final dateInfo = TimeUtil().getChatMessageCreatedAt(room.lastMessageAt!);
                       final unreadCount = room.members!.firstWhere((member) => member.user!.id == userId).unreadCount;
-
+                      final isActive = targetUser.user!.status == UserStatus.active;
 
                       return Slidable(
-                        endActionPane: ActionPane(
-                          motion: ScrollMotion(),
-                          extentRatio: 0.25,
-                          children: [
-                            SlidableAction(
-                              onPressed: (_) {
-                                Get.snackbar("실행", "채팅방 삭제 실행");
-                                // context.read<MessageBloc>().add(DeleteRoomEvent(room.id!));
-                              },
-                              backgroundColor: const Color(0xFF0392CF),
-                              foregroundColor: Colors.white,
-                              icon: Icons.delete,
-                              label: '삭제',
-                            ),
-                          ]
-                        ),
+                        endActionPane: ActionPane(motion: ScrollMotion(), extentRatio: 0.25, children: [
+                          SlidableAction(
+                            onPressed: (_) {
+                              Get.snackbar("실행", "채팅방 삭제 실행");
+                              // context.read<MessageBloc>().add(DeleteRoomEvent(room.id!));
+                            },
+                            backgroundColor: const Color(0xFF0392CF),
+                            foregroundColor: Colors.white,
+                            icon: Icons.delete,
+                            label: '삭제',
+                          ),
+                        ]),
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTap: () {
@@ -107,24 +104,24 @@ class _MessageMainPageState extends State<MessageMainPage> {
                                     width: 60,
                                     child: ClipRect(
                                         child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(25),
-                                      child: targetUser.user!.profileImg?.url != null
-                                          ? CachedNetworkImage(
-                                              imageUrl: targetUser.user!.profileImg!.url!,
-                                              width: 60,
-                                              height: 60,
-                                              fit: BoxFit.cover,
-                                              placeholder: (context, url) => Container(color: Colors.grey[200]),
-                                              errorWidget: (context, url, error) =>
-                                                  Image.asset('assets/images/default avatar.png', fit: BoxFit.cover),
-                                            )
-                                          : Image.asset(
-                                              'assets/images/default avatar.png',
-                                              width: 50,
-                                              height: 50,
-                                              fit: BoxFit.cover,
-                                            ),
-                                    )),
+                                            borderRadius: BorderRadius.circular(25),
+                                            child: targetUser.user!.profileImg?.url != null && isActive
+                                                ? CachedNetworkImage(
+                                                    imageUrl: targetUser.user!.profileImg!.url!,
+                                                    width: 60,
+                                                    height: 60,
+                                                    fit: BoxFit.cover,
+                                                    placeholder: (context, url) => Container(color: Colors.grey[200]),
+                                                    errorWidget: (context, url, error) => Image.asset(
+                                                        'assets/images/default avatar.png',
+                                                        fit: BoxFit.cover),
+                                                  )
+                                                : Image.asset(
+                                                    'assets/images/default avatar.png',
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.cover,
+                                                  ))),
                                   ),
                                 ),
                                 const Gap(10),
@@ -136,7 +133,7 @@ class _MessageMainPageState extends State<MessageMainPage> {
                                           Row(
                                             children: [
                                               Text(
-                                                targetUser.user!.nickname!,
+                                                isActive ? targetUser.user!.nickname! : "알 수 없는 유져",
                                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                                               ),
                                             ],
@@ -171,21 +168,23 @@ class _MessageMainPageState extends State<MessageMainPage> {
                                                   style: TextStyle(fontSize: dateInfo['size'], color: Colors.grey)),
                                             ],
                                           ),
-                                          if(unreadCount != null && unreadCount > 0)
+                                          if (unreadCount != null && unreadCount > 0)
                                             Row(
                                               mainAxisAlignment: MainAxisAlignment.end,
                                               children: [
                                                 Container(
-                                                  width: 25,
-                                                  height: 25,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.red,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(unreadCount.toString(), style: TextStyle(color: Colors.white),),
-                                                  )
-                                                ),
+                                                    width: 25,
+                                                    height: 25,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.red,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        unreadCount.toString(),
+                                                        style: TextStyle(color: Colors.white),
+                                                      ),
+                                                    )),
                                               ],
                                             )
                                         ],

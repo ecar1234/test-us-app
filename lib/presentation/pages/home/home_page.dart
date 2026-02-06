@@ -23,6 +23,7 @@ import 'package:test_us_app/presentation/provider/post_provider/base_post_provid
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
 
+import '../../../data/models/user/user_model.dart';
 import '../../../data/sharedPreferences/auth_preference.dart';
 import '../../../domain/entities/recruit_post_entity.dart';
 import '../../../services/common_height_provider.dart';
@@ -443,6 +444,7 @@ class _HomePageState extends State<HomePage> {
                           padding: EdgeInsets.only(left: 20, right: 20),
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (context, idx) {
+                            final isActive = posts[idx].author!.status == UserStatus.active;
                             return GestureDetector(
                               onTap: () async {
                                 Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
@@ -526,7 +528,7 @@ class _HomePageState extends State<HomePage> {
                                     const Gap(5),
                                     SizedBox(
                                         child: Text(
-                                      posts[idx].author!.nickname ?? context.read<UserProvider>().user!.nickname ?? '',
+                                      isActive ? posts[idx].author!.nickname ?? '알수 없는 회원' : '알수 없는 회원',
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w500,
@@ -594,6 +596,7 @@ class _HomePageState extends State<HomePage> {
                           padding: EdgeInsets.only(left: 20, right: 20),
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (context, idx) {
+                            final isActive = posts[idx].author!.status == UserStatus.active;
                             return GestureDetector(
                               onTap: () async {
                                 Get.to(() => PromotionPostDetailPage(postId: posts[idx].id!));
@@ -678,7 +681,7 @@ class _HomePageState extends State<HomePage> {
                                     const Gap(5),
                                     SizedBox(
                                         child: Text(
-                                      posts[idx].author!.nickname ?? context.read<UserProvider>().user!.nickname ?? '',
+                                          isActive ? posts[idx].author!.nickname ?? '알수 없는 회원' : '알수 없는 회원',
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w500,

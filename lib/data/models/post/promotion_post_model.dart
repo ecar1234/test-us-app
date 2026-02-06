@@ -1,12 +1,8 @@
-
-
-
 import 'package:json_annotation/json_annotation.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 
 import '../application/application_model.dart';
 import '../image/image_model.dart';
-import '../review/post_review_model.dart';
 import '../user/user_model.dart';
 
 part 'promotion_post_model.g.dart';

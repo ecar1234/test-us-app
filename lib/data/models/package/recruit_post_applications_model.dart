@@ -13,6 +13,7 @@ class User {
   String? nickname;
   String? email;
   ImageModel? profileImg;
+  UserStatus? status;
   UserType? userType;
   UserRole? role;
   DateTime? createdAt;

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -8,6 +9,7 @@ import 'package:test_us_app/presentation/bloc/review_bloc/review_state.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_event.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 
+import '../../../../../data/models/user/user_model.dart';
 import '../../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../../services/common_height_provider.dart';
 import '../../../../../services/theme_provider.dart';
@@ -76,6 +78,7 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
                     shrinkWrap: true,
                     itemBuilder: (context, idx) {
                       final user = state.users.firstWhere((element) => element.id == widget.reviews[idx].reviewerUserId);
+                      final isActive = user.status == UserStatus.active;
                       return Container(
                           padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -101,13 +104,13 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
                                     height: 40,
                                     width: 40,
                                     child: CircleAvatar(
-                                      backgroundImage:user.profileImg == null || user.profileImg!.url == null
+                                      backgroundImage:user.profileImg == null || user.profileImg!.url == null && !isActive
                                           ? const AssetImage('assets/images/Generic avatar.png')
-                                          : NetworkImage(user.profileImg!.url!),
+                                          : CachedNetworkImage(imageUrl: user.profileImg!.url!,) as ImageProvider,
                                     ),
                                   ),
                                   const Gap(10),
-                                  Text(user.nickname!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500))
+                                  Text(isActive ? user.nickname! : '알 수 없는 유져', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500))
                                 ]
                               ),
                               const Gap(10),

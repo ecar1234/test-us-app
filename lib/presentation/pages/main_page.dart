@@ -256,7 +256,9 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
             useMaterial3: true,
             swapLegacyOnMaterial3: true,
-            fontFamily: GoogleFonts.notoSans().fontFamily),
+            fontFamily: GoogleFonts.notoSans().fontFamily,
+
+        ),
         darkTheme: FlexThemeData.dark(
             scheme: FlexScheme.damask,
             subThemesData: const FlexSubThemesData(

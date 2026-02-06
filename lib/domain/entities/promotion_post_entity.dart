@@ -53,6 +53,7 @@ class PromotionPostEntity {
       id: model.author!.userId,
       nickname: model.author!.nickname,
       profileImg: model.author!.profileImg == null ? null : ImageEntity.toImageEntity(model.author!.profileImg!),
+      status: model.author!.status,
     );
     final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
     // final reviews = model.reviews!.map((e) => PostReviewEntity.toEntity(e)).toList();

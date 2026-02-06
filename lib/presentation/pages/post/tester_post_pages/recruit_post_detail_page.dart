@@ -23,6 +23,7 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/linkfy_util.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../data/models/user/user_model.dart';
 import '../../../../domain/entities/image_entity.dart';
 import '../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../domain/entities/user_entity.dart';
@@ -132,6 +133,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
 
   Widget _postInfoBuilder(RecruitPostEntity post, double hei) {
     final user = context.read<UserProvider>().isLogged ?? false ? context.read<UserProvider>().user : null;
+    final isActive = post.author!.status == UserStatus.active;
     final isAuthor = post.author != null && post.author!.id == user?.id;
     return CustomScrollView(
       slivers: [
@@ -330,15 +332,15 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                             width: 30,
                             child: CircleAvatar(
                                 radius: 40,
-                                backgroundImage: post.author!.profileImg == null
+                                backgroundImage: isActive ?  (post.author!.profileImg == null
                                     ? const AssetImage('assets/images/Generic avatar.png')
-                                    : CachedNetworkImageProvider(
-                                        post.author!.profileImg!.url!,
-                                      ) as ImageProvider),
+                                    : CachedNetworkImageProvider(post.author!.profileImg!.url!,) as ImageProvider)
+                                    : const AssetImage('assets/images/Generic avatar.png')
+                            ),
                           ),
                           const Gap(5),
                           Text(
-                            '${post.author!.nickname}',
+                            isActive ? '${post.author!.nickname}' : '알 수 없는 회원',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -378,7 +380,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                         context.read<BasePostProvider>().updateRecruitPost(state.post!);
                       },
                       listenWhen: (prev, current) => current.state != UserAppState.loadingState,
-                      child: _applicationSection(context, post)),
+                      child: isActive ? _applicationSection(context, post) : SizedBox()),
                 const Gap(40)
               ],
             ),
@@ -397,13 +399,6 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
       return app;
     }, builder: (context, application, child) {
       if (!isLogged) return _beforeApplicationSection(context, post);
-
-      // final applications = context.read<ApplicationProvider>().userApplications ?? [];
-      // final user = context.read<UserProvider>().user!;
-      // final app = applications.firstWhere((e) => e.postId == post.id && e.applicantId == user.id,
-      //     orElse: () => ApplicationEntity());
-// todo : 신청은 정상 작동, 취소 시 새로 받아오는 post application state가 pending으로 나옴(서버 확인)
-// todo : 서버에서 mobileOs가 DB에 저장 안됨(서버확인
       switch (application.status) {
         case ApplicationStatus.pending:
         case ApplicationStatus.accepted:

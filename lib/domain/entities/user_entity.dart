@@ -11,6 +11,7 @@ class UserEntity {
   String? password;
   String? nickname;
   ImageEntity? profileImg;
+  UserStatus? status;
   UserType? userType;
   UserRole? role;
   String? userName;
@@ -26,6 +27,7 @@ class UserEntity {
     this.password,
     this.nickname,
     this.profileImg,
+    this.status,
     this.userType,
     this.role,
     this.userName,
@@ -45,6 +47,7 @@ class UserEntity {
         password: model.password,
         nickname: model.nickname,
         profileImg: profileImage,
+        status: model.status,
         userType: model.userType,
         role: model.role,
         userName: model.userName,

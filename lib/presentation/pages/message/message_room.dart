@@ -15,6 +15,7 @@ import 'package:test_us_app/presentation/bloc/message_bloc/message_state.dart';
 import 'package:test_us_app/presentation/provider/socket_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 
+import '../../../data/models/user/user_model.dart';
 import '../../../services/common_height_provider.dart';
 import '../../../services/socket/socket_io_client.dart';
 import '../../../services/theme_provider.dart';
@@ -90,7 +91,8 @@ class _MessageRoomState extends State<MessageRoom> {
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
-              title: Text('${widget.targetUser!.nickname}'),
+              title:
+                  Text(widget.targetUser!.status == UserStatus.active ? '${widget.targetUser!.nickname}' : '알 수 없는 유져'),
             ),
             body: GestureDetector(
               behavior: HitTestBehavior.opaque,
@@ -277,30 +279,30 @@ class _MessageRoomState extends State<MessageRoom> {
 
   Widget _buildLeftMessage(MessageEntity message, bool showProfile, bool showTime) {
     final isDarkMode = context.read<ThemeProvider>().isDarkMode;
+    final isActive = message.sender!.status == UserStatus.active;
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showProfile)
           ClipRRect(
-            borderRadius: BorderRadius.circular(25),
-            child: message.sender!.profileImg?.url != null
-                ? CachedNetworkImage(
-                    imageUrl: message.sender!.profileImg!.url!,
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(color: Colors.grey[200]),
-                    errorWidget: (context, url, error) =>
-                        Image.asset('assets/images/default avatar.png', fit: BoxFit.cover),
-                  )
-                : Image.asset(
-                    'assets/images/default avatar.png',
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                  ),
-          )
+              borderRadius: BorderRadius.circular(25),
+              child: message.sender!.profileImg?.url != null && isActive
+                  ? CachedNetworkImage(
+                      imageUrl: message.sender!.profileImg!.url!,
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(color: Colors.grey[200]),
+                      errorWidget: (context, url, error) =>
+                          Image.asset('assets/images/default avatar.png', fit: BoxFit.cover),
+                    )
+                  : Image.asset(
+                      'assets/images/default avatar.png',
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                    ))
         else
           SizedBox(
             width: 40,
@@ -309,7 +311,9 @@ class _MessageRoomState extends State<MessageRoom> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (showProfile) Text(message.sender!.nickname!, style: TextStyle(fontSize: 14, color: Colors.grey)),
+            if (showProfile)
+              Text(isActive ? message.sender!.nickname! : '알 수 없는 유져',
+                  style: TextStyle(fontSize: 14, color: Colors.grey)),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -325,8 +329,7 @@ class _MessageRoomState extends State<MessageRoom> {
                       border: Border.all(color: Colors.grey.shade600)),
                   child: Text(
                     message.content!,
-                    style: TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                 ),
                 if (showTime) ...[

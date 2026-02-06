@@ -125,7 +125,7 @@ class _TesterReviewMainPageState extends State<TesterReviewMainPage> {
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                    Text('테스터 수 : '),
+                                    Text('참여 유져 : '),
                                     const Gap(10),
                                     Text('${posts[idx].applications!.length} 명',
                                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))

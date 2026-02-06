@@ -14,6 +14,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       profileImg: json['profileImg'] == null
           ? null
           : ImageModel.fromJson(json['profileImg'] as Map<String, dynamic>),
+      status: $enumDecodeNullable(_$UserStatusEnumMap, json['status']),
       userType: $enumDecodeNullable(_$UserTypeEnumMap, json['userType']),
       role: $enumDecodeNullable(_$UserRoleEnumMap, json['role']),
       userName: json['userName'] as String?,
@@ -38,6 +39,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'password': instance.password,
       'nickname': instance.nickname,
       'profileImg': instance.profileImg,
+      'status': _$UserStatusEnumMap[instance.status],
       'userType': _$UserTypeEnumMap[instance.userType],
       'role': _$UserRoleEnumMap[instance.role],
       'userName': instance.userName,
@@ -47,6 +49,12 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };
+
+const _$UserStatusEnumMap = {
+  UserStatus.active: 'ACTIVE',
+  UserStatus.inactive: 'INACTIVE',
+  UserStatus.delete: 'DELETE',
+};
 
 const _$UserTypeEnumMap = {
   UserType.individuals: 'INDIVIDUALS',

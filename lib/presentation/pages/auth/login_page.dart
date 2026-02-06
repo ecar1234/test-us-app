@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -28,25 +29,6 @@ class _LoginPageState extends State<LoginPage> {
   final logger = Logger();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    // GoogleSignIn.instance.authenticationEvents.listen((event) {
-    //   setState(() {
-    //     if (event is GoogleSignInAuthenticationEventSignIn) {
-    //       _currentUser = event.user;
-    //       _status = 'Signed in: ${_currentUser?.displayName}';
-    //     } else if (event is GoogleSignInAuthenticationEventSignOut) {
-    //       _currentUser = null;
-    //       _status = 'Signed out';
-    //     }
-    //   });
-    // });
-    //
-    // GoogleSignIn.instance.attemptLightweightAuthentication();
-  }
 
   @override
   void dispose() {
@@ -151,8 +133,9 @@ class _LoginPageState extends State<LoginPage> {
                                                             width: wid * 0.3,
                                                             child: Text('이메일',
                                                                 style: TextStyle(
-                                                                    fontSize: 16,
-                                                                    fontWeight: FontWeight.w600,),
+                                                                  fontSize: 16,
+                                                                  fontWeight: FontWeight.w600,
+                                                                ),
                                                                 textAlign: TextAlign.center),
                                                           )),
                                                       Flexible(
@@ -173,8 +156,9 @@ class _LoginPageState extends State<LoginPage> {
                                                         width: wid * 0.3,
                                                         child: Text('닉네임',
                                                             style: TextStyle(
-                                                                fontSize: 16,
-                                                                fontWeight: FontWeight.w600,),
+                                                              fontSize: 16,
+                                                              fontWeight: FontWeight.w600,
+                                                            ),
                                                             textAlign: TextAlign.center),
                                                       )),
                                                   Flexible(
@@ -183,8 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                                                           width: wid * 0.7,
                                                           child: Text(
                                                             state.user!.nickname ?? "",
-                                                            style: TextStyle(fontSize: 16,
-                                                                fontWeight: FontWeight.w600),
+                                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                                                           )))
                                                 ])),
                                                 const Gap(20),
@@ -196,8 +179,9 @@ class _LoginPageState extends State<LoginPage> {
                                                           width: wid * 0.3,
                                                           child: Text('타입',
                                                               style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontWeight: FontWeight.w600, ),
+                                                                fontSize: 16,
+                                                                fontWeight: FontWeight.w600,
+                                                              ),
                                                               textAlign: TextAlign.center),
                                                         )),
                                                     Flexible(
@@ -231,8 +215,9 @@ class _LoginPageState extends State<LoginPage> {
                                                           child: Text(
                                                             '역할',
                                                             style: TextStyle(
-                                                                fontSize: 16,
-                                                                fontWeight: FontWeight.w600,),
+                                                              fontSize: 16,
+                                                              fontWeight: FontWeight.w600,
+                                                            ),
                                                             textAlign: TextAlign.center,
                                                           ),
                                                         )),
@@ -283,19 +268,19 @@ class _LoginPageState extends State<LoginPage> {
                                                         email: state.user!.email,
                                                         id: state.user!.id,
                                                         nickname: state.user!.nickname,
-                                                        role:
-                                                        TypeConversionUtil().toUserRole(roleController.text),
-                                                        userType: TypeConversionUtil()
-                                                            .toUserType(userTypeController.text),
+                                                        role: TypeConversionUtil().toUserRole(roleController.text),
+                                                        userType:
+                                                            TypeConversionUtil().toUserType(userTypeController.text),
                                                         profileImg: state.user!.profileImg!,
-                                                        method: state.message == 'naver' ? AuthType.naver : AuthType.google);
+                                                        method: state.message == 'naver'
+                                                            ? AuthType.naver
+                                                            : AuthType.google);
 
-                                                    context.read<AuthBloc>().add(OauthLoginEvent(user:userInfo));
+                                                    context.read<AuthBloc>().add(OauthLoginEvent(user: userInfo));
                                                     Get.back();
                                                   },
                                                   child: Text("확인",
-                                                      style:
-                                                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
+                                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
                                             ),
                                           ),
                                         ])),
@@ -324,7 +309,7 @@ class _LoginPageState extends State<LoginPage> {
                           const Gap(40),
                           // 로그인 버튼
                           SizedBox(
-                            width: 180,
+                            width: MediaQuery.sizeOf(context).width * 0.6,
                             height: 50,
                             child: ElevatedButton(
                                 onPressed: () async {
@@ -337,7 +322,11 @@ class _LoginPageState extends State<LoginPage> {
                                       .add(EmailLoginEvent(emailController.text, passwordController.text));
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                  backgroundColor: Theme.of(context).primaryColor,
+                                  foregroundColor: Colors.white,
                                 ),
                                 child: Text("로그인")),
                           ),
@@ -361,7 +350,9 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                     child: Text(
                                       "회원가입",
-                                      style: TextStyle(fontSize: 12,),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
                                 )
@@ -387,7 +378,9 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                     child: Text(
                                       "정보 찾기",
-                                      style: TextStyle(fontSize: 12,),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
                                 )
@@ -397,7 +390,41 @@ class _LoginPageState extends State<LoginPage> {
                           const Gap(20),
                           _divider(),
                           const Gap(20),
-                          _oAuthButtons(context)
+                          _oAuthButtons(context),
+                          const Gap(50),
+                          RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                              children: [
+                                const TextSpan(text: '가입 시 '),
+                                TextSpan(
+                                  text: '이용약관',
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      debugPrint('이용약관');
+                                    },
+                                ),
+                                const TextSpan(text: ' 및 '),
+                                TextSpan(
+                                  text: '개인정보처리방침',
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      debugPrint('개인정보');
+                                    },
+                                ),
+                                const TextSpan(text: '에 동의하게 됩니다.'),
+                              ],
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -409,13 +436,13 @@ class _LoginPageState extends State<LoginPage> {
     return [
       SizedBox(
         child: Text(
-          "Testus(테스터스)로 들어가기",
+          "TESTUS(테스터스)로 들어가기",
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
         ),
       ),
       const Gap(10),
       SizedBox(
-        child: Text("Testus를 통해 개발 서비스의 방향성을 찾고,"),
+        child: Text("TESTUS 통해 개발 서비스의 방향성을 찾고,"),
       ),
       SizedBox(
         child: Text("테스트를 진행 하면서 인사이트를 얻어보세요."),
@@ -428,19 +455,29 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         children: [
           SizedBox(
-            width: 320,
+            width: MediaQuery.sizeOf(context).width * 0.7,
             child: TextField(
               controller: emailController,
-              decoration: InputDecoration(labelText: "Email"),
+              decoration: InputDecoration(
+                labelText: "Email",
+                prefixIcon: Icon(Icons.email),
+                prefixIconColor: Theme.of(context).primaryColor,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              ),
             ),
           ),
           const Gap(20),
           SizedBox(
-            width: 320,
+            width: MediaQuery.sizeOf(context).width * 0.7,
             child: TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: InputDecoration(labelText: "Password"),
+              decoration: InputDecoration(
+                labelText: "Password",
+                prefixIcon: Icon(Icons.lock),
+                prefixIconColor: Theme.of(context).primaryColor,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              ),
             ),
           )
         ],
