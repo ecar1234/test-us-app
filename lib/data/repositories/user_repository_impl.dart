@@ -142,4 +142,28 @@ class UserRepositoryImpl implements UserRepository {
     return res;
   }
 
+  @override
+  Future<String> findEmail(String nickname) async {
+    final res = await remote.findEmail(nickname);
+    return res;
+  }
+
+  @override
+  Future<bool> findPassword(String email) async {
+    final res = await remote.findPassword(email);
+    return res;
+  }
+
+  @override
+  Future<bool> verifyOtp(String email, String otp) async {
+    final res = await remote.verifyOtp(email, otp);
+    return res;
+  }
+
+  @override
+  Future<bool> changePassword(String email, String newPassword) async {
+    final res = await remote.changePassword(email, newPassword);
+    return res;
+  }
+
 }

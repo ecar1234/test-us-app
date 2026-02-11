@@ -45,12 +45,33 @@ class PasswordUpdateEvent extends AuthEvent {
 
   PasswordUpdateEvent(this.token, this.userId, this.oldPw, this.newPw);
 }
+class PasswordChangeEvent extends AuthEvent {
+  final String email;
+  final String newPw;
+  PasswordChangeEvent(this.email, this.newPw);
+}
 
 class RequestUserDeleteEvent extends AuthEvent {
   final String token;
   final String userId;
   RequestUserDeleteEvent(this.token, this.userId);
 }
+
+class FindEmailEvent extends AuthEvent {
+  final String nickname;
+  FindEmailEvent(this.nickname);
+}
+class FindPasswordEvent extends AuthEvent {
+  final String email;
+  FindPasswordEvent(this.email);
+}
+
+class VerifyOtpEvent extends AuthEvent {
+  final String email;
+  final String otp;
+  VerifyOtpEvent(this.email, this.otp);
+}
+
 
 class LogoutEvent extends AuthEvent {
   LogoutEvent();

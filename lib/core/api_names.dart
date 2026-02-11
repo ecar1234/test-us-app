@@ -13,7 +13,11 @@ class AuthApi {
   static const String refreshToken = '/api/v1/auth/refreshToken';
   static const String autoLogin = '/api/v1/auth/autoLogin';
   static const String updatePassword = '/api/v1/auth/updatePassword';
+  static const String changePassword = '/api/v1/auth/changePassword';
   static const String logout = '/api/v1/auth/logout';
+  static const String findEmail = '/api/v1/auth/findEmail';
+  static const String findPassword = '/api/v1/auth/findPassword';
+  static const String verifyOtp = '/api/v1/auth/verifyOtp';
 }
 
 class UserApi {

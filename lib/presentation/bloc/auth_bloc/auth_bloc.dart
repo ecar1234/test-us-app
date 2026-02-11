@@ -29,8 +29,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthState(state: UserAuthState.beforeLoginState));
         return;
       } else {
-        final serverToken = await  userUseCase.autoLogin(token);
-        if(serverToken != token) {
+        final serverToken = await userUseCase.autoLogin(token);
+        if (serverToken != token) {
           pref.setToken(serverToken);
           logger.d('token changed!');
         }
@@ -92,21 +92,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
 
         final userInfo = UserEntity(
-            email: googleUser.email, nickname: googleUser.displayName, profileImg: ImageEntity(url: googleUser.photoUrl));
+            email: googleUser.email,
+            nickname: googleUser.displayName,
+            profileImg: ImageEntity(url: googleUser.photoUrl));
         emit(AuthState(state: UserAuthState.authLoginCompletedState, user: userInfo, message: 'google'));
         logger.i('state : Google login completed state');
       } catch (e) {
         logger.e(e);
         logger.i('state : login failed state');
         // emit(AuthState(state: UserAuthState.authFailedState, message: '구글 로그인 정보를 가져오지 못했습니다. 다시 시도해주세요.'));
-        emit(AuthState(state: UserAuthState.authFailedState, message: e.toString() ));
+        emit(AuthState(state: UserAuthState.authFailedState, message: e.toString()));
       }
     });
 
     on<RequestNaverAuth>((event, emit) async {
       emit(AuthState(state: UserAuthState.naverAuthPendingState));
       try {
-
         final NaverLoginResult naverUser = await FlutterNaverLogin.logIn();
         if (naverUser.status == NaverLoginStatus.error) {
           emit(AuthState(state: UserAuthState.authFailedState, message: naverUser.errorMessage));
@@ -159,7 +160,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
-
     on<LoginCompletedEvent>((event, emit) {
       emit(AuthState(state: UserAuthState.loginCompletedState, user: event.user));
     });
@@ -186,17 +186,33 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       logger.i('state : loading state');
       try {
         final isPwValid = await userUseCase.isPasswordValid(event.token, event.userId, event.oldPw);
-        if(!isPwValid){
+        if (!isPwValid) {
           emit(AuthState(state: UserAuthState.authFailedState, message: '기존 비밀번호가 일치하지 않습니다.'));
           logger.e('기존 비밀번호가 일치하지 않습니다.');
           return;
         }
         logger.i('password is valid');
         final res = await userUseCase.updatePassword(event.token, event.userId, event.newPw);
-        if(res){
+        if (res) {
           emit(AuthState(state: UserAuthState.passwordUpdateCompletedState));
           logger.i('state : password update completed state');
-        }else{
+        } else {
+          emit(AuthState(state: UserAuthState.errorState, message: '비밀번호 변경에 실패했습니다.'));
+        }
+      } on Exception catch (e) {
+        logger.e(e.toString());
+        emit(AuthState(state: UserAuthState.errorState, message: e.toString()));
+      }
+    });
+    on<PasswordChangeEvent>((event, emit) async {
+      emit(AuthState(state: UserAuthState.loadingState));
+      logger.i('state : loading state');
+      try {
+        final res = await userUseCase.changePassword(event.email, event.newPw);
+        if (res) {
+          emit(AuthState(state: UserAuthState.passwordUpdateCompletedState));
+          logger.i('state : password update completed state');
+        } else {
           emit(AuthState(state: UserAuthState.errorState, message: '비밀번호 변경에 실패했습니다.'));
         }
       } on Exception catch (e) {
@@ -209,15 +225,64 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthState(state: UserAuthState.loadingState));
       try {
         final res = await userUseCase.deleteUser(event.token, event.userId);
-        if(res){
+        if (res) {
           add(LogoutEvent());
           emit(AuthState(state: UserAuthState.userDeleteCompletedState));
-        }else{
-        }
-
+        } else {}
       } on Exception catch (e) {
         logger.e(e.toString());
         emit(AuthState(state: UserAuthState.errorState, message: e.toString()));
+      }
+    });
+
+    on<FindEmailEvent>((event, emit) async {
+      emit(AuthState(state: UserAuthState.loadingState));
+      logger.i('state : loading state');
+      try {
+        final email = await userUseCase.findEmail(event.nickname);
+        if (email.contains('found')) {
+          emit(AuthState(state: UserAuthState.failedState, message: '해당 닉네임을 가진 유저가 없습니다.'));
+          logger.e('state : failed state');
+          return;
+        }
+        emit(FindEmailCompletedState(email));
+        logger.i('state : find email completed state');
+      } on Exception catch (e) {
+        logger.e(e.toString());
+        emit(AuthState(state: UserAuthState.errorState, message: e.toString()));
+      }
+    });
+    on<FindPasswordEvent>((event, emit) async {
+      emit(AuthState(state: UserAuthState.loadingState));
+      logger.i('state : loading state');
+      try {
+        final res = await userUseCase.findPassword(event.email);
+        if (!res) {
+          emit(AuthState(state: UserAuthState.failedState, message: '해당 이메일을 가진 유저가 없습니다.'));
+          logger.e('state : failed state');
+          return;
+        }
+        emit(FindPasswordCompletedState(res));
+        logger.i('state : find password completed state');
+      } on Exception catch (e) {
+        emit(AuthState(state: UserAuthState.errorState, message: e.toString()));
+      }
+    });
+    on<VerifyOtpEvent>((event, emit) async {
+      emit(AuthState(state: UserAuthState.loadingState));
+      logger.i('state : loading state');
+      try {
+        final res = await userUseCase.verifyOtp(event.email, event.otp);
+        if (!res) {
+          emit(AuthState(state: UserAuthState.failedState, message: '인증번호가 일치하지 않습니다.'));
+          logger.e('state : failed state');
+          return;
+        }
+        emit(VerifyOtpCompletedState(res));
+        logger.i('state : verify otp completed state');
+      } on Exception catch (e) {
+        emit(AuthState(state: UserAuthState.errorState, message: e.toString()));
+        logger.e(e.toString());
       }
     });
   }

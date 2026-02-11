@@ -105,4 +105,23 @@ class UserUseCase {
   Future<void> deleteFirebaseToken(String token, String messagingToken, String userId)async{
     await repository.deleteFirebaseToken(token, messagingToken ,userId);
   }
+
+  Future<String> findEmail(String nickname) async {
+    final res = await repository.findEmail(nickname);
+    return res;
+  }
+
+  Future<bool> findPassword(String email) async {
+    final res = await repository.findPassword(email);
+    return res;
+  }
+
+  Future<bool> verifyOtp(String email, String otp) async {
+    final res = await repository.verifyOtp(email, otp);
+    return res;
+  }
+  Future<bool> changePassword(String email, String newPassword) async {
+    final res = await repository.changePassword(email, newPassword);
+    return res;
+  }
 }

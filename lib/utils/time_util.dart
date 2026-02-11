@@ -61,4 +61,10 @@ class TimeUtil {
       return "${date.year}.${date.month}.${date.day}";
     }
   }
+  String toMMSS(int total) {
+    int minutes = total ~/ 60;
+    int seconds = total % 60;
+
+    return "${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
+  }
 }

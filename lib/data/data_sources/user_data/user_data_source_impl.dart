@@ -114,6 +114,15 @@ class UserDataSourceImpl implements UserDataSource {
       throw Exception('Error');
     }
   }
+  @override
+  Future<bool> changePassword(String email, String newPassword) async {
+    final res = await netDriver.requestPostJson("", AuthApi.changePassword, {"email": email, "newPassword": newPassword});
+    if (res['status'] == 200) {
+      return true;
+    } else {
+      throw Exception('Error');
+    }
+  }
 
   @override
   Future<bool> deleteUser(String token, String userId) async {
@@ -244,4 +253,37 @@ class UserDataSourceImpl implements UserDataSource {
       throw Exception('Error');
     }
   }
+
+  @override
+  Future<String> findEmail(String nickname) async {
+    final res = await netDriver.requestPostJson("", AuthApi.findEmail, {'nickname': nickname});
+    if (res['status'] == 200) {
+      return res['email'];
+    } else {
+      return res['error'];
+    }
+  }
+
+  @override
+  Future<bool> findPassword(String email) async {
+    final res = await netDriver.requestPostJson("", AuthApi.findPassword, {'email': email});
+    if (res['status'] == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> verifyOtp(String email, String otp) async {
+    final res = await netDriver.requestPostJson("", AuthApi.verifyOtp, {'email': email, 'code': otp});
+    if (res['status'] == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+
 }

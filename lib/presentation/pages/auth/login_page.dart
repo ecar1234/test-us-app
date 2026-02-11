@@ -16,6 +16,7 @@ import 'package:test_us_app/utils/type_conversion_util.dart';
 import '../../../data/models/user/user_model.dart';
 import '../../../data/sharedPreferences/auth_preference.dart';
 import '../../bloc/auth_bloc/auth_event.dart';
+import 'find_user_info_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -371,13 +372,13 @@ class _LoginPageState extends State<LoginPage> {
                                   height: 20,
                                   child: TextButton(
                                     onPressed: () {
-                                      Get.to(() => const SignupPage());
+                                      Get.to(() => const FindUserInfoPage());
                                     },
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                     ),
                                     child: Text(
-                                      "정보 찾기",
+                                      "계정 찾기",
                                       style: TextStyle(
                                         fontSize: 12,
                                       ),

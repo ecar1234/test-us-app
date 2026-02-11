@@ -19,6 +19,7 @@ abstract class UserRepository {
   Future<bool> isEmailAvailable(String email);
   Future<bool> isPasswordValid(String token, String userId,String password);
   Future<bool> updatePassword(String token, String userId, String newPassword);
+  Future<bool> changePassword(String email, String newPassword);
   Future<UserEntity> updateUserInfoWithImage(String token, UserEntity userInfo, XFile image, {ImageEntity? oldImage});
   Future<UserEntity> updateUserInfo(String token, UserEntity userInfo);
   Future<bool> deleteUser(String token, String userId);
@@ -27,4 +28,7 @@ abstract class UserRepository {
   Future<void> createFirebaseToken(String token, String messagingToken, String userId, String deviceType);
   Future<void> updateFirebaseToken(String token, String messagingToken, String userId, String deviceType);
   Future<void> deleteFirebaseToken(String token, String messagingToken, String userId);
+  Future<String> findEmail(String nickname);
+  Future<bool> findPassword(String email);
+  Future<bool> verifyOtp(String email, String otp);
 }

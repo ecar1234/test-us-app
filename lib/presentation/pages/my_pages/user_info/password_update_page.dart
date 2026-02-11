@@ -12,7 +12,9 @@ import '../../../bloc/auth_bloc/auth_event.dart';
 import '../../main_page.dart';
 
 class PasswordUpdatePage extends StatefulWidget {
-  const PasswordUpdatePage({super.key});
+  final bool isOtp;
+  final String? email;
+  const PasswordUpdatePage({super.key, this.isOtp = false, this.email});
 
   @override
   State<PasswordUpdatePage> createState() => _PasswordUpdatePageState();
@@ -67,6 +69,7 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    if(!widget.isOtp)
                     SizedBox(
                       height: 60,
                       width: MediaQuery.sizeOf(context).width * 0.7,
@@ -238,7 +241,7 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                               width: MediaQuery.sizeOf(context).width * 0.4,
                               height: 50,
                               child: ElevatedButton(onPressed: (){
-                                if(_oldPwController.text.isEmpty){
+                                if(_oldPwController.text.isEmpty && !widget.isOtp){
                                   Get.snackbar('알림', '기존 비밀번호를 입력해주세요.');
                                   return;
                                 }
@@ -260,8 +263,12 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                                 }
 
                                 final token = context.read<UserProvider>().token ?? "";
-                                final userId = context.read<UserProvider>().user?.id ?? "";
-                                context.read<AuthBloc>().add(PasswordUpdateEvent(token, userId, _oldPwController.text, _newPwController.text));
+                                final user = context.read<UserProvider>().user;
+                                if(widget.isOtp){
+                                  context.read<AuthBloc>().add(PasswordChangeEvent(widget.email!, _newPwController.text));
+                                }else {
+                                  context.read<AuthBloc>().add(PasswordUpdateEvent(token, user!.id!, _oldPwController.text, _newPwController.text));
+                                }
                               }, style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
