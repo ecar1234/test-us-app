@@ -14,7 +14,7 @@ class PromotionPostEntity {
   String? title;
   String? subtitle;
   ApplicationPlatform? platform;
-  List<MobileOsType>? mobileOs;
+  MobileOsType? mobileOs;
   PostCategory? category;
   String? contents;
   PostStatus? status;
@@ -22,7 +22,7 @@ class PromotionPostEntity {
   UserEntity? author;
   int? views;
   List<ImageEntity>? images;
-  List<String>? domain;
+  String? domain;
   String? postType;
   List<String>? reviews;
   DateTime? createdAt;

@@ -27,7 +27,7 @@ class RecruitPostEntity {
   String? title;
   String? subtitle;
   ApplicationPlatform? platform;
-  List<MobileOsType>? mobileOs;
+  MobileOsType? mobileOs;
   PostCategory? category;
   String? contents;
   PostStatus? status;

@@ -21,13 +21,14 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
-    );
+    )..status = $enumDecodeNullable(_$UserStatusEnumMap, json['status']);
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'userId': instance.userId,
       'nickname': instance.nickname,
       'email': instance.email,
       'profileImg': instance.profileImg,
+      'status': _$UserStatusEnumMap[instance.status],
       'userType': _$UserTypeEnumMap[instance.userType],
       'role': _$UserRoleEnumMap[instance.role],
       'createdAt': instance.createdAt?.toIso8601String(),
@@ -53,6 +54,12 @@ const _$UserRoleEnumMap = {
   UserRole.qa: 'QA',
   UserRole.cs: 'CS',
   UserRole.user: 'USER',
+};
+
+const _$UserStatusEnumMap = {
+  UserStatus.active: 'ACTIVE',
+  UserStatus.inactive: 'INACTIVE',
+  UserStatus.delete: 'DELETE',
 };
 
 Application _$ApplicationFromJson(Map<String, dynamic> json) => Application(

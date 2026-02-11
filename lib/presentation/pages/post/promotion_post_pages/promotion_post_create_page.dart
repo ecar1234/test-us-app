@@ -47,7 +47,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
   final TextEditingController _contentController = TextEditingController();
   final TextEditingController _periodController = TextEditingController(text: "7");
   final TextEditingController _webUrlController = TextEditingController();
-  final TextEditingController _gameUrlController = TextEditingController();
+  // final TextEditingController _gameUrlController = TextEditingController();
   final TextEditingController _iosUrlController = TextEditingController();
   final TextEditingController _androidUrlController = TextEditingController();
 
@@ -61,7 +61,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
   bool _iosCheck = false;
   bool _androidCheck = false;
 
-  List<MobileOsType> _selectedOs = [];
+  MobileOsType? _selectedOs;
   PostCategory? _selectedCategory = PostCategory.game;
 
   @override
@@ -73,38 +73,22 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
       _subtitleController.text = widget.post!.subtitle!;
       _contentController.text = widget.post!.contents!;
 
-      if (widget.post!.domain!.length < 2) {
-        if (widget.post!.platform == ApplicationPlatform.web) {
-          _webUrlController.text = widget.post!.domain!.isNotEmpty ? widget.post!.domain![0] : '';
-          ;
-        } else {
-          _gameUrlController.text = widget.post!.domain!.isNotEmpty ? widget.post!.domain![0] : '';
-        }
-      } else {
-        for (int i = 0; i < widget.post!.domain!.length; i++) {
-          if (widget.post!.domain![i].contains('apps.apple.com')) {
-            _iosUrlController.text = widget.post!.domain![i];
-          } else if (i == 1) {
-            _androidUrlController.text = widget.post!.domain![i];
-          }
-        }
-      }
-
       _selectedPlatform = widget.post!.platform!;
       if (_selectedPlatform == ApplicationPlatform.web) {
         _webCheck = true;
-      }
-      if (_selectedPlatform == ApplicationPlatform.mobile) {
+        _webUrlController.text = widget.post!.domain!;
+      } else if (_selectedPlatform == ApplicationPlatform.mobile) {
         _mobileCheck = true;
         _selectedOs = widget.post!.mobileOs!;
-        if (_selectedOs.contains(MobileOsType.ios)) {
+        if(_selectedOs == MobileOsType.ios) {
           _iosCheck = true;
-        }
-        if (_selectedOs.contains(MobileOsType.android)) {
+          _iosUrlController.text = widget.post!.domain!;
+        } else if(_selectedOs == MobileOsType.android) {
           _androidCheck = true;
+          _androidUrlController.text = widget.post!.domain!;
         }
       }
-      if(widget.post!.category != null) {
+      if (widget.post!.category != null) {
         _selectedCategory = widget.post!.category!;
       }
 
@@ -132,7 +116,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
     _contentController.dispose();
     _periodController.dispose();
     _webUrlController.dispose();
-    _gameUrlController.dispose();
+    // _gameUrlController.dispose();
     _iosUrlController.dispose();
     _androidUrlController.dispose();
   }
@@ -467,10 +451,9 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
           children: [
             SizedBox(
                 child: Text(
-                  "카테고리",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                )
-            ),
+              "카테고리",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            )),
             const Gap(10),
             SizedBox(
                 child: DropdownMenu(
@@ -481,19 +464,14 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         _selectedCategory = value;
                       });
                     },
-                    dropdownMenuEntries: List.generate(
-                        PostCategory.values.length,
-                            (index) {
-                          return DropdownMenuEntry(
-                            value: PostCategory.values[index],
-                            label: TypeConversionUtil().postCategoryToString(PostCategory.values[index]),
-                          );
-                        }
-                    ))
-            )
+                    dropdownMenuEntries: List.generate(PostCategory.values.length, (index) {
+                      return DropdownMenuEntry(
+                        value: PostCategory.values[index],
+                        label: TypeConversionUtil().postCategoryToString(PostCategory.values[index]),
+                      );
+                    })))
           ],
-        )
-    );
+        ));
   }
 
   Widget _platformSection() {
@@ -551,42 +529,34 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                               }
                             });
                             if (value == true) {
-                             final res = await showModalBottomSheet(
-                              context: context,
-                              isDismissible: false,
-                              builder: (context) {
-                                return _mobileOsSection();
-                              });
-                             if(res['android'] == true) {
-                               setState(() {
-                                  _androidCheck = true;
+                              final res = await showModalBottomSheet(
+                                  context: context,
+                                  isDismissible: false,
+                                  builder: (context) {
+                                    return _mobileOsSection();
+                                  });
+                              if (res != null) {
+                                setState(() {
+                                  _androidCheck = res['android'] ?? false;
+                                  _iosCheck = res['ios'] ?? false;
+
+                                  // OS 타입 설정
+                                  if (_androidCheck) {
+                                    _selectedOs = MobileOsType.android;
+                                  } else if (_iosCheck) {
+                                    _selectedOs = MobileOsType.ios;
+                                  } else {
+                                    _selectedOs = null;
+                                  }
                                 });
-                             }
-                             if(res['ios'] == true) {
-                               setState(() {
-                                  _iosCheck = true;
-                                });
-                             }
+                              }
                             } else {
                               setState(() {
-                                _selectedOs = [];
+                                _selectedOs = null;
                                 _androidCheck = false;
                                 _iosCheck = false;
                               });
                             }
-                            setState(() {
-                              if (_androidCheck == true) {
-                                _selectedOs.add(MobileOsType.ios);
-                              } else {
-                                _selectedOs.remove(MobileOsType.ios);
-                              }
-
-                              if (_iosCheck == true) {
-                                _selectedOs.add(MobileOsType.android);
-                              } else {
-                                _selectedOs.remove(MobileOsType.android);
-                              }
-                            });
                           }),
                       Text(
                         'Mobile Service',
@@ -637,6 +607,9 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                                     onChanged: (value) {
                                       setState(() {
                                         android = value!;
+                                        if(value == true){
+                                          ios = false;
+                                        }
                                       });
                                     }),
                                 Text(
@@ -656,12 +629,14 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                                     onChanged: (value) {
                                       setState(() {
                                         ios = value!;
+                                        if(value == true) {
+                                          android = false;
+                                        }
                                       });
                                     }),
                                 Text(
                                   'IOS',
-                                  style: TextStyle(
-                                      fontSize: 14, fontWeight: ios ? FontWeight.bold : FontWeight.normal),
+                                  style: TextStyle(fontSize: 14, fontWeight: ios ? FontWeight.bold : FontWeight.normal),
                                 )
                               ],
                             ),
@@ -682,11 +657,8 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                                 Navigator.pop(context);
                               },
                               style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)
-                                )
-                              ),
+                                  side: BorderSide(color: Theme.of(context).primaryColor),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                               child: Text("취소"),
                             ),
                           ),
@@ -707,11 +679,8 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                                 Navigator.pop(context, {'android': android, 'ios': ios});
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).primaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)
-                                )
-                              ),
+                                  backgroundColor: Theme.of(context).primaryColor,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                               child: Text("확인", style: TextStyle(color: Colors.white)),
                             ),
                           ),
@@ -747,13 +716,10 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       child: Center(child: Text('플랫폼을 선택해 주세요.', style: TextStyle(fontSize: 16, color: Colors.grey)))),
                 if (_webCheck) _urlTextFiled(context, '웹사이트', _webUrlController),
                 if (_mobileCheck)
-                  Column(
-                    children: [
-                      if(_androidCheck)
-                      _urlTextFiled(context, 'Play Store', _androidUrlController),
-                      if(_iosCheck)
-                      _urlTextFiled(context, 'App Store', _iosUrlController)
-                    ])
+                  Column(children: [
+                    if (_androidCheck) _urlTextFiled(context, 'Play Store', _androidUrlController),
+                    if (_iosCheck) _urlTextFiled(context, 'App Store', _iosUrlController)
+                  ])
               ],
             ),
           )
@@ -790,8 +756,6 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
     final token = context.read<UserProvider>().token ?? '';
     return BlocListener<PromotionBloc, PromotionPostState>(
         listener: (context, state) async {
-          // NOTE: Recruit Post는 페이지 접속 시 새로 불러옴.
-          // NOTE: init post의 Recruit post에만 추가 필요. CRUD 모두 적용
           final provider = context.read<BasePostProvider>();
           if (state.state == PromotionPostLoadState.postCreateCompletedState) {
             provider.createPromotionPost(state.post!);
@@ -832,24 +796,24 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         return;
                       }
                       if (_mobileCheck) {
-                        if(_androidCheck && _androidUrlController.text.isEmpty){
+                        if (_androidCheck && _androidUrlController.text.isEmpty) {
                           Get.snackbar("알림", "Play Store URL을 입력해주세요.");
                           return;
                         }
-                        if(_iosCheck && _iosUrlController.text.isEmpty){
+                        if (_iosCheck && _iosUrlController.text.isEmpty) {
                           Get.snackbar("알림", "App Store URL을 입력해주세요.");
                           return;
                         }
                       }
-                      final domain = <String>[];
+                      String domain = '';
                       if (_webCheck) {
-                        domain.add(_webUrlController.text);
+                        domain = _webUrlController.text;
                       } else {
                         if (_iosCheck) {
-                          domain.add(_iosUrlController.text);
+                          domain = _iosUrlController.text;
                         }
                         if (_androidCheck) {
-                          domain.add(_androidUrlController.text);
+                          domain = _androidUrlController.text;
                         }
                       }
 
@@ -874,15 +838,15 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       if (_deleteImages.isNotEmpty) {
                         postImage.removeWhere((element) => _deleteImages.contains(element));
                       }
-
+                      final user = context.read<UserProvider>().user!;
                       final post = PromotionPostEntity(
                         title: _titleController.text,
                         subtitle: _subtitleController.text,
                         contents: _contentController.text,
                         category: _selectedCategory,
                         platform: _selectedPlatform,
-                        mobileOs: _mobileCheck ? _selectedOs : null,
-                        author: context.read<UserProvider>().user!,
+                        mobileOs: _selectedOs,
+                        author: user,
                         domain: domain,
                         images: postImage,
                       );
@@ -918,24 +882,24 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         return;
                       }
                       if (_mobileCheck) {
-                        if(_androidCheck && _androidUrlController.text.isEmpty){
+                        if (_androidCheck && _androidUrlController.text.isEmpty) {
                           Get.snackbar("알림", "Play Store URL을 입력해주세요.");
                           return;
                         }
-                        if(_iosCheck && _iosUrlController.text.isEmpty){
+                        if (_iosCheck && _iosUrlController.text.isEmpty) {
                           Get.snackbar("알림", "App Store URL을 입력해주세요.");
                           return;
                         }
                       }
-                      final domain = <String>[];
+                      String domain = '';
                       if (_webCheck) {
-                        domain.add(_webUrlController.text);
+                        domain = _webUrlController.text;
                       } else {
                         if (_iosCheck) {
-                          domain.add(_iosUrlController.text);
+                          domain = _iosUrlController.text;
                         }
                         if (_androidCheck) {
-                          domain.add(_androidUrlController.text);
+                          domain = _androidUrlController.text;
                         }
                       }
 
@@ -990,29 +954,28 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         return;
                       }
                       if (_mobileCheck) {
-                        if(_androidCheck && _androidUrlController.text.isEmpty){
+                        if (_androidCheck && _androidUrlController.text.isEmpty) {
                           Get.snackbar("알림", "Play Store URL을 입력해주세요.");
                           return;
                         }
-                        if(_iosCheck && _iosUrlController.text.isEmpty){
+                        if (_iosCheck && _iosUrlController.text.isEmpty) {
                           Get.snackbar("알림", "App Store URL을 입력해주세요.");
                           return;
                         }
                       }
-                      final domain = <String>[];
+                      String domain = '';
                       if (_webCheck) {
-                        domain.add(_webUrlController.text);
+                        domain =_webUrlController.text;
                       } else {
                         if (_iosCheck) {
-                          domain.add(_iosUrlController.text);
+                          domain = _iosUrlController.text;
                         }
                         if (_androidCheck) {
-                          domain.add(_androidUrlController.text);
+                          domain = _androidUrlController.text;
                         }
                       }
 
                       try {
-
                         final post = PromotionPostEntity(
                             id: widget.post!.id,
                             title: _titleController.text,
@@ -1066,7 +1029,10 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                   width: (MediaQuery.sizeOf(context).width - 40) * 0.8,
                   child: TextField(
                     controller: controller,
-                    // decoration: InputDecoration(enabled: false),
+                    decoration: InputDecoration(
+                      hintText: title == '웹사이트' ? 'https://' : 'Store download link',
+                      hintStyle: TextStyle(color: Colors.grey.shade600),
+                    ),
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                 ),

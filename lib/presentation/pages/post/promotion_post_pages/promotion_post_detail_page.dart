@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -56,15 +57,13 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
     final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
     return SafeArea(
       child: Scaffold(
-        body: BlocConsumer<PromotionBloc, PromotionPostState>(
-            listener: (context, state) {
+        body: BlocConsumer<PromotionBloc, PromotionPostState>(listener: (context, state) {
           final provider = context.read<BasePostProvider>();
           if (state.state == PromotionPostLoadState.postDeleteCompletedState) {
             provider.deletePromotionPost(state.postId!);
             Get.back();
-          }
-          else if(state.state == PromotionPostLoadState.getPostByIdCompletedState||
-              state.state == PromotionPostLoadState.postUpdateCompletedState){
+          } else if (state.state == PromotionPostLoadState.getPostByIdCompletedState ||
+              state.state == PromotionPostLoadState.postUpdateCompletedState) {
             provider.updateUserPromotionPosts(state.post!);
           }
         }, builder: (context, state) {
@@ -135,67 +134,73 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                             return PromotionPostCreatePage(post: post);
                           }));
                         } else if (value == 2) {
-                          await showDialog(context: context, builder: (context) {
-                            return Container(
-                                height: 200,
-                                width: MediaQuery.sizeOf(context).width,
-                                padding: EdgeInsets.all(10),
-                                child: LayoutBuilder(
-                                  builder: (context, constraints) => Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?',
-                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                      ),
-                                      const Gap(20),
-                                      Row(
+                          await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Container(
+                                    height: 200,
+                                    width: MediaQuery.sizeOf(context).width,
+                                    padding: EdgeInsets.all(10),
+                                    child: LayoutBuilder(
+                                      builder: (context, constraints) => Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Flexible(
-                                            flex: 3,
-                                            child: SizedBox(
-                                              width: constraints.maxWidth * 0.3,
-                                              child: OutlinedButton(
-                                                  onPressed: () {
-                                                    Get.back();
-                                                  },
-                                                  style: OutlinedButton.styleFrom(
-                                                    side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                                  ),
-                                                  child: Text('취소')),
-                                            ),
+                                          Text(
+                                            '삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?',
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                                           ),
-                                          const Gap(10),
-                                          Flexible(
-                                            flex: 7,
-                                            child: SizedBox(
-                                              width: constraints.maxWidth * 0.7,
-                                              child: ElevatedButton(
-                                                  onPressed: () {
-                                                    final token = context.read<UserProvider>().token ?? "";
-                                                    try {
-                                                      context.read<PromotionBloc>().add(RequestPostDeleteEvent(token, post.id!));
-                                                    } on Exception catch (e) {
-                                                      Get.snackbar('알림', '삭제 실패');
-                                                      logger.e(e.toString());
-                                                      return;
-                                                    }
-                                                    Get.back();
-                                                  },
-                                                  style: OutlinedButton.styleFrom(
-                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                                  ),
-                                                  child: Text('확인')),
-                                            ),
-                                          )
+                                          const Gap(20),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Flexible(
+                                                flex: 3,
+                                                child: SizedBox(
+                                                  width: constraints.maxWidth * 0.3,
+                                                  child: OutlinedButton(
+                                                      onPressed: () {
+                                                        Get.back();
+                                                      },
+                                                      style: OutlinedButton.styleFrom(
+                                                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(10)),
+                                                      ),
+                                                      child: Text('취소')),
+                                                ),
+                                              ),
+                                              const Gap(10),
+                                              Flexible(
+                                                flex: 7,
+                                                child: SizedBox(
+                                                  width: constraints.maxWidth * 0.7,
+                                                  child: ElevatedButton(
+                                                      onPressed: () {
+                                                        final token = context.read<UserProvider>().token ?? "";
+                                                        try {
+                                                          context
+                                                              .read<PromotionBloc>()
+                                                              .add(RequestPostDeleteEvent(token, post.id!));
+                                                        } on Exception catch (e) {
+                                                          Get.snackbar('알림', '삭제 실패');
+                                                          logger.e(e.toString());
+                                                          return;
+                                                        }
+                                                        Get.back();
+                                                      },
+                                                      style: OutlinedButton.styleFrom(
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(10)),
+                                                      ),
+                                                      child: Text('확인')),
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                ));
-                          });
+                                    ));
+                              });
                           Get.defaultDialog(title: "알림", middleText: "삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?", actions: [
                             ElevatedButton(
                               onPressed: () {
@@ -235,9 +240,11 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                           overflow: TextOverflow.ellipsis,
                         )),
                     background: GestureDetector(
-                      onTap: (){
-                        Get.to(() => PostImageDetailPage(images: post.images!,));
-                      },
+                        onTap: () {
+                          Get.to(() => PostImageDetailPage(
+                                images: post.images!,
+                              ));
+                        },
                         child: _buildImages(post.images!)));
               },
             )),
@@ -302,12 +309,13 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                             width: 30,
                             child: CircleAvatar(
                                 radius: 40,
-                                backgroundImage: isActive ? ( post.author!.profileImg == null
-                                    ? const AssetImage('assets/images/Generic avatar.png')
-                                    : CachedNetworkImageProvider(
-                                        post.author!.profileImg!.url!,
-                                      ) as ImageProvider) : const AssetImage('assets/images/Generic avatar.png')
-                            ),
+                                backgroundImage: isActive
+                                    ? (post.author!.profileImg == null
+                                        ? const AssetImage('assets/images/Generic avatar.png')
+                                        : CachedNetworkImageProvider(
+                                            post.author!.profileImg!.url!,
+                                          ) as ImageProvider)
+                                    : const AssetImage('assets/images/Generic avatar.png')),
                           ),
                           const Gap(5),
                           Text(
@@ -336,54 +344,13 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
                   )),
                 ),
                 const Gap(40),
-                if(isActive)
-                SizedBox(
-                    child: ListView.separated(
-                        padding: EdgeInsets.symmetric(vertical: 20),
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, idx) {
-                          String title = '';
-                          if (post.domain![idx].contains('apps.apple.com')) {
-                            title = 'App Store 에서 다운로드';
-                          } else if (post.domain![idx].contains('play.google.com')) {
-                            title = 'Google Play 에서 다운로드';
-                          } else {
-                            title = 'URL 접속하기';
-                          }
-                          return SizedBox(
-                            height: 40,
-                            // width:  80,
-                            child: ElevatedButton.icon(
-                              onPressed: () async {
-                                String url = post.domain![idx];
-                                if (!url.startsWith('http')) {
-                                  url = 'https://$url';
-                                }
-                                final uri = Uri.parse(url);
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri, mode: LaunchMode.platformDefault);
-                                } else {
-                                  Get.snackbar('연결 실패', '접속할 수 없거나 존재하지 않는 주소입니다.');
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  )),
-                              label: Text(
-                                title,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              icon: Icon(Symbols.download),
-                              iconAlignment: IconAlignment.end,
-                            ),
-                          );
-                        },
-                        separatorBuilder: (context, idx) => const Gap(16),
-                        itemCount: post.domain!.length))
+                if (isActive)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _domainButton(post.platform!, post.domain!, post.mobileOs),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -451,6 +418,62 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
           viewportFraction: 1.0,
           height: 250,
         ),
+      );
+    }
+  }
+
+  Widget _domainButton(ApplicationPlatform platform, String domain, MobileOsType? os) {
+    if (platform == ApplicationPlatform.web) {
+      return SizedBox(
+          width: 150,
+          height: 50,
+          child: ElevatedButton(
+              onPressed: () {
+                launchUrl(Uri.parse(domain));
+              },
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('사이트 구경하기')
+          ));
+    } else if (platform == ApplicationPlatform.mobile) {
+      if (os == MobileOsType.ios) {
+        return GestureDetector(
+          onTap: () {
+            if (Platform.isAndroid) {
+              Get.snackbar('알림', '해당 기기에서 지원하지 않습니다');
+              return;
+            }
+            launchUrl(Uri.parse(domain));
+          },
+          child: SizedBox(
+              height: 50,
+              child: SvgPicture.asset(
+                'assets/images/App_Store_Badge.svg',
+                height: 50,
+              )),
+        );
+      }
+      return GestureDetector(
+        onTap: () {
+          if (Platform.isIOS) {
+            Get.snackbar('알림', '해당 기기에서 지원하지 않습니다');
+            return;
+          }
+          launchUrl(Uri.parse(domain));
+        },
+        child: SizedBox(
+          height: 50,
+          child: Image.asset('assets/images/GetItOnGooglePlay_Badge.png'),
+        ),
+      );
+    } else {
+      return SizedBox(
+        height: 50,
       );
     }
   }

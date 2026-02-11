@@ -13,9 +13,7 @@ PromotionPostModel _$PromotionPostModelFromJson(Map<String, dynamic> json) =>
       subtitle: json['subtitle'] as String?,
       platform:
           $enumDecodeNullable(_$ApplicationPlatformEnumMap, json['platform']),
-      mobileOs: (json['mobileOs'] as List<dynamic>?)
-          ?.map((e) => $enumDecode(_$MobileOsTypeEnumMap, e))
-          .toList(),
+      mobileOs: $enumDecodeNullable(_$MobileOsTypeEnumMap, json['mobileOs']),
       category: $enumDecodeNullable(_$PostCategoryEnumMap, json['category']),
       contents: json['contents'] as String?,
       status: $enumDecodeNullable(_$PostStatusEnumMap, json['status']),
@@ -27,8 +25,7 @@ PromotionPostModel _$PromotionPostModelFromJson(Map<String, dynamic> json) =>
       images: (json['images'] as List<dynamic>?)
           ?.map((e) => ImageModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      domain:
-          (json['domain'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      domain: json['domain'] as String?,
       postType: json['postType'] as String?,
       reviews:
           (json['reviews'] as List<dynamic>?)?.map((e) => e as String).toList(),
@@ -46,8 +43,7 @@ Map<String, dynamic> _$PromotionPostModelToJson(PromotionPostModel instance) =>
       'title': instance.title,
       'subtitle': instance.subtitle,
       'platform': _$ApplicationPlatformEnumMap[instance.platform],
-      'mobileOs':
-          instance.mobileOs?.map((e) => _$MobileOsTypeEnumMap[e]!).toList(),
+      'mobileOs': _$MobileOsTypeEnumMap[instance.mobileOs],
       'category': _$PostCategoryEnumMap[instance.category],
       'contents': instance.contents,
       'status': _$PostStatusEnumMap[instance.status],

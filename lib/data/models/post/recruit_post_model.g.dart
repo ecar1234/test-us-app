@@ -33,9 +33,7 @@ RecruitPostModel _$RecruitPostModelFromJson(Map<String, dynamic> json) =>
       contents: json['contents'] as String?,
       platform:
           $enumDecodeNullable(_$ApplicationPlatformEnumMap, json['platform']),
-      mobileOs: (json['mobileOs'] as List<dynamic>?)
-          ?.map((e) => $enumDecode(_$MobileOsTypeEnumMap, e))
-          .toList(),
+      mobileOs: $enumDecodeNullable(_$MobileOsTypeEnumMap, json['mobileOs']),
       category: $enumDecodeNullable(_$PostCategoryEnumMap, json['category']),
       status: $enumDecodeNullable(_$PostStatusEnumMap, json['status']),
       period: (json['period'] as num?)?.toInt(),
@@ -64,8 +62,7 @@ Map<String, dynamic> _$RecruitPostModelToJson(RecruitPostModel instance) =>
       'title': instance.title,
       'subtitle': instance.subtitle,
       'platform': _$ApplicationPlatformEnumMap[instance.platform],
-      'mobileOs':
-          instance.mobileOs?.map((e) => _$MobileOsTypeEnumMap[e]!).toList(),
+      'mobileOs': _$MobileOsTypeEnumMap[instance.mobileOs],
       'category': _$PostCategoryEnumMap[instance.category],
       'contents': instance.contents,
       'status': _$PostStatusEnumMap[instance.status],

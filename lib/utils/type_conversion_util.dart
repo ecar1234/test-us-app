@@ -129,17 +129,13 @@ class TypeConversionUtil {
         return "기타";
     }
   }
-  String getPostOs(List<MobileOsType> os) {
-    if(os.length == 1){
-      switch(os[0]){
-        case MobileOsType.android:
-          return "Android";
-        case MobileOsType.ios:
-          return "iOS";
-      }
-    }else if(os.length == 2){
-     return "AOS / IOS";
+
+  String getPostOs(MobileOsType os) {
+    switch (os) {
+      case MobileOsType.android:
+        return "Android";
+      case MobileOsType.ios:
+        return "iOS";
     }
-    return "";
   }
 }

@@ -49,7 +49,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
   final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
   ApplicationPlatform? _selectedPlatform;
-  List<MobileOsType> _selectedOs = [];
+  MobileOsType? _selectedOs;
   PostCategory? _selectedCategory = PostCategory.game;
 
   bool _webCheck = false;
@@ -67,7 +67,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
       subtitleController.text = widget.post!.subtitle!;
       contentController.text = widget.post!.contents!;
       _selectedPlatform = widget.post!.platform!;
-      _selectedOs = widget.post!.platform != ApplicationPlatform.mobile ? widget.post!.mobileOs! : [];
+      _selectedOs = widget.post!.platform != ApplicationPlatform.mobile ? widget.post!.mobileOs! : null;
       _selectedCategory = widget.post!.category;
       if (widget.post!.images != null && widget.post!.images!.isNotEmpty) {
         _existedImages = widget.post!.images!;
@@ -77,10 +77,10 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
       }
       if (_selectedPlatform == ApplicationPlatform.mobile) {
         _mobileCheck = true;
-        if (_selectedOs.contains(MobileOsType.ios)) {
+        if (_selectedOs == MobileOsType.ios) {
           _iosCheck = true;
         }
-        if (_selectedOs.contains(MobileOsType.android)) {
+        if (_selectedOs == MobileOsType.android) {
           _androidCheck = true;
         }
       }
@@ -490,7 +490,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                                   });
                                 }else {
                                   setState(() {
-                                    _selectedOs = [];
+                                    _selectedOs = null;
                                     _androidCheck = false;
                                     _iosCheck = false;
                                   });
@@ -547,9 +547,9 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                                       setState(() {
                                         _androidCheck = value!;
                                         if(value == true) {
-                                          _selectedOs.add(MobileOsType.android);
+                                          _selectedOs = (MobileOsType.android);
                                         }else {
-                                          _selectedOs.remove(MobileOsType.android);
+                                          _selectedOs = null;
                                         }
                                       });
                                     }
@@ -571,9 +571,9 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                                       setState(() {
                                         _iosCheck = value!;
                                         if(value == true) {
-                                          _selectedOs.add(MobileOsType.ios);
+                                          _selectedOs = MobileOsType.ios;
                                         }else {
-                                          _selectedOs.remove(MobileOsType.ios);
+                                          _selectedOs = null;
                                         }
                                       });
                                     }
