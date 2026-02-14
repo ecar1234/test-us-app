@@ -105,8 +105,8 @@ class _MessageRoomState extends State<MessageRoom> {
                       socketProvider.setMessages(state.messageList);
                       if (state.messageList.isNotEmpty) {
                         roomId = state.messageList[0].roomId!;
+                        socketProvider.resetUnreadCount(state.messageList.first.roomId!);
                       }
-                      socketProvider.resetUnreadCount(state.messageList.first.roomId!);
                     }
                   },
                   child: Padding(

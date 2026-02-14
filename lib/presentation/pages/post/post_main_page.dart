@@ -67,7 +67,7 @@ class _PostMainPageState extends State<PostMainPage> {
     return BlocListener<RecruitPostBloc, RecruitPostState>(
         listener: (context, state) {
           final provider = context.read<RecruitPostProvider>();
-          if (state.state == RecruitPostLoadState.getPostByIdCompletedState) {
+          if (state.state == RecruitPostLoadState.recruitPostsLoadCompletedState) {
             provider.getPostPagination(state.posts!, state.page);
             page++;
           }
@@ -75,7 +75,6 @@ class _PostMainPageState extends State<PostMainPage> {
         child: Selector<RecruitPostProvider, List<RecruitPostEntity>>(
             selector: (context, provider) => provider.recruitmentPosts ?? [],
             builder: (context, posts, child) {
-
               return _postListBuilder(context, posts);
             }));
   }
@@ -83,7 +82,7 @@ class _PostMainPageState extends State<PostMainPage> {
   Widget _promotionSelector(context, double hei) {
     return BlocListener<PromotionBloc, PromotionPostState>(listener: (context, state) {
       final provider = context.read<PromotionPostProvider>();
-      if (state.state == PromotionPostLoadState.getPostByIdCompletedState) {
+      if (state.state == PromotionPostLoadState.getPaginationCompletedState) {
         provider.getPagination(state.posts!, state.page!);
         page++;
       }
@@ -118,6 +117,7 @@ class _PostMainPageState extends State<PostMainPage> {
                       // childAspectRatio: 0.5
                     ),
                     itemBuilder: (context, idx) {
+                      final isRecruit = widget.type == 'recruit';
                       return GestureDetector(
                         onTap: () async {
                           widget.type == 'recruit'
@@ -173,7 +173,8 @@ class _PostMainPageState extends State<PostMainPage> {
                                             style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
                                         Row(
                                           children: [
-                                            Text("${posts[idx].platform!.toUpperCase()}",
+                                            Text(isRecruit ? (posts[idx] as RecruitPostEntity).platform!.name.toUpperCase()
+                                                : (posts[idx] as PromotionPostEntity).platform!.name.toUpperCase(),
                                                 style: TextStyle(
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.normal,

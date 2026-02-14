@@ -15,8 +15,7 @@ class CustomBottomBar extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTap;
 
-  const CustomBottomBar(
-      {super.key, required this.currentIndex, required this.onTap});
+  const CustomBottomBar({super.key, required this.currentIndex, required this.onTap});
 
   @override
   State<CustomBottomBar> createState() => _CustomBottomBarState();
@@ -50,16 +49,15 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
         height: 60,
         width: MediaQuery.sizeOf(context).width,
         padding: EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(25)),
+        decoration:
+            BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(25)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             BlocListener<RecruitPostBloc, RecruitPostState>(
               listener: (context, state) {
-                if(state.state == RecruitPostLoadState.recruitPostsLoadCompletedState){
+                if (state.state == RecruitPostLoadState.recruitPostsLoadCompletedState) {
                   context.read<RecruitPostProvider>().getPostPagination(state.posts!, state.page);
                 }
               },
@@ -97,31 +95,34 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                   child: Container(
                     width: 60,
                     decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(10)),
+                        color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(10)),
                     child: PopupMenuButton(
-                      offset: Offset(-25, -110),
+                        offset: Offset(-30, -100),
                         itemBuilder: (context) {
-                          // final isLogin = context.read<UserProvider>().isLogged??false;
-                          // if(!isLogin) {
-                          //   showDialog(context: context, builder: (context) => const LoginDialog());
-                          //   return;
-                          // }
-                          // Get.to(() => PostCreatePage());
                           return const [
-                            PopupMenuItem(value: 0, height: 40, child: Text('테스터 모집'),),
-                            PopupMenuItem(value: 1, height: 40, child: Text('서비스 홍보'),),
+                            PopupMenuItem(
+                                value: 0,
+                                height: 40,
+                                child: Center(
+                                    child:
+                                        Text('테스터 모집', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)))),
+                            PopupMenuItem(
+                                value: 1,
+                                height: 40,
+                                child: Center(
+                                  child: Text('서비스 홍보', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                                )),
                           ];
                         },
                         onSelected: (value) {
-                          final isLogin = context.read<UserProvider>().isLogged??false;
-                          if(!isLogin) {
+                          final isLogin = context.read<UserProvider>().isLogged ?? false;
+                          if (!isLogin) {
                             showDialog(context: context, builder: (context) => const LoginDialog());
                             return;
                           }
-                          if(value == 0){
+                          if (value == 0) {
                             Get.to(() => RecruitPostCreatePage());
-                          }else if(value == 1){
+                          } else if (value == 1) {
                             Get.to(() => PromotionPostCreatePage());
                           }
                           // Get.to(() => RecruitPostCreatePage)
@@ -150,10 +151,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                         });
                         widget.onTap(_selectedIndex);
                       },
-                      icon: Icon(Symbols.crown,
-                          weight: 600,
-                          fill: 1,
-                          color: _selectedIndex == 3 ? Colors.amber : null))
+                      icon: Icon(Symbols.crown, weight: 600, fill: 1, color: _selectedIndex == 3 ? Colors.amber : null))
                 ],
               ),
             )

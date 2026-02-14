@@ -13,6 +13,7 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       profileImg: json['profileImg'] == null
           ? null
           : ImageModel.fromJson(json['profileImg'] as Map<String, dynamic>),
+      status: $enumDecodeNullable(_$UserStatusEnumMap, json['status']),
       userType: $enumDecodeNullable(_$UserTypeEnumMap, json['userType']),
       role: $enumDecodeNullable(_$UserRoleEnumMap, json['role']),
       createdAt: json['createdAt'] == null
@@ -21,7 +22,7 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
-    )..status = $enumDecodeNullable(_$UserStatusEnumMap, json['status']);
+    );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'userId': instance.userId,
@@ -34,6 +35,12 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };
+
+const _$UserStatusEnumMap = {
+  UserStatus.active: 'ACTIVE',
+  UserStatus.inactive: 'INACTIVE',
+  UserStatus.delete: 'DELETE',
+};
 
 const _$UserTypeEnumMap = {
   UserType.individuals: 'INDIVIDUALS',
@@ -54,12 +61,6 @@ const _$UserRoleEnumMap = {
   UserRole.qa: 'QA',
   UserRole.cs: 'CS',
   UserRole.user: 'USER',
-};
-
-const _$UserStatusEnumMap = {
-  UserStatus.active: 'ACTIVE',
-  UserStatus.inactive: 'INACTIVE',
-  UserStatus.delete: 'DELETE',
 };
 
 Application _$ApplicationFromJson(Map<String, dynamic> json) => Application(

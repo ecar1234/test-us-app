@@ -26,6 +26,8 @@ class MessageEntity {
       userId: model.sender!.userId,
       nickname: model.sender!.nickname,
       email: model.sender!.email,
+      profileImg: model.sender!.profileImg,
+      status: model.sender!.status,
     );
     return MessageEntity(
       id: model.id,

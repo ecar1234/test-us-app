@@ -604,6 +604,22 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
   }
 
   Widget _beforeApplicationSection(BuildContext context, RecruitPostEntity post) {
+    if(post.platform == ApplicationPlatform.mobile) {
+      if(Platform.isIOS && post.mobileOs == MobileOsType.android
+          || Platform.isAndroid && post.mobileOs == MobileOsType.ios){
+        return Center(
+          child: SizedBox(
+            height: 50,
+            width: MediaQuery.sizeOf(context).width - 80,
+            child: ElevatedButton(
+              onPressed: null,
+              style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+              child: Text("이 기기와 OS가 맞지 않습니다."),
+            ),
+          ),
+        );
+      }
+    }
     return Center(
       child: SizedBox(
         height: 50,

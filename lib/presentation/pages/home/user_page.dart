@@ -80,12 +80,12 @@ class _UserPageState extends State<UserPage> {
                           const Gap(20),
                           SizedBox(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 user.id == null
                                     ? SizedBox(
-                                  height: 40,
+                                  height: 30,
                                         child: TextButton.icon(
                                           onPressed: () {
                                             Get.to(() => const LoginPage());
@@ -102,7 +102,7 @@ class _UserPageState extends State<UserPage> {
                                         ),
                                       )
                                     : SizedBox(
-                                  height: 40,
+                                  height: 30,
                                         child: TextButton.icon(
                                           onPressed: () {
                                             Get.to(() => UserInfoPage(user: user));
@@ -315,7 +315,7 @@ class _UserPageState extends State<UserPage> {
                 const Gap(20),
                 // menu section
                 Container(
-                    height: hei * 0.4,
+                    height: hei * 0.45,
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -345,7 +345,7 @@ class _UserPageState extends State<UserPage> {
                                       : showDialog(context: context, builder: (context) => const LoginDialog());
                                 },
                                 child: SizedBox(
-                                    height: ((hei*0.4)-20-((menu.length-1)*16))/menu.length,
+                                    height: ((hei*0.45)-20-((menu.length-1)*16))/menu.length,
                                     width: double.infinity,
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.start,

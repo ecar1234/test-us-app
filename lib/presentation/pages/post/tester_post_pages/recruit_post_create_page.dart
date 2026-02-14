@@ -10,8 +10,10 @@ import 'package:logger/logger.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
+import 'package:test_us_app/data/models/user/user_model.dart';
 
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
+import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
@@ -57,8 +59,6 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
   bool _iosCheck = false;
   bool _androidCheck = false;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -67,7 +67,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
       subtitleController.text = widget.post!.subtitle!;
       contentController.text = widget.post!.contents!;
       _selectedPlatform = widget.post!.platform!;
-      _selectedOs = widget.post!.platform != ApplicationPlatform.mobile ? widget.post!.mobileOs! : null;
+      _selectedOs =  widget.post!.mobileOs;
       _selectedCategory = widget.post!.category;
       if (widget.post!.images != null && widget.post!.images!.isNotEmpty) {
         _existedImages = widget.post!.images!;
@@ -143,6 +143,9 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                       const Gap(20),
                       // 플랫폼
                       _platformSection(),
+                      const Gap(20),
+                      if(_mobileCheck)
+                        _mobileOsSection(),
                       const Gap(20),
                       // 카테고리
                       _categorySection(),
@@ -428,7 +431,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
 
   Widget _platformSection() {
     return Padding(
-      padding: const EdgeInsets.only(right: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: SizedBox(
           width: MediaQuery.sizeOf(context).width - 40,
           child: Column(
@@ -441,53 +444,59 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
               )),
               const Gap(10),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(
-                        height: 50,
-                        child: Row(
-                          children: [
-                            Checkbox(
-                              value: _webCheck,
-                              onChanged: (value) {
+                  Flexible(
+                    flex: 1,
+                    child: SizedBox(
+                          height: 50,
+                          child: Row(
+                            children: [
+                              Checkbox(
+                                value: _webCheck,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _webCheck = value!;
+                                    _selectedPlatform = ApplicationPlatform.web;
+                                    if(value == true && _mobileCheck == true){
+                                      _mobileCheck = false;
+                                      _androidCheck = false;
+                                      _iosCheck = false;
+                                    }
+                                  });
+                                }
+                              ),
+                              Text(
+                                'Web Service',
+                                style: TextStyle(fontSize: 14, fontWeight: _webCheck ? FontWeight.bold : FontWeight.normal),
+                              )
+                            ],
+                          ),
+                        ),
+                  ),
+                  Flexible(
+                    flex: 1,
+                    child: SizedBox(
+                      height: 30,
+                      child: Row(
+                        children: [
+                          Checkbox(
+                              value: _mobileCheck,
+                              onChanged: (value) async {
                                 setState(() {
-                                  _webCheck = value!;
-                                  _selectedPlatform = ApplicationPlatform.web;
-                                  if(value == true && _mobileCheck == true){
-                                    _mobileCheck = false;
-                                    _androidCheck = false;
-                                    _iosCheck = false;
+                                  _mobileCheck = value!;
+                                  _selectedPlatform = ApplicationPlatform.mobile;
+                                  if(value == true){
+                                    _webCheck = false;
                                   }
                                 });
-                              }
-                            ),
-                            Text(
-                              'Web Service',
-                              style: TextStyle(fontSize: 14, fontWeight: _webCheck ? FontWeight.bold : FontWeight.normal),
-                            )
-                          ],
-                        ),
-                      ),
-                  SizedBox(
-                    height: 30,
-                    child: Row(
-                      children: [
-                        Checkbox(
-                            value: _mobileCheck,
-                            onChanged: (value) {
-                              setState(() {
-                                _mobileCheck = value!;
-                                _selectedPlatform = ApplicationPlatform.mobile;
-                                if(value == true && _webCheck == true){
-                                  _webCheck = false;
-                                }
                                 if(value == true) {
-                                  showModalBottomSheet(
-                                      context: context,
-                                      isDismissible: false,
-                                      builder: (context) {
-                                    return _mobileOsSection();
-                                  });
+                                  // await showModalBottomSheet(
+                                  //     context: context,
+                                  //     isDismissible: false,
+                                  //     builder: (context) {
+                                  //       return _mobileOsSection();
+                                  //     });
                                 }else {
                                   setState(() {
                                     _selectedOs = null;
@@ -495,14 +504,14 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                                     _iosCheck = false;
                                   });
                                 }
-                              });
-                            }
-                        ),
-                        Text(
-                          'Mobile Service',
-                          style: TextStyle(fontSize: 14, fontWeight: _mobileCheck ? FontWeight.bold : FontWeight.normal),
-                        )
-                      ],
+                              }
+                          ),
+                          Text(
+                            'Mobile Service',
+                            style: TextStyle(fontSize: 14, fontWeight: _mobileCheck ? FontWeight.bold : FontWeight.normal),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -513,100 +522,76 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
   }
 
   Widget _mobileOsSection() {
-    return StatefulBuilder(
-      builder: (context, setState) => Container(
-        height: 280,
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-                child: Text(
-                  "모바일 OS",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                )),
-            const Gap(10),
-            SizedBox(
-                width: MediaQuery.sizeOf(context).width - 40,
-                height: 180,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 40),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          SizedBox(
-                            height: 50,
-                            child: Row(
-                              children: [
-                                Checkbox(
-                                    value: _androidCheck,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _androidCheck = value!;
-                                        if(value == true) {
-                                          _selectedOs = (MobileOsType.android);
-                                        }else {
-                                          _selectedOs = null;
-                                        }
-                                      });
-                                    }
-                                ),
-                                Text(
-                                  'Android OS',
-                                  style: TextStyle(fontSize: 14, fontWeight: _androidCheck ? FontWeight.bold : FontWeight.normal),
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 30,
-                            child: Row(
-                              children: [
-                                Checkbox(
-                                    value: _iosCheck,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _iosCheck = value!;
-                                        if(value == true) {
-                                          _selectedOs = MobileOsType.ios;
-                                        }else {
-                                          _selectedOs = null;
-                                        }
-                                      });
-                                    }
-                                ),
-                                Text(
-                                  'IOS',
-                                  style: TextStyle(fontSize: 14, fontWeight: _iosCheck ? FontWeight.bold : FontWeight.normal),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 50,
-                      width: 100,
-                      child: ElevatedButton(
-                        onPressed: (){
-                          if(!_androidCheck && !_iosCheck){
-                            Get.snackbar("알림", "OS를 선택해주세요.");
-                            return;
+    return Container(
+      width: MediaQuery.sizeOf(context).width - 40,
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+              child: Text(
+                "모바일 OS",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              )),
+          const Gap(10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Flexible(
+                flex: 1,
+                child: SizedBox(
+                  height: 50,
+                  child: Row(
+                    children: [
+                      Checkbox(
+                          value: _androidCheck,
+                          onChanged: (value) {
+                            setState(() {
+                              _androidCheck = value!;
+                              if(value){
+                                _iosCheck = false;
+                                _selectedOs = MobileOsType.android;
+                              }
+                            });
                           }
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(),
-                        child: Text("선택"),
                       ),
-                    )
-                  ],
-                )),
-          ],
-        ),
+                      Text(
+                        'Android OS',
+                        style: TextStyle(fontSize: 14, fontWeight: _androidCheck ? FontWeight.bold : FontWeight.normal),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: SizedBox(
+                  height: 30,
+                  child: Row(
+                    children: [
+                      Checkbox(
+                          value: _iosCheck,
+                          onChanged: (value) {
+                            setState(() {
+                              _iosCheck = value!;
+                              if(value){
+                                _androidCheck = false;
+                                _selectedOs = MobileOsType.ios;
+                              }
+                            });
+                          }
+                      ),
+                      Text(
+                        'IOS',
+                        style: TextStyle(fontSize: 14, fontWeight: _iosCheck ? FontWeight.bold : FontWeight.normal),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -741,18 +726,21 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         postImage.removeWhere((element) => _deleteImages.contains(element));
                       }
 
-
-                      final post = RecruitPostEntity(
-                        title: titleController.text,
-                        subtitle: subtitleController.text,
-                        contents: contentController.text,
-                        platform: _selectedPlatform,
-                        category: _selectedCategory,
-                        mobileOs: _mobileCheck ? _selectedOs : null,
-                        author: context.read<UserProvider>().user!,
-                        images: postImage,
-                      );
-                      Get.to(() => RecruitPostDetailPage(post: post));
+                      if(context.mounted){
+                        final user = context.read<UserProvider>().user!;
+                        user.status = UserStatus.active;
+                        final post = RecruitPostEntity(
+                          title: titleController.text,
+                          subtitle: subtitleController.text,
+                          contents: contentController.text,
+                          platform: _selectedPlatform,
+                          category: _selectedCategory,
+                          mobileOs: _mobileCheck ? _selectedOs : null,
+                          author: user,
+                          images: postImage,
+                        );
+                        Get.to(() => RecruitPostDetailPage(post: post));
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),

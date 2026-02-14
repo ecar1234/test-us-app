@@ -92,45 +92,19 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
       sound: true,
     );
 
-    // 앱이 켜져 있을 때
+    // 포그라운드
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      final notification = FirebaseMessagingEntity(
-        id: message.messageId!,
-        title: message.notification?.title,
-        body: message.notification?.body,
-        createdAt: DateTime.now(),
-        data: message.data,
-        isRead: false,
-      );
-      MessagingService().saveNotification(notification);
-      NotificationService().showNotification(message);
+      _handleMessageProcessing(message);
     });
-    // 알림 클릭으로 앱이 열렸을 때 처리
+    // 백그라운드
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      final notification = FirebaseMessagingEntity(
-        id: message.messageId!,
-        title: message.notification?.title,
-        body: message.notification?.body,
-        createdAt: DateTime.now(),
-        data: message.data,
-        isRead: false,
-      );
-      MessagingService().saveNotification(notification);
+      _handleMessageProcessing(message, shouldNavigate: true);
       // 이동 로직 추가 (권장)
     });
-    // 앱이 꺼져 있을때.
+    // 앱 종료시
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       if (message == null) return;
-      final notification = FirebaseMessagingEntity(
-        id: message.messageId!,
-        title: message.notification?.title,
-        body: message.notification?.body,
-        createdAt: DateTime.now(),
-        data: message.data,
-        isRead: false,
-      );
-      MessagingService().saveNotification(notification);
-      // NotificationService().showNotification(message);
+      _handleMessageProcessing(message, shouldNavigate: true);
     });
 
     // 토큰 업데이트
@@ -138,6 +112,26 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
       MessagingService().saveToken(messagingToken);
     });
   }
+
+  void _handleMessageProcessing(RemoteMessage message, {bool shouldNavigate = false}) {
+    final notification = FirebaseMessagingEntity(
+      id: message.messageId!,
+      title: message.notification?.title,
+      body: message.notification?.body,
+      createdAt: DateTime.now(),
+      data: message.data,
+      isRead: false,
+    );
+
+    // 데이터 저장
+    MessagingService().saveNotification(notification);
+
+    // 이동 로직이 필요한 경우 (클릭 이벤트 등)
+    if (shouldNavigate) {
+      NotificationService().showNotification(message);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -150,8 +144,8 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             context
                 .read<BasePostProvider>()
                 .getInitPosts(state.favoritePosts!, state.recruitPosts!, state.promotionPosts!);
-            context.read<RecruitPostProvider>().getInitPosts(state.recruitPosts!);
-            context.read<PromotionPostProvider>().getInitPromotionPosts(state.promotionPosts!);
+            // context.read<RecruitPostProvider>().getInitPosts(state.recruitPosts!);
+            // context.read<PromotionPostProvider>().getInitPromotionPosts(state.promotionPosts!);
             FlutterNativeSplash.remove();
           },
           listenWhen: (preState, state) => state.state == BasePostLoadState.getInitPostCompletedState,
@@ -163,6 +157,14 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             context.read<BasePostProvider>().setUserInitData(recruit, promotion);
           },
           listenWhen: (preState, state) => state.state == BasePostLoadState.getUserInitPostsCompletedState,
+        ),
+        BlocListener<AuthBloc, AuthState>(
+          listener: (context, state){
+            context.read<UserProvider>().logout();
+            context.read<AuthBloc>().add(LogoutEvent());
+            Get.snackbar("알림", "자동 로그인에 실패 했습니다. 다시 로그인 해주세요.", duration: const Duration(seconds: 3));
+          },
+          listenWhen: (prev, current) => current.state == UserAuthState.errorState,
         ),
         BlocListener<AuthBloc, AuthState>(
           listener: (context, state) async {

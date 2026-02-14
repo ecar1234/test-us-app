@@ -76,6 +76,7 @@ class _SearchPageState extends State<SearchPage> {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
     final isDarkMode = context.read<ThemeProvider>().isDarkMode;
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: BlocListener<BasePostBloc, BasePostState>(
       listener: (context, state) {
         if (state is GetSearchPostState) {
@@ -91,33 +92,36 @@ class _SearchPageState extends State<SearchPage> {
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
         },
-        child: Container(
-          height: hei,
-          padding: EdgeInsets.all(20),
-          child: Column(
-            children: [
-              _searchBar(),
-              if (_searchController.text.isNotEmpty)
-                _searchList(hei, isDarkMode)
-              else
-                SizedBox(
-                  height: hei - 120,
-                  child: Center(
-                    child: Text.rich(
-                      TextSpan(text: 'TESTES', children: [
-                        TextSpan(
-                            text: ' 의 게시물을 검색 할 수 있어요.',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: isDarkMode ? Colors.white : Colors.grey.shade800)),
-                      ]),
-                      style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            height: hei,
+            padding: EdgeInsets.all(20),
+            child: Column(
+              children: [
+                _searchBar(),
+                if (_searchController.text.isNotEmpty)
+                  _searchList(hei, isDarkMode)
+                else
+                  SizedBox(
+                    height: hei - 120,
+                    child: Center(
+                      child: Text.rich(
+                        TextSpan(text: 'TESTES', children: [
+                          TextSpan(
+                              text: ' 의 게시물을 검색 할 수 있어요.',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDarkMode ? Colors.white : Colors.grey.shade800)),
+                        ]),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.primary),
+                      ),
                     ),
-                  ),
-                )
-            ],
+                  )
+              ],
+            ),
           ),
         ),
       ),

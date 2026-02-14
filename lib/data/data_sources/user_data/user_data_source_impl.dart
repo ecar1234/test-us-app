@@ -250,7 +250,7 @@ class UserDataSourceImpl implements UserDataSource {
         throw Exception('Error');
       }
     } else {
-      throw Exception('Error');
+      throw Exception(res['error']);
     }
   }
 

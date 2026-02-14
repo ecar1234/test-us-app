@@ -24,18 +24,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc(UserUseCase userUseCase) : super(AuthState(state: UserAuthState.serviceStartState)) {
     on<TokenCheckEvent>((event, emit) async {
-      final token = await pref.getToken();
-      if (token.isEmpty) {
-        emit(AuthState(state: UserAuthState.beforeLoginState));
-        return;
-      } else {
-        final serverToken = await userUseCase.autoLogin(token);
-        if (serverToken != token) {
-          pref.setToken(serverToken);
-          logger.d('token changed!');
+      try {
+        final token = await pref.getToken();
+        if (token.isEmpty) {
+          emit(AuthState(state: UserAuthState.beforeLoginState));
+          return;
+        } else {
+          final serverToken = await userUseCase.autoLogin(token);
+          if (serverToken != token) {
+            pref.setToken(serverToken);
+            logger.d('token changed!');
+          }
+          final user = await pref.getUserInfo();
+          emit(AuthState(state: UserAuthState.loginCompletedState, user: user, token: serverToken));
         }
-        final user = await pref.getUserInfo();
-        emit(AuthState(state: UserAuthState.loginCompletedState, user: user, token: serverToken));
+      } on Exception catch (e) {
+        logger.e(e);
+        emit(AuthState(state: UserAuthState.errorState, message: e.toString()));
       }
     });
 

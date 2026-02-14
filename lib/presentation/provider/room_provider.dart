@@ -46,6 +46,7 @@ class RoomProvider with ChangeNotifier {
   }
 
   void resetMemberCount(int roomId) {
+    _roomList ??= [];
     final index = _roomList!.indexWhere((e) => e.id == roomId);
     if (index != -1) {
       final room = _roomList![index];

@@ -19,7 +19,7 @@ class User {
   DateTime? createdAt;
   DateTime? updatedAt;
 
-  User({this.userId, this.nickname, this.email, this.profileImg, this.userType, this.role, this.createdAt, this.updatedAt});
+  User({this.userId, this.nickname, this.email, this.profileImg, this.status, this.userType, this.role, this.createdAt, this.updatedAt});
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

@@ -60,7 +60,7 @@ class _MessageMainPageState extends State<MessageMainPage> {
                   return provider.roomList ?? [];
                 }, builder: (context, roomList, child) {
                   if (roomList.isEmpty) {
-                    return Center(child: Text("아직 대화방이 없습니다 😯"));
+                    return Center(child: Text("아직 대화방이 없습니다 😯", style: TextStyle(fontSize: 18)));
                   }
                   return ListView.separated(
                     padding: EdgeInsets.symmetric(vertical: 20),
@@ -89,9 +89,14 @@ class _MessageMainPageState extends State<MessageMainPage> {
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTap: () {
+                            if(!isActive){
+                              Get.snackbar("알림", "종료 또는 접근할 수 없는 채팅 입니다.");
+                              return;
+                            }
                             final user = User(
                               userId: targetUser.user!.id,
                               nickname: targetUser.user!.nickname,
+                              status: targetUser.user!.status,
                             );
                             Get.to(() => MessageRoom(roomId: room.id, targetUser: user));
                           },
