@@ -60,14 +60,14 @@ class _MessageRoomState extends State<MessageRoom> {
 
     if (widget.postId != null) {
       // 신규 방 생성 시나리오
-      socketProvider.joinUser(widget.targetUser!.userId!);
+      // socketProvider.joinUser(widget.targetUser!.userId!);
       socketProvider.joinUser(senderId);
       context
           .read<MessageBloc>()
           .add(RequestRoomMessagesByPostIdEvent(token, widget.postId!, widget.targetUser!.userId!));
     } else if (widget.roomId != null) {
       // 기존 방 입장 시나리오
-      socketProvider.joinUser(widget.targetUser!.userId!);
+      // socketProvider.joinUser(widget.targetUser!.userId!);
       socketProvider.joinUser(senderId);
       socketProvider.joinRoom(widget.roomId!);
       context.read<MessageBloc>().add(RequestRoomMessagesByRoomIdEvent(token, widget.roomId!, senderId));
@@ -320,7 +320,7 @@ class _MessageRoomState extends State<MessageRoom> {
                 Container(
                   key: ValueKey(message.id),
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.sizeOf(context).width * 0.4,
+                    maxWidth: MediaQuery.sizeOf(context).width * 0.6,
                   ),
                   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                   decoration: BoxDecoration(
@@ -360,7 +360,7 @@ class _MessageRoomState extends State<MessageRoom> {
         Container(
           key: ValueKey(message.id),
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.sizeOf(context).width * 0.4,
+            maxWidth: MediaQuery.sizeOf(context).width * 0.6,
           ),
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
           decoration: BoxDecoration(

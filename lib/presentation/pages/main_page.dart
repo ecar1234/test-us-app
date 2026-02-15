@@ -108,9 +108,16 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
     });
 
     // 토큰 업데이트
-    FirebaseMessaging.instance.onTokenRefresh.listen((messagingToken) {
+    FirebaseMessaging.instance.onTokenRefresh.listen((String messagingToken) {
       MessagingService().saveToken(messagingToken);
     });
+
+    _firebaseMessaging.onTokenRefresh.listen((messagingToken) async {
+      _refreshToken(messagingToken);
+    });
+  }
+  void _refreshToken(String messageToken){
+    MessagingService().saveToken(messageToken);
   }
 
   void _handleMessageProcessing(RemoteMessage message, {bool shouldNavigate = false}) {

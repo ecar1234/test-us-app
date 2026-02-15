@@ -1,17 +1,8 @@
-
-
 import 'dart:io';
-
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:path/path.dart';
 import 'package:test_us_app/domain/use_cases/user_usecase.dart';
 
 import '../../domain/entities/firebase_messaging_entity.dart';
-import '../../presentation/bloc/user_bloc/user_bloc.dart';
-import '../../presentation/bloc/user_bloc/user_event.dart';
 import '../../presentation/provider/firebase_messaging_provider.dart';
 import '../../presentation/provider/user_provider.dart';
 
