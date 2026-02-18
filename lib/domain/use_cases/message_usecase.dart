@@ -25,6 +25,10 @@ class MessageUseCase {
     final res = await _roomRepo.requestRoomInfoById(roomId);
     return res;
   }
+  Future<RoomEntity> resetUnreadCount(String token, int roomId, String userId) async {
+    final res = await _messageRepo.resetUnreadCount(token, roomId, userId);
+    return res;
+  }
 
   // message
   Future<List<MessageEntity>> requestMessageByPostId(String token, String postId, String targetId) async {

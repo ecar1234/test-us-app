@@ -104,6 +104,7 @@ class MessageApi {
   static const String requestRoomInfoById = '/api/v1/message/getRoomById';
   static const String requestMessageByRoomId = '/api/v1/message/getMessageByRoomId';
   static const String requestMessageByPostId = '/api/v1/message/getMessageByPostId';
+  static const String resetUnreadCount = '/api/v1/message/resetUnreadCount';
   // static const String requestRoom = '/api/v1/message/requestRoom';
 }
 

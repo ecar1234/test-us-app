@@ -20,6 +20,14 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         emit(UserState(UserDataState.errorState));
       }
     });
+    on<UpdateFirebaseTokenEvent>((event, emit) async {
+      try {
+        await userUseCase.updateFirebaseToken(event.token!, event.messagingToken!, event.userId!, event.deviceType!);
+      } catch (e){
+        logger.e(e);
+        emit(UserState(UserDataState.errorState));
+      }
+    });
     on<RemoveFirebaseTokenEvent>((event, emit) async {
       await userUseCase.deleteFirebaseToken(event.token!, event.messagingToken!, event.userId!);
     });

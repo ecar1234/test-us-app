@@ -104,9 +104,14 @@ class _MessageRoomState extends State<MessageRoom> {
                     if (state is RoomMessagesLoadCompletedState) {
                       socketProvider.setMessages(state.messageList);
                       if (state.messageList.isNotEmpty) {
+                        final token = context.read<UserProvider>().token ?? '';
+                        final userId = context.read<UserProvider>().user!.id!;
                         roomId = state.messageList[0].roomId!;
-                        socketProvider.resetUnreadCount(state.messageList.first.roomId!);
+                        context.read<MessageBloc>().add(ResetUnreadCount(token, roomId!, userId));
                       }
+                    }
+                    else if(state is RoomInfoLoadCompletedState){
+                        socketProvider.resetUnreadCount(roomId!);
                     }
                   },
                   child: Padding(

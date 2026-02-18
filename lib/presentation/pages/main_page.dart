@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -24,19 +23,14 @@ import 'package:test_us_app/presentation/pages/home/purchase_page.dart';
 import 'package:test_us_app/presentation/pages/home/search_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
-import 'package:test_us_app/presentation/provider/post_provider/promotion_post_provider.dart';
-import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/pages/home/user_page.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:test_us_app/services/socket/Isocket_io_client.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import '../../core/api_names.dart';
-import '../../data/sharedPreferences/auth_preference.dart';
 import '../../data/sharedPreferences/firebase_messaging_preference.dart';
-import '../../domain/entities/user_entity.dart';
 import '../../services/firebase/messaging_service.dart';
 import '../../services/notification/notification_service.dart';
 import '../bloc/app_bloc/app_event.dart';
@@ -61,11 +55,10 @@ class MetaDataSetting extends StatefulWidget {
 }
 
 class _MetaDataSettingState extends State<MetaDataSetting> {
-  final pref = AuthPreference.instance;
+  // final authPref = AuthPreference.instance;
   final firebasePref = FirebaseMessagingPreference.instance;
   final logger = Logger();
-
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  // final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
@@ -86,7 +79,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
   }
 
   Future<void> _initializeNotification() async {
-    await _firebaseMessaging.requestPermission(
+    await FirebaseMessaging.instance.requestPermission(
       alert: true,
       badge: true,
       sound: true,
@@ -111,13 +104,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
     FirebaseMessaging.instance.onTokenRefresh.listen((String messagingToken) {
       MessagingService().saveToken(messagingToken);
     });
-
-    _firebaseMessaging.onTokenRefresh.listen((messagingToken) async {
-      _refreshToken(messagingToken);
-    });
-  }
-  void _refreshToken(String messageToken){
-    MessagingService().saveToken(messageToken);
   }
 
   void _handleMessageProcessing(RemoteMessage message, {bool shouldNavigate = false}) {
@@ -189,15 +175,25 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
               userBloc.add(RequestUserDataEvent(state.token!, state.user!.id!));
             }
 
-            final messagingToken = await _firebaseMessaging.getToken();
+
+            String? messagingToken = await firebasePref.getFirebaseToken();
             logger.d('firebase token : $messagingToken');
+
             if (messagingToken == null) {
-              return;
+              messagingToken = await FirebaseMessaging.instance.getToken();
+              final deviceType = Platform.isAndroid ? 'android' : 'ios';
+              userBloc.add(CreateFirebaseTokenEvent(state.token, messagingToken, state.user!.id, deviceType));
+              firebaseProvider.setFirebaseToken(messagingToken!);
+            }else {
+              final fmcToken = await FirebaseMessaging.instance.getToken();
+              if (fmcToken != messagingToken) {
+                final deviceType = Platform.isAndroid ? 'android' : 'ios';
+                userBloc.add(UpdateFirebaseTokenEvent(state.token, messagingToken, state.user!.id, deviceType));
+                firebaseProvider.setFirebaseToken(fmcToken!);
+              }
             }
 
-            final deviceType = Platform.isAndroid ? 'android' : 'ios';
-            userBloc.add(CreateFirebaseTokenEvent(state.token, messagingToken, state.user!.id, deviceType));
-            firebaseProvider.setFirebaseToken(messagingToken);
+
             firebaseProvider.getNotification();
 
             String host = kDebugMode ? Host.baseDevUrl : Host.baseProdUrl;
@@ -322,7 +318,6 @@ class _MainState extends State<MainPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _pageList = [
       HomePage(

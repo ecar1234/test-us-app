@@ -15,6 +15,15 @@ class CreateFirebaseTokenEvent extends UserEvent {
   CreateFirebaseTokenEvent(this.token, this.messagingToken, this.userId, this.deviceType);
 }
 
+class UpdateFirebaseTokenEvent extends UserEvent {
+  final String? token;
+  final String? messagingToken;
+  final String? userId;
+  final String? deviceType;
+
+  UpdateFirebaseTokenEvent(this.token, this.messagingToken, this.userId, this.deviceType);
+}
+
 class RemoveFirebaseTokenEvent extends UserEvent {
   final String? token;
   final String? userId;

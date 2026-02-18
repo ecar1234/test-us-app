@@ -2,6 +2,7 @@
 
 import 'package:test_us_app/data/data_sources/message_data/message_data_source.dart';
 import 'package:test_us_app/domain/entities/message_entity.dart';
+import 'package:test_us_app/domain/entities/room_entity.dart';
 
 import '../../domain/repositories/message_repository.dart';
 
@@ -23,5 +24,11 @@ class MessageRepositoryImpl implements MessageRepository {
     final res = await remote.requestMessageByRoomId(token, roomId, userId);
     if(res.isEmpty) return [];
     return res.map((e) => MessageEntity.toEntity(e)).toList();
+  }
+
+  @override
+  Future<RoomEntity> resetUnreadCount(String token, int roomId, String userId) async {
+    final res = await remote.resetUnreadCount(token, roomId, userId);
+    return RoomEntity.toEntity(res);
   }
 }

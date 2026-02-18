@@ -27,6 +27,10 @@ class MessagingService {
     final token = userProvider.token ?? "";
     final userId = userProvider.user?.id ?? "";
     final deviceType = Platform.isAndroid ? 'android' : 'ios';
-    await GetIt.I.get<UserUseCase>().createFirebaseToken(token, messagingToken, userId, deviceType);
+    if(provider.token == null){
+      await GetIt.I.get<UserUseCase>().createFirebaseToken(token, messagingToken, userId, deviceType);
+    }else {
+      await GetIt.I.get<UserUseCase>().updateFirebaseToken(token, messagingToken, userId, deviceType);
+    }
   }
 }

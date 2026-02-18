@@ -30,3 +30,10 @@ class DeleteRoomEvent extends MessageBlocEvent {
 
   DeleteRoomEvent(this.roomId);
 }
+class ResetUnreadCount extends MessageBlocEvent {
+  final String token;
+  final int roomId;
+  final String userId;
+
+  ResetUnreadCount(this.token, this.roomId, this.userId);
+}
