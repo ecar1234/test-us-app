@@ -10,6 +10,7 @@ import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_state.dart';
 import 'package:test_us_app/presentation/pages/auth/signup_page.dart';
+import 'package:test_us_app/services/auth/auth_service.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
 
@@ -52,8 +53,6 @@ class _LoginPageState extends State<LoginPage> {
               child: BlocListener<AuthBloc, AuthState>(
                   listener: (context, state) async {
                     if (state.state == UserAuthState.loginCompletedState) {
-                      // context.read<UserProvider>().autoLogin(state.token!, state.user!);
-                      // context.read<BasePostBloc>().add(RequestUserInItDataEvent(state.token!, state.user!.id!));
                       await showDialog(
                           context: context,
                           builder: (context) {
@@ -86,6 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                                     SizedBox(
                                       child: ElevatedButton(
                                           onPressed: () {
+                                            // GetIt.I.get<AuthService>().loginCompletionHandler(context, state);
                                             Navigator.pop(context);
                                           },
                                           style: ElevatedButton.styleFrom(

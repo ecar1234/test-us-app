@@ -51,11 +51,16 @@ class MessageBloc extends Bloc<MessageBlocEvent, MessageBlocState> {
     });
 
     on<ResetUnreadCount>((event, emit) async {
-      emit(MessageBlocState(state: MessageLoadState.dataLoadState));
-      logger.i("data state : dataLoadState");
-      final res = await messageUseCase.resetUnreadCount(event.token, event.roomId, event.userId);
-      emit(RoomInfoLoadCompletedState(res));
-      logger.i("data state : getMessageListCompletedState");
+      try {
+        emit(MessageBlocState(state: MessageLoadState.dataLoadState));
+        logger.i("data state : dataLoadState");
+        final res = await messageUseCase.resetUnreadCount(event.token, event.roomId, event.userId);
+        emit(RoomInfoLoadCompletedState(res));
+        logger.i("data state : getMessageListCompletedState");
+      } on Exception catch (e) {
+        emit(MessageBlocState(state: MessageLoadState.errorState));
+        logger.e("data state : errorState");
+      }
     });
   }
 }

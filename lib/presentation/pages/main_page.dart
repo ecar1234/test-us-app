@@ -25,6 +25,7 @@ import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/presentation/pages/home/user_page.dart';
+import 'package:test_us_app/services/auth/auth_service.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:test_us_app/services/theme_provider.dart';
@@ -58,6 +59,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
   // final authPref = AuthPreference.instance;
   final firebasePref = FirebaseMessagingPreference.instance;
   final logger = Logger();
+
   // final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   @override
@@ -125,7 +127,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = context.watch<ThemeProvider>().isDarkMode;
@@ -152,7 +153,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
           listenWhen: (preState, state) => state.state == BasePostLoadState.getUserInitPostsCompletedState,
         ),
         BlocListener<AuthBloc, AuthState>(
-          listener: (context, state){
+          listener: (context, state) {
             context.read<UserProvider>().logout();
             context.read<AuthBloc>().add(LogoutEvent());
             Get.snackbar("알림", "자동 로그인에 실패 했습니다. 다시 로그인 해주세요.", duration: const Duration(seconds: 3));
@@ -161,44 +162,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         ),
         BlocListener<AuthBloc, AuthState>(
           listener: (context, state) async {
-            final userProvider = context.read<UserProvider>();
-            final firebaseProvider = context.read<FirebaseMessagingProvider>();
-            final basePostBloc = context.read<BasePostBloc>();
-            final applicationBloc = context.read<AppBloc>();
-            final userBloc = context.read<UserBloc>();
-            final socket =  context.read<SocketProvider>();
-
-            await userProvider.autoLogin(state.token!, state.user!);
-            basePostBloc.add(RequestUserInItDataEvent(state.token!, state.user!.id!));
-            applicationBloc.add(RequestMyApplicationsEvent(state.token!, state.user!.id!));
-            if (state.user!.method != AuthType.email) {
-              userBloc.add(RequestUserDataEvent(state.token!, state.user!.id!));
-            }
-
-
-            String? messagingToken = await firebasePref.getFirebaseToken();
-            logger.d('firebase token : $messagingToken');
-
-            if (messagingToken == null) {
-              messagingToken = await FirebaseMessaging.instance.getToken();
-              final deviceType = Platform.isAndroid ? 'android' : 'ios';
-              userBloc.add(CreateFirebaseTokenEvent(state.token, messagingToken, state.user!.id, deviceType));
-              firebaseProvider.setFirebaseToken(messagingToken!);
-            }else {
-              final fmcToken = await FirebaseMessaging.instance.getToken();
-              if (fmcToken != messagingToken) {
-                final deviceType = Platform.isAndroid ? 'android' : 'ios';
-                userBloc.add(UpdateFirebaseTokenEvent(state.token, messagingToken, state.user!.id, deviceType));
-                firebaseProvider.setFirebaseToken(fmcToken!);
-              }
-            }
-
-
-            firebaseProvider.getNotification();
-
-            String host = kDebugMode ? Host.baseDevUrl : Host.baseProdUrl;
-
-            socket.initializeSocket(host, state.token!);
+            GetIt.I.get<AuthService>().loginCompletionHandler(context, state);
           },
           listenWhen: (preState, state) => state.state == UserAuthState.loginCompletedState,
         ),
@@ -233,36 +197,35 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
       ],
       child: GetMaterialApp(
         theme: FlexThemeData.light(
-            scheme: FlexScheme.damask,
-            // surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-            // blendLevel: 9,
-            subThemesData: const FlexSubThemesData(
-              interactionEffects: true,
-              tintedDisabledControls: true,
-              useM2StyleDividerInM3: true,
-              inputDecoratorIsFilled: true,
-              inputDecoratorBorderType: FlexInputBorderType.outline,
-              alignedDropdown: true,
-              navigationRailUseIndicator: true,
-            ),
-            keyColors: const FlexKeyColors(
-              keepPrimary: true,
-              keepSecondary: true,
-              keepTertiary: true,
-              keepError: true,
-              keepPrimaryContainer: true,
-              keepSecondaryContainer: true,
-              keepTertiaryContainer: true,
-              keepErrorContainer: true,
-            ),
-            variant: FlexSchemeVariant.monochrome,
-            // Direct ThemeData properties.
-            visualDensity: FlexColorScheme.comfortablePlatformDensity,
-            cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-            useMaterial3: true,
-            swapLegacyOnMaterial3: true,
-            fontFamily: GoogleFonts.notoSans().fontFamily,
-
+          scheme: FlexScheme.damask,
+          // surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+          // blendLevel: 9,
+          subThemesData: const FlexSubThemesData(
+            interactionEffects: true,
+            tintedDisabledControls: true,
+            useM2StyleDividerInM3: true,
+            inputDecoratorIsFilled: true,
+            inputDecoratorBorderType: FlexInputBorderType.outline,
+            alignedDropdown: true,
+            navigationRailUseIndicator: true,
+          ),
+          keyColors: const FlexKeyColors(
+            keepPrimary: true,
+            keepSecondary: true,
+            keepTertiary: true,
+            keepError: true,
+            keepPrimaryContainer: true,
+            keepSecondaryContainer: true,
+            keepTertiaryContainer: true,
+            keepErrorContainer: true,
+          ),
+          variant: FlexSchemeVariant.monochrome,
+          // Direct ThemeData properties.
+          visualDensity: FlexColorScheme.comfortablePlatformDensity,
+          cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+          useMaterial3: true,
+          swapLegacyOnMaterial3: true,
+          fontFamily: GoogleFonts.notoSans().fontFamily,
         ),
         darkTheme: FlexThemeData.dark(
             scheme: FlexScheme.damask,
