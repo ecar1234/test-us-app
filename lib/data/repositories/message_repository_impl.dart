@@ -12,8 +12,11 @@ class MessageRepositoryImpl implements MessageRepository {
   MessageRepositoryImpl(this.remote);
 
   @override
-  Future<List<MessageEntity>> requestMessageByPostId(String token, String postId, String targetId) async {
+  Future<List<MessageEntity>?> requestMessageByPostId(String token, String postId, String targetId) async {
     final res = await remote.requestMessageByPostId(token, postId, targetId);
+    if(res == null) {
+      return null;
+    }
     if(res.isEmpty) return [];
     final messages = res.map((e) => MessageEntity.toEntity(e)).toList();
     return messages;

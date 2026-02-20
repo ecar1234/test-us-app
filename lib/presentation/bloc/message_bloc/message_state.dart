@@ -8,7 +8,9 @@ enum MessageLoadState {
   getRoomListCompletedState,
   getRoomMessagesCompletedState,
   getRoomInfoCompletedState,
+  roomDeleteCompletedState,
   errorState,
+  failedState
 }
 
 
@@ -25,6 +27,11 @@ class RoomListLoadCompletedState extends MessageBlocState {
 class RoomInfoLoadCompletedState extends MessageBlocState {
   RoomEntity room;
   RoomInfoLoadCompletedState(this.room) : super(state: MessageLoadState.getRoomInfoCompletedState);
+}
+class RoomDeleteCompletedState extends MessageBlocState {
+  int roomId;
+
+  RoomDeleteCompletedState(this.roomId) : super(state: MessageLoadState.roomDeleteCompletedState);
 }
 
 // message

@@ -123,7 +123,7 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   getIt.registerLazySingleton<RecruitPostUseCase>(() => RecruitPostUseCase(getIt<RecruitPostRepository>()));
   getIt.registerLazySingleton<PromotionPostUseCase>(() => PromotionPostUseCase(getIt<PromotionPostRepository>()));
   getIt.registerLazySingleton<FirebaseMessagingUseCase>(() => FirebaseMessagingUseCase());
-  getIt.registerLazySingleton<MessageUseCase>(() => MessageUseCase(getIt<RoomRepository>(), getIt<MessageRepository>(), getIt<RoomMemberRepository>()));
+  getIt.registerLazySingleton<MessageUseCase>(() => MessageUseCase(getIt<RoomRepository>(), getIt<MessageRepository>(), getIt<RoomMemberRepository>(), getIt<UserProvider>()));
 
 
   //provider

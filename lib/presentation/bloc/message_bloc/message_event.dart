@@ -26,9 +26,11 @@ class RequestRoomMessagesByRoomIdEvent extends MessageBlocEvent {
 }
 
 class DeleteRoomEvent extends MessageBlocEvent {
+  final String token;
   final int roomId;
+  final String userId;
 
-  DeleteRoomEvent(this.roomId);
+  DeleteRoomEvent(this.token, this.roomId, this.userId);
 }
 class ResetUnreadCount extends MessageBlocEvent {
   final String token;

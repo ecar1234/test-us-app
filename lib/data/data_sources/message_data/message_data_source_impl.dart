@@ -13,15 +13,19 @@ class MessageDataSourceImpl implements MessageDataSource {
   MessageDataSourceImpl(this.netDriver);
 
   @override
-  Future<List<MessageModel>> requestMessageByPostId(String token, String postId, String targetId) async {
-    final res = await netDriver.requestPostJson(token, MessageApi.requestMessageByPostId, {'postId': postId, 'targetId': targetId});
-    if (res['status'] == 200){
-      if((res['messages'] as List<dynamic>).isEmpty){
-        return [];
+  Future<List<MessageModel>?> requestMessageByPostId(String token, String postId, String targetId) async {
+    try {
+      final res = await netDriver.requestPostJson(token, MessageApi.requestMessageByPostId, {'postId': postId, 'targetId': targetId});
+      if (res['status'] == 200){
+        if((res['messages'] as List<dynamic>).isEmpty){
+          return [];
+        }
+        return res['messages'].map<MessageModel>((e) => MessageModel.fromJson(e)).toList();
+      } else {
+        return null;
       }
-      return res['messages'].map<MessageModel>((e) => MessageModel.fromJson(e)).toList();
-    } else {
-      return [];
+    } on Exception catch (e) {
+      throw Exception(e);
     }
   }
 

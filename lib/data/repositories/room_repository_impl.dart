@@ -11,12 +11,6 @@ class RoomRepositoryImpl implements RoomRepository {
   RoomRepositoryImpl(this.remote);
 
   @override
-  Future<void> deleteRoom(String token, String roomId) {
-    // TODO: implement deleteRoom
-    throw UnimplementedError();
-  }
-
-  @override
   Future<List<RoomEntity>> requestRoomList(String token, String userId) async {
     final res = await remote.requestRoomList(token, userId);
     if(res.isEmpty) return [];
@@ -28,5 +22,4 @@ class RoomRepositoryImpl implements RoomRepository {
     final res = await remote.requestRoomInfoById(roomId);
     return RoomEntity.toEntity(res);
   }
-
 }

@@ -29,6 +29,11 @@ class MessageBloc extends Bloc<MessageBlocEvent, MessageBlocState> {
       logger.i("data state : dataLoadState");
       try {
         final res = await messageUseCase.requestMessageByPostId(event.token, event.postId, event.targetId);
+        if(res ==  null){
+          emit(MessageBlocState(state: MessageLoadState.failedState));
+          logger.e("data state : failedState");
+          return;
+        }
         emit(RoomMessagesLoadCompletedState(messageList: res));
         logger.i("data state : getMessageListCompletedState");
       } catch (error) {
@@ -57,6 +62,18 @@ class MessageBloc extends Bloc<MessageBlocEvent, MessageBlocState> {
         final res = await messageUseCase.resetUnreadCount(event.token, event.roomId, event.userId);
         emit(RoomInfoLoadCompletedState(res));
         logger.i("data state : getMessageListCompletedState");
+      } on Exception catch (e) {
+        emit(MessageBlocState(state: MessageLoadState.errorState));
+        logger.e("data state : errorState");
+      }
+    });
+
+    on<DeleteRoomEvent>((event, emit) async {
+      try {
+        emit(MessageBlocState(state: MessageLoadState.dataLoadState));
+        logger.i("data state : dataLoadState");
+        final res = await messageUseCase.deleteRoom(event.token, event.roomId, event.userId);
+        emit(RoomDeleteCompletedState(res));
       } on Exception catch (e) {
         emit(MessageBlocState(state: MessageLoadState.errorState));
         logger.e("data state : errorState");

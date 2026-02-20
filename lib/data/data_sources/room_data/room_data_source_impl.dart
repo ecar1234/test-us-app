@@ -10,11 +10,6 @@ class RoomDataSourceImpl implements RoomDataSource {
   final NetDriver netDriver;
 
   RoomDataSourceImpl(this.netDriver);
-  @override
-  Future<RoomModel> deleteRoom(String token, String roomId) {
-    // TODO: implement deleteRoom
-    throw UnimplementedError();
-  }
 
   @override
   Future<List<RoomModel>> requestRoomList(String token, String userId) async {

@@ -8,6 +8,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 import 'package:test_us_app/domain/entities/room_entity.dart';
+import 'package:test_us_app/domain/entities/room_member_entity.dart';
 
 import '../../../data/models/user/user_model.dart';
 import '../../../utils/time_util.dart';
@@ -49,6 +50,10 @@ class _MessageMainPageState extends State<MessageMainPage> {
               child: BlocConsumer<MessageBloc, MessageBlocState>(listener: (context, state) {
                 if (state is RoomListLoadCompletedState) {
                   context.read<RoomProvider>().setRoomList(state.roomList);
+                } else if (state is RoomDeleteCompletedState) {
+                  context.read<RoomProvider>().deleteRoom(state.roomId);
+                } else if (state.state == MessageLoadState.errorState) {
+                  Get.snackbar("알림", "에러가 발생했습니다.");
                 }
               }, builder: (context, state) {
                 if (state.state == MessageLoadState.dataLoadState) {
@@ -68,17 +73,86 @@ class _MessageMainPageState extends State<MessageMainPage> {
                     shrinkWrap: true,
                     itemBuilder: (context, idx) {
                       final room = roomList[idx];
-                      final targetUser = room.members!.firstWhere((m) => m.user!.id != userId);
+                      final targetUser = room.members!.firstWhereOrNull((member) => member.user!.id != userId);
                       final dateInfo = TimeUtil().getChatMessageCreatedAt(room.lastMessageAt!);
                       final unreadCount = room.members!.firstWhere((member) => member.user!.id == userId).unreadCount;
-                      final isActive = targetUser.user!.status == UserStatus.active;
+                      // final isActiveTarget = targetUser != null && targetUser.user!.status == UserStatus.active;
+                      // final isActiveRoom = room.post.
 
                       return Slidable(
                         endActionPane: ActionPane(motion: ScrollMotion(), extentRatio: 0.25, children: [
                           SlidableAction(
-                            onPressed: (_) {
-                              Get.snackbar("실행", "채팅방 삭제 실행");
-                              // context.read<MessageBloc>().add(DeleteRoomEvent(room.id!));
+                            onPressed: (_) async {
+                              await showDialog(
+                                  context: context,
+                                  builder: (context) => Dialog(
+                                        child: Container(
+                                          height: 200,
+                                          width: MediaQuery.sizeOf(context).width,
+                                          padding: EdgeInsets.all(20),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            // color: Colors.white
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Text(
+                                                "채팅방 나가기",
+                                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                '채팅방을 나가면 이전 대화를\n다시 확인하거나 복구할 수 없습니다.',
+                                                style: TextStyle(fontSize: 14),textAlign: TextAlign.center,
+                                              ),
+                                              const Gap(20),
+                                              LayoutBuilder(builder: (context, constraints) {
+                                                return Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Flexible(
+                                                      flex: 3,
+                                                      child: SizedBox(
+                                                        width: constraints.maxWidth * 0.3,
+                                                        child: OutlinedButton(
+                                                            onPressed: () {
+                                                              Get.back();
+                                                            },
+                                                            style: OutlinedButton.styleFrom(
+                                                              side: BorderSide(
+                                                                  color: Theme.of(context).colorScheme.primary),
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.circular(10)),
+                                                            ),
+                                                            child: Text('취소')),
+                                                      ),
+                                                    ),
+                                                    const Gap(10),
+                                                    Flexible(
+                                                      flex: 7,
+                                                      child: SizedBox(
+                                                        width: constraints.maxWidth * 0.7,
+                                                        child: ElevatedButton(
+                                                            onPressed: () {
+                                                              final token = context.read<UserProvider>().token ?? '';
+                                                              final userId = context.read<UserProvider>().user!.id ?? '';
+                                                              context.read<MessageBloc>().add(DeleteRoomEvent(token, room.id!, userId));
+                                                              Navigator.pop(context);
+                                                            },
+                                                            style: OutlinedButton.styleFrom(
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.circular(10)),
+                                                            ),
+                                                            child: Text('삭제(나가기)')),
+                                                      ),
+                                                    )
+                                                  ],
+                                                );
+                                              }),
+                                            ],
+                                          ),
+                                        ),
+                                      ));
                             },
                             backgroundColor: const Color(0xFF0392CF),
                             foregroundColor: Colors.white,
@@ -89,15 +163,17 @@ class _MessageMainPageState extends State<MessageMainPage> {
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTap: () {
-                            if(!isActive){
-                              Get.snackbar("알림", "종료 또는 접근할 수 없는 채팅 입니다.");
-                              return;
-                            }
-                            final user = User(
-                              userId: targetUser.user!.id,
-                              nickname: targetUser.user!.nickname,
-                              status: targetUser.user!.status,
-                            );
+                            // if(!isActive){
+                            //   Get.snackbar("알림", "종료 또는 접근할 수 없는 채팅 입니다.");
+                            //   return;
+                            // }
+                            final user = targetUser != null
+                                ? User(
+                                    userId: targetUser.user!.id,
+                                    nickname: targetUser.user!.nickname,
+                                    status: targetUser.user!.status,
+                                  )
+                                : null;
                             Get.to(() => MessageRoom(roomId: room.id, targetUser: user));
                           },
                           child: SizedBox(
@@ -110,7 +186,7 @@ class _MessageMainPageState extends State<MessageMainPage> {
                                     child: ClipRect(
                                         child: ClipRRect(
                                             borderRadius: BorderRadius.circular(25),
-                                            child: targetUser.user!.profileImg?.url != null && isActive
+                                            child: targetUser != null && targetUser.user!.profileImg!.url != null
                                                 ? CachedNetworkImage(
                                                     imageUrl: targetUser.user!.profileImg!.url!,
                                                     width: 60,
@@ -138,7 +214,7 @@ class _MessageMainPageState extends State<MessageMainPage> {
                                           Row(
                                             children: [
                                               Text(
-                                                isActive ? targetUser.user!.nickname! : "알 수 없는 유져",
+                                                targetUser != null ? targetUser.user!.nickname! : "알 수 없는 유져",
                                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                                               ),
                                             ],

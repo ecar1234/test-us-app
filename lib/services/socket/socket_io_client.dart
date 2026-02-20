@@ -116,15 +116,17 @@ class SocketIOClientImpl implements ISocketClient {
   }
 
   @override
-  void onLeave(int? roomId, String userId, String targetUserId) {
+  void onLeave(int? roomId, String userId, String? targetUserId) {
     logger.d('[SocketIO] leave_room: $roomId');
     logger.d('[SocketIO] leave_user: $userId');
     logger.d('[SocketIO] leave_target_user: $targetUserId');
     if(roomId != null){
       _socket?.emit('leave room', roomId);
     }
+    if(targetUserId != null){
+      _socket?.emit('leave user', targetUserId);
+    }
     _socket?.emit('leave user', userId);
-    _socket?.emit('leave user', targetUserId);
   }
 
   @override

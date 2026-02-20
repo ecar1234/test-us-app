@@ -1,6 +1,7 @@
 
 
 import 'package:test_us_app/domain/entities/room_entity.dart';
+import 'package:test_us_app/presentation/provider/user_provider.dart';
 
 import '../entities/message_entity.dart';
 import '../repositories/message_repository.dart';
@@ -11,9 +12,9 @@ class MessageUseCase {
   final RoomRepository _roomRepo;
   final MessageRepository _messageRepo;
   final RoomMemberRepository _roomMemberRepo;
+  final UserProvider _userProvider;
 
-
-  MessageUseCase(this._roomRepo, this._messageRepo, this._roomMemberRepo);
+  MessageUseCase(this._roomRepo, this._messageRepo, this._roomMemberRepo, this._userProvider);
 
   // room
   Future<List<RoomEntity>> requestRoomList(String token, String userId) async {
@@ -25,13 +26,21 @@ class MessageUseCase {
     final res = await _roomRepo.requestRoomInfoById(roomId);
     return res;
   }
-  Future<RoomEntity> resetUnreadCount(String token, int roomId, String userId) async {
+
+  Future<RoomEntity> resetUnreadCount(String? token, int roomId, String userId) async {
+    token ??= _userProvider.token??'';
     final res = await _messageRepo.resetUnreadCount(token, roomId, userId);
     return res;
   }
 
+  // member
+  Future<int> deleteRoom(String token, int roomId, String userId) async {
+    final res = await _roomMemberRepo.deleteRoom(token, roomId, userId);
+    return res;
+  }
+
   // message
-  Future<List<MessageEntity>> requestMessageByPostId(String token, String postId, String targetId) async {
+  Future<List<MessageEntity>?> requestMessageByPostId(String token, String postId, String targetId) async {
     final res = await _messageRepo.requestMessageByPostId(token, postId, targetId);
     return res;
   }

@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:test_us_app/data/models/message/message_model.dart';
 import 'package:test_us_app/domain/use_cases/message_usecase.dart';
 import 'package:test_us_app/presentation/provider/room_provider.dart';
+import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/socket/Isocket_io_client.dart';
 import 'package:test_us_app/services/socket/socket_io_client.dart';
 
@@ -14,6 +15,10 @@ import '../../domain/entities/room_entity.dart';
 
 
 class SocketProvider with ChangeNotifier {
+
+  int? _roomId;
+  int? get roomId => _roomId;
+
   /// ✅ GetIt으로 주입된 SocketClient (Singleton)
   final ISocketClient _socket;
   SocketProvider(this._socket);
@@ -64,10 +69,12 @@ class SocketProvider with ChangeNotifier {
         debugPrint('received messages: ${event.id}, ${event.content}, ${event.sender ?? 'none'}, ${event.sender?.nickname}, ${event.sender?.profileImg}');
         /// 메지시 중복 방지.
         if(_messages != null && _messages!.any((m) => m.id == event.id)) return;
-
         _messages = [event, ..._messages!];
-        /// ❗ roomProvider는 nullable → 반드시 null 체크
-        _roomProvider!.addRoom(event);
+
+        /// 룸 데이터 업데이트
+        final userId = GetIt.I.get<UserProvider>().user!.id!;
+        _roomProvider!.updateRoom(event, userId, isJoin: _roomId == event.roomId);
+
         notifyListeners();
       },
       onError: (e, s) {
@@ -80,9 +87,6 @@ class SocketProvider with ChangeNotifier {
     );
   }
 
-  void resetUnreadCount(int roomId) {
-    _roomProvider!.resetMemberCount(roomId);
-  }
   /// ✅ 실제 socket 연결 (UI initState / didChangeDependencies 에서 호출)
   void connect() {
     if (_socket.connected()) return;
@@ -94,6 +98,7 @@ class SocketProvider with ChangeNotifier {
   /// ✅ 방 입장 (connect + onConnect 이후 호출해야 함)
   void joinRoom(int roomId) {
     debugPrint('[SocketProvider] joinRoom: $roomId');
+    _roomId = roomId;
     _socket.joinRoom(roomId);
   }
   void joinUser(String userId) {
@@ -109,8 +114,9 @@ class SocketProvider with ChangeNotifier {
   }
 
   /// ✅ 방 나가기
-  void leaveRoom(int? roomId, String userId, String targetUserId) {
+  void leaveRoom(int? roomId, String userId, String? targetUserId) {
     debugPrint('[SocketProvider] leaveRoom: $roomId');
+    _roomId = null;
     _socket.onLeave(roomId, userId, targetUserId);
   }
 
