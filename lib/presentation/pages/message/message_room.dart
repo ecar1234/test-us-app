@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -88,8 +87,7 @@ class _MessageRoomState extends State<MessageRoom> {
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
-              title:
-                  Text(widget.targetUser != null ? '${widget.targetUser!.nickname}' : '알 수 없는 유져'),
+              title: Text(widget.targetUser != null ? '${widget.targetUser!.nickname}' : '알 수 없는 유져'),
             ),
             body: GestureDetector(
               behavior: HitTestBehavior.opaque,
@@ -99,14 +97,15 @@ class _MessageRoomState extends State<MessageRoom> {
               child: BlocListener<MessageBloc, MessageBlocState>(
                   listener: (context, state) {
                     if (state is RoomMessagesLoadCompletedState) {
-                      setState(() {
-                        _roomId = state.messageList.last.roomId;
-                      });
                       _socketProvider.setMessages(state.messageList);
-                      if(state.messageList.isNotEmpty){
+
+                      if (state.messageList.isNotEmpty) {
+                        setState(() {
+                          _roomId = state.messageList.last.roomId;
+                        });
                         _roomProvider.updateRoom(state.messageList.last, _senderId, isJoin: true);
                       }
-                    }else if(state.state == MessageLoadState.failedState){
+                    } else if (state.state == MessageLoadState.failedState) {
                       Get.snackbar('알림', '이용 할 수 없습니다.');
                       Navigator.pop(context);
                     }
@@ -141,8 +140,7 @@ class _MessageRoomState extends State<MessageRoom> {
                                 shrinkWrap: true,
                                 reverse: true,
                                 itemBuilder: (context, idx) {
-
-                                  if(isLeft && idx == 0) {
+                                  if (isLeft && idx == 0) {
                                     return _buildLeaveFooter(context);
                                   }
 
@@ -193,7 +191,7 @@ class _MessageRoomState extends State<MessageRoom> {
                                       if (showDateHeader) _buildDateHeader(createdAt!),
                                       if (message.sender!.userId != _senderId)
                                         _buildLeftMessage(message, showProfile, showTime)
-                                      else if(message.sender!.userId == _senderId)
+                                      else if (message.sender!.userId == _senderId)
                                         _buildRightMessage(message),
                                     ],
                                   );
@@ -239,20 +237,22 @@ class _MessageRoomState extends State<MessageRoom> {
                                   height: 40,
                                   width: (MediaQuery.sizeOf(context).width - 40) * 0.2,
                                   child: ElevatedButton(
-                                      onPressed:widget.targetUser == null ? null : () {
-                                        if (_controller.text.isEmpty) {
-                                          Get.snackbar('알림', '메시지를 입력해주세요.');
-                                          return;
-                                        }
-                                        final req = TReqMessageEntity(
-                                          roomId: _roomId,
-                                          content: _controller.text,
-                                          targetId: widget.targetUser!.userId,
-                                          postId: widget.postId,
-                                        );
-                                        _socketProvider.sendMessage(req);
-                                        _controller.clear();
-                                      },
+                                      onPressed: widget.targetUser == null
+                                          ? null
+                                          : () {
+                                              if (_controller.text.isEmpty) {
+                                                Get.snackbar('알림', '메시지를 입력해주세요.');
+                                                return;
+                                              }
+                                              final req = TReqMessageEntity(
+                                                roomId: _roomId,
+                                                content: _controller.text,
+                                                targetId: widget.targetUser!.userId,
+                                                postId: widget.postId,
+                                              );
+                                              _socketProvider.sendMessage(req);
+                                              _controller.clear();
+                                            },
                                       style: ElevatedButton.styleFrom(
                                         padding: EdgeInsets.zero,
                                         shape: RoundedRectangleBorder(
@@ -288,7 +288,8 @@ class _MessageRoomState extends State<MessageRoom> {
       ),
     );
   }
-  Widget _buildLeaveFooter(BuildContext context){
+
+  Widget _buildLeaveFooter(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Center(

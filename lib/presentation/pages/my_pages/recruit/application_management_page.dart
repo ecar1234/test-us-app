@@ -393,7 +393,10 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
         if (current.application != null && current.application!.id == info.application!.id) {
           return true;
         }
-        if (current.state == UserAppState.loadingState) {
+        if (current.state == UserAppState.loadingState && current.loadingAppId == info.application!.id) {
+          return true;
+        }
+        if (previous.state == UserAppState.loadingState && previous.loadingAppId == info.application!.id) {
           return true;
         }
 
@@ -434,7 +437,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                 final token = context.read<UserProvider>().token ?? '';
                 context
                     .read<AppBloc>()
-                    .add(RequestCompleteApplicationEvent(token, info.user!.userId!, info.application!.postId!));
+                    .add(RequestCompleteApplicationEvent(token, info.user!.userId!, info.application!.postId!, info.application!.id!));
               },
             );
         }
@@ -542,7 +545,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                     onPressed: () {
                                       final token = context.read<UserProvider>().token ?? '';
                                       context.read<AppBloc>().add(RequestRejectApplicationEvent(
-                                          token, info.user!.userId!, info.application!.postId!));
+                                          token, info.user!.userId!, info.application!.postId!, info.application!.id!));
                                       Get.back();
                                     },
                                     style: OutlinedButton.styleFrom(

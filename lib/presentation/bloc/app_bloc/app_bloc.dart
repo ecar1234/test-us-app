@@ -45,7 +45,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
     });
 
     on<RequestRejectApplicationEvent>((event, emit) async {
-      emit(AppState(state: UserAppState.loadingState));
+      emit(AppState(state: UserAppState.loadingState, loadingAppId: event.appId));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.rejectApplication(event.token, event.userId, event.postId);
       emit(AppState(state: UserAppState.applicationRejectCompletedState, application: res));
@@ -53,7 +53,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
     });
 
     on<RequestCompleteApplicationEvent>((event, emit) async {
-      emit(AppState(state: UserAppState.loadingState));
+      emit(AppState(state: UserAppState.loadingState, loadingAppId: event.appId));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.completeApplication(event.token, event.userId, event.postId);
       emit(AppState(state: UserAppState.applicationCompletedState, application: res));
@@ -61,7 +61,7 @@ class AppBloc extends Bloc<AppEvent, AppState>{
     });
 
     on<RequestCancelEvent>((event, emit) async {
-      emit(AppState(state: UserAppState.loadingState));
+      emit(AppState(state: UserAppState.loadingState, loadingAppId: event.appId));
       logger.i('application state: loadingState');
       final res = await applicationUseCase.cancelApply(event.token, event.appId);
       emit(AppState(state: UserAppState.applicationCancelCompletedState, application: res['application'], post: res['post']));

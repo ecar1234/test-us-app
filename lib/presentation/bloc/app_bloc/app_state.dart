@@ -23,8 +23,9 @@ class AppState {
   ApplicationEntity? application;
   List<ApplicationEntity>? applications;
   RecruitPostEntity? post;
+  int? loadingAppId;
 
-  AppState({this.state = UserAppState.startServiceState, this.application, this.applications, this.post});
+  AppState({this.state = UserAppState.startServiceState, this.application, this.applications, this.post, this.loadingAppId});
 }
 
 class GetRecruitPostTestersReviewState extends AppState {

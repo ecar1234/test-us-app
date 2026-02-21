@@ -154,7 +154,7 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                                                     Text(posts[idx].platform!.name.toUpperCase(),
                                                         style: TextStyle(color: Colors.grey.shade600)),
                                                     if (posts[idx].platform == ApplicationPlatform.mobile)
-                                                      Text('(${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)})',
+                                                      Text('(${TypeConversionUtil().getPostOs(posts[idx].mobileOs??MobileOsType.ios)})',
                                                           style: TextStyle(color: Colors.grey.shade600))
                                                   ],
                                                 ),
@@ -199,9 +199,7 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
     String message = '';
     if(postState == PostStatus.end){
       message = '테스트 종료';
-    }
-
-    else if (state == ApplicationStatus.pending) {
+    } else if (state == ApplicationStatus.pending) {
       message = '테스터 신청 중';
     } else if (state == ApplicationStatus.rejected) {
       message ='테스터 신청 미승인';

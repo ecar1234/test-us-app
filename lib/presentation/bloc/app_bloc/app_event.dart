@@ -26,14 +26,16 @@ class RequestCompleteApplicationEvent extends AppEvent {
   final String token;
   final String userId;
   final String postId;
-  RequestCompleteApplicationEvent(this.token, this.userId, this.postId);
+  final int appId;
+  RequestCompleteApplicationEvent(this.token, this.userId, this.postId, this.appId);
 }
 
 class RequestRejectApplicationEvent extends AppEvent {
   final String token;
   final String userId;
   final String postId;
-  RequestRejectApplicationEvent(this.token, this.userId, this.postId);
+  final int appId;
+  RequestRejectApplicationEvent(this.token, this.userId, this.postId, this.appId);
 }
 
 class RequestMyApplicationsEvent extends AppEvent {
