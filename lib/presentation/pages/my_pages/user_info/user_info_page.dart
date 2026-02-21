@@ -386,6 +386,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
         child: Column(
           children: [
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: (){
                 Get.to(() => PasswordUpdatePage());
               },
@@ -405,6 +406,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
               color: Colors.grey.shade200,
             ),
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: (){
                 Get.to(() => UserDeletePage());
               },
