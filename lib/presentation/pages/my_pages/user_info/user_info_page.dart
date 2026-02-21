@@ -323,42 +323,50 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   child: Text('확인')),
             ),
             const Gap(20),
-            SizedBox(
-              width: wid * 0.6,
-              height: 50,
-              child: ElevatedButton(
-                  onPressed: () async {
-                    final token = context.read<UserProvider>().token ?? '';
-                    final userInfo = UserEntity(
-                      id: widget.user.id,
-                      email: widget.user.email,
-                      nickname: _nicknameController.text,
-                      userType: typeUtil.toUserType(_userTypeController.text),
-                      role: typeUtil.toUserRole(_userRoleController.text),
-                    );
-
-                    if (profileImage != null) {
-                      context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo,
-                          profileImage: profileImage, oldImage: widget.user.profileImg));
-                    } else {
-                      if (widget.user.profileImg != null) {
-                        userInfo.profileImg = widget.user.profileImg;
-                      }
-                      final checkNickname = await context.read<UserProvider>().isNicknameAvailable(_nicknameController.text);
-                      if(checkNickname && context.mounted){
-                        context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo));
-                      }else {
-                        Get.snackbar('알림', '이미 존재하는 닉네임입니다.');
+            BlocSelector<UserBloc, UserState, bool>(
+              selector: (state) => state.state == UserDataState.loadingState,
+              builder: (context, isLoading) {
+                return SizedBox(
+                width: wid * 0.6,
+                height: 50,
+                child: ElevatedButton(
+                    onPressed: () async {
+                      if(isLoading){
+                        Get.snackbar('알림', '업데이트 중입니다.');
                         return;
                       }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      final token = context.read<UserProvider>().token ?? '';
+                      final userInfo = UserEntity(
+                        id: widget.user.id,
+                        email: widget.user.email,
+                        nickname: _nicknameController.text,
+                        userType: typeUtil.toUserType(_userTypeController.text),
+                        role: typeUtil.toUserRole(_userRoleController.text),
+                      );
+
+                      if (profileImage != null) {
+                        context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo,
+                            profileImage: profileImage, oldImage: widget.user.profileImg));
+                      } else {
+                        if (widget.user.profileImg != null) {
+                          userInfo.profileImg = widget.user.profileImg;
+                        }
+                        final checkNickname = await context.read<UserProvider>().isNicknameAvailable(_nicknameController.text);
+                        if(checkNickname && context.mounted){
+                          context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo));
+                        }else {
+                          Get.snackbar('알림', '이미 존재하는 닉네임입니다.');
+                          return;
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                  ),
-                  child: Text('업데이트')),
+                    child: isLoading ? CircularProgressIndicator() : Text('업데이트')),
+              );}
             ),
           ],
         ));

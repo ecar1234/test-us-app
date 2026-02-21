@@ -770,241 +770,254 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
             return;
           }
         },
-        child: SizedBox(
-          height: 50,
-          width: MediaQuery.sizeOf(context).width - 40,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                  height: 50,
-                  width: 150,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_titleController.text.isEmpty ||
-                          _subtitleController.text.isEmpty ||
-                          _contentController.text.isEmpty) {
-                        Get.snackbar("알림", "모든 항목을 입력해주세요.");
-                        return;
-                      }
-                      if (_selectedPlatform == null) {
-                        Get.snackbar("알림", "플랫폼을 선택해주세요.");
-                        return;
-                      }
-                      if (_webCheck && _webUrlController.text.isEmpty) {
-                        Get.snackbar("알림", "Web Service URL을 입력해주세요.");
-                        return;
-                      }
-                      if (_mobileCheck) {
-                        if (_androidCheck && _androidUrlController.text.isEmpty) {
-                          Get.snackbar("알림", "Play Store URL을 입력해주세요.");
-                          return;
-                        }
-                        if (_iosCheck && _iosUrlController.text.isEmpty) {
-                          Get.snackbar("알림", "App Store URL을 입력해주세요.");
-                          return;
-                        }
-                      }
-                      String domain = '';
-                      if (_webCheck) {
-                        domain = _webUrlController.text;
-                      } else {
-                        if (_iosCheck) {
-                          domain = _iosUrlController.text;
-                        }
-                        if (_androidCheck) {
-                          domain = _androidUrlController.text;
-                        }
-                      }
-
-                      List<ImageEntity> postImage = [];
-                      final dir = await getTemporaryDirectory();
-
-                      if (_selectedImages.isNotEmpty) {
-                        postImage = await Future.wait(
-                          _selectedImages.map((e) async {
-                            final newPath = '${dir.path}/${path.basename(e.path)}';
-                            final copiedFile = await File(e.path).copy(newPath);
-                            return ImageEntity(
-                              isLocal: true,
-                              url: copiedFile.path, // 실제 존재하는 파일 경로
-                            );
-                          }),
-                        );
-                      }
-                      if (widget.post != null) {
-                        postImage.addAll(widget.post!.images!);
-                      }
-                      if (_deleteImages.isNotEmpty) {
-                        postImage.removeWhere((element) => _deleteImages.contains(element));
-                      }
-                      final user = context.read<UserProvider>().user!;
-                      final post = PromotionPostEntity(
-                        title: _titleController.text,
-                        subtitle: _subtitleController.text,
-                        contents: _contentController.text,
-                        category: _selectedCategory,
-                        platform: _selectedPlatform,
-                        mobileOs: _selectedOs,
-                        author: user,
-                        domain: domain,
-                        images: postImage,
-                      );
-                      Get.to(() => PromotionPostDetailPage(post: post));
-                    },
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: Text("미리보기"),
-                  )),
-              const Gap(20),
-              if (widget.post == null)
+        child: BlocSelector<PromotionBloc, PromotionPostState, bool>(
+          selector: (state) {
+            return state.state == PromotionPostLoadState.postLoadingState;
+          },
+          builder: (context, isLoading) => SizedBox(
+            height: 50,
+            width: MediaQuery.sizeOf(context).width - 40,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 SizedBox(
-                  height: 50,
-                  width: 150,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_titleController.text.isEmpty ||
-                          _subtitleController.text.isEmpty ||
-                          _contentController.text.isEmpty) {
-                        Get.snackbar("알림", "모든 항목을 입력해주세요.");
-                        return;
-                      }
-                      if (_selectedPlatform == null) {
-                        Get.snackbar("알림", "플랫폼을 선택해주세요.");
-                        return;
-                      }
-                      if (_selectedImages.isEmpty) {
-                        Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
-                        return;
-                      }
-                      if (_webCheck && _webUrlController.text.isEmpty) {
-                        Get.snackbar("알림", "Web Service URL을 입력해주세요.");
-                        return;
-                      }
-                      if (_mobileCheck) {
-                        if (_androidCheck && _androidUrlController.text.isEmpty) {
-                          Get.snackbar("알림", "Play Store URL을 입력해주세요.");
+                    height: 50,
+                    width: 150,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_titleController.text.isEmpty ||
+                            _subtitleController.text.isEmpty ||
+                            _contentController.text.isEmpty) {
+                          Get.snackbar("알림", "모든 항목을 입력해주세요.");
                           return;
                         }
-                        if (_iosCheck && _iosUrlController.text.isEmpty) {
-                          Get.snackbar("알림", "App Store URL을 입력해주세요.");
+                        if (_selectedPlatform == null) {
+                          Get.snackbar("알림", "플랫폼을 선택해주세요.");
                           return;
                         }
-                      }
-                      String domain = '';
-                      if (_webCheck) {
-                        domain = _webUrlController.text;
-                      } else {
-                        if (_iosCheck) {
-                          domain = _iosUrlController.text;
+                        if (_webCheck && _webUrlController.text.isEmpty) {
+                          Get.snackbar("알림", "Web Service URL을 입력해주세요.");
+                          return;
                         }
-                        if (_androidCheck) {
-                          domain = _androidUrlController.text;
+                        if (_mobileCheck) {
+                          if (_androidCheck && _androidUrlController.text.isEmpty) {
+                            Get.snackbar("알림", "Play Store URL을 입력해주세요.");
+                            return;
+                          }
+                          if (_iosCheck && _iosUrlController.text.isEmpty) {
+                            Get.snackbar("알림", "App Store URL을 입력해주세요.");
+                            return;
+                          }
                         }
-                      }
+                        String domain = '';
+                        if (_webCheck) {
+                          domain = _webUrlController.text;
+                        } else {
+                          if (_iosCheck) {
+                            domain = _iosUrlController.text;
+                          }
+                          if (_androidCheck) {
+                            domain = _androidUrlController.text;
+                          }
+                        }
 
-                      try {
-                        // context.read<RecruitPostBloc>().add(PostDataLoadEvent());
-                        // final token = context.read<UserProvider>().token!;
+                        List<ImageEntity> postImage = [];
+                        final dir = await getTemporaryDirectory();
+
+                        if (_selectedImages.isNotEmpty) {
+                          postImage = await Future.wait(
+                            _selectedImages.map((e) async {
+                              final newPath = '${dir.path}/${path.basename(e.path)}';
+                              final copiedFile = await File(e.path).copy(newPath);
+                              return ImageEntity(
+                                isLocal: true,
+                                url: copiedFile.path, // 실제 존재하는 파일 경로
+                              );
+                            }),
+                          );
+                        }
+                        if (widget.post != null) {
+                          postImage.addAll(widget.post!.images!);
+                        }
+                        if (_deleteImages.isNotEmpty) {
+                          postImage.removeWhere((element) => _deleteImages.contains(element));
+                        }
+                        final user = context.read<UserProvider>().user!;
                         final post = PromotionPostEntity(
                           title: _titleController.text,
                           subtitle: _subtitleController.text,
                           contents: _contentController.text,
                           category: _selectedCategory,
                           platform: _selectedPlatform,
-                          mobileOs: _mobileCheck ? _selectedOs : null,
-                          author: context.read<UserProvider>().user!,
+                          mobileOs: _selectedOs,
+                          author: user,
                           domain: domain,
-                          period: 7,
+                          images: postImage,
                         );
-                        context.read<PromotionBloc>().add(RequestPostCreateEvent(token, post, _selectedImages));
-                      } on Exception catch (e) {
-                        logger.e(e);
-                        Get.snackbar('알림', '등록 실패');
-                        return;
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: Text("등록"),
-                  ),
-                )
-              else
-                SizedBox(
-                  height: 50,
-                  width: 150,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_titleController.text.isEmpty ||
-                          _subtitleController.text.isEmpty ||
-                          _contentController.text.isEmpty) {
-                        Get.snackbar("알림", "모든 항목을 입력해주세요.");
-                        return;
-                      }
-                      if (_selectedPlatform == null) {
-                        Get.snackbar("알림", "플랫폼을 선택해주세요.");
-                        return;
-                      }
-                      if (_existedImages.isEmpty && _selectedImages.isEmpty) {
-                        Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
-                        return;
-                      }
-                      if (_webCheck && _webUrlController.text.isEmpty) {
-                        Get.snackbar("알림", "Web Service URL을 입력해주세요.");
-                        return;
-                      }
-                      if (_mobileCheck) {
-                        if (_androidCheck && _androidUrlController.text.isEmpty) {
-                          Get.snackbar("알림", "Play Store URL을 입력해주세요.");
+                        Get.to(() => PromotionPostDetailPage(post: post));
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      child: Text("미리보기"),
+                    )),
+                const Gap(20),
+                if (widget.post == null)
+                  SizedBox(
+                    height: 50,
+                    width: 150,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (isLoading) {
+                          Get.snackbar("알림", "잠시만 기다려주세요.");
                           return;
                         }
-                        if (_iosCheck && _iosUrlController.text.isEmpty) {
-                          Get.snackbar("알림", "App Store URL을 입력해주세요.");
+                        if (_titleController.text.isEmpty ||
+                            _subtitleController.text.isEmpty ||
+                            _contentController.text.isEmpty) {
+                          Get.snackbar("알림", "모든 항목을 입력해주세요.");
                           return;
                         }
-                      }
-                      String domain = '';
-                      if (_webCheck) {
-                        domain =_webUrlController.text;
-                      } else {
-                        if (_iosCheck) {
-                          domain = _iosUrlController.text;
+                        if (_selectedPlatform == null) {
+                          Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                          return;
                         }
-                        if (_androidCheck) {
-                          domain = _androidUrlController.text;
+                        if (_selectedImages.isEmpty) {
+                          Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
+                          return;
                         }
-                      }
+                        if (_webCheck && _webUrlController.text.isEmpty) {
+                          Get.snackbar("알림", "Web Service URL을 입력해주세요.");
+                          return;
+                        }
+                        if (_mobileCheck) {
+                          if (_androidCheck && _androidUrlController.text.isEmpty) {
+                            Get.snackbar("알림", "Play Store URL을 입력해주세요.");
+                            return;
+                          }
+                          if (_iosCheck && _iosUrlController.text.isEmpty) {
+                            Get.snackbar("알림", "App Store URL을 입력해주세요.");
+                            return;
+                          }
+                        }
+                        String domain = '';
+                        if (_webCheck) {
+                          domain = _webUrlController.text;
+                        } else {
+                          if (_iosCheck) {
+                            domain = _iosUrlController.text;
+                          }
+                          if (_androidCheck) {
+                            domain = _androidUrlController.text;
+                          }
+                        }
 
-                      try {
-                        final post = PromotionPostEntity(
-                            id: widget.post!.id,
+                        try {
+                          // context.read<RecruitPostBloc>().add(PostDataLoadEvent());
+                          // final token = context.read<UserProvider>().token!;
+                          final post = PromotionPostEntity(
                             title: _titleController.text,
                             subtitle: _subtitleController.text,
                             contents: _contentController.text,
                             category: _selectedCategory,
                             platform: _selectedPlatform,
                             mobileOs: _mobileCheck ? _selectedOs : null,
-                            status: widget.post!.status,
-                            period: widget.post!.period,
+                            author: context.read<UserProvider>().user!,
                             domain: domain,
-                            author: context.read<UserProvider>().user!);
-                        final token = context.read<UserProvider>().token ?? "";
-                        context
-                            .read<PromotionBloc>()
-                            .add(RequestPostUpdateEvent(token, post, _selectedImages, _deleteImages));
-                      } on Exception catch (e) {
-                        logger.e(e);
-                        Get.snackbar('알림', '수정 실패');
-                      }
+                            period: 7,
+                          );
+                          context.read<PromotionBloc>().add(RequestPostCreateEvent(token, post, _selectedImages));
+                        } on Exception catch (e) {
+                          logger.e(e);
+                          Get.snackbar('알림', '등록 실패');
+                          return;
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      child: Text("등록"),
+                    ),
+                  )
+                else
+                  SizedBox(
+                    height: 50,
+                    width: 150,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (isLoading) {
+                          Get.snackbar("알림", "잠시만 기다려주세요.");
+                          return;
+                        }
+                        if (_titleController.text.isEmpty ||
+                            _subtitleController.text.isEmpty ||
+                            _contentController.text.isEmpty) {
+                          Get.snackbar("알림", "모든 항목을 입력해주세요.");
+                          return;
+                        }
+                        if (_selectedPlatform == null) {
+                          Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                          return;
+                        }
+                        if (_existedImages.isEmpty && _selectedImages.isEmpty) {
+                          Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
+                          return;
+                        }
+                        if (_webCheck && _webUrlController.text.isEmpty) {
+                          Get.snackbar("알림", "Web Service URL을 입력해주세요.");
+                          return;
+                        }
+                        if (_mobileCheck) {
+                          if (_androidCheck && _androidUrlController.text.isEmpty) {
+                            Get.snackbar("알림", "Play Store URL을 입력해주세요.");
+                            return;
+                          }
+                          if (_iosCheck && _iosUrlController.text.isEmpty) {
+                            Get.snackbar("알림", "App Store URL을 입력해주세요.");
+                            return;
+                          }
+                        }
+                        String domain = '';
+                        if (_webCheck) {
+                          domain =_webUrlController.text;
+                        } else {
+                          if (_iosCheck) {
+                            domain = _iosUrlController.text;
+                          }
+                          if (_androidCheck) {
+                            domain = _androidUrlController.text;
+                          }
+                        }
 
-                      // Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: Text("수정하기"),
-                  ),
-                )
-            ],
+                        try {
+                          final post = PromotionPostEntity(
+                              id: widget.post!.id,
+                              title: _titleController.text,
+                              subtitle: _subtitleController.text,
+                              contents: _contentController.text,
+                              category: _selectedCategory,
+                              platform: _selectedPlatform,
+                              mobileOs: _mobileCheck ? _selectedOs : null,
+                              status: widget.post!.status,
+                              period: widget.post!.period,
+                              domain: domain,
+                              author: context.read<UserProvider>().user!);
+                          final token = context.read<UserProvider>().token ?? "";
+                          context
+                              .read<PromotionBloc>()
+                              .add(RequestPostUpdateEvent(token, post, _selectedImages, _deleteImages));
+                        } on Exception catch (e) {
+                          logger.e(e);
+                          Get.snackbar('알림', '수정 실패');
+                        }
+
+                        // Get.back();
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      child: Text("수정하기"),
+                    ),
+                  )
+              ],
+            ),
           ),
         ));
   }

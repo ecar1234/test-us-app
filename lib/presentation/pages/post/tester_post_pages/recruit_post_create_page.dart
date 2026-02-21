@@ -25,6 +25,7 @@ import '../../../../domain/entities/image_entity.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../../../bloc/user_bloc/user_bloc.dart';
 import '../../../provider/post_provider/recruit_post_provider.dart';
 
 class RecruitPostCreatePage extends StatefulWidget {
@@ -680,149 +681,160 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
         child: SizedBox(
           height: 50,
           width: MediaQuery.sizeOf(context).width - 40,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                  height: 50,
-                  width: 150,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (titleController.text.isEmpty ||
-                          subtitleController.text.isEmpty ||
-                          contentController.text.isEmpty) {
-                        Get.snackbar("알림", "모든 항목을 입력해주세요.");
-                        return;
-                      }
-                      if (_selectedPlatform == null) {
-                        Get.snackbar("알림", "플랫폼 선택해주세요.");
-                        return;
-                      }
-
-                      if (_selectedCategory == null) {
-                        Get.snackbar("알림", "카테고리를 선택해주세요.");
-                        return;
-                      }
-
-                      List<ImageEntity> postImage = [];
-                      final dir = await getTemporaryDirectory();
-
-                      if (_selectedImages.isNotEmpty) {
-                        postImage = await Future.wait(
-                          _selectedImages.map((e) async {
-                            final newPath = '${dir.path}/${path.basename(e.path)}';
-                            final copiedFile = await File(e.path).copy(newPath);
-                            return ImageEntity(
-                              isLocal: true,
-                              url: copiedFile.path, // 실제 존재하는 파일 경로
-                            );
-                          }),
-                        );
-                      }
-                      if(widget.post != null){
-                        postImage.addAll(widget.post!.images!);
-                      }
-                      if(_deleteImages.isNotEmpty) {
-                        postImage.removeWhere((element) => _deleteImages.contains(element));
-                      }
-
-                      if(context.mounted){
-                        final user = context.read<UserProvider>().user!;
-                        user.status = UserStatus.active;
-                        final post = RecruitPostEntity(
-                          title: titleController.text,
-                          subtitle: subtitleController.text,
-                          contents: contentController.text,
-                          platform: _selectedPlatform,
-                          category: _selectedCategory,
-                          mobileOs: _mobileCheck ? _selectedOs : null,
-                          author: user,
-                          images: postImage,
-                        );
-                        Get.to(() => RecruitPostDetailPage(post: post));
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: Text("미리보기"),
-                  )),
-              const Gap(20),
-              if (widget.post == null)
+          child: BlocSelector<RecruitPostBloc, RecruitPostState, bool>(
+            selector: (state) => state.state == RecruitPostLoadState.dataLoadState,
+            builder:(context, isLoading) => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 SizedBox(
-                  height: 50,
-                  width: 150,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (titleController.text.isEmpty ||
-                          subtitleController.text.isEmpty ||
-                          contentController.text.isEmpty) {
-                        Get.snackbar("알림", "모든 항목을 입력해주세요.");
-                        return;
-                      }
-                      if (_selectedCategory == null) {
-                        Get.snackbar("알림", "플랫폼을 선택해주세요.");
-                        return;
-                      }
-                      if (_selectedImages.isEmpty) {
-                        Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
-                        return;
-                      }
-                      try {
+                    height: 50,
+                    width: 150,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (titleController.text.isEmpty ||
+                            subtitleController.text.isEmpty ||
+                            contentController.text.isEmpty) {
+                          Get.snackbar("알림", "모든 항목을 입력해주세요.");
+                          return;
+                        }
+                        if (_selectedPlatform == null) {
+                          Get.snackbar("알림", "플랫폼 선택해주세요.");
+                          return;
+                        }
+
+                        if (_selectedCategory == null) {
+                          Get.snackbar("알림", "카테고리를 선택해주세요.");
+                          return;
+                        }
+
+                        List<ImageEntity> postImage = [];
+                        final dir = await getTemporaryDirectory();
+
+                        if (_selectedImages.isNotEmpty) {
+                          postImage = await Future.wait(
+                            _selectedImages.map((e) async {
+                              final newPath = '${dir.path}/${path.basename(e.path)}';
+                              final copiedFile = await File(e.path).copy(newPath);
+                              return ImageEntity(
+                                isLocal: true,
+                                url: copiedFile.path, // 실제 존재하는 파일 경로
+                              );
+                            }),
+                          );
+                        }
+                        if(widget.post != null){
+                          postImage.addAll(widget.post!.images!);
+                        }
+                        if(_deleteImages.isNotEmpty) {
+                          postImage.removeWhere((element) => _deleteImages.contains(element));
+                        }
+
+                        if(context.mounted){
+                          final user = context.read<UserProvider>().user!;
+                          user.status = UserStatus.active;
+                          final post = RecruitPostEntity(
+                            title: titleController.text,
+                            subtitle: subtitleController.text,
+                            contents: contentController.text,
+                            platform: _selectedPlatform,
+                            category: _selectedCategory,
+                            mobileOs: _mobileCheck ? _selectedOs : null,
+                            author: user,
+                            images: postImage,
+                          );
+                          Get.to(() => RecruitPostDetailPage(post: post));
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      child: Text("미리보기"),
+                    )),
+                const Gap(20),
+                if (widget.post == null)
+                  SizedBox(
+                    height: 50,
+                    width: 150,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if(isLoading){
+                          Get.snackbar("알림", "잠시만 기다려주세요.");
+                          return;
+                        }
+                        if (titleController.text.isEmpty ||
+                            subtitleController.text.isEmpty ||
+                            contentController.text.isEmpty) {
+                          Get.snackbar("알림", "모든 항목을 입력해주세요.");
+                          return;
+                        }
+                        if (_selectedCategory == null) {
+                          Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                          return;
+                        }
+                        if (_selectedImages.isEmpty) {
+                          Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
+                          return;
+                        }
+                        try {
+                          final post = RecruitPostEntity(
+                            title: titleController.text,
+                            subtitle: subtitleController.text,
+                            contents: contentController.text,
+                            platform: _selectedPlatform,
+                            category: _selectedCategory,
+                            mobileOs: _mobileCheck ? _selectedOs : null,
+                            author: context.read<UserProvider>().user!,
+                            period: 7,
+                          );
+                          context.read<RecruitPostBloc>().add(RequestPostCreateEvent(token, post, _selectedImages));
+                        } on Exception catch (e) {
+                          logger.e(e);
+                          Get.snackbar('알림', '등록 실패');
+                          return;
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      child: Text("등록"),
+                    ),
+                  )
+                else
+                  SizedBox(
+                    height: 50,
+                    width: 150,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if(isLoading){
+                          Get.snackbar("알림", "잠시만 기다려주세요.");
+                          return;
+                        }
                         final post = RecruitPostEntity(
-                          title: titleController.text,
-                          subtitle: subtitleController.text,
-                          contents: contentController.text,
-                          platform: _selectedPlatform,
-                          category: _selectedCategory,
-                          mobileOs: _mobileCheck ? _selectedOs : null,
-                          author: context.read<UserProvider>().user!,
-                          period: 7,
-                        );
-                        context.read<RecruitPostBloc>().add(RequestPostCreateEvent(token, post, _selectedImages));
-                      } on Exception catch (e) {
-                        logger.e(e);
-                        Get.snackbar('알림', '등록 실패');
-                        return;
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: Text("등록"),
-                  ),
-                )
-              else
-                SizedBox(
-                  height: 50,
-                  width: 150,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final post = RecruitPostEntity(
-                          id: widget.post!.id,
-                          title: titleController.text,
-                          subtitle: subtitleController.text,
-                          contents: contentController.text,
-                          platform: _selectedPlatform,
-                          category: _selectedCategory,
-                          mobileOs: _mobileCheck ? _selectedOs : null,
-                          status: widget.post!.status,
-                          period: widget.post!.period,
-                          author: context.read<UserProvider>().user!);
-                      final token = context.read<UserProvider>().token ?? "";
-                      try {
-                        context
-                            .read<RecruitPostBloc>()
-                            .add(RequestPostUpdateEvent(token, post, _selectedImages, _deleteImages));
-                      } on Exception catch (e) {
-                        logger.e(e);
-                        Get.snackbar('알림', '수정 실패');
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: Text("수정하기"),
-                  ),
-                )
-            ],
+                            id: widget.post!.id,
+                            title: titleController.text,
+                            subtitle: subtitleController.text,
+                            contents: contentController.text,
+                            platform: _selectedPlatform,
+                            category: _selectedCategory,
+                            mobileOs: _mobileCheck ? _selectedOs : null,
+                            status: widget.post!.status,
+                            period: widget.post!.period,
+                            author: context.read<UserProvider>().user!);
+                        final token = context.read<UserProvider>().token ?? "";
+                        try {
+                          context
+                              .read<RecruitPostBloc>()
+                              .add(RequestPostUpdateEvent(token, post, _selectedImages, _deleteImages));
+                        } on Exception catch (e) {
+                          logger.e(e);
+                          Get.snackbar('알림', '수정 실패');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                      child: Text("수정하기"),
+                    ),
+                  )
+              ],
+            ),
           ),
         ));
   }
