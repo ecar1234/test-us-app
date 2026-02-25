@@ -22,8 +22,9 @@ class RecruitPostBloc extends Bloc<RecruitPostEvent, RecruitPostState> {
     on<RequestRecruitmentPaginationEvent>((event, emit) async {
       try {
         final res = await postUseCase.getPostPagination(event.page, event.size);
-        emit(
-            RecruitPostState(state: RecruitPostLoadState.recruitPostsLoadCompletedState, posts: res, page: event.page));
+
+        emit(RecruitPaginationState(resPost: res.posts!, page: res.page!, isLast: res.isLast!));
+
         logger.i("data state : recruitPostsLoadCompletedState");
       } on Exception catch (e) {
         // TODO

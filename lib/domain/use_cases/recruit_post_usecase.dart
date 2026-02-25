@@ -2,6 +2,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 
 import '../entities/image_entity.dart';
+import '../entities/package/post_pagination_entity.dart';
 import '../entities/recruit_post_entity.dart';
 import '../repositories/recruit_post_repository.dart';
 
@@ -49,7 +50,7 @@ class RecruitPostUseCase {
     return res;
   }
 
-  Future<List<RecruitPostEntity>> getPostPagination(int page, int size) async {
+  Future<PostPaginationEntity<RecruitPostEntity>> getPostPagination(int page, int size) async {
     final res = await repository.getPostPagination(page, size);
     return res;
   }

@@ -4,6 +4,8 @@ import 'package:test_us_app/domain/use_cases/promotion_post_usecase.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_event.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_state.dart';
 
+import '../../../../domain/entities/promotion_post_entity.dart';
+
 class PromotionBloc extends Bloc<PromotionEvent, PromotionPostState> {
   final logger = Logger();
   PromotionBloc(PromotionPostUseCase useCase)
@@ -73,7 +75,7 @@ class PromotionBloc extends Bloc<PromotionEvent, PromotionPostState> {
     on<RequestPromotionPaginationEvent>((event, emit) async {
       try {
         final res = await useCase.getPostPagination(event.page, event.size);
-        emit(PromotionPostState(state: PromotionPostLoadState.getPaginationCompletedState, posts: res, page: event.page));
+        emit(PromotionPaginationState(resPosts: res.posts!, page: res.page ?? 0, isLast: res.isLast ?? true));
         logger.i("data state : recruitPostsLoadCompletedState");
       } on Exception catch (e) {
         // TODO

@@ -2,6 +2,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/data/models/image/image_model.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
+import 'package:test_us_app/domain/entities/package/post_pagination_entity.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
@@ -63,9 +64,9 @@ class RecruitPostRepositoryImpl implements RecruitPostRepository {
 
 
   @override
-  Future<List<RecruitPostEntity>> getPostPagination(int page, int size) async {
+  Future<PostPaginationEntity<RecruitPostEntity>> getPostPagination(int page, int size) async {
     final res = await remote.getPostsPagination(page, size);
-    return res.map((e) => RecruitPostEntity.toPostEntity(e)).toList();
+    return PostPaginationEntity.toEntity<RecruitPostModel, RecruitPostEntity>(model: res, mapper: (model) => RecruitPostEntity.toPostEntity(model));
   }
 
   @override

@@ -1,11 +1,14 @@
 
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
+import 'package:test_us_app/data/models/post/promotion_post_model.dart';
 import 'package:test_us_app/domain/entities/image_entity.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 
+import '../../domain/entities/package/post_pagination_entity.dart';
 import '../../domain/repositories/promotion_post_repository.dart';
 import '../data_sources/post_data/promotion_post_datasource.dart';
+import '../models/package/post_pagination_model.dart';
 
 class PromotionPostRepositoryImpl implements PromotionPostRepository {
   final logger = Logger();
@@ -46,8 +49,12 @@ class PromotionPostRepositoryImpl implements PromotionPostRepository {
   }
 
   @override
-  Future<List<PromotionPostEntity>> getPostPagination(int page, int size) async {
-    final res = await remote.getPostPagination(page, size);
-    return res.map((e) => PromotionPostEntity.toEntity(e)).toList();
+  Future<PostPaginationEntity<PromotionPostEntity>> getPostPagination(int page, int size) async {
+    final PostPagiNationModel<PromotionPostModel>  res = await remote.getPostPagination(page, size);
+    final entity =  PostPaginationEntity.toEntity<PromotionPostModel, PromotionPostEntity>(
+      model: res,
+      mapper: (model) => PromotionPostEntity.toEntity(model),
+    );
+    return entity;
   }
 }

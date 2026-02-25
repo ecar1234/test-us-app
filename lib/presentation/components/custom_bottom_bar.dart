@@ -57,9 +57,10 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
           children: [
             BlocListener<RecruitPostBloc, RecruitPostState>(
               listener: (context, state) {
-                if (state.state == RecruitPostLoadState.recruitPostsLoadCompletedState) {
-                  context.read<RecruitPostProvider>().getPostPagination(state.posts!, state.page);
-                }
+                // note: BlocListener 의 상용 목적이 무엇???
+                // if (state.state == RecruitPostLoadState.recruitPostsLoadCompletedState) {
+                //   context.read<RecruitPostProvider>().getPostPagination(state.posts!, state.page);
+                // }
               },
               child: SizedBox(
                 width: (MediaQuery.sizeOf(context).width / 3) - 10,

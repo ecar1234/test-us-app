@@ -18,6 +18,7 @@ enum RecruitPostLoadState {
   getPostByIdCompletedState,
   getUserRecruitmentPostsCompletedState,
   getAppRecruitPostsCompletedState,
+  getPaginationCompletedState,
   postDataLoadCompletedState,
   errorState,
   failedState
@@ -25,15 +26,23 @@ enum RecruitPostLoadState {
 
 class RecruitPostState {
   RecruitPostLoadState state;
-  int page;
+  // int page;
   RecruitPostEntity? post;
   List<RecruitPostEntity>? posts;
   List<Map<String, dynamic>>? images;
 
-  RecruitPostState({this.state = RecruitPostLoadState.serviceStartState, this.page = 1, this.post, this.images, this.posts});
+  RecruitPostState({this.state = RecruitPostLoadState.serviceStartState, this.post, this.images, this.posts});
 }
 
 class GetPostApplicationsInfoState extends RecruitPostState {
   List<TResRecruitPostApplicationsInfo>? info;
   GetPostApplicationsInfoState({this.info});
+}
+
+class RecruitPaginationState extends RecruitPostState {
+  List<RecruitPostEntity> resPost;
+  int page;
+  bool isLast;
+  RecruitPaginationState({this.resPost = const [], this.page = 1, this.isLast = false})
+      : super(state: RecruitPostLoadState.getPaginationCompletedState);
 }

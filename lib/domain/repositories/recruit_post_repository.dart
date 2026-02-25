@@ -1,6 +1,7 @@
 
 
 import 'package:image_picker/image_picker.dart';
+import 'package:test_us_app/domain/entities/package/post_pagination_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
 import '../../data/models/package/recruit_post_applications_model.dart';
@@ -8,7 +9,7 @@ import '../entities/image_entity.dart';
 
 abstract class RecruitPostRepository{
   Future<List<RecruitPostEntity>> getUserRecruitmentPosts(String token, String userId);
-  Future<List<RecruitPostEntity>> getPostPagination(int page, int size);
+  Future<PostPaginationEntity<RecruitPostEntity>> getPostPagination(int page, int size);
   // Future<List<PostEntity>> getPostByPlatform(int page);
   Future<RecruitPostEntity> getPostById(String token, String id);
   Future<List<RecruitPostEntity>> getPostByTitle(String title);

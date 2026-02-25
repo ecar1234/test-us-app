@@ -7,6 +7,7 @@ import 'package:test_us_app/data/data_sources/post_data/promotion_post_datasourc
 import 'package:test_us_app/data/models/post/promotion_post_model.dart';
 
 import '../../models/image/image_model.dart';
+import '../../models/package/post_pagination_model.dart';
 
 class PromotionPostDataSourceImpl implements PromotionPostDataSource {
   final logger = Logger();
@@ -81,12 +82,12 @@ class PromotionPostDataSourceImpl implements PromotionPostDataSource {
   }
 
   @override
-  Future<List<PromotionPostModel>> getPostPagination(int page, int size) async {
+  Future<PostPagiNationModel<PromotionPostModel>> getPostPagination(int page, int size) async {
     final res = await netDriver.requestPostJson(page.toString(), PromotionApi.getPostsPagination,
         {'size': size, 'page': page});
     if (res['status'] == 200) {
       // logger.d(res['posts']);
-      return (res['posts'] as List).map<PromotionPostModel>((e) => PromotionPostModel.fromJson(e)).toList();
+      return PostPagiNationModel<PromotionPostModel>.fromJson(res, (json) => PromotionPostModel.fromJson(json as Map<String, dynamic>));
     } else {
       throw Exception('Error');
     }

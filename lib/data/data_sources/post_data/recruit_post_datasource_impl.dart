@@ -12,6 +12,7 @@ import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 
 import '../../../core/net_driver.dart';
 import '../../models/image/image_model.dart';
+import '../../models/package/post_pagination_model.dart';
 
 class RecruitPostDatasourceImpl implements RecruitPostDatasource {
   final logger = Logger();
@@ -20,12 +21,12 @@ class RecruitPostDatasourceImpl implements RecruitPostDatasource {
   RecruitPostDatasourceImpl(this.netDriver);
 
   @override
-  Future<List<RecruitPostModel>> getPostsPagination(int page, int size) async {
+  Future<PostPagiNationModel<RecruitPostModel>> getPostsPagination(int page, int size) async {
     final res = await netDriver.requestPostJson(page.toString(), RecruitPostApi.getPostsPagination,
         {'size': size, 'page': page});
     if (res['status'] == 200) {
       // logger.d(res['posts']);
-      return (res['posts'] as List).map<RecruitPostModel>((e) => RecruitPostModel.fromJson(e)).toList();
+      return PostPagiNationModel<RecruitPostModel>.fromJson(res, (json) => RecruitPostModel.fromJson(json as Map<String, dynamic>));
     } else {
       throw Exception('Error');
     }

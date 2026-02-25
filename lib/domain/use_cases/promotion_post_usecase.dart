@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:test_us_app/domain/entities/image_entity.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 
+import '../entities/package/post_pagination_entity.dart';
 import '../repositories/promotion_post_repository.dart';
 
 class PromotionPostUseCase {
@@ -33,7 +34,7 @@ class PromotionPostUseCase {
     return res;
   }
 
-  Future<List<PromotionPostEntity>> getPostPagination(int page, int size) async {
+  Future<PostPaginationEntity<PromotionPostEntity>> getPostPagination(int page, int size) async {
     final res = await repository.getPostPagination(page, size);
     return res;
   }
