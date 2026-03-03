@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -11,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
-import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/domain/entities/firebase_messaging_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
@@ -30,11 +26,10 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
-import '../../core/api_names.dart';
 import '../../data/sharedPreferences/firebase_messaging_preference.dart';
 import '../../services/firebase/messaging_service.dart';
 import '../../services/notification/notification_service.dart';
-import '../bloc/app_bloc/app_event.dart';
+import '../../services/revenue_cat_purchases/purchase_management.dart';
 import '../bloc/app_bloc/app_state.dart';
 import '../bloc/auth_bloc/auth_bloc.dart';
 import '../bloc/auth_bloc/auth_state.dart';
@@ -42,10 +37,8 @@ import '../bloc/post_blocs/base_post_bloc/base_post_event.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
-import '../bloc/user_bloc/user_event.dart';
 import '../components/custom_bottom_bar.dart';
 import '../provider/firebase_messaging_provider.dart';
-import '../provider/socket_provider.dart';
 import 'home/home_page.dart';
 
 class MetaDataSetting extends StatefulWidget {
@@ -56,11 +49,8 @@ class MetaDataSetting extends StatefulWidget {
 }
 
 class _MetaDataSettingState extends State<MetaDataSetting> {
-  // final authPref = AuthPreference.instance;
   final firebasePref = FirebaseMessagingPreference.instance;
   final logger = Logger();
-
-  // final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
@@ -68,13 +58,14 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
     super.initState();
     MessagingService().init(context.read<FirebaseMessagingProvider>());
     Future.microtask(() async {
-      await _init();
+      await _initSystem();
       NotificationService().init();
       await _initializeNotification();
+
     });
   }
 
-  Future<void> _init() async {
+  Future<void> _initSystem() async {
     GetIt.I.get<ResponsiveHeightProvider>().setHeight(context);
     context.read<ThemeProvider>().getIsDarkMod();
     context.read<BasePostBloc>().add(ServiceStartEvent());
@@ -127,6 +118,10 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
     }
   }
 
+  Future<void> _purchaseManagementsInit(BuildContext context)async{
+    context.read<PurchasesManagements>().initializeRevenueCat();
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = context.watch<ThemeProvider>().isDarkMode;
@@ -163,6 +158,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         BlocListener<AuthBloc, AuthState>(
           listener: (context, state) async {
             GetIt.I.get<AuthService>().loginCompletionHandler(context, state);
+            _purchaseManagementsInit(context);
           },
           listenWhen: (preState, state) => state.state == UserAuthState.loginCompletedState,
         ),

@@ -28,8 +28,7 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/auth/auth_service.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/firebase/firebase_options.dart';
-import 'package:test_us_app/services/notification/notification_service.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
 import 'package:test_us_app/services/socket/Isocket_io_client.dart';
 import 'package:test_us_app/services/socket/socket_io_client.dart';
 
@@ -130,5 +129,6 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   getIt.registerSingleton<FirebaseMessagingProvider>(FirebaseMessagingProvider(getIt<FirebaseMessagingUseCase>()));
   getIt.registerSingleton<UserProvider>(UserProvider(getIt<UserUseCase>()));
   getIt.registerSingleton<SocketProvider>(SocketProvider(getIt<ISocketClient>()));
+  getIt.registerSingleton<PurchasesManagements>(PurchasesManagements());
 
 }

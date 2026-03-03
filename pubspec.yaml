@@ -49,6 +49,9 @@ dependencies:
   custom_refresh_indicator: ^4.0.1
   socket_io_client: ^3.1.4
   flutter_slidable: ^4.0.3
+  accordion: ^2.6.0
+  purchases_flutter: ^9.12.3
+  purchases_ui_flutter: ^9.12.3
 
 dev_dependencies:
   flutter_test:

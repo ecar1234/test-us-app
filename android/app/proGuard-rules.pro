@@ -11,6 +11,7 @@
 -keep class com.google.ads.** {
     public *;
 }
+#-keep class com.revenuecat.purchases.** { *; }
 
 # okhttp3 라이브러리가 사용하는 Conscrypt, OpenJSSE 클래스들을 유지합니다.
 -dontwarn org.conscrypt.**

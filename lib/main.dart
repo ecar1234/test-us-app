@@ -27,6 +27,7 @@ import 'package:test_us_app/presentation/provider/socket_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/service_locator.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import 'domain/use_cases/base_post_usecase.dart';
@@ -58,6 +59,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (context) => ReviewProvider(getIt<ReviewUseCase>())),
       ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ChangeNotifierProvider(create: (context) => RoomProvider(getIt<MessageUseCase>())),
+      ChangeNotifierProvider(create: (context) => PurchasesManagements()),
       ChangeNotifierProxyProvider<RoomProvider, SocketProvider>(
           create: (context) => GetIt.I.get<SocketProvider>(),
         update: (context, roomProvider, socketProvider) {

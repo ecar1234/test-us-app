@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:test_us_app/presentation/pages/my_pages/application/my_applications_page.dart';
+import 'package:test_us_app/presentation/pages/my_pages/promotion/my_promotion_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/recruit/my_recruitment_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/review_page.dart';
 
@@ -74,6 +75,8 @@ class NotificationService {
       Get.to(() => ReviewPage());
     }else if(res.data['type'] == 'chat') {
       Get.to(() => MessageMainPage());
+    }else if(res.data['type'] == 'promotion'){
+      Get.to(() => MyPromotionPage());
     }
     // payload를 확인하여 특정 화면으로 이동
   }
