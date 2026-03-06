@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
@@ -25,6 +26,7 @@ import 'package:test_us_app/services/theme_provider.dart';
 import '../../../data/models/application/application_model.dart';
 import '../../../data/models/post/recruit_post_model.dart';
 import '../../../data/models/user/user_model.dart';
+import '../../../services/revenue_cat_purchases/purchase_management.dart';
 import '../../bloc/auth_bloc/auth_bloc.dart';
 import '../../bloc/auth_bloc/auth_event.dart';
 import '../../bloc/auth_bloc/auth_state.dart';
@@ -125,16 +127,33 @@ class _UserPageState extends State<UserPage> {
                                                 iconAlignment: IconAlignment.end,
                                               ),
                                             ),
-                                            Container(
-                                              margin: EdgeInsets.only(left: 10),
-                                              height: 30,
-                                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(20),
-                                                color: Colors.blueAccent,
-                                              ),
-                                              child: Text('Standard 이용중', style: TextStyle(color: Colors.white)),
-                                            )
+                                            Selector<PurchasesManagements, CustomerInfo?>(
+                                                selector: (context, purchase) => purchase.customerInfo,
+                                                builder: (context, info, child) {
+                                                  String plan;
+                                                  if (info != null){
+                                                    if (info.entitlements.all['Standard'] != null && info.entitlements.all['Standard']!.isActive) {
+                                                      plan = 'Standard';
+                                                    } else if (info.entitlements.all['Premium'] != null && info.entitlements.all['Premium']!.isActive) {
+                                                      plan = 'Premium';
+                                                    } else {
+                                                      plan = 'Free';
+                                                    }
+                                                  } else {
+                                                    plan = 'Free';
+                                                  }
+                                                  return Container(
+                                                      margin: EdgeInsets.only(left: 10),
+                                                      height: 30,
+                                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(20),
+                                                        color: plan == 'Free'
+                                                            ? Colors.grey.shade300
+                                                            : plan == 'Standard' ? Colors.blueAccent : Colors.amber,
+                                                      ),
+                                                      child: Text(plan, style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)));
+                                                })
                                           ],
                                         ),
                                   SizedBox(
