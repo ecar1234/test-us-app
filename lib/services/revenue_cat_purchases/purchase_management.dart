@@ -2,83 +2,61 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../../domain/entities/purchase_entity.dart';
+
 class PurchasesManagements with ChangeNotifier {
+  final logger = Logger();
+  PurchaseEntity? _subscribedItem;
+  PurchaseEntity? get subscribedItem => _subscribedItem;
 
-  CustomerInfo? _customerInfo;
-  CustomerInfo? get customerInfo => _customerInfo;
+  List<Package>? _packages;
+  List<Package>? get packages => _packages;
 
-
-  Future<void> initializeRevenueCat() async {
-    Purchases.setLogLevel(LogLevel.debug);// Platform-specific API keys
-    late PurchasesConfiguration configuration;
-    if (Platform.isIOS) {
-      configuration = PurchasesConfiguration('appl_PEXNIkAbwtzuQdJdiSCwOawkOgx');
-      debugPrint('[RevenueCat] Release Mode(IOS) Init');
-    } else if (Platform.isAndroid) {
-      configuration = PurchasesConfiguration('goog_iSxQflIhRkehjVWlyHwfGckiGEv');
-      debugPrint('[RevenueCat] Release Mode(Android) Init');
-    } else {
-      throw UnsupportedError('Platform not supported');
-    }
-
-    await Purchases.configure(configuration);
+  Future<void> addUpdateListenerRevenueCat() async {
+    // Purchases.setLogLevel(LogLevel.debug);// Platform-specific API keys
+    logger.i('[Purchase] addCustomerInfoUpdateListener');
     Purchases.addCustomerInfoUpdateListener((CustomerInfo customerInfo) {
-      if(customerInfo.entitlements.all.values.first.isActive){
-        _customerInfo = customerInfo;
+      final entitlement = customerInfo.entitlements.all.values.where((info) => info.isActive).toList();
+
+      if(entitlement.isNotEmpty && entitlement.length == 1){
+        _subscribedItem = PurchaseEntity.toEntity(entitlement[0]);
         notifyListeners();
       }
     });
-    _getCustomInfo();
-  }
-  Future<void> _getCustomInfo() async {
-    final customerInfo = await Purchases.getCustomerInfo();
-    if(customerInfo.entitlements.all.values.first.isActive){
-      _customerInfo = customerInfo;
-      notifyListeners();
-    }
   }
 
-  Future<List<Package>> getOfferings(String plan) async {
-    try {
-      final offerings = await Purchases.getOfferings();
-      final packages = offerings.all[plan.toLowerCase()]!.availablePackages;
-      // debugPrint("[Provider getOfferings] ${offering.toString()}");
-      if (packages.isEmpty) {
-        return [];
-      }
-      return packages;
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-    return [];
-  }
-
-  Future<void> purchase(Package packageToPurchase, {bool? isChangePackage = false}) async {
-    try {
-      PurchaseParams purchaseParam;
-      if (Platform.isAndroid && isChangePackage == true) {
-          purchaseParam = PurchaseParams.package(
-            packageToPurchase,
-            googleProductChangeInfo: GoogleProductChangeInfo(
-              _customerInfo!.activeSubscriptions.first,
-              prorationMode: GoogleProrationMode.immediateWithTimeProration
-            )
-          );
-      }else {
-        purchaseParam = PurchaseParams.package(packageToPurchase);
-      }
-      final result = await Purchases.purchase(purchaseParam);
-      if (result.customerInfo.entitlements.all[packageToPurchase.identifier]?.isActive ?? false){
-        _customerInfo = result.customerInfo;
+  void login(String userId) async {
+    final loginRes = await Purchases.logIn(userId);
+    if(_subscribedItem == null){
+      if(loginRes.customerInfo.entitlements.active.values.length == 1) {
+        _subscribedItem = PurchaseEntity.toEntity(loginRes.customerInfo.entitlements.active.values.first);
         notifyListeners();
+      }else if(loginRes.customerInfo.entitlements.active.values.length > 1){
+        final activeItem = loginRes.customerInfo.entitlements.active.values.where((item) => item.isActive).toList();
+        _subscribedItem = PurchaseEntity.toEntity(activeItem.first);
       }
-    } on PlatformException catch(e){
-      debugPrint(e.toString());
     }
   }
 
-  Future<void> restore() async {}
+  void getOfferings(List<Package> packages) async {
+    _packages = packages;
+    notifyListeners();
+  }
+
+  Future<void> purchase(PurchaseEntity entity) async {
+    _subscribedItem = entity;
+    notifyListeners();
+  }
+
+  Future<void> restore() async {
+    await Purchases.restorePurchases();
+  }
+
+  Future<void> logout() async {
+    await Purchases.logOut();
+  }
 
 }

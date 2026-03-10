@@ -13,6 +13,7 @@ import 'package:test_us_app/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_bloc.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:test_us_app/presentation/pages/main_page.dart';
@@ -78,6 +79,7 @@ Future<void> main() async {
         BlocProvider(create: (context) => AppBloc(getIt<ApplicationUseCase>(), getIt<RecruitPostUseCase>(), getIt<UserUseCase>())),
         BlocProvider(create: (context) => ReviewBloc(getIt<ReviewUseCase>(), getIt<UserUseCase>())),
         BlocProvider(create: (context) => MessageBloc(getIt<MessageUseCase>())),
+        BlocProvider(create: (context) => PurchaseBloc())
       ], child: const MetaDataSetting(),
     ),
   ));

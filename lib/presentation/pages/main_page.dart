@@ -13,6 +13,7 @@ import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
+import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_event.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
 import 'package:test_us_app/presentation/pages/home/purchase_page.dart';
@@ -37,6 +38,8 @@ import '../bloc/post_blocs/base_post_bloc/base_post_event.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../bloc/purchase_bloc/purchase_bloc.dart';
+import '../bloc/purchase_bloc/purchase_state.dart';
 import '../components/custom_bottom_bar.dart';
 import '../provider/firebase_messaging_provider.dart';
 import 'home/home_page.dart';
@@ -118,10 +121,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
     }
   }
 
-  Future<void> _purchaseManagementsInit(BuildContext context)async{
-    context.read<PurchasesManagements>().initializeRevenueCat();
-  }
-
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = context.watch<ThemeProvider>().isDarkMode;
@@ -133,6 +132,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             context
                 .read<BasePostProvider>()
                 .getInitPosts(state.favoritePosts!, state.recruitPosts!, state.promotionPosts!);
+            context.read<PurchaseBloc>().add(PurchaseInit());
             // context.read<RecruitPostProvider>().getInitPosts(state.recruitPosts!);
             // context.read<PromotionPostProvider>().getInitPromotionPosts(state.promotionPosts!);
             FlutterNativeSplash.remove();
@@ -158,7 +158,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         BlocListener<AuthBloc, AuthState>(
           listener: (context, state) async {
             GetIt.I.get<AuthService>().loginCompletionHandler(context, state);
-            _purchaseManagementsInit(context);
           },
           listenWhen: (preState, state) => state.state == UserAuthState.loginCompletedState,
         ),
@@ -189,6 +188,12 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             }
           },
           listenWhen: (prevState, state) => state.state == UserDataState.getUserDataLoadedState,
+        ),
+        BlocListener<PurchaseBloc, PurchaseState>(
+          listener: (context, state) async {
+            context.read<PurchasesManagements>().addUpdateListenerRevenueCat();
+          },
+          listenWhen: (preState, state) => state.state == PurchaseProgressState.initCompleted,
         )
       ],
       child: GetMaterialApp(

@@ -15,10 +15,13 @@ import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_pos
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_event.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
+import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
 
 import '../../core/api_names.dart';
 import '../../data/sharedPreferences/firebase_messaging_preference.dart';
 import '../../presentation/bloc/app_bloc/app_bloc.dart';
+import '../../presentation/bloc/purchase_bloc/purchase_bloc.dart';
+import '../../presentation/bloc/purchase_bloc/purchase_event.dart';
 import '../../presentation/provider/firebase_messaging_provider.dart';
 import '../../presentation/provider/socket_provider.dart';
 
@@ -34,6 +37,7 @@ class AuthService {
     context.read<UserProvider>().autoLogin(token, user);
     context.read<BasePostBloc>().add(RequestUserInItDataEvent(token, user.id!));
     context.read<AppBloc>().add(RequestMyApplicationsEvent(token, user.id!));
+    context.read<PurchasesManagements>().login(user.id!);
     if(user.method != AuthType.email){
       context.read<UserBloc>().add(RequestUserDataEvent(token, user.id!));
     }

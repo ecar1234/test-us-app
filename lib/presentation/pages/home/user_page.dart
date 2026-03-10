@@ -26,6 +26,7 @@ import 'package:test_us_app/services/theme_provider.dart';
 import '../../../data/models/application/application_model.dart';
 import '../../../data/models/post/recruit_post_model.dart';
 import '../../../data/models/user/user_model.dart';
+import '../../../domain/entities/purchase_entity.dart';
 import '../../../services/revenue_cat_purchases/purchase_management.dart';
 import '../../bloc/auth_bloc/auth_bloc.dart';
 import '../../bloc/auth_bloc/auth_event.dart';
@@ -127,15 +128,13 @@ class _UserPageState extends State<UserPage> {
                                                 iconAlignment: IconAlignment.end,
                                               ),
                                             ),
-                                            Selector<PurchasesManagements, CustomerInfo?>(
-                                                selector: (context, purchase) => purchase.customerInfo,
+                                            Selector<PurchasesManagements, PurchaseEntity?>(
+                                                selector: (context, purchase) => purchase.subscribedItem,
                                                 builder: (context, info, child) {
                                                   String plan;
                                                   if (info != null){
-                                                    if (info.entitlements.all['Standard'] != null && info.entitlements.all['Standard']!.isActive) {
-                                                      plan = 'Standard';
-                                                    } else if (info.entitlements.all['Premium'] != null && info.entitlements.all['Premium']!.isActive) {
-                                                      plan = 'Premium';
+                                                    if (info.isActive!) {
+                                                      plan = info.plan!;
                                                     } else {
                                                       plan = 'Free';
                                                     }
@@ -150,7 +149,7 @@ class _UserPageState extends State<UserPage> {
                                                         borderRadius: BorderRadius.circular(20),
                                                         color: plan == 'Free'
                                                             ? Colors.grey.shade300
-                                                            : plan == 'Standard' ? Colors.blueAccent : Colors.amber,
+                                                            : plan == 'standard' ? Colors.blueAccent : Colors.amber,
                                                       ),
                                                       child: Text(plan, style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)));
                                                 })
@@ -472,12 +471,6 @@ class _UserPageState extends State<UserPage> {
                                                                     Navigator.pop(context);
                                                                     final user = context.read<UserProvider>().user!;
                                                                     if (user.method! != AuthType.email) {
-                                                                      // final token = context.read<AuthBloc>().state.token!;
-                                                                      // final userId = context.read<AuthBloc>().state.user!.id;
-                                                                      // final messagingToken = context.read<FirebaseMessagingProvider>().token??'';
-                                                                      // context
-                                                                      //     .read<UserBloc>()
-                                                                      //     .add(RemoveFirebaseTokenEvent(token, userId, messagingToken));
                                                                       context.read<AuthBloc>().add(LogoutEvent());
                                                                       context.read<SocketProvider>().disconnect();
                                                                     }
@@ -490,7 +483,7 @@ class _UserPageState extends State<UserPage> {
                                                                     context
                                                                         .read<FirebaseMessagingProvider>()
                                                                         .readAllNotification();
-                                                                    // context.read<AuthBloc>().add(LogoutEvent());
+                                                                    context.read<PurchasesManagements>().logout();
                                                                   },
                                                                   style: OutlinedButton.styleFrom(
                                                                     shape: RoundedRectangleBorder(

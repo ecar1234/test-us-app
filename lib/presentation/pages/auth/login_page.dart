@@ -13,6 +13,7 @@ import 'package:test_us_app/presentation/pages/auth/signup_page.dart';
 import 'package:test_us_app/services/auth/auth_service.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/models/user/user_model.dart';
 import '../../../data/sharedPreferences/auth_preference.dart';
@@ -408,6 +409,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
+                                      launchUrl(Uri.parse('https://readygoprivate.imweb.me/?mode=policy'));
                                       debugPrint('이용약관');
                                     },
                                 ),
@@ -419,6 +421,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
+                                      launchUrl(Uri.parse('https://readygoprivate.imweb.me/?mode=privacy'));
                                       debugPrint('개인정보');
                                     },
                                 ),
