@@ -100,6 +100,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
               }
             },
             child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
               child: Container(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -405,6 +406,26 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("비밀번호 변경", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
+                    Icon(Icons.arrow_forward_ios_sharp, size: 16)
+                  ],
+                ),
+              ),
+            ),
+            Divider(
+              color: Colors.grey.shade200,
+            ),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: (){
+                // Get.to(() => UserDeletePage());
+              },
+              child: SizedBox(
+                height: 40,
+                width: wid-40,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("구매 내역 관리", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
                     Icon(Icons.arrow_forward_ios_sharp, size: 16)
                   ],
                 ),

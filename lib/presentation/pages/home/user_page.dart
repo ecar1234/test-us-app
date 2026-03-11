@@ -55,470 +55,395 @@ class _UserPageState extends State<UserPage> {
       child: Scaffold(
           appBar: AppBar(
             title: Text("마이페이지"),
+            actions: [
+              _logoutButton()
+            ],
           ),
-          body: BlocListener<AuthBloc, AuthState>(
-            listener: (context, state) {},
-            listenWhen: (prev, current) =>
-                current.state == UserAuthState.authLoginCompletedState ||
-                current.state == UserAuthState.loginCompletedState,
+          body: SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
             child: SizedBox(
               height: hei,
-              // decoration: BoxDecoration(
-              // gradient: LinearGradient(
-              //     begin: Alignment.topCenter,
-              //     end: Alignment.bottomCenter,
-              //     colors: [Colors.blue.shade50, Colors.white, Colors.white, Colors.white])),
               child: Column(
                 children: [
                   //image section
-                  Selector<UserProvider, UserEntity>(
-                    selector: (context, provider) => provider.user ?? UserEntity(),
-                    builder: (context, user, child) => Container(
-                        height: hei * 0.15,
-                        padding: EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 40,
-                              backgroundColor: Colors.grey.shade200,
-                              backgroundImage: user.profileImg == null || user.profileImg!.url == null
-                                  ? const AssetImage('assets/images/Generic avatar.png')
-                                  : CachedNetworkImageProvider(user.profileImg!.url!),
-                            ),
-                            const Gap(20),
-                            SizedBox(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  user.id == null
-                                      ? SizedBox(
-                                          height: 30,
-                                          child: TextButton.icon(
-                                            onPressed: () {
-                                              Get.to(() => const LoginPage());
-                                            },
-                                            style: TextButton.styleFrom(
-                                              padding: EdgeInsets.zero,
-                                            ),
-                                            label: Text(
-                                              '로그인',
-                                              style: TextStyle(fontSize: 20),
-                                            ),
-                                            icon: Icon(Icons.arrow_forward_ios_sharp),
-                                            iconAlignment: IconAlignment.end,
-                                          ),
-                                        )
-                                      : Row(
-                                          children: [
-                                            SizedBox(
-                                              height: 30,
-                                              child: TextButton.icon(
-                                                onPressed: () {
-                                                  Get.to(() => UserInfoPage(user: user));
-                                                },
-                                                style: TextButton.styleFrom(
-                                                  padding: EdgeInsets.zero,
-                                                ),
-                                                label: Text(
-                                                  '${user.nickname}',
-                                                  style: TextStyle(fontSize: 20),
-                                                ),
-                                                icon: Icon(Icons.arrow_forward_ios_sharp),
-                                                iconAlignment: IconAlignment.end,
-                                              ),
-                                            ),
-                                            Selector<PurchasesManagements, PurchaseEntity?>(
-                                                selector: (context, purchase) => purchase.subscribedItem,
-                                                builder: (context, info, child) {
-                                                  String plan;
-                                                  if (info != null){
-                                                    if (info.isActive!) {
-                                                      plan = info.plan!;
-                                                    } else {
-                                                      plan = 'Free';
-                                                    }
-                                                  } else {
-                                                    plan = 'Free';
-                                                  }
-                                                  return Container(
-                                                      margin: EdgeInsets.only(left: 10),
-                                                      height: 30,
-                                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(20),
-                                                        color: plan == 'Free'
-                                                            ? Colors.grey.shade300
-                                                            : plan == 'standard' ? Colors.blueAccent : Colors.amber,
-                                                      ),
-                                                      child: Text(plan, style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)));
-                                                })
-                                          ],
-                                        ),
-                                  SizedBox(
-                                    child: Text(user.id == null ? 'Guest' : '${user.email}'),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )),
-                  ),
+                  _userInfoSection(context, hei),
                   const Gap(20),
                   // info section
-                  Container(
-                      // height: hei * 0.15,
-                      width: MediaQuery.sizeOf(context).width,
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      // decoration: BoxDecoration(
-                      //   border: Border.all(),
-                      //   borderRadius: BorderRadius.circular(10),
-                      // ),
-                      child: Selector<UserProvider, bool>(
-                        selector: (context, provider) => provider.isLogged ?? false,
-                        builder: (context, isLogged, child) => Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                // border: Border.all(),
-                                borderRadius: BorderRadius.circular(10),
-                                color: isDarkMode ? Colors.grey.shade800 : Colors.white,
-                                boxShadow: isDarkMode
-                                    ? null
-                                    : [
-                                        BoxShadow(
-                                          color: Colors.grey.shade200,
-                                          spreadRadius: 5,
-                                          blurRadius: 7,
-                                          offset: Offset(0, 3), // changes position of shadow
-                                        ),
-                                      ]),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // 테스트 완료 서비스
-                                SizedBox(
-                                    width: (MediaQuery.sizeOf(context).width - 60) * 0.3,
-                                    // decoration: BoxDecoration(
-                                    //   border: Border.all()
-                                    // ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: [
-                                        // SizedBox(
-                                        //   child: Icon(
-                                        //     Symbols.check_circle,
-                                        //     color: const Color(0xffEE6C20),
-                                        //     size: 25,
-                                        //   ),
-                                        // ),
-                                        SizedBox(
-                                          child: Text(
-                                            "테스트 모집",
-                                            style: TextStyle(color: Colors.grey.shade500),
-                                          ),
-                                        ),
-                                        Selector<BasePostProvider, List<RecruitPostEntity>>(
-                                            selector: (context, provider) {
-                                          List<RecruitPostEntity> posts = [];
-                                          if (provider.userRecruitPosts != null) {
-                                            if (provider.userRecruitPosts!.isEmpty) {
-                                              return posts;
-                                            }
-                                            for (var post in provider.userRecruitPosts!) {
-                                              if (post.status == PostStatus.active) {
-                                                posts.add(post);
-                                              }
-                                            }
-                                          }
-                                          return posts;
-                                        }, builder: (context, posts, child) {
-                                          return SizedBox(
-                                            child: Text(
-                                              isLogged ? '${posts.length}' : '0',
-                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                            ),
-                                          );
-                                        }),
-                                      ],
-                                    )),
-                                SizedBox(width: 16, height: 30, child: const VerticalDivider()),
-                                // 나의 홍보
-                                SizedBox(
-                                    width: (MediaQuery.sizeOf(context).width - 60) * 0.3,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: [
-                                        // SizedBox(
-                                        //   child: Icon(
-                                        //     Symbols.electrical_services,
-                                        //     color: const Color(0xffEE6C20),
-                                        //     size: 25,
-                                        //   ),
-                                        // ),
-                                        SizedBox(
-                                          child: Text(
-                                            "서비스 홍보",
-                                            style: TextStyle(color: Colors.grey.shade500),
-                                          ),
-                                        ),
-                                        Selector<BasePostProvider, List<PromotionPostEntity>>(
-                                          selector: (context, provider) {
-                                            List<PromotionPostEntity> posts = [];
-                                            if (provider.userPromotionPosts != null) {
-                                              if (provider.userPromotionPosts!.isEmpty) {
-                                                return posts;
-                                              }
-                                              for (var post in provider.userPromotionPosts!) {
-                                                if (post.status == PostStatus.active) {
-                                                  posts.add(post);
-                                                }
-                                              }
-                                            }
-                                            return posts;
-                                          },
-                                          builder: (context, posts, child) {
-                                            return SizedBox(
-                                                child: Text(
-                                              isLogged ? '${posts.length}' : '0',
-                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                            ));
-                                          },
-                                        ),
-                                      ],
-                                    )),
-                                SizedBox(width: 16, height: 30, child: const VerticalDivider()),
-                                // 나의 테스트 신청
-                                SizedBox(
-                                    width: (MediaQuery.sizeOf(context).width - 60) * 0.3,
-                                    // decoration: BoxDecoration(
-                                    //   border: Border.all()
-                                    // ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: [
-                                        // SizedBox(
-                                        //   child: Icon(
-                                        //     Symbols.crop_free,
-                                        //     color: const Color(0xffEE6C20),
-                                        //     size: 25,
-                                        //   ),
-                                        // ),
-                                        SizedBox(
-                                            child: Text(
-                                          "테스트 신청",
-                                          style: TextStyle(color: Colors.grey.shade500),
-                                        )),
-                                        Selector<ApplicationProvider, List<ApplicationEntity>>(
-                                            selector: (context, provider) {
-                                          List<ApplicationEntity> apps = [];
-                                          if (provider.userApplications != null) {
-                                            if (provider.userApplications!.isEmpty) {
-                                              return apps;
-                                            }
-                                            for (var app in provider.userApplications!) {
-                                              if (app.status != ApplicationStatus.cancel &&
-                                                  app.status != ApplicationStatus.rejected) {
-                                                apps.add(app);
-                                              }
-                                            }
-                                          }
-                                          return apps;
-                                        }, builder: (context, apps, child) {
-                                          int length = 0;
-                                          if (apps.isNotEmpty) {
-                                            for (var app in apps) {
-                                              if (app.status != ApplicationStatus.cancel &&
-                                                  app.status != ApplicationStatus.rejected) {
-                                                length++;
-                                              }
-                                            }
-                                          }
-                                          return SizedBox(
-                                            child: Text(
-                                              isLogged ? '$length' : '0',
-                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                            ),
-                                          );
-                                        }),
-                                      ],
-                                    )),
-                              ],
-                            )),
-                      )),
+                  _infoTableSection(context, hei, isDarkMode),
                   const Gap(20),
                   // menu section
-                  Container(
-                      // height: hei * 0.45,
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: isDarkMode ? Colors.grey.shade800 : Colors.white,
-                              boxShadow: isDarkMode
-                                  ? null
-                                  : [
-                                      BoxShadow(
-                                        color: Colors.grey.shade200,
-                                        spreadRadius: 5,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 3), // changes position of shadow
-                                      ),
-                                    ]),
-                          child: Selector<UserProvider, bool>(
-                            selector: (context, provider) => provider.isLogged ?? false,
-                            builder: (context, isLogged, child) => ListView.separated(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, idx) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    isLogged
-                                        ? _pageNavigator(context, idx)
-                                        : showDialog(context: context, builder: (context) => const LoginDialog());
-                                  },
-                                  child: SizedBox(
-                                      height: 40,
-                                      width: double.infinity,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          SizedBox(child: Icon(_getIcon(idx))),
-                                          const Gap(10),
-                                          SizedBox(
-                                            width: (MediaQuery.sizeOf(context).width - 80) * 0.85,
-                                            child: Text(
-                                              menu[idx],
-                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                                            ),
-                                          ),
-                                        ],
-                                      )),
-                                );
-                              },
-                              separatorBuilder: (context, idx) {
-                                return Divider(
-                                  color: Colors.grey.shade100,
-                                );
-                              },
-                              itemCount: menu.length,
-                            ),
-                          ))),
-                  const Gap(40),
-                  Expanded(
-                    child: Selector<UserProvider, bool>(
-                        selector: (context, provider) => provider.isLogged ?? false,
-                        builder: (context, isLogged, child) {
-                          if (isLogged) {
-                            return Center(
-                              child: SizedBox(
-                                height: 50,
-                                width: MediaQuery.sizeOf(context).width * 0.7,
-                                child: ElevatedButton(
-                                    onPressed: () async {
-                                      await showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return Dialog(
-                                              child: Container(
-                                                height: 200,
-                                                width: MediaQuery.sizeOf(context).width,
-                                                padding: EdgeInsets.all(20),
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  // color: Colors.white
-                                                ),
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                  children: [
-                                                    Text(
-                                                      "로그아웃",
-                                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                                    ),
-                                                    Text(
-                                                      '로그아웃 하시나요?',
-                                                      style: TextStyle(fontSize: 14),
-                                                    ),
-                                                    const Gap(20),
-                                                    LayoutBuilder(builder: (context, constraints) {
-                                                      return Row(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        children: [
-                                                          Flexible(
-                                                            flex: 3,
-                                                            child: SizedBox(
-                                                              width: constraints.maxWidth * 0.3,
-                                                              child: OutlinedButton(
-                                                                  onPressed: () {
-                                                                    Get.back();
-                                                                  },
-                                                                  style: OutlinedButton.styleFrom(
-                                                                    side: BorderSide(
-                                                                        color: Theme.of(context).colorScheme.primary),
-                                                                    shape: RoundedRectangleBorder(
-                                                                        borderRadius: BorderRadius.circular(10)),
-                                                                  ),
-                                                                  child: Text('취소')),
-                                                            ),
-                                                          ),
-                                                          const Gap(10),
-                                                          Flexible(
-                                                            flex: 7,
-                                                            child: SizedBox(
-                                                              width: constraints.maxWidth * 0.7,
-                                                              child: ElevatedButton(
-                                                                  onPressed: () {
-                                                                    Navigator.pop(context);
-                                                                    final user = context.read<UserProvider>().user!;
-                                                                    if (user.method! != AuthType.email) {
-                                                                      context.read<AuthBloc>().add(LogoutEvent());
-                                                                      context.read<SocketProvider>().disconnect();
-                                                                    }
-                                                                    context.read<UserProvider>().logout();
-                                                                    context.read<BasePostProvider>().logout();
-                                                                    context.read<ApplicationProvider>().logout();
-                                                                    context
-                                                                        .read<FirebaseMessagingProvider>()
-                                                                        .removeFirebaseToken();
-                                                                    context
-                                                                        .read<FirebaseMessagingProvider>()
-                                                                        .readAllNotification();
-                                                                    context.read<PurchasesManagements>().logout();
-                                                                  },
-                                                                  style: OutlinedButton.styleFrom(
-                                                                    shape: RoundedRectangleBorder(
-                                                                        borderRadius: BorderRadius.circular(10)),
-                                                                  ),
-                                                                  child: Text('확인')),
-                                                            ),
-                                                          )
-                                                        ],
-                                                      );
-                                                    }),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          });
-                                    },
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                    child: Text("로그아웃", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-                              ),
-                            );
-                          }
-                          return SizedBox();
-                        }),
-                  )
+                  _menuSection(context, hei, isDarkMode),
                 ],
               ),
             ),
           )),
     );
+  }
+
+  Widget _logoutButton(){
+    return Selector<UserProvider, bool>(
+        selector: (context, provider) => provider.isLogged ?? false,
+        builder: (context, isLogged, child) {
+          if (isLogged) {
+            return Padding(
+              padding: EdgeInsets.only(right: 20),
+              child: SizedBox(
+                child: OutlinedButton(
+                    onPressed: () async {
+                      _logoutDialog(context);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text("로그아웃", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
+              ),
+            );
+          }
+          return SizedBox.shrink();
+        });
+  }
+
+  Widget _userInfoSection(BuildContext context, double hei){
+    return Selector<UserProvider, UserEntity>(
+      selector: (context, provider) => provider.user ?? UserEntity(),
+      builder: (context, user, child) => Container(
+          height: hei * 0.15,
+          padding: EdgeInsets.all(20),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.grey.shade200,
+                backgroundImage: user.profileImg == null || user.profileImg!.url == null
+                    ? const AssetImage('assets/images/Generic avatar.png')
+                    : CachedNetworkImageProvider(user.profileImg!.url!),
+              ),
+              const Gap(20),
+              SizedBox(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    user.id == null
+                        ? SizedBox(
+                      height: 30,
+                      child: TextButton.icon(
+                        onPressed: () {
+                          Get.to(() => const LoginPage());
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                        ),
+                        label: Text(
+                          '로그인',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        icon: Icon(Icons.arrow_forward_ios_sharp),
+                        iconAlignment: IconAlignment.end,
+                      ),
+                    )
+                        : Row(
+                      children: [
+                        SizedBox(
+                          height: 30,
+                          child: TextButton.icon(
+                            onPressed: () {
+                              Get.to(() => UserInfoPage(user: user));
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                            ),
+                            label: Text(
+                              '${user.nickname}',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            icon: Icon(Icons.arrow_forward_ios_sharp),
+                            iconAlignment: IconAlignment.end,
+                          ),
+                        ),
+                        Selector<PurchasesManagements, PurchaseEntity?>(
+                            selector: (context, purchase) => purchase.subscribedItem,
+                            builder: (context, info, child) {
+                              String plan;
+                              if (info != null){
+                                if (info.isActive!) {
+                                  plan = info.plan!;
+                                } else {
+                                  plan = 'Free';
+                                }
+                              } else {
+                                plan = 'Free';
+                              }
+                              return Container(
+                                  margin: EdgeInsets.only(left: 10),
+                                  height: 30,
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: plan == 'Free'
+                                        ? Colors.grey.shade300
+                                        : plan == 'standard' ? Colors.blueAccent : Colors.amber,
+                                  ),
+                                  child: Text(plan, style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)));
+                            })
+                      ],
+                    ),
+                    SizedBox(
+                      child: Text(user.id == null ? 'Guest' : '${user.email}'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )),
+    );
+  }
+
+  Widget _infoTableSection(BuildContext context, double hei, bool isDarkMode){
+    return Container(
+      // height: hei * 0.15,
+        width: MediaQuery.sizeOf(context).width,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        // decoration: BoxDecoration(
+        //   border: Border.all(),
+        //   borderRadius: BorderRadius.circular(10),
+        // ),
+        child: Selector<UserProvider, bool>(
+          selector: (context, provider) => provider.isLogged ?? false,
+          builder: (context, isLogged, child) => Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                // border: Border.all(),
+                  borderRadius: BorderRadius.circular(10),
+                  color: isDarkMode ? Colors.grey.shade800 : Colors.white,
+                  boxShadow: isDarkMode
+                      ? null
+                      : [
+                    BoxShadow(
+                      color: Colors.grey.shade200,
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ]),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // 테스트 완료 서비스
+                  SizedBox(
+                      width: (MediaQuery.sizeOf(context).width - 60) * 0.3,
+                      // decoration: BoxDecoration(
+                      //   border: Border.all()
+                      // ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          // SizedBox(
+                          //   child: Icon(
+                          //     Symbols.check_circle,
+                          //     color: const Color(0xffEE6C20),
+                          //     size: 25,
+                          //   ),
+                          // ),
+                          SizedBox(
+                            child: Text(
+                              "테스트 모집",
+                              style: TextStyle(color: Colors.grey.shade500),
+                            ),
+                          ),
+                          Selector<BasePostProvider, List<RecruitPostEntity>>(
+                              selector: (context, provider) {
+                                List<RecruitPostEntity> posts = [];
+                                if (provider.userRecruitPosts != null) {
+                                  if (provider.userRecruitPosts!.isEmpty) {
+                                    return posts;
+                                  }
+                                  for (var post in provider.userRecruitPosts!) {
+                                    if (post.status == PostStatus.active) {
+                                      posts.add(post);
+                                    }
+                                  }
+                                }
+                                return posts;
+                              }, builder: (context, posts, child) {
+                            return SizedBox(
+                              child: Text(
+                                isLogged ? '${posts.length}' : '0',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                              ),
+                            );
+                          }),
+                        ],
+                      )),
+                  SizedBox(width: 16, height: 30, child: const VerticalDivider()),
+                  // 나의 홍보
+                  SizedBox(
+                      width: (MediaQuery.sizeOf(context).width - 60) * 0.3,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          // SizedBox(
+                          //   child: Icon(
+                          //     Symbols.electrical_services,
+                          //     color: const Color(0xffEE6C20),
+                          //     size: 25,
+                          //   ),
+                          // ),
+                          SizedBox(
+                            child: Text(
+                              "서비스 홍보",
+                              style: TextStyle(color: Colors.grey.shade500),
+                            ),
+                          ),
+                          Selector<BasePostProvider, List<PromotionPostEntity>>(
+                            selector: (context, provider) {
+                              List<PromotionPostEntity> posts = [];
+                              if (provider.userPromotionPosts != null) {
+                                if (provider.userPromotionPosts!.isEmpty) {
+                                  return posts;
+                                }
+                                for (var post in provider.userPromotionPosts!) {
+                                  if (post.status == PostStatus.active) {
+                                    posts.add(post);
+                                  }
+                                }
+                              }
+                              return posts;
+                            },
+                            builder: (context, posts, child) {
+                              return SizedBox(
+                                  child: Text(
+                                    isLogged ? '${posts.length}' : '0',
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                  ));
+                            },
+                          ),
+                        ],
+                      )),
+                  SizedBox(width: 16, height: 30, child: const VerticalDivider()),
+                  // 나의 테스트 신청
+                  SizedBox(
+                      width: (MediaQuery.sizeOf(context).width - 60) * 0.3,
+                      // decoration: BoxDecoration(
+                      //   border: Border.all()
+                      // ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          // SizedBox(
+                          //   child: Icon(
+                          //     Symbols.crop_free,
+                          //     color: const Color(0xffEE6C20),
+                          //     size: 25,
+                          //   ),
+                          // ),
+                          SizedBox(
+                              child: Text(
+                                "테스트 신청",
+                                style: TextStyle(color: Colors.grey.shade500),
+                              )),
+                          Selector<ApplicationProvider, List<ApplicationEntity>>(
+                              selector: (context, provider) {
+                                List<ApplicationEntity> apps = [];
+                                if (provider.userApplications != null) {
+                                  if (provider.userApplications!.isEmpty) {
+                                    return apps;
+                                  }
+                                  for (var app in provider.userApplications!) {
+                                    if (app.status != ApplicationStatus.cancel &&
+                                        app.status != ApplicationStatus.rejected) {
+                                      apps.add(app);
+                                    }
+                                  }
+                                }
+                                return apps;
+                              }, builder: (context, apps, child) {
+                            int length = 0;
+                            if (apps.isNotEmpty) {
+                              for (var app in apps) {
+                                if (app.status != ApplicationStatus.cancel &&
+                                    app.status != ApplicationStatus.rejected) {
+                                  length++;
+                                }
+                              }
+                            }
+                            return SizedBox(
+                              child: Text(
+                                isLogged ? '$length' : '0',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                              ),
+                            );
+                          }),
+                        ],
+                      )),
+                ],
+              )),
+        ));
+  }
+
+  Widget _menuSection(BuildContext context, double hei, bool isDarkMode){
+    return Container(
+      // height: hei * 0.45,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: isDarkMode ? Colors.grey.shade800 : Colors.white,
+                boxShadow: isDarkMode
+                    ? null
+                    : [
+                  BoxShadow(
+                    color: Colors.grey.shade200,
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ]),
+            child: Selector<UserProvider, bool>(
+              selector: (context, provider) => provider.isLogged ?? false,
+              builder: (context, isLogged, child) => ListView.separated(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, idx) {
+                  return GestureDetector(
+                    onTap: () {
+                      isLogged
+                          ? _pageNavigator(context, idx)
+                          : showDialog(context: context, builder: (context) => const LoginDialog());
+                    },
+                    child: SizedBox(
+                        height: 40,
+                        width: double.infinity,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(child: Icon(_getIcon(idx))),
+                            const Gap(10),
+                            SizedBox(
+                              width: (MediaQuery.sizeOf(context).width - 80) * 0.85,
+                              child: Text(
+                                menu[idx],
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ],
+                        )),
+                  );
+                },
+                separatorBuilder: (context, idx) {
+                  return Divider(
+                    color: Colors.grey.shade100,
+                  );
+                },
+                itemCount: menu.length,
+              ),
+            )));
   }
 
   IconData _getIcon(int idx) {
@@ -572,5 +497,92 @@ class _UserPageState extends State<UserPage> {
         break;
       default:
     }
+  }
+
+  Future<void> _logoutDialog(BuildContext context) async {
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Container(
+              height: 200,
+              width: MediaQuery.sizeOf(context).width,
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                // color: Colors.white
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "로그아웃",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    '로그아웃 하시나요?',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  const Gap(20),
+                  LayoutBuilder(builder: (context, constraints) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          flex: 3,
+                          child: SizedBox(
+                            width: constraints.maxWidth * 0.3,
+                            child: OutlinedButton(
+                                onPressed: () {
+                                  Get.back();
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                      color: Theme.of(context).colorScheme.primary),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                ),
+                                child: Text('취소')),
+                          ),
+                        ),
+                        const Gap(10),
+                        Flexible(
+                          flex: 7,
+                          child: SizedBox(
+                            width: constraints.maxWidth * 0.7,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  final user = context.read<UserProvider>().user!;
+                                  if (user.method! != AuthType.email) {
+                                    context.read<AuthBloc>().add(LogoutEvent());
+                                    context.read<SocketProvider>().disconnect();
+                                  }
+                                  context.read<UserProvider>().logout();
+                                  context.read<BasePostProvider>().logout();
+                                  context.read<ApplicationProvider>().logout();
+                                  context
+                                      .read<FirebaseMessagingProvider>()
+                                      .removeFirebaseToken();
+                                  context
+                                      .read<FirebaseMessagingProvider>()
+                                      .readAllNotification();
+                                  context.read<PurchasesManagements>().logout();
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                ),
+                                child: Text('확인')),
+                          ),
+                        )
+                      ],
+                    );
+                  }),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

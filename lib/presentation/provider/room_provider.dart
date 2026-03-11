@@ -54,7 +54,7 @@ class RoomProvider with ChangeNotifier {
         lastMessageContent: message.content,
       );
 
-      _roomList = [updatedRoom, ..._roomList!.where((e) => e.id != message.roomId)];
+      _roomList = [updatedRoom, ..._roomList!.where((e) => e.id != message.roomId)].toList();
       notifyListeners();
     } else {
       final newRoom = await _messageUseCase.requestRoomInfoById(message.roomId!);

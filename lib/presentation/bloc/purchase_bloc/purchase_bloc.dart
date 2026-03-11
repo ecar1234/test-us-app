@@ -122,6 +122,26 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
         logger.i('[Purchase] purchase error');
       }
     });
+
+    on<RequestRestorePurchase>((event, emit) async {
+      emit(PurchaseState(state: PurchaseProgressState.loading));
+      logger.i('[Purchase] restore start');
+      try {
+        final restore = await Purchases.restorePurchases();
+        if(restore.entitlements.active.isEmpty){
+          emit(PurchaseState(state: PurchaseProgressState.failed, message: '구매 내역이 없습니다.'));
+          logger.i('[Purchase] restore failed');
+          return;
+        }
+        final activeItem = restore.entitlements.active.values.where((item) => item.isActive).toList();
+        final res = PurchaseEntity.toEntity(activeItem.first);
+        emit(PurchaseRestoreCompletedState(res));
+        logger.i('[Purchase] restore success');
+      } on PlatformException catch (e) {
+        emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
+        logger.e('[Purchase] restore error : $e');
+      }
+    });
   }
 
   int _checkProrationMode(PurchaseEntity entity, Package newPackage) {

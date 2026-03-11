@@ -11,7 +11,9 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
+import 'package:test_us_app/domain/entities/purchase_entity.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
+import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
 
 import '../../../../data/models/post/recruit_post_model.dart';
 import '../../../../domain/entities/image_entity.dart';
@@ -51,7 +53,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
   final TextEditingController _iosUrlController = TextEditingController();
   final TextEditingController _androidUrlController = TextEditingController();
 
-  final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+  // final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
   // final _categoryList = ['WEB', 'Mobile'];
   ApplicationPlatform? _selectedPlatform;
@@ -72,8 +74,8 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
       _titleController.text = widget.post!.title!;
       _subtitleController.text = widget.post!.subtitle!;
       _contentController.text = widget.post!.contents!;
-
       _selectedPlatform = widget.post!.platform!;
+      _periodController.text = widget.post!.period.toString();
       if (_selectedPlatform == ApplicationPlatform.web) {
         _webCheck = true;
         _webUrlController.text = widget.post!.domain!;
@@ -123,6 +125,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final activePlan = context.read<PurchasesManagements>().subscribedItem;
     return GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
@@ -145,10 +148,10 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       _subtitleSection(),
                       const Gap(20),
                       // 이미지 추가
-                      _addImageSection(),
+                      _addImageSection(activePlan),
                       const Gap(20),
                       // 게시 기간
-                      _periodSection(),
+                      _periodSection(activePlan),
                       const Gap(20),
                       // 카테고리
                       _categorySection(),
@@ -223,7 +226,9 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
     );
   }
 
-  Widget _addImageSection() {
+  Widget _addImageSection(PurchaseEntity? activePlan) {
+    final imagesLimit = activePlan == null ? 4 : (activePlan.plan == 'standard' ? 6 : 8);
+    final volumeLimit = activePlan == null ? 6 : (activePlan.plan == 'standard' ? 7 : 10);
     return SizedBox(
       width: MediaQuery.sizeOf(context).width - 40,
       height: 180,
@@ -245,16 +250,16 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                     width: 100,
                     height: 40,
                     child: ElevatedButton(
-                      onPressed: _existedImages.length == 3
+                      onPressed: _existedImages.length == imagesLimit-1
                           ? () async {
                               final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
                               if (image == null) {
                                 return;
-                              } else if (File(image.path).lengthSync() / (1024 * 1024) > 5) {
-                                Get.snackbar('알림', '5MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                              } else if (File(image.path).lengthSync() / (1024 * 1024) > volumeLimit) {
+                                Get.snackbar('알림', '${volumeLimit}MB를 초과하는 이미지는 업로드 할 수 없습니다.');
                                 return;
-                              } else if (_existedImages.length + _selectedImages.length >= 4) {
-                                Get.snackbar('알림', '최대 4개의 이미지를 선택할 수 있습니다.');
+                              } else if (_existedImages.length + _selectedImages.length >= imagesLimit) {
+                                Get.snackbar('알림', '최대 $imagesLimit개의 이미지를 선택할 수 있습니다.');
                                 return;
                               } else {
                                 setState(() {
@@ -266,20 +271,20 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                               final images = await picker
                                   .pickMultiImage(
                                       imageQuality: 100,
-                                      limit: _existedImages.isNotEmpty ? 4 - _existedImages.length : 4)
+                                      limit: _existedImages.isNotEmpty ? imagesLimit - _existedImages.length : imagesLimit)
                                   .onError((e, state) {
                                 Get.snackbar('알림', '이미지 선택에 실패했습니다.');
                                 return [];
                               });
                               if (images.isEmpty) {
                                 return;
-                              } else if (images.length + _existedImages.length > 4) {
-                                Get.snackbar('알림', '최대 4개의 이미지를 선택할 수 있습니다.');
+                              } else if (images.length + _existedImages.length > imagesLimit) {
+                                Get.snackbar('알림', '최대 $imagesLimit개의 이미지를 선택할 수 있습니다.');
                                 return;
                               } else {
                                 final sizeList = images.map((e) => File(e.path).lengthSync() / (1024 * 1024)).toList();
-                                if (sizeList.any((element) => element > 5)) {
-                                  Get.snackbar('알림', '5MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                                if (sizeList.any((element) => element > volumeLimit)) {
+                                  Get.snackbar('알림', '${volumeLimit}Mb를 초과하는 이미지는 업로드 할 수 없습니다.');
                                   return;
                                 }
                               }
@@ -371,13 +376,14 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                         );
                       },
                       separatorBuilder: (context, idx) => const Gap(10),
-                      itemCount: 4))
+                      itemCount: _selectedImages.length + _existedImages.length))
         ],
       ),
     );
   }
 
-  Widget _periodSection() {
+  Widget _periodSection(PurchaseEntity? activePlan) {
+    final period = activePlan == null ? 7 : (activePlan.plan == 'standard' ? 14 : 30);
     return SizedBox(
         // height: 200,
         width: MediaQuery.sizeOf(context).width - 40,
@@ -393,27 +399,6 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  const Gap(10),
-                  SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: Tooltip(
-                          key: tooltipKey,
-                          message: "모집기간은 광고시청(3일) 또는 인앱구매로 변경 가능 합니다.",
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          showDuration: const Duration(seconds: 3),
-                          child: IconButton(
-                            onPressed: () {
-                              tooltipKey.currentState?.ensureTooltipVisible();
-                            },
-                            style: IconButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                            ),
-                            icon: Icon(Icons.info_outline),
-                          )))
                 ],
               ),
             ),
@@ -423,17 +408,24 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
               child: Row(
                 children: [
                   SizedBox(
-                    height: 50,
-                    width: 80,
-                    child: TextField(
-                      controller: _periodController,
-                      readOnly: true,
-                      // enabled: false,
-                      decoration: InputDecoration(enabled: false),
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.right,
-                    ),
-                  ),
+                      height: 50,
+                      width: 150,
+                      child: DropdownMenu(
+                          controller: _periodController,
+                          initialSelection: period,
+                          onSelected: (int? value) {
+                            setState(() {
+                              _periodController.text = value.toString();
+                            });
+                          },
+                          menuHeight: 200,
+                          textAlign: TextAlign.end,
+                          dropdownMenuEntries: List.generate(period, (index) {
+                            return DropdownMenuEntry(
+                              value: index + 1,
+                              label: (index + 1).toString(),
+                            );
+                          }))),
                   const Gap(10),
                   SizedBox(child: Text("일", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))
                 ],
@@ -923,7 +915,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                             mobileOs: _mobileCheck ? _selectedOs : null,
                             author: context.read<UserProvider>().user!,
                             domain: domain,
-                            period: 7,
+                            period: int.parse(_periodController.text),
                           );
                           context.read<PromotionBloc>().add(RequestPostCreateEvent(token, post, _selectedImages));
                         } on Exception catch (e) {
@@ -997,7 +989,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                               platform: _selectedPlatform,
                               mobileOs: _mobileCheck ? _selectedOs : null,
                               status: widget.post!.status,
-                              period: widget.post!.period,
+                              period: int.parse(_periodController.text),
                               domain: domain,
                               author: context.read<UserProvider>().user!);
                           final token = context.read<UserProvider>().token ?? "";

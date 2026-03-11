@@ -11,6 +11,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
+import 'package:test_us_app/domain/entities/purchase_entity.dart';
 
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
@@ -18,6 +19,7 @@ import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_po
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
+import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
 
 import '../../../../data/models/application/application_model.dart';
@@ -44,12 +46,12 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
   List<ImageEntity> _existedImages = [];
   final List<ImageEntity> _deleteImages = [];
 
-  TextEditingController titleController = TextEditingController();
-  TextEditingController subtitleController = TextEditingController();
-  TextEditingController contentController = TextEditingController();
-  TextEditingController periodController = TextEditingController(text: "7");
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _subtitleController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
+  final TextEditingController _periodController = TextEditingController();
 
-  final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
+  // final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
   ApplicationPlatform? _selectedPlatform;
   MobileOsType? _selectedOs;
@@ -64,12 +66,13 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
   void initState() {
     super.initState();
     if (widget.post != null) {
-      titleController.text = widget.post!.title!;
-      subtitleController.text = widget.post!.subtitle!;
-      contentController.text = widget.post!.contents!;
+      _titleController.text = widget.post!.title!;
+      _subtitleController.text = widget.post!.subtitle!;
+      _contentController.text = widget.post!.contents!;
       _selectedPlatform = widget.post!.platform!;
-      _selectedOs =  widget.post!.mobileOs;
+      _selectedOs = widget.post!.mobileOs;
       _selectedCategory = widget.post!.category;
+      _periodController.text = widget.post!.period.toString();
       if (widget.post!.images != null && widget.post!.images!.isNotEmpty) {
         _existedImages = widget.post!.images!;
       }
@@ -101,20 +104,19 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
   @override
   void dispose() {
     super.dispose();
-    titleController.dispose();
-    subtitleController.dispose();
-    contentController.dispose();
-    periodController.dispose();
+    _titleController.dispose();
+    _subtitleController.dispose();
+    _contentController.dispose();
+    _periodController.dispose();
   }
 
-  void _onPlatformSelected(bool? checked, String platform) {
-    setState(() {
-
-    });
-  }
+  // void _onPlatformSelected(bool? checked, String platform) {
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final activePlan = context.read<PurchasesManagements>().subscribedItem;
     return GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
@@ -137,16 +139,15 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                       _subtitleSection(),
                       const Gap(20),
                       // 이미지 추가
-                      _addImageSection(),
+                      _addImageSection(activePlan),
                       const Gap(20),
                       // 게시 기간
-                      _periodSection(),
+                      _periodSection(activePlan),
                       const Gap(20),
                       // 플랫폼
                       _platformSection(),
                       const Gap(20),
-                      if(_mobileCheck)
-                        _mobileOsSection(),
+                      if (_mobileCheck) _mobileOsSection(),
                       const Gap(20),
                       // 카테고리
                       _categorySection(),
@@ -179,7 +180,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
           SizedBox(
             height: 60,
             child: TextField(
-              controller: titleController,
+              controller: _titleController,
             ),
           )
         ],
@@ -202,7 +203,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
           SizedBox(
             height: 80,
             child: TextField(
-              controller: subtitleController,
+              controller: _subtitleController,
               maxLines: 1,
               maxLength: 30,
             ),
@@ -212,7 +213,9 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
     );
   }
 
-  Widget _addImageSection() {
+  Widget _addImageSection(PurchaseEntity? activePlan) {
+    final imagesLimit = activePlan == null ? 4 : (activePlan.plan == 'standard' ? 6 : 8);
+    final volumeLimit = activePlan == null ? 6 : (activePlan.plan == 'standard' ? 7 : 10);
     return SizedBox(
       width: MediaQuery.sizeOf(context).width - 40,
       height: 180,
@@ -227,23 +230,24 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
               children: [
                 SizedBox(
                     child: Text(
-                  "서비스 이미지 추가 (${_existedImages.length + _selectedImages.length} / 4)",
+                  "서비스 이미지 추가 (${_existedImages.length + _selectedImages.length} / $imagesLimit)",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 )),
                 SizedBox(
                     width: 100,
                     height: 40,
                     child: ElevatedButton(
-                      onPressed: _existedImages.length == 3
+                      // TODO: 이미지 추가 버튼을 왜 나눠야 하는가? 단순 limit만 활용해도 하나로 만들 수 있는지 테스트 필요.
+                      onPressed: _existedImages.length == imagesLimit - 1
                           ? () async {
                               final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
                               if (image == null) {
                                 return;
-                              } else if (File(image.path).lengthSync() / (1024 * 1024) > 5) {
-                                Get.snackbar('알림', '5MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                              } else if (File(image.path).lengthSync() / (1024 * 1024) > volumeLimit) {
+                                Get.snackbar('알림', '${volumeLimit}Mb를 초과하는 이미지는 업로드 할 수 없습니다.');
                                 return;
-                              } else if (_existedImages.length + _selectedImages.length >= 4) {
-                                Get.snackbar('알림', '최대 4개의 이미지를 선택할 수 있습니다.');
+                              } else if (_existedImages.length + _selectedImages.length >= imagesLimit) {
+                                Get.snackbar('알림', '최대 $imagesLimit개의 이미지를 선택할 수 있습니다.');
                                 return;
                               } else {
                                 setState(() {
@@ -255,20 +259,21 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                               final images = await picker
                                   .pickMultiImage(
                                       imageQuality: 100,
-                                      limit: _existedImages.isNotEmpty ? 4 - _existedImages.length : 4)
+                                      limit:
+                                          _existedImages.isNotEmpty ? imagesLimit - _existedImages.length : imagesLimit)
                                   .onError((e, state) {
                                 Get.snackbar('알림', '이미지 선택에 실패했습니다.');
                                 return [];
                               });
                               if (images.isEmpty) {
                                 return;
-                              } else if (images.length + _existedImages.length > 4) {
-                                Get.snackbar('알림', '최대 4개의 이미지를 선택할 수 있습니다.');
+                              } else if (images.length + _existedImages.length > imagesLimit) {
+                                Get.snackbar('알림', '최대 $imagesLimit개의 이미지를 선택할 수 있습니다.');
                                 return;
                               } else {
                                 final sizeList = images.map((e) => File(e.path).lengthSync() / (1024 * 1024)).toList();
-                                if (sizeList.any((element) => element > 5)) {
-                                  Get.snackbar('알림', '5MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                                if (sizeList.any((element) => element > volumeLimit)) {
+                                  Get.snackbar('알림', '${volumeLimit}MB를 초과하는 이미지는 업로드 할 수 없습니다.');
                                   return;
                                 }
                               }
@@ -360,13 +365,15 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         );
                       },
                       separatorBuilder: (context, idx) => const Gap(10),
-                      itemCount: 4))
+                      itemCount: _selectedImages.length + _existedImages.length,
+                    ))
         ],
       ),
     );
   }
 
-  Widget _periodSection() {
+  Widget _periodSection(PurchaseEntity? activePlan) {
+    final period = activePlan == null ? 7 : (activePlan.plan == 'standard' ? 14 : 30);
     return SizedBox(
         width: MediaQuery.sizeOf(context).width - 40,
         child: Column(
@@ -381,27 +388,6 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  const Gap(10),
-                  SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: Tooltip(
-                          key: tooltipKey,
-                          message: "모집기간은 광고시청(3일) 또는 인앱구매로 변경 가능 합니다.",
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          showDuration: const Duration(seconds: 3),
-                          child: IconButton(
-                            onPressed: () {
-                              tooltipKey.currentState?.ensureTooltipVisible();
-                            },
-                            style: IconButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                            ),
-                            icon: Icon(Icons.info_outline),
-                          )))
                 ],
               ),
             ),
@@ -411,16 +397,24 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
               child: Row(
                 children: [
                   SizedBox(
-                    height: 50,
-                    width: 80,
-                    child: TextField(
-                      controller: periodController,
-                      readOnly: true,
-                      decoration: InputDecoration(enabled: false),
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.right,
-                    ),
-                  ),
+                      height: 50,
+                      width: 150,
+                      child: DropdownMenu(
+                          controller: _periodController,
+                          initialSelection: period,
+                          onSelected: (int? value) {
+                            setState(() {
+                              _periodController.text = value.toString();
+                            });
+                          },
+                          menuHeight: 200,
+                          textAlign: TextAlign.end,
+                          dropdownMenuEntries: List.generate(period, (index) {
+                            return DropdownMenuEntry(
+                              value: index + 1,
+                              label: (index + 1).toString(),
+                            );
+                          }))),
                   const Gap(10),
                   SizedBox(child: Text("일", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))
                 ],
@@ -450,30 +444,29 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                   Flexible(
                     flex: 1,
                     child: SizedBox(
-                          height: 50,
-                          child: Row(
-                            children: [
-                              Checkbox(
-                                value: _webCheck,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _webCheck = value!;
-                                    _selectedPlatform = ApplicationPlatform.web;
-                                    if(value == true && _mobileCheck == true){
-                                      _mobileCheck = false;
-                                      _androidCheck = false;
-                                      _iosCheck = false;
-                                    }
-                                  });
-                                }
-                              ),
-                              Text(
-                                'Web Service',
-                                style: TextStyle(fontSize: 14, fontWeight: _webCheck ? FontWeight.bold : FontWeight.normal),
-                              )
-                            ],
-                          ),
-                        ),
+                      height: 50,
+                      child: Row(
+                        children: [
+                          Checkbox(
+                              value: _webCheck,
+                              onChanged: (value) {
+                                setState(() {
+                                  _webCheck = value!;
+                                  _selectedPlatform = ApplicationPlatform.web;
+                                  if (value == true && _mobileCheck == true) {
+                                    _mobileCheck = false;
+                                    _androidCheck = false;
+                                    _iosCheck = false;
+                                  }
+                                });
+                              }),
+                          Text(
+                            'Web Service',
+                            style: TextStyle(fontSize: 14, fontWeight: _webCheck ? FontWeight.bold : FontWeight.normal),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                   Flexible(
                     flex: 1,
@@ -487,29 +480,29 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                                 setState(() {
                                   _mobileCheck = value!;
                                   _selectedPlatform = ApplicationPlatform.mobile;
-                                  if(value == true){
+                                  if (value == true) {
                                     _webCheck = false;
                                   }
                                 });
-                                if(value == true) {
+                                if (value == true) {
                                   // await showModalBottomSheet(
                                   //     context: context,
                                   //     isDismissible: false,
                                   //     builder: (context) {
                                   //       return _mobileOsSection();
                                   //     });
-                                }else {
+                                } else {
                                   setState(() {
                                     _selectedOs = null;
                                     _androidCheck = false;
                                     _iosCheck = false;
                                   });
                                 }
-                              }
-                          ),
+                              }),
                           Text(
                             'Mobile Service',
-                            style: TextStyle(fontSize: 14, fontWeight: _mobileCheck ? FontWeight.bold : FontWeight.normal),
+                            style:
+                                TextStyle(fontSize: 14, fontWeight: _mobileCheck ? FontWeight.bold : FontWeight.normal),
                           )
                         ],
                       ),
@@ -531,9 +524,9 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
         children: [
           SizedBox(
               child: Text(
-                "모바일 OS",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              )),
+            "모바일 OS",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          )),
           const Gap(10),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -549,13 +542,12 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                           onChanged: (value) {
                             setState(() {
                               _androidCheck = value!;
-                              if(value){
+                              if (value) {
                                 _iosCheck = false;
                                 _selectedOs = MobileOsType.android;
                               }
                             });
-                          }
-                      ),
+                          }),
                       Text(
                         'Android OS',
                         style: TextStyle(fontSize: 14, fontWeight: _androidCheck ? FontWeight.bold : FontWeight.normal),
@@ -575,13 +567,12 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                           onChanged: (value) {
                             setState(() {
                               _iosCheck = value!;
-                              if(value){
+                              if (value) {
                                 _androidCheck = false;
                                 _selectedOs = MobileOsType.ios;
                               }
                             });
-                          }
-                      ),
+                          }),
                       Text(
                         'IOS',
                         style: TextStyle(fontSize: 14, fontWeight: _iosCheck ? FontWeight.bold : FontWeight.normal),
@@ -599,39 +590,33 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
 
   Widget _categorySection() {
     return SizedBox(
-      width: MediaQuery.sizeOf(context).width - 40,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            child: Text(
+        width: MediaQuery.sizeOf(context).width - 40,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+                child: Text(
               "카테고리",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            )
-          ),
-          const Gap(10),
-          SizedBox(
-            child: DropdownMenu(
-              menuHeight: 200,
-              initialSelection: _selectedCategory,
-              onSelected: (value) {
-                setState(() {
-                  _selectedCategory = value;
-                });
-              },
-                dropdownMenuEntries: List.generate(
-              PostCategory.values.length,
-              (index) {
-                return DropdownMenuEntry(
-                  value: PostCategory.values[index],
-                  label: TypeConversionUtil().postCategoryToString(PostCategory.values[index]),
-                );
-              }
-            ))
-          )
-        ],
-      )
-    );
+            )),
+            const Gap(10),
+            SizedBox(
+                child: DropdownMenu(
+                    menuHeight: 200,
+                    initialSelection: _selectedCategory,
+                    onSelected: (value) {
+                      setState(() {
+                        _selectedCategory = value;
+                      });
+                    },
+                    dropdownMenuEntries: List.generate(PostCategory.values.length, (index) {
+                      return DropdownMenuEntry(
+                        value: PostCategory.values[index],
+                        label: TypeConversionUtil().postCategoryToString(PostCategory.values[index]),
+                      );
+                    })))
+          ],
+        ));
   }
 
   Widget _contentSection() {
@@ -650,7 +635,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
           SizedBox(
             height: hei * 0.5,
             child: TextField(
-              controller: contentController,
+              controller: _contentController,
               minLines: 20,
               maxLines: 20,
             ),
@@ -683,7 +668,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
           width: MediaQuery.sizeOf(context).width - 40,
           child: BlocSelector<RecruitPostBloc, RecruitPostState, bool>(
             selector: (state) => state.state == RecruitPostLoadState.dataLoadState,
-            builder:(context, isLoading) => Row(
+            builder: (context, isLoading) => Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
@@ -691,9 +676,9 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                     width: 150,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (titleController.text.isEmpty ||
-                            subtitleController.text.isEmpty ||
-                            contentController.text.isEmpty) {
+                        if (_titleController.text.isEmpty ||
+                            _subtitleController.text.isEmpty ||
+                            _contentController.text.isEmpty) {
                           Get.snackbar("알림", "모든 항목을 입력해주세요.");
                           return;
                         }
@@ -722,20 +707,20 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                             }),
                           );
                         }
-                        if(widget.post != null){
+                        if (widget.post != null) {
                           postImage.addAll(widget.post!.images!);
                         }
-                        if(_deleteImages.isNotEmpty) {
+                        if (_deleteImages.isNotEmpty) {
                           postImage.removeWhere((element) => _deleteImages.contains(element));
                         }
 
-                        if(context.mounted){
+                        if (context.mounted) {
                           final user = context.read<UserProvider>().user!;
                           user.status = UserStatus.active;
                           final post = RecruitPostEntity(
-                            title: titleController.text,
-                            subtitle: subtitleController.text,
-                            contents: contentController.text,
+                            title: _titleController.text,
+                            subtitle: _subtitleController.text,
+                            contents: _contentController.text,
                             platform: _selectedPlatform,
                             category: _selectedCategory,
                             mobileOs: _mobileCheck ? _selectedOs : null,
@@ -756,13 +741,13 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                     width: 150,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if(isLoading){
+                        if (isLoading) {
                           Get.snackbar("알림", "잠시만 기다려주세요.");
                           return;
                         }
-                        if (titleController.text.isEmpty ||
-                            subtitleController.text.isEmpty ||
-                            contentController.text.isEmpty) {
+                        if (_titleController.text.isEmpty ||
+                            _subtitleController.text.isEmpty ||
+                            _contentController.text.isEmpty) {
                           Get.snackbar("알림", "모든 항목을 입력해주세요.");
                           return;
                         }
@@ -776,9 +761,9 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         }
                         try {
                           final post = RecruitPostEntity(
-                            title: titleController.text,
-                            subtitle: subtitleController.text,
-                            contents: contentController.text,
+                            title: _titleController.text,
+                            subtitle: _subtitleController.text,
+                            contents: _contentController.text,
                             platform: _selectedPlatform,
                             category: _selectedCategory,
                             mobileOs: _mobileCheck ? _selectedOs : null,
@@ -803,20 +788,20 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                     width: 150,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if(isLoading){
+                        if (isLoading) {
                           Get.snackbar("알림", "잠시만 기다려주세요.");
                           return;
                         }
                         final post = RecruitPostEntity(
                             id: widget.post!.id,
-                            title: titleController.text,
-                            subtitle: subtitleController.text,
-                            contents: contentController.text,
+                            title: _titleController.text,
+                            subtitle: _subtitleController.text,
+                            contents: _contentController.text,
                             platform: _selectedPlatform,
                             category: _selectedCategory,
                             mobileOs: _mobileCheck ? _selectedOs : null,
                             status: widget.post!.status,
-                            period: widget.post!.period,
+                            period: int.parse(_periodController.text),
                             author: context.read<UserProvider>().user!);
                         final token = context.read<UserProvider>().token ?? "";
                         try {

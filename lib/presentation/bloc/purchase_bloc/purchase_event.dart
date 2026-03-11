@@ -26,3 +26,7 @@ class RequestUpdatePurchase extends PurchaseEvent {
   RequestUpdatePurchase(this.package, this.old);
 }
 
+class RequestRestorePurchase extends PurchaseEvent {
+  RequestRestorePurchase();
+}
+

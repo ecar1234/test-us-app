@@ -177,7 +177,7 @@ class _SearchPageState extends State<SearchPage> {
                   padding: EdgeInsets.all(5),
                   decoration: BoxDecoration(
                       color: isDarkMode ? Colors.grey.shade800 : Colors.white,
-                      border: Border.all(),
+                      border: Border.all(color: Colors.grey.shade400),
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: isDarkMode
                           ? null

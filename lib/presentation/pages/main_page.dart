@@ -18,6 +18,8 @@ import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
 import 'package:test_us_app/presentation/pages/home/purchase_page.dart';
 import 'package:test_us_app/presentation/pages/home/search_page.dart';
+import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_create_page.dart';
+import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_create_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
@@ -41,7 +43,10 @@ import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../bloc/purchase_bloc/purchase_bloc.dart';
 import '../bloc/purchase_bloc/purchase_state.dart';
 import '../components/custom_bottom_bar.dart';
+import '../components/one_action_dialog.dart';
 import '../provider/firebase_messaging_provider.dart';
+import '../provider/post_provider/promotion_post_provider.dart';
+import '../provider/post_provider/recruit_post_provider.dart';
 import 'home/home_page.dart';
 
 class MetaDataSetting extends StatefulWidget {
@@ -316,6 +321,7 @@ class _MainState extends State<MainPage> {
       child: Selector<ThemeProvider, bool>(
           selector: (contest, provider) => provider.isDarkMode,
           builder: (context, isDarkMode, chile) {
+            final activePlan = context.read<PurchasesManagements>().subscribedItem;
             return Container(
               decoration: BoxDecoration(color: isDarkMode ? Colors.black : Colors.white),
               child: Stack(children: [
@@ -331,6 +337,39 @@ class _MainState extends State<MainPage> {
                       setState(() {
                         _currentIdx = idx;
                       });
+                    },
+                    onRecruit: () {
+                      final recruitLimit = activePlan == null ? 1 : (activePlan.plan == 'standard' ? 2 : 4);
+                      final recruitLength = context.read<BasePostProvider>().userRecruitPosts?.length ?? 0;
+                      if(recruitLength < recruitLimit){
+                        Get.to(() => RecruitPostCreatePage());
+                      }else {
+                        showDialog(context: context, builder: (context) => Dialog(
+                          child: OneActionDialog(
+                              title: '알림',
+                              contents1: '사용중인 Plan에서는',
+                              contents2: '최대 $recruitLimit개의 테스트 진행 가능합니다.',
+                              buttonText: '확인',
+                              onPressed: () => Get.back()),
+                        ));
+                      }
+                    },
+                    onPromotion: () {
+                      final promotionLimit = activePlan == null ? 1 : (activePlan.plan == 'standard' ? 2 : 100);
+                      final promotionLength = context.read<BasePostProvider>().userPromotionPosts?.length??0;
+                      if(promotionLength < promotionLimit){
+                        Get.to(() => PromotionPostCreatePage());
+                      }else {
+                        showDialog(context: context, builder: (context) => Dialog(
+                          child: OneActionDialog(
+                              title: '알림',
+                              contents1: '사용중인 Plan에서는',
+                              contents2: '최대 $promotionLimit개의 홍보가 가능합니다.',
+                              buttonText: '확인',
+                              onPressed: () => Get.back()
+                          ),
+                        ));
+                      }
                     },
                   ),
                 )

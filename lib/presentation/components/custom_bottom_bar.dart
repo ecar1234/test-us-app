@@ -3,10 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import 'package:test_us_app/presentation/components/one_action_dialog.dart';
+import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
 
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../pages/post/promotion_post_pages/promotion_post_create_page.dart';
 import '../pages/post/tester_post_pages/recruit_post_create_page.dart';
+import '../provider/post_provider/promotion_post_provider.dart';
 import '../provider/post_provider/recruit_post_provider.dart';
 import '../provider/user_provider.dart';
 import 'login_dialogs.dart';
@@ -14,8 +17,14 @@ import 'login_dialogs.dart';
 class CustomBottomBar extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTap;
+  final Function() onRecruit;
+  final Function() onPromotion;
 
-  const CustomBottomBar({super.key, required this.currentIndex, required this.onTap});
+  const CustomBottomBar({super.key,
+    required this.currentIndex,
+    required this.onTap,
+    required this.onRecruit,
+    required this.onPromotion});
 
   @override
   State<CustomBottomBar> createState() => _CustomBottomBarState();
@@ -121,10 +130,11 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                             showDialog(context: context, builder: (context) => const LoginDialog());
                             return;
                           }
+
                           if (value == 0) {
-                            Get.to(() => RecruitPostCreatePage());
+                            widget.onRecruit();
                           } else if (value == 1) {
-                            Get.to(() => PromotionPostCreatePage());
+                            widget.onPromotion();
                           }
                           // Get.to(() => RecruitPostCreatePage)
                         },

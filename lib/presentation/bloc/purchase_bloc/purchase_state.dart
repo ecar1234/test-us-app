@@ -34,3 +34,7 @@ class PurchaseUpdateCompletedState extends PurchaseState{
   final int grade;
   PurchaseUpdateCompletedState(this.entity, this.grade): super(state: PurchaseProgressState.success);
 }
+class PurchaseRestoreCompletedState extends PurchaseState{
+  final PurchaseEntity entity;
+  PurchaseRestoreCompletedState(this.entity): super(state: PurchaseProgressState.success);
+}

@@ -52,15 +52,15 @@ class _PurchasePageState extends State<PurchasePage> {
                 }
               } else if (state is PurchaseCompletedState) {
                 context.read<PurchasesManagements>().purchase(state.entity);
-                await showDialog(context: context, builder: (context) => Dialog(
-                  child: OneActionDialog(
-                      title: '구독 시작',
-                      contents1: '구독이 시작 되었습니다.',
-                      contents2: '이제 모든 ${state.entity.plan} 기능을 마음껏 이용해 보세요.',
-                      buttonText: '확인',
-                      onPressed: () => Get.back()
-                  )
-                ));
+                await showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                        child: OneActionDialog(
+                            title: '구독 시작',
+                            contents1: '구독이 시작 되었습니다.',
+                            contents2: '이제 모든 ${state.entity.plan} 기능을 마음껏 이용해 보세요.',
+                            buttonText: '확인',
+                            onPressed: () => Get.back())));
                 return;
               } else if (state is PurchaseUpdateCompletedState) {
                 context.read<PurchasesManagements>().purchase(state.entity);
@@ -72,15 +72,15 @@ class _PurchasePageState extends State<PurchasePage> {
                 } else {
                   comment = '${state.entity.plan}의 구독 기간이 성공적으로 변경되었습니다.-다음 갱신일부터 변경된 기간으로 결제가 진행됩니다.';
                 }
-                await showDialog(context: context, builder: (context) => Dialog(
-                  child: OneActionDialog(
-                      title: '구독 변경 성공',
-                      contents1: comment.split('-')[0],
-                      contents2: comment.split('-')[1],
-                      buttonText: '확인',
-                      onPressed: () => Get.back()
-                  )
-                ));
+                await showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                        child: OneActionDialog(
+                            title: '구독 변경 성공',
+                            contents1: comment.split('-')[0],
+                            contents2: comment.split('-')[1],
+                            buttonText: '확인',
+                            onPressed: () => Get.back())));
                 return;
               }
             },
@@ -96,7 +96,7 @@ class _PurchasePageState extends State<PurchasePage> {
                       Container(
                         width: 100,
                         height: 100,
-                        margin: EdgeInsets.only(top: 40),
+                        margin: EdgeInsets.only(top: 20),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey.shade400),
                           borderRadius: BorderRadius.circular(20),
@@ -123,15 +123,15 @@ class _PurchasePageState extends State<PurchasePage> {
                     child: ElevatedButton(
                         onPressed: _isPlanSelected.contains(true)
                             ? () async {
-                          // showDialog(context: context, builder: (context) => Dialog(
-                          //   child: OneActionDialog(
-                          //       title: "구독 알림",
-                          //       contents1: '구독이 시작 되었습니다.',
-                          //       contents2: '이제 모든 플랜 기능을 마음껏 이용해 보세요.',
-                          //       buttonText: '확인',
-                          //       buttonWidth: 100,
-                          //       onPressed: () => Get.back() ),
-                          // ));
+                                // showDialog(context: context, builder: (context) => Dialog(
+                                //   child: OneActionDialog(
+                                //       title: "구독 알림",
+                                //       contents1: '구독이 시작 되었습니다.',
+                                //       contents2: '이제 모든 플랜 기능을 마음껏 이용해 보세요.',
+                                //       buttonText: '확인',
+                                //       buttonWidth: 100,
+                                //       onPressed: () => Get.back() ),
+                                // ));
                                 final plan = _isPlanSelected[0] ? 'Standard' : 'Premium';
                                 context.read<PurchaseBloc>().add(PurchaseOfferings(plan));
 
@@ -317,7 +317,7 @@ class _PurchasePageState extends State<PurchasePage> {
         isScrollControlled: true,
         builder: (context) {
           return Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 60),
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 40),
             child: Stack(
               children: [
                 SizedBox(
@@ -329,7 +329,6 @@ class _PurchasePageState extends State<PurchasePage> {
                         Container(
                           width: 80,
                           height: 80,
-                          margin: EdgeInsets.only(top: 20),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey.shade400),
                             borderRadius: BorderRadius.circular(20),
@@ -354,16 +353,16 @@ class _PurchasePageState extends State<PurchasePage> {
                               height: 50,
                               child: ElevatedButton(
                                   onPressed: () {
-                                    if(context.read<UserProvider>().isLogged == false
-                                        || context.read<UserProvider>().isLogged == null){
+                                    if (context.read<UserProvider>().isLogged == false ||
+                                        context.read<UserProvider>().isLogged == null) {
                                       Get.defaultDialog(
-                                        title: '알림',
-                                        middleText: '로그인 후 이용해주세요.',
-                                        textConfirm: '확인',
-                                        confirmTextColor: Colors.white,
-                                        onConfirm: () {
-                                          Get.back();
-                                        });
+                                          title: '알림',
+                                          middleText: '로그인 후 이용해주세요.',
+                                          textConfirm: '확인',
+                                          confirmTextColor: Colors.white,
+                                          onConfirm: () {
+                                            Get.back();
+                                          });
                                       return;
                                     }
 
@@ -388,9 +387,7 @@ class _PurchasePageState extends State<PurchasePage> {
                                     }
 
                                     if (isChange) {
-                                      context
-                                          .read<PurchaseBloc>()
-                                          .add(RequestUpdatePurchase(_selectedPackage!, info!));
+                                      context.read<PurchaseBloc>().add(RequestUpdatePurchase(_selectedPackage!, info!));
                                     } else {
                                       context.read<PurchaseBloc>().add(RequestNewPurchase(_selectedPackage!));
                                     }
@@ -466,19 +463,25 @@ class _PurchasePageState extends State<PurchasePage> {
           columns: const <DataColumn>[
             DataColumn(label: Text('')),
             DataColumn(
-                label: Text(
-              'Free',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                label: Center(
+              child: Text(
+                'Free',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
             )),
             DataColumn(
-                label: Text(
-              'Standard',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                label: Center(
+              child: Text(
+                'Standard',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+              ),
             )),
             DataColumn(
-                label: Text(
-              'Premium',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.amber),
+                label: Center(
+              child: Text(
+                'Premium',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.amber),
+              ),
             )),
           ],
           rows: const <DataRow>[
@@ -508,9 +511,10 @@ class _PurchasePageState extends State<PurchasePage> {
                 '이미지',
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               ))),
-              DataCell(Center(child: Text('4장'))),
-              DataCell(Center(child: Text('8장'))),
-              DataCell(Center(child: Text('8장'))),
+              //TODO: 자간 줄이거나 ... 어쨋든 방법이 필요함.
+              DataCell(Center(child: Text('4장 / 25Mb'))),
+              DataCell(Center(child: Text('6장 / 40Mb'))),
+              DataCell(Center(child: Text('8장 / 80Mb'))),
             ]),
             DataRow(cells: [
               DataCell(Center(
@@ -562,8 +566,8 @@ class _PurchasePageState extends State<PurchasePage> {
         selector: (context, provider) {
           return provider.packages ?? [];
         },
-        builder: (context, packages, child)  => StatefulBuilder(
-          builder: (context, setState)=> ListView.separated(
+        builder: (context, packages, child) => StatefulBuilder(
+          builder: (context, setState) => ListView.separated(
               shrinkWrap: false,
               physics: const BouncingScrollPhysics(),
               scrollDirection: Axis.vertical,

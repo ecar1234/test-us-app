@@ -57,11 +57,16 @@ class _HomePageState extends State<HomePage> {
               Selector<UserProvider, bool>(
                   selector: (context, provider) => provider.isLogged ?? false,
                   builder: (context, isLogin, child) => !isLogin
-                      ? TextButton(
+                      ? ElevatedButton(
                           onPressed: () {
                             Get.to(() => LoginPage());
                           },
-                          child: Text('로그인', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)))
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)
+                        )
+                      ),
+                          child: Text('로그인', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)))
                       : Selector<FirebaseMessagingProvider, List<FirebaseMessagingEntity>>(
                           selector: (context, provider) => provider.notifications ?? [],
                           builder: (context, notifications, child) {
