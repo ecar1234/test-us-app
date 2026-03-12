@@ -87,21 +87,19 @@ class _UserPageState extends State<UserPage> {
           if (isLogged) {
             return Padding(
               padding: EdgeInsets.only(right: 20),
-              child: SizedBox(
-                child: OutlinedButton(
-                    onPressed: () async {
-                      _logoutDialog(context);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.primary),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+              child: OutlinedButton(
+                  onPressed: () async {
+                    _logoutDialog(context);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    side: BorderSide(
+                        color: Theme.of(context).colorScheme.primary),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text("로그아웃", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
-              ),
+                  ),
+                  child: Text("로그아웃", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
             );
           }
           return SizedBox.shrink();

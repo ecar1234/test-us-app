@@ -62,6 +62,7 @@ class _HomePageState extends State<HomePage> {
                             Get.to(() => LoginPage());
                           },
                       style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)
                         )

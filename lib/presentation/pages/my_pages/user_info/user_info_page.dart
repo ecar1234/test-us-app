@@ -17,6 +17,7 @@ import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
 
 import '../../../../data/models/user/user_model.dart';
+import '../../../../services/revenue_cat_purchases/purchase_management.dart';
 import '../../../../services/theme_provider.dart';
 import '../../../bloc/user_bloc/user_bloc.dart';
 import '../../../provider/post_provider/base_post_provider.dart';
@@ -129,6 +130,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
   }
 
   Widget _profileSection(BuildContext context, double hei, double wid) {
+    final activePlan = context.read<PurchasesManagements>().subscribedItem;
+    final volumeLimit = activePlan == null ? 6 : (activePlan.plan == 'standard' ? 7 : 10);
+
     return SizedBox(
         height: hei * 0.25,
         width: wid,
@@ -162,8 +166,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           final image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
                           if (image == null) {
                             return;
-                          } else if (File(image.path).lengthSync() / (1024 * 1024) > 5) {
-                            Get.snackbar('알림', '5MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                          } else if (File(image.path).lengthSync() / (1024 * 1024) > volumeLimit) {
+                            Get.snackbar('알림', '${volumeLimit}MB를 초과하는 이미지는 업로드 할 수 없습니다.');
                             return;
                           } else {
                             setState(() {

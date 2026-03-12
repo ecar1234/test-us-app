@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:accordion/accordion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -342,8 +345,9 @@ class _PurchasePageState extends State<PurchasePage> {
                           plan,
                           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                         ),
-                        const Gap(20),
+                        const Gap(10),
                         _planBuilder(plan),
+                        const Gap(10),
                         //Buttons
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -574,9 +578,13 @@ class _PurchasePageState extends State<PurchasePage> {
               itemBuilder: (context, idx) {
                 final info = context.read<PurchasesManagements>().subscribedItem;
                 final data = _getPackageData(packages[idx].storeProduct);
+                // debugPrint('plan: ${info?.plan} / planId: ${info?.planId} / isActive: ${info?.isActive}');
                 bool isUsed = false;
                 if (info != null) {
-                  if (packages[idx].storeProduct.identifier.split(':')[1] == info.planId! && info.isActive!) {
+                  if (Platform.isAndroid
+                      && packages[idx].storeProduct.identifier.split(':')[1] == info.planId! && info.isActive!) {
+                    isUsed = true;
+                  }else if(Platform.isIOS && packages[idx].storeProduct.identifier == info.planId){
                     isUsed = true;
                   }
                 }

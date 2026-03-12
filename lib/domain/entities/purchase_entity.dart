@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class PurchaseEntity {
@@ -22,16 +25,39 @@ class PurchaseEntity {
   });
 
   static PurchaseEntity toEntity(EntitlementInfo info) {
-    final plan = info.productPlanIdentifier?.split('-');
-    return PurchaseEntity(
-      plan: info.identifier.split(' ')[0] , // android : standard / premium , ios :
-      period: plan?[1]??"", // 1m / 3m / 6m / 12m
-      planId: info.productPlanIdentifier, // ex. standard-1m-price
-      isActive: info.isActive,
-      willRenew: info.willRenew,
-      paidStore: info.store.name,
-      startDate: info.originalPurchaseDate,
-      expireDate: info.expirationDate,
-    );
+    // debugPrint('entitlementInfo : identifier: ${info.identifier} '
+    //     '/ productIdentifier: ${info.productIdentifier} '
+    //     '/ productPlanIdentifier: ${info.productPlanIdentifier} '
+    //     '/ isActive: ${info.isActive}'
+    //     '/ willRenew: ${info.willRenew} '
+    //     '/ originalPurchaseDate: ${info.originalPurchaseDate} '
+    //     '/ expirationDate: ${info.expirationDate} '
+    //     '/ store: ${info.store.name}'
+    //     '/ productPlanIdentifier: ${info.productPlanIdentifier}'
+    // );
+    if (Platform.isAndroid) {
+      final plan = info.productPlanIdentifier?.split('-');
+      return PurchaseEntity(
+        plan: info.identifier.split(' ')[0], // standard / premium
+        period: plan?.last ?? "", // 1m / 3m / 6m / 1y
+        planId: info.productPlanIdentifier, // ex. std-1m
+        isActive: info.isActive,
+        willRenew: info.willRenew,
+        paidStore: info.store.name,
+        startDate: info.originalPurchaseDate,
+        expireDate: info.expirationDate,
+      );
+    } else {
+      return PurchaseEntity(
+        plan: info.identifier, // standard / premium
+        period: info.productPlanIdentifier?.split('_')[1], // 1m / 3m / 6m / 1y
+        planId: info.productPlanIdentifier, // ex. std_1m
+        isActive: info.isActive,
+        willRenew: info.willRenew,
+        paidStore: info.store.name,
+        startDate: info.originalPurchaseDate,
+        expireDate: info.expirationDate,
+      );
+    }
   }
 }

@@ -10,7 +10,13 @@ import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_event.dart'
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_state.dart';
 
 class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
-  final logger = Logger();
+  final logger = Logger(
+    printer: PrettyPrinter(
+      methodCount: 0,
+      errorMethodCount: 8,
+      lineLength: 10000,
+    )
+  );
   PurchaseBloc() : super(PurchaseState(state: PurchaseProgressState.serviceStart)) {
     on<PurchaseInit> ((event, emit) async {
       emit(PurchaseState(state: PurchaseProgressState.loading));
