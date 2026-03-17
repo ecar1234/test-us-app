@@ -35,6 +35,7 @@ import 'domain/use_cases/base_post_usecase.dart';
 import 'domain/use_cases/firebase_messaging_usecase.dart';
 import 'domain/use_cases/message_usecase.dart';
 import 'domain/use_cases/promotion_post_usecase.dart';
+import 'domain/use_cases/purchase_usecase.dart';
 import 'domain/use_cases/recruit_post_usecase.dart';
 import 'domain/use_cases/review_usecase.dart';
 import 'domain/use_cases/user_usecase.dart';
@@ -79,7 +80,7 @@ Future<void> main() async {
         BlocProvider(create: (context) => AppBloc(getIt<ApplicationUseCase>(), getIt<RecruitPostUseCase>(), getIt<UserUseCase>())),
         BlocProvider(create: (context) => ReviewBloc(getIt<ReviewUseCase>(), getIt<UserUseCase>())),
         BlocProvider(create: (context) => MessageBloc(getIt<MessageUseCase>())),
-        BlocProvider(create: (context) => PurchaseBloc())
+        BlocProvider(create: (context) => PurchaseBloc(getIt<PurchaseUseCase>()))
       ], child: const MetaDataSetting(),
     ),
   ));

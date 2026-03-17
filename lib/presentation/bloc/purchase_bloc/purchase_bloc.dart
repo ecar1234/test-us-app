@@ -6,18 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:test_us_app/domain/entities/purchase_entity.dart';
+import 'package:test_us_app/domain/use_cases/purchase_usecase.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_event.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_state.dart';
 
 class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
-  final logger = Logger(
-    printer: PrettyPrinter(
-      methodCount: 0,
-      errorMethodCount: 8,
-      lineLength: 10000,
-    )
-  );
-  PurchaseBloc() : super(PurchaseState(state: PurchaseProgressState.serviceStart)) {
+  final logger = Logger();
+  PurchaseBloc(PurchaseUseCase purchaseUseCase) : super(PurchaseState(state: PurchaseProgressState.serviceStart)) {
     on<PurchaseInit> ((event, emit) async {
       emit(PurchaseState(state: PurchaseProgressState.loading));
       logger.i('[Purchase] initializeRevenueCat start');
@@ -63,33 +58,44 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
     on<RequestNewPurchase>((event, emit) async {
       emit(PurchaseState(state: PurchaseProgressState.loading));
       logger.i('[Purchase] purchase start');
-        try {
-            final purchaseParam = PurchaseParams.package(event.package);
-            final result = await Purchases.purchase(purchaseParam);
-            final activeItem = result.customerInfo.entitlements.active.values.where((item) => item.isActive).toList();
-            if (activeItem.isNotEmpty){
-              if(activeItem.length == 1){
-                final res = PurchaseEntity.toEntity(activeItem.first);
-                emit(PurchaseCompletedState(res));
-                logger.i('[Purchase] purchase success');
-              }else {
-                emit(PurchaseState(state: PurchaseProgressState.error, message: '활성화 상품이 하나 이상입니다.'));
-                logger.i('[Purchase] purchase error');
-              }
-            }else{
-              emit(PurchaseState(state: PurchaseProgressState.failed, message: '활성화 상품이 존재하지 않습니다.'));
-              logger.i('[Purchase] purchase failed');
-            }
+      try {
+        final purchaseParam = PurchaseParams.package(event.package);
+        final result = await Purchases.purchase(purchaseParam);
 
-        } on PlatformException catch(e){
-          emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
+        // 안전한 접근: active 리스트가 있을 때만 로그 기록
+        final activeEntitlements = result.customerInfo.entitlements.active.values.toList();
+
+        if (activeEntitlements.isNotEmpty) {
+          await purchaseUseCase.eventLog(activeEntitlements.first);
+
+          if (activeEntitlements.length == 1) {
+            final res = PurchaseEntity.toEntity(activeEntitlements.first);
+            emit(PurchaseCompletedState(res));
+            logger.i('[Purchase] purchase success');
+          } else {
+            // iOS에서 구독 그룹 이동 시 일시적으로 2개가 잡힐 수 있음 (필요시 로직 완화 검토)
+            emit(PurchaseState(state: PurchaseProgressState.error, message: '활성화된 상품 정보가 올바르지 않습니다.'));
+          }
+        } else {
+          emit(PurchaseState(state: PurchaseProgressState.failed, message: '활성화 상품이 존재하지 않습니다.'));
+        }
+      } on PlatformException catch (e) {
+        // 사용자가 취소한 경우 에러가 아닌 취소 상태로 처리
+        var errorCode = PurchasesErrorHelper.getErrorCode(e);
+        if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
+          emit(PurchaseState(state: PurchaseProgressState.serviceStart)); // 또는 별도의 cancelled 상태
+          logger.i('[Purchase] user cancelled');
+        } else {
+          emit(PurchaseState(state: PurchaseProgressState.error, message: e.message ?? e.toString()));
+          purchaseUseCase.errorLog(e.toString());
           logger.e('[Purchase] purchase error : $e');
         }
+      }
     });
     on<RequestUpdatePurchase>((event, emit) async {
       try {
         PurchaseParams purchaseParam;
-        final grade = _checkProrationMode(event.old!, event.package); // 0: none, 1: upgrade, -1 : downgrade
+        final grade = _checkProrationMode(event.old, event.package); // 0: none, 1: upgrade, -1 : downgrade
 
         if(Platform.isAndroid){
           final prorationMode = grade == 1 ? GoogleProrationMode.deferred
@@ -124,6 +130,9 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
           return;
         }
       } on PlatformException catch (e) {
+        emit(PurchaseState(state: PurchaseProgressState.error, message: '활성화 상품이 하나 이상입니다.'));
+        logger.i('[Purchase] purchase error');
+      } on Exception catch (e) {
         emit(PurchaseState(state: PurchaseProgressState.error, message: '활성화 상품이 하나 이상입니다.'));
         logger.i('[Purchase] purchase error');
       }

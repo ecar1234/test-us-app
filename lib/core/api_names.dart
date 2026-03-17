@@ -120,3 +120,9 @@ class FirebaseApi {
   static const String updateToken = '/api/v1/firebase/updateToken';
   static const String deleteToken = '/api/v1/firebase/removeToken';
 }
+
+class PurchaseApi {
+  static const String eventLog = '/api/v1/purchase/debug/eventLog';
+  static const String errorLog = '/api/v1/purchase/debug/errorLog';
+  static const String refresh = '/api/v1/purchase/refresh';
+}

@@ -458,112 +458,6 @@ class _PurchasePageState extends State<PurchasePage> {
         });
   }
 
-  Widget _compareDataTable() {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: DataTable(
-          border: TableBorder.symmetric(inside: BorderSide(color: Colors.grey.shade400)),
-          columnSpacing: 30,
-          columns: const <DataColumn>[
-            DataColumn(label: Text('')),
-            DataColumn(
-                label: Center(
-              child: Text(
-                'Free',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-              ),
-            )),
-            DataColumn(
-                label: Center(
-              child: Text(
-                'Standard',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blueAccent),
-              ),
-            )),
-            DataColumn(
-                label: Center(
-              child: Text(
-                'Premium',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.amber),
-              ),
-            )),
-          ],
-          rows: const <DataRow>[
-            DataRow(cells: [
-              DataCell(Center(
-                  child: Text(
-                '테스트',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              ))),
-              DataCell(Center(child: Text('1개'))),
-              DataCell(Center(child: Text('2개'))),
-              DataCell(Center(child: Text('4개'))),
-            ]),
-            DataRow(cells: [
-              DataCell(Center(
-                  child: Text(
-                '홍보',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              ))),
-              DataCell(Center(child: Text('1개'))),
-              DataCell(Center(child: Text('2개'))),
-              DataCell(Center(child: Text('무제한'))),
-            ]),
-            DataRow(cells: [
-              DataCell(Center(
-                  child: Text(
-                '이미지',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              ))),
-              //TODO: 자간 줄이거나 ... 어쨋든 방법이 필요함.
-              DataCell(Center(child: Text('4장 / 25Mb'))),
-              DataCell(Center(child: Text('6장 / 40Mb'))),
-              DataCell(Center(child: Text('8장 / 80Mb'))),
-            ]),
-            DataRow(cells: [
-              DataCell(Center(
-                  child: Text(
-                '게시기간',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              ))),
-              DataCell(Center(child: Text('7일'))),
-              DataCell(Center(child: Text('14일'))),
-              DataCell(Center(child: Text('30일'))),
-            ]),
-            DataRow(cells: [
-              DataCell(Center(
-                  child: Text(
-                '메시지 보관',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              ))),
-              DataCell(Center(child: Text('3일'))),
-              DataCell(Center(child: Text('10일'))),
-              DataCell(Center(child: Text('무제한'))),
-            ]),
-            DataRow(cells: [
-              DataCell(Center(
-                  child: Text(
-                '끌어올리기',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              ))),
-              DataCell(Center(child: Text('1회'))),
-              DataCell(Center(child: Text('2회'))),
-              DataCell(Center(child: Text('4회'))),
-            ]),
-            DataRow(cells: [
-              DataCell(Center(
-                  child: Text(
-                '단체 메시지',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              ))),
-              DataCell(Center(child: Text('❌'))),
-              DataCell(Center(child: Text('2개'))),
-              DataCell(Center(child: Text('무제한'))),
-            ]),
-          ]),
-    );
-  }
-
   Widget _planBuilder(String plan) {
     return Expanded(
       child: Selector<PurchasesManagements, List<Package>>(
@@ -584,7 +478,7 @@ class _PurchasePageState extends State<PurchasePage> {
                   if (Platform.isAndroid
                       && packages[idx].storeProduct.identifier.split(':')[1] == info.planId! && info.isActive!) {
                     isUsed = true;
-                  }else if(Platform.isIOS && packages[idx].storeProduct.identifier == info.planId){
+                  }else if(Platform.isIOS && packages[idx].storeProduct.identifier == info.planId && info.isActive!) {
                     isUsed = true;
                   }
                 }
@@ -691,6 +585,112 @@ class _PurchasePageState extends State<PurchasePage> {
               itemCount: packages.length),
         ),
       ),
+    );
+  }
+
+  Widget _compareDataTable() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: DataTable(
+          border: TableBorder.symmetric(inside: BorderSide(color: Colors.grey.shade400)),
+          columnSpacing: 30,
+          columns: const <DataColumn>[
+            DataColumn(label: Text('')),
+            DataColumn(
+                label: Center(
+                  child: Text(
+                    'Free',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                )),
+            DataColumn(
+                label: Center(
+                  child: Text(
+                    'Standard',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                  ),
+                )),
+            DataColumn(
+                label: Center(
+                  child: Text(
+                    'Premium',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.amber),
+                  ),
+                )),
+          ],
+          rows: const <DataRow>[
+            DataRow(cells: [
+              DataCell(Center(
+                  child: Text(
+                    '테스트',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ))),
+              DataCell(Center(child: Text('1개'))),
+              DataCell(Center(child: Text('2개'))),
+              DataCell(Center(child: Text('4개'))),
+            ]),
+            DataRow(cells: [
+              DataCell(Center(
+                  child: Text(
+                    '홍보',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ))),
+              DataCell(Center(child: Text('1개'))),
+              DataCell(Center(child: Text('2개'))),
+              DataCell(Center(child: Text('무제한'))),
+            ]),
+            DataRow(cells: [
+              DataCell(Center(
+                  child: Text(
+                    '이미지',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ))),
+              //TODO: 자간 줄이거나 ... 어쨋든 방법이 필요함.
+              DataCell(Center(child: Text('4장 / 25Mb'))),
+              DataCell(Center(child: Text('6장 / 40Mb'))),
+              DataCell(Center(child: Text('8장 / 80Mb'))),
+            ]),
+            DataRow(cells: [
+              DataCell(Center(
+                  child: Text(
+                    '게시기간',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ))),
+              DataCell(Center(child: Text('7일'))),
+              DataCell(Center(child: Text('14일'))),
+              DataCell(Center(child: Text('30일'))),
+            ]),
+            DataRow(cells: [
+              DataCell(Center(
+                  child: Text(
+                    '메시지 보관',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ))),
+              DataCell(Center(child: Text('3일'))),
+              DataCell(Center(child: Text('10일'))),
+              DataCell(Center(child: Text('무제한'))),
+            ]),
+            DataRow(cells: [
+              DataCell(Center(
+                  child: Text(
+                    '끌어올리기',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ))),
+              DataCell(Center(child: Text('1회'))),
+              DataCell(Center(child: Text('2회'))),
+              DataCell(Center(child: Text('4회'))),
+            ]),
+            DataRow(cells: [
+              DataCell(Center(
+                  child: Text(
+                    '단체 메시지',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ))),
+              DataCell(Center(child: Text('❌'))),
+              DataCell(Center(child: Text('2개'))),
+              DataCell(Center(child: Text('무제한'))),
+            ]),
+          ]),
     );
   }
 
