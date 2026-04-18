@@ -82,8 +82,8 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                               .firstWhere((e) => e.postId == posts[idx].id);
                           return GestureDetector(
                             onTap: (){
-                              if(posts[idx].status == PostStatus.end){
-                                Get.snackbar('알림', '종료된 프로덕트 입니다.');
+                              if(posts[idx].status != PostStatus.active){
+                                Get.snackbar('알림', '종료(만료)된 프로덕트 입니다.');
                                 return;
                               }
                               Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));

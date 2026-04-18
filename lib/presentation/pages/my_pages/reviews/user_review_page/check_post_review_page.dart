@@ -71,7 +71,6 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
             padding: EdgeInsets.all(20),
             child: Column(
               children: [
-
                 ListView.separated(
                     padding: EdgeInsets.symmetric(vertical: 20),
                     physics: BouncingScrollPhysics(),

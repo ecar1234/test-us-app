@@ -19,7 +19,7 @@ import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_po
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
-import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
+import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
 
 import '../../../../data/models/application/application_model.dart';
@@ -116,7 +116,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final activePlan = context.read<PurchasesManagements>().subscribedItem;
+    // final activePlan = context.read<PurchasesManagements>().subscribedItem;
     return GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
@@ -139,10 +139,10 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                       _subtitleSection(),
                       const Gap(20),
                       // 이미지 추가
-                      _addImageSection(activePlan),
+                      _addImageSection(),
                       const Gap(20),
                       // 게시 기간
-                      _periodSection(activePlan),
+                      _periodSection(),
                       const Gap(20),
                       // 플랫폼
                       _platformSection(),
@@ -213,9 +213,11 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
     );
   }
 
-  Widget _addImageSection(PurchaseEntity? activePlan) {
-    final imagesLimit = activePlan == null ? 4 : (activePlan.plan == 'standard' ? 6 : 8);
-    final volumeLimit = activePlan == null ? 6 : (activePlan.plan == 'standard' ? 7 : 10);
+  Widget _addImageSection() {
+    // final imagesLimit = activePlan == null ? 4 : (activePlan.plan == 'standard' ? 6 : 8);
+    // final volumeLimit = activePlan == null ? 6 : (activePlan.plan == 'standard' ? 7 : 10);
+    final imagesLimit = 4;
+    final volumeLimit = 5;
     return SizedBox(
       width: MediaQuery.sizeOf(context).width - 40,
       height: 180,
@@ -372,8 +374,9 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
     );
   }
 
-  Widget _periodSection(PurchaseEntity? activePlan) {
-    final period = activePlan == null ? 7 : (activePlan.plan == 'standard' ? 14 : 30);
+  Widget _periodSection() {
+    // final period = activePlan == null ? 7 : (activePlan.plan == 'standard' ? 14 : 30);
+    final period = 14;
     return SizedBox(
         width: MediaQuery.sizeOf(context).width - 40,
         child: Column(

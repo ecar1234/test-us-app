@@ -79,12 +79,12 @@ class ApplicationProvider with ChangeNotifier{
     if(_userApplicationPosts!.any((e) => e.id == review.postId)) {
       final idx = _userApplicationPosts!.indexWhere((e) => e.id == review.postId);
       final post = _userApplicationPosts![idx];
-      final reviewEntity = RecruitReviewEntity(
-        reviewId: review.reviewId,
-        postId: review.postId,
-        reviewerUserId: review.reviewerUserId,
-        rating: review.rating,
-      );
+      // final reviewEntity = RecruitReviewEntity(
+      //   reviewId: review.reviewId,
+      //   postId: review.postId,
+      //   reviewerUserId: review.reviewerUserId,
+      //   rating: review.rating,
+      // );
       final updatePost = RecruitPostEntity(
         id: post.id,
         title: post.title,
@@ -98,7 +98,7 @@ class ApplicationProvider with ChangeNotifier{
         views: post.views,
         applications: post.applications,
         images: post.images,
-        reviews: [...post.reviews!, reviewEntity],
+        // reviews: [...post.reviews!, reviewEntity],
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
       );

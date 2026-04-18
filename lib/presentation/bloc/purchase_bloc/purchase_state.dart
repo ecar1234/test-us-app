@@ -1,12 +1,14 @@
-
-import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:test_us_app/domain/entities/purchase_entity.dart';
+
+import '../../../domain/entities/product_entity.dart';
 
 enum PurchaseProgressState {
   serviceStart,
   initCompleted,
   starting,
   loading,
+  pending,
   success,
   error,
   failed
@@ -22,12 +24,22 @@ class PurchaseInitCompletedState extends PurchaseState{
   PurchaseInitCompletedState(): super(state: PurchaseProgressState.initCompleted);
 }
 class GetOfferingCompletedState extends PurchaseState{
-  final List<Package>? packages;
-  GetOfferingCompletedState({this.packages}): super(state: PurchaseProgressState.success);
+  final List<ProductEntity> products;
+  GetOfferingCompletedState(this.products): super(state: PurchaseProgressState.success);
+}
+class PurchasePendingState extends PurchaseState{
+  PurchasePendingState(): super(state: PurchaseProgressState.pending);
 }
 class PurchaseCompletedState extends PurchaseState{
+  final PurchaseDetails details;
+  PurchaseCompletedState({required this.details}): super(state: PurchaseProgressState.success);
+}
+class PurchaseCompletedByServerState extends PurchaseState{
   final PurchaseEntity entity;
-  PurchaseCompletedState(this.entity): super(state: PurchaseProgressState.success);
+  PurchaseCompletedByServerState(this.entity): super(state: PurchaseProgressState.pending);
+}
+class UpdateLoadingState extends PurchaseState {
+  UpdateLoadingState(): super(state: PurchaseProgressState.pending);
 }
 class PurchaseUpdateCompletedState extends PurchaseState{
   final PurchaseEntity entity;
@@ -35,6 +47,12 @@ class PurchaseUpdateCompletedState extends PurchaseState{
   PurchaseUpdateCompletedState(this.entity, this.grade): super(state: PurchaseProgressState.success);
 }
 class PurchaseRestoreCompletedState extends PurchaseState{
-  final PurchaseEntity entity;
-  PurchaseRestoreCompletedState(this.entity): super(state: PurchaseProgressState.success);
+  final PurchaseDetails details;
+  PurchaseRestoreCompletedState(this.details): super(state: PurchaseProgressState.success);
+}
+
+class GetUserPurchaseInfoCompletedState extends PurchaseState{
+  final List<PurchaseEntity> subscribeList;
+
+  GetUserPurchaseInfoCompletedState(this.subscribeList): super(state: PurchaseProgressState.success);
 }

@@ -13,7 +13,7 @@ import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/domain/entities/purchase_entity.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
-import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
+import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 
 import '../../../../data/models/post/recruit_post_model.dart';
 import '../../../../domain/entities/image_entity.dart';
@@ -125,7 +125,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final activePlan = context.read<PurchasesManagements>().subscribedItem;
+    // final activePlan = context.read<PurchasesManagements>().subscribedItem;
     return GestureDetector(
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
@@ -148,10 +148,10 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       _subtitleSection(),
                       const Gap(20),
                       // 이미지 추가
-                      _addImageSection(activePlan),
+                      _addImageSection(),
                       const Gap(20),
                       // 게시 기간
-                      _periodSection(activePlan),
+                      _periodSection(),
                       const Gap(20),
                       // 카테고리
                       _categorySection(),
@@ -226,9 +226,11 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
     );
   }
 
-  Widget _addImageSection(PurchaseEntity? activePlan) {
-    final imagesLimit = activePlan == null ? 4 : (activePlan.plan == 'standard' ? 6 : 8);
-    final volumeLimit = activePlan == null ? 6 : (activePlan.plan == 'standard' ? 7 : 10);
+  Widget _addImageSection() {
+    // final imagesLimit = activePlan == null ? 4 : (activePlan.plan == 'standard' ? 6 : 8);
+    // final volumeLimit = activePlan == null ? 6 : (activePlan.plan == 'standard' ? 7 : 10);
+    final imagesLimit = 4;
+    final volumeLimit = 5;
     return SizedBox(
       width: MediaQuery.sizeOf(context).width - 40,
       height: 180,
@@ -382,8 +384,9 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
     );
   }
 
-  Widget _periodSection(PurchaseEntity? activePlan) {
-    final period = activePlan == null ? 7 : (activePlan.plan == 'standard' ? 14 : 30);
+  Widget _periodSection() {
+    // final period = activePlan == null ? 7 : (activePlan.plan == 'standard' ? 14 : 30);
+    final period = 7;
     return SizedBox(
         // height: 200,
         width: MediaQuery.sizeOf(context).width - 40,

@@ -172,62 +172,64 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
                                     ],
                                   )),
                               const Gap(10),
-                              if (posts[idx]
-                                  .reviews!
-                                  .any((element) => element.reviewerUserId == context.read<UserProvider>().user!.id!))
-                                SizedBox(
-                                  height: 30,
-                                  width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
-                                  child: ElevatedButton(
-                                      onPressed: ()async {
-                                        await _checkReviewedModal(context, posts[idx]);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        padding: EdgeInsets.zero,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        elevation: 2,
-                                      ),
-                                      child: Text('나의 리뷰 보기')),
-                                )
-                              else
-                                SizedBox(
-                                  height: 30,
-                                  width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
-                                  child: ElevatedButton(
-                                      onPressed: () {
-                                        Get.to(() => AddServiceReviewPage(post: posts[idx]));
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        padding: EdgeInsets.zero,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        elevation: 2,
-                                      ),
-                                      child: Text('서비스 리뷰 하기')),
-                                ),
+                              //Fixme: post의 review를 삭제하고 다시 가져오는 방법을 찾아야함.
+                              // if (posts[idx]
+                              //     .reviews!
+                              //     .any((element) => element.reviewerUserId == context.read<UserProvider>().user!.id!))
+                              //   SizedBox(
+                              //     height: 30,
+                              //     width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
+                              //     child: ElevatedButton(
+                              //         onPressed: ()async {
+                              //           await _checkReviewedModal(context, posts[idx]);
+                              //         },
+                              //         style: ElevatedButton.styleFrom(
+                              //           padding: EdgeInsets.zero,
+                              //           shape: RoundedRectangleBorder(
+                              //             borderRadius: BorderRadius.circular(10),
+                              //           ),
+                              //           elevation: 2,
+                              //         ),
+                              //         child: Text('나의 리뷰 보기')),
+                              //   )
+                              // else
+                              //   SizedBox(
+                              //     height: 30,
+                              //     width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
+                              //     child: ElevatedButton(
+                              //         onPressed: () {
+                              //           Get.to(() => AddServiceReviewPage(post: posts[idx]));
+                              //         },
+                              //         style: ElevatedButton.styleFrom(
+                              //           padding: EdgeInsets.zero,
+                              //           shape: RoundedRectangleBorder(
+                              //             borderRadius: BorderRadius.circular(10),
+                              //           ),
+                              //           elevation: 2,
+                              //         ),
+                              //         child: Text('서비스 리뷰 하기')),
+                              //   ),
                             ]),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  if(posts[idx].reviews!.any((element) => element.reviewerUserId == context.read<UserProvider>().user!.id!))
-                    Positioned(
-                      top: 10,
-                      right: 20,
-                      child: SizedBox(
-                        height: 50,
-                        width: 50,
-                        child: Icon(
-                          Symbols.task_alt,
-                          color: Colors.green,
-                          size: 40,
-                        ),
-                      ),
-                    )
+                  //Fixme: post의 review를 삭제하고 다시 가져오는 방법을 찾아야함.
+                  // if(posts[idx].reviews!.any((element) => element.reviewerUserId == context.read<UserProvider>().user!.id!))
+                  //   Positioned(
+                  //     top: 10,
+                  //     right: 20,
+                  //     child: SizedBox(
+                  //       height: 50,
+                  //       width: 50,
+                  //       child: Icon(
+                  //         Symbols.task_alt,
+                  //         color: Colors.green,
+                  //         size: 40,
+                  //       ),
+                  //     ),
+                  //   )
                 ],
               );
             },
@@ -240,7 +242,9 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
 
   Future<void> _checkReviewedModal(BuildContext context, RecruitPostEntity post) async {
     final token = context.read<UserProvider>().token!;
-    final reviewId = post.reviews!.firstWhere((element) => element.reviewerUserId == context.read<UserProvider>().user!.id!).reviewId ?? "";
+    // final reviewId = post.reviews!.firstWhere((element) => element.reviewerUserId == context.read<UserProvider>().user!.id!).reviewId ?? "";
+    final reviewId = '';
+    //Fixme: post의 review를 삭제하고 다시 가져오는 방법을 찾아야함.
     if(reviewId.isEmpty) {
       return showDialog(context: context, builder: (context) => AlertDialog(
       title: Text('알림'),
@@ -252,8 +256,9 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
       ]
     ));
     }
-    // final review = context.read<ReviewBloc>().add(RequestReviewByPostReviewIdEvent()
-    context.read<ReviewBloc>().add(RequestReviewByPostReviewIdEvent(token, reviewId));
+    // final review = context.read<ReviewBloc>().add(RequestReviewByPostReviewIdEvent() -> 사용 안함.
+    //Fixme: post의 review를 삭제하고 다시 가져오는 방법을 찾아야함.
+    // context.read<ReviewBloc>().add(RequestReviewByPostReviewIdEvent(token, reviewId));
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
     return showDialog(
         context: context,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:test_us_app/domain/use_cases/application_usecase.dart';
 import 'package:test_us_app/domain/use_cases/image_usecase.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
@@ -28,7 +29,7 @@ import 'package:test_us_app/presentation/provider/socket_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/service_locator.dart';
 import 'package:provider/provider.dart';
-import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
+import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import 'domain/use_cases/base_post_usecase.dart';
@@ -61,7 +62,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (context) => ReviewProvider(getIt<ReviewUseCase>())),
       ChangeNotifierProvider(create: (context) => ThemeProvider()),
       ChangeNotifierProvider(create: (context) => RoomProvider(getIt<MessageUseCase>())),
-      ChangeNotifierProvider(create: (context) => PurchasesManagements()),
+      ChangeNotifierProvider(create: (context) => PurchaseProvider()),
       ChangeNotifierProxyProvider<RoomProvider, SocketProvider>(
           create: (context) => GetIt.I.get<SocketProvider>(),
         update: (context, roomProvider, socketProvider) {
@@ -80,7 +81,7 @@ Future<void> main() async {
         BlocProvider(create: (context) => AppBloc(getIt<ApplicationUseCase>(), getIt<RecruitPostUseCase>(), getIt<UserUseCase>())),
         BlocProvider(create: (context) => ReviewBloc(getIt<ReviewUseCase>(), getIt<UserUseCase>())),
         BlocProvider(create: (context) => MessageBloc(getIt<MessageUseCase>())),
-        BlocProvider(create: (context) => PurchaseBloc(getIt<PurchaseUseCase>()))
+        BlocProvider(create: (context) => PurchaseBloc(getIt<PurchaseUseCase>(), getIt<InAppPurchase>()))
       ], child: const MetaDataSetting(),
     ),
   ));

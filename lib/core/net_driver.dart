@@ -30,6 +30,7 @@ class NetDriver {
       // logger.e(res.statusMessage);
       return res.data;
     } else {
+      logger.d('[Error URL] $url');
       logger.e("${res.statusCode} : ${res.statusMessage}s");
       logger.w(res.data);
       return res.data;

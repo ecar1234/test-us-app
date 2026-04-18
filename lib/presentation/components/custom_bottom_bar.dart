@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import 'package:test_us_app/presentation/components/one_action_dialog.dart';
-import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
+import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
 import '../pages/post/promotion_post_pages/promotion_post_create_page.dart';

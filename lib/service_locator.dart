@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/application_data/application_datasource.dart';
 import 'package:test_us_app/data/data_sources/application_data/application_datasource_impl.dart';
@@ -30,7 +31,7 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/auth/auth_service.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/firebase/firebase_options.dart';
-import 'package:test_us_app/services/revenue_cat_purchases/purchase_management.dart';
+import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 import 'package:test_us_app/services/socket/Isocket_io_client.dart';
 import 'package:test_us_app/services/socket/socket_io_client.dart';
 
@@ -88,6 +89,7 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   // getIt.registerSingleton<ThemeProvider>(ThemeProvider());
   getIt.registerLazySingleton<ISocketClient>(() => SocketIOClientImpl());
   getIt.registerSingleton<AuthService>(AuthService());
+  getIt.registerSingleton<InAppPurchase>(InAppPurchase.instance);
 
   // data
   getIt.registerLazySingleton<UserDataSource>(() => UserDataSourceImpl(getIt<NetDriver>()));
@@ -127,12 +129,12 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   getIt.registerLazySingleton<PromotionPostUseCase>(() => PromotionPostUseCase(getIt<PromotionPostRepository>()));
   getIt.registerLazySingleton<FirebaseMessagingUseCase>(() => FirebaseMessagingUseCase());
   getIt.registerLazySingleton<MessageUseCase>(() => MessageUseCase(getIt<RoomRepository>(), getIt<MessageRepository>(), getIt<RoomMemberRepository>(), getIt<UserProvider>()));
-  getIt.registerLazySingleton<PurchaseUseCase>(() => PurchaseUseCase(getIt<PurchaseRepository>()));
+  getIt.registerLazySingleton<PurchaseUseCase>(() => PurchaseUseCase(getIt<PurchaseRepository>(), getIt<InAppPurchase>()));
 
   //provider
   getIt.registerSingleton<FirebaseMessagingProvider>(FirebaseMessagingProvider(getIt<FirebaseMessagingUseCase>()));
   getIt.registerSingleton<UserProvider>(UserProvider(getIt<UserUseCase>()));
   getIt.registerSingleton<SocketProvider>(SocketProvider(getIt<ISocketClient>()));
-  getIt.registerSingleton<PurchasesManagements>(PurchasesManagements());
+  getIt.registerSingleton<PurchaseProvider>(PurchaseProvider());
 
 }

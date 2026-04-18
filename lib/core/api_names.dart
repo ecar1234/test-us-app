@@ -125,4 +125,7 @@ class PurchaseApi {
   static const String eventLog = '/api/v1/purchase/debug/eventLog';
   static const String errorLog = '/api/v1/purchase/debug/errorLog';
   static const String refresh = '/api/v1/purchase/refresh';
+  static const String verifyPurchaseAOS = '/api/v1/purchase/purchaseAOS';
+  static const String verifyPurchaseIOS = '/api/v1/purchase/purchaseIOS';
+  static const String getPurchaseList = '/api/v1/purchase/subscribes';
 }

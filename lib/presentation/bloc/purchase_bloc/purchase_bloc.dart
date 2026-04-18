@@ -1,180 +1,143 @@
-
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/billing_client_wrappers.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:logger/logger.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
+
 import 'package:test_us_app/domain/entities/purchase_entity.dart';
 import 'package:test_us_app/domain/use_cases/purchase_usecase.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_event.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_state.dart';
 
+import '../../../domain/entities/product_entity.dart';
+
 class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
   final logger = Logger();
-  PurchaseBloc(PurchaseUseCase purchaseUseCase) : super(PurchaseState(state: PurchaseProgressState.serviceStart)) {
-    on<PurchaseInit> ((event, emit) async {
-      emit(PurchaseState(state: PurchaseProgressState.loading));
-      logger.i('[Purchase] initializeRevenueCat start');
-      try {
-        late PurchasesConfiguration configuration;
-        if (Platform.isIOS) {
-          configuration = PurchasesConfiguration('appl_tRVsZtlDmNwTzkGftXvkEynXymB');
-          logger.i('[RevenueCat] Release Mode(IOS) Init');
-        } else if (Platform.isAndroid) {
-          configuration = PurchasesConfiguration('goog_fPnfMAsYqlmIVGbUxdMkVgYJDUU');
-          logger.i('[RevenueCat] Release Mode(Android) Init');
-        } else {
-          throw UnsupportedError('Platform not supported');
-        }
+  final InAppPurchase _inAppPurchase;
 
-        await Purchases.configure(configuration);
-        emit(PurchaseInitCompletedState());
-        logger.i('[Purchase] initializeRevenueCat success');
-      } catch (e) {
-        emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
-        logger.e('[Purchase] initializeRevenueCat error : $e');
+  PurchaseBloc(PurchaseUseCase purchaseUseCase, this._inAppPurchase)
+      : super(PurchaseState(state: PurchaseProgressState.serviceStart)) {
+
+    on<PurchaseInit>((event, emit) async {
+      final bool available = await _inAppPurchase.isAvailable();
+      if (!available) {
+        emit(PurchaseState(state: PurchaseProgressState.error, message: '구매 서비스를 사용할 수 없습니다.'));
+        logger.e('[Purchase] purchase service is not available');
+        return;
       }
+      late StreamSubscription<List<PurchaseDetails>> subscription;
+      final Stream<List<PurchaseDetails>> purchaseUpdated = _inAppPurchase.purchaseStream;
+      subscription = purchaseUpdated.listen((List<PurchaseDetails> purchaseDetailsList) {
+        add(PurchaseOnHandlerEvent(event.token, purchaseDetailsList));
+      }, onDone: () {
+        subscription.cancel();
+      }, onError: (Object error) {
+        // handle error here.
+      });
+      emit(PurchaseInitCompletedState());
+      logger.i('[Purchase] stream listener initialized');
     });
+
     on<PurchaseOfferings>((event, emit) async {
       emit(PurchaseState(state: PurchaseProgressState.loading));
-      logger.i('[Purchase] getOfferings start');
+      logger.i('[Purchase] offering loading....');
+
       try {
-        final offerings = await Purchases.getOfferings();
-        final offer = '${event.plan.toLowerCase()}-default';
-        final packages = offerings.all[offer]!.availablePackages;
-        if (packages.isEmpty) {
-          emit(GetOfferingCompletedState(packages: []));
-          logger.i('[Purchase] getOfferings empty');
+        final products = await purchaseUseCase.getProducts();
+        if(products.isEmpty){
+          emit(PurchaseState(
+              state: PurchaseProgressState.error, message: '상품 정보를 가져오는데 실패 했습니다.'));
+          logger.e('[Purchase] purchase service is not available');
           return;
         }
-        emit(GetOfferingCompletedState(packages: packages.reversed.toList()));
-        logger.i('[Purchase] getOfferings success : ${packages.length}');
-      } catch (e) {
-        emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
-        logger.e('[Purchase] getOfferings error : $e');
-      }
-    });
-    on<RequestNewPurchase>((event, emit) async {
-      emit(PurchaseState(state: PurchaseProgressState.loading));
-      logger.i('[Purchase] purchase start');
-      try {
-        final purchaseParam = PurchaseParams.package(event.package);
-        final result = await Purchases.purchase(purchaseParam);
 
-        // 안전한 접근: active 리스트가 있을 때만 로그 기록
-        final activeEntitlements = result.customerInfo.entitlements.active.values.toList();
-
-        if (activeEntitlements.isNotEmpty) {
-          await purchaseUseCase.eventLog(activeEntitlements.first);
-
-          if (activeEntitlements.length == 1) {
-            final res = PurchaseEntity.toEntity(activeEntitlements.first);
-            emit(PurchaseCompletedState(res));
-            logger.i('[Purchase] purchase success');
-          } else {
-            // iOS에서 구독 그룹 이동 시 일시적으로 2개가 잡힐 수 있음 (필요시 로직 완화 검토)
-            emit(PurchaseState(state: PurchaseProgressState.error, message: '활성화된 상품 정보가 올바르지 않습니다.'));
-          }
-        } else {
-          emit(PurchaseState(state: PurchaseProgressState.failed, message: '활성화 상품이 존재하지 않습니다.'));
-        }
-      } on PlatformException catch (e) {
-        // 사용자가 취소한 경우 에러가 아닌 취소 상태로 처리
-        var errorCode = PurchasesErrorHelper.getErrorCode(e);
-        if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
-          emit(PurchaseState(state: PurchaseProgressState.serviceStart)); // 또는 별도의 cancelled 상태
-          logger.i('[Purchase] user cancelled');
-        } else {
-          emit(PurchaseState(state: PurchaseProgressState.error, message: e.message ?? e.toString()));
-          purchaseUseCase.errorLog(e.toString());
-          logger.e('[Purchase] purchase error : $e');
-        }
-      }
-    });
-    on<RequestUpdatePurchase>((event, emit) async {
-      try {
-        PurchaseParams purchaseParam;
-        final grade = _checkProrationMode(event.old, event.package); // 0: none, 1: upgrade, -1 : downgrade
-
-        if(Platform.isAndroid){
-          final prorationMode = grade == 1 ? GoogleProrationMode.deferred
-              // : (grade == -1 ? GoogleProrationMode.immediateWithTimeProration : GoogleProrationMode.immediateAndChargeFullPrice);
-              : (grade == -1 ? GoogleProrationMode.immediateAndChargeFullPrice : GoogleProrationMode.immediateAndChargeFullPrice);
-          purchaseParam = PurchaseParams.package(
-              event.package,
-              googleProductChangeInfo: GoogleProductChangeInfo(
-                  "purchase:${event.old.planId}",
-                  prorationMode: prorationMode
-              )
-          );
-        }else {
-          purchaseParam = PurchaseParams.package(event.package);
-        }
-        final result = await Purchases.purchase(purchaseParam);
-        final activeItem = result.customerInfo.entitlements.active.values.where((item) => item.isActive).toList();
-        if (activeItem.isNotEmpty){
-          if(activeItem.length == 1){
-            final res = PurchaseEntity.toEntity(activeItem.first);
-            emit(PurchaseUpdateCompletedState(res, grade));
-            logger.i('[Purchase] purchase update success : gradeCode : $grade (0: none, 1: upgrade, -1 : downgrade)');
-            return;
-          }else {
-            emit(PurchaseState(state: PurchaseProgressState.error, message: '활성화 상품이 하나 이상입니다.'));
-            logger.i('[Purchase] purchase error');
-            return;
-          }
-        }else{
-          emit(PurchaseState(state: PurchaseProgressState.failed, message: '활성화 상품이 존재하지 않습니다.'));
-          logger.i('[Purchase] purchase failed');
-          return;
-        }
-      } on PlatformException catch (e) {
-        emit(PurchaseState(state: PurchaseProgressState.error, message: '활성화 상품이 하나 이상입니다.'));
-        logger.i('[Purchase] purchase error');
+        emit(GetOfferingCompletedState(products));
+        logger.i('[Purchase] offering loaded');
       } on Exception catch (e) {
-        emit(PurchaseState(state: PurchaseProgressState.error, message: '활성화 상품이 하나 이상입니다.'));
-        logger.i('[Purchase] purchase error');
+        emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
+        logger.e('[Purchase] offering loading failed');
       }
+    });
+
+    on<RequestAosNewPurchase>((event, emit) async {
+      final res = await purchaseUseCase.newPurchaseByAos(event.product);
+      if (!res) {
+        emit(PurchaseState(state: PurchaseProgressState.error, message: '구매에 실패하였습니다.'));
+        logger.e('[Purchase] purchase failed');
+        return;
+      }
+      emit(PurchasePendingState());
+      logger.i('[Purchase] PurchasePendingState');
+    });
+
+    on<PrepareUpdateRestorePurchase>((event, emit) async {
+      await purchaseUseCase.prepareUpdate();
+      emit(UpdateLoadingState());
+      logger.i('[Purchase] prepare update : start restore');
+    });
+
+    on<RequestAosUpdatePurchase>((event, emit) async {
+      final res = await purchaseUseCase.purchaseUpdateByAos(event.product, event.old);
+
     });
 
     on<RequestRestorePurchase>((event, emit) async {
+      await _inAppPurchase.restorePurchases();
+    });
+
+    on<VerificationPurchase>((event, emit) async {
       emit(PurchaseState(state: PurchaseProgressState.loading));
-      logger.i('[Purchase] restore start');
+      logger.i('[Purchase] verification starting....');
       try {
-        final restore = await Purchases.restorePurchases();
-        if(restore.entitlements.active.isEmpty){
-          emit(PurchaseState(state: PurchaseProgressState.failed, message: '구매 내역이 없습니다.'));
-          logger.i('[Purchase] restore failed');
-          return;
-        }
-        final activeItem = restore.entitlements.active.values.where((item) => item.isActive).toList();
-        final res = PurchaseEntity.toEntity(activeItem.first);
-        emit(PurchaseRestoreCompletedState(res));
-        logger.i('[Purchase] restore success');
-      } on PlatformException catch (e) {
+        final res = await purchaseUseCase.verifyPurchase(event.token, event.userId, event.details);
+        emit(PurchaseCompletedByServerState(res));
+        logger.i('[Purchase] verification && purchase completed');
+      } on Exception catch (e) {
         emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
-        logger.e('[Purchase] restore error : $e');
+        logger.e('[Purchase] verification failed');
       }
     });
-  }
 
-  int _checkProrationMode(PurchaseEntity entity, Package newPackage) {
-    // 2. 현재 플랜과 새 플랜의 가중치 비교
-    int currentPlan = 0; // 0: none, 1: standard, 2: premium
-    int newPlan = 0; // 0: 0: none, 1: standard, 2: premium
+    on<RequestUserPurchaseInfo>((event, emit) async {
+      try {
+        emit(PurchaseState(state: PurchaseProgressState.loading));
+        logger.i('[Purchase] user purchase info loading....');
+        final res = await purchaseUseCase.getPurchaseList(event.token, event.userId);
+        emit(GetUserPurchaseInfoCompletedState(res));
+      } on Exception catch (e) {
+        emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
+        logger.e('[Purchase] user purchase info loading failed');
+      }
+    });
 
-    if(entity.plan == 'standard') {
-      currentPlan = 1;
-    }else {
-      currentPlan = 2;
-    }
-    if(newPackage.storeProduct.presentedOfferingContext?.offeringIdentifier.split('-')[0]=='standard') {
-      newPlan = 1;
-    }else {
-      newPlan = 2;
-    }
+    on<PurchaseOnHandlerEvent>((event, emit) async {
+      for (final PurchaseDetails purchaseDetails in event.purchaseDetailsList) {
+        if (purchaseDetails.status == PurchaseStatus.pending) {
+          emit(PurchaseState(state: PurchaseProgressState.pending));
+          logger.i('[Purchase] purchase state update to pending');
+        } else {
+          if (purchaseDetails.status == PurchaseStatus.error) {
+            emit(PurchaseState(state: PurchaseProgressState.error, message: purchaseDetails.error?.message));
+            logger.i('[Purchase] purchase state update to error');
+          } else if (purchaseDetails.status == PurchaseStatus.purchased) {
+            emit(PurchaseCompletedState(details: purchaseDetails));
+            logger.i('[Purchase] PurchaseCompletedState');
+          } else if (purchaseDetails.status == PurchaseStatus.restored) {
+            emit(PurchaseRestoreCompletedState(purchaseDetails));
+            logger.i('[Purchase] PurchaseRestoreCompletedState');
+          }
 
-    return currentPlan - newPlan;
+        }
+      }
+    });
+
+    on<PurchaseStateInitEvent>((event, emit) async {
+      emit(PurchaseState(state: PurchaseProgressState.initCompleted));
+    });
   }
 }

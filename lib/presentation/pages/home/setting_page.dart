@@ -7,7 +7,7 @@ import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_state.dart'
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
-import '../../../services/revenue_cat_purchases/purchase_management.dart';
+import '../../provider/purchase_provider.dart';
 import '../../bloc/purchase_bloc/purchase_bloc.dart';
 import '../../bloc/purchase_bloc/purchase_event.dart';
 import '../../provider/user_provider.dart';

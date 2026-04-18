@@ -32,7 +32,7 @@ import 'package:test_us_app/services/theme_provider.dart';
 import '../../data/sharedPreferences/firebase_messaging_preference.dart';
 import '../../services/firebase/messaging_service.dart';
 import '../../services/notification/notification_service.dart';
-import '../../services/revenue_cat_purchases/purchase_management.dart';
+import '../provider/purchase_provider.dart';
 import '../bloc/app_bloc/app_state.dart';
 import '../bloc/auth_bloc/auth_bloc.dart';
 import '../bloc/auth_bloc/auth_state.dart';
@@ -137,7 +137,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
             context
                 .read<BasePostProvider>()
                 .getInitPosts(state.favoritePosts!, state.recruitPosts!, state.promotionPosts!);
-            context.read<PurchaseBloc>().add(PurchaseInit());
             // context.read<RecruitPostProvider>().getInitPosts(state.recruitPosts!);
             // context.read<PromotionPostProvider>().getInitPromotionPosts(state.promotionPosts!);
             FlutterNativeSplash.remove();
@@ -196,9 +195,18 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         ),
         BlocListener<PurchaseBloc, PurchaseState>(
           listener: (context, state) async {
-            context.read<PurchasesManagements>().addUpdateListenerRevenueCat();
+            if(state is PurchaseInitCompletedState){
+              final userProvider = context.read<UserProvider>();
+              //TODO : offering은 해결, 유져 정보 가져오기 실패. 서버 확인 (하는김에 entity 통합.)
+              context.read<PurchaseBloc>().add(RequestUserPurchaseInfo(token: userProvider.token!, userId: userProvider.user!.id!));
+            }else if(state is GetUserPurchaseInfoCompletedState){
+              context.read<PurchaseProvider>().getUserPurchaseList(state.subscribeList);
+              context.read<PurchaseBloc>().add(PurchaseOfferings());
+            }else if(state is GetOfferingCompletedState){
+              context.read<PurchaseProvider>().getProducts(state.products);
+            }
           },
-          listenWhen: (preState, state) => state.state == PurchaseProgressState.initCompleted,
+          // listenWhen: (preState, state) => state.state == PurchaseProgressState.initCompleted,
         )
       ],
       child: GetMaterialApp(
@@ -321,7 +329,7 @@ class _MainState extends State<MainPage> {
       child: Selector<ThemeProvider, bool>(
           selector: (contest, provider) => provider.isDarkMode,
           builder: (context, isDarkMode, chile) {
-            final activePlan = context.read<PurchasesManagements>().subscribedItem;
+            // final activePlan = context.read<PurchasesManagements>().subscribedItem;
             return Container(
               decoration: BoxDecoration(color: isDarkMode ? Colors.black : Colors.white),
               child: Stack(children: [
@@ -339,37 +347,10 @@ class _MainState extends State<MainPage> {
                       });
                     },
                     onRecruit: () {
-                      final recruitLimit = activePlan == null ? 1 : (activePlan.plan == 'standard' ? 2 : 4);
-                      final recruitLength = context.read<BasePostProvider>().userRecruitPosts?.length ?? 0;
-                      if(recruitLength < recruitLimit){
-                        Get.to(() => RecruitPostCreatePage());
-                      }else {
-                        showDialog(context: context, builder: (context) => Dialog(
-                          child: OneActionDialog(
-                              title: '알림',
-                              contents1: '사용중인 Plan에서는',
-                              contents2: '최대 $recruitLimit개의 테스트 진행 가능합니다.',
-                              buttonText: '확인',
-                              onPressed: () => Get.back()),
-                        ));
-                      }
+                      Get.to(() => RecruitPostCreatePage());
                     },
                     onPromotion: () {
-                      final promotionLimit = activePlan == null ? 1 : (activePlan.plan == 'standard' ? 2 : 100);
-                      final promotionLength = context.read<BasePostProvider>().userPromotionPosts?.length??0;
-                      if(promotionLength < promotionLimit){
-                        Get.to(() => PromotionPostCreatePage());
-                      }else {
-                        showDialog(context: context, builder: (context) => Dialog(
-                          child: OneActionDialog(
-                              title: '알림',
-                              contents1: '사용중인 Plan에서는',
-                              contents2: '최대 $promotionLimit개의 홍보가 가능합니다.',
-                              buttonText: '확인',
-                              onPressed: () => Get.back()
-                          ),
-                        ));
-                      }
+                      Get.to(() => PromotionPostCreatePage());
                     },
                   ),
                 )

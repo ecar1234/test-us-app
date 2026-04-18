@@ -35,7 +35,8 @@ class RecruitPostEntity {
   int? views;
   List<ImageEntity>? images;
   String? postType;
-  List<RecruitReviewEntity>? reviews;
+  // FIXME: 굳이 초반에 reviews data가 필요한 이유?? review는 review 페이지 들어갔을 때 로드해도 될듯?  
+  // List<RecruitReviewEntity>? reviews;
   UserEntity? author;
   List<int>? applications;
   DateTime? createdAt;
@@ -56,7 +57,7 @@ class RecruitPostEntity {
     this.views,
     this.images,
     this.postType,
-    this.reviews,
+    // this.reviews,
     this.createdAt,
     this.updatedAt,
   });
@@ -70,12 +71,12 @@ class RecruitPostEntity {
     );
     final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
     // final applications = model.applications!.map((e) => ApplicationEntity.toEntity(e)).toList();
-    final reviews = model.reviews!.map((e) => RecruitReviewEntity(
-      reviewId: e.reviewId,
-      postId: e.postId,
-      reviewerUserId: e.reviewerUserId,
-      rating: e.rating
-    )).toList();
+    // final reviews = model.reviews!.map((e) => RecruitReviewEntity(
+    //   reviewId: e.reviewId,
+    //   postId: e.postId,
+    //   reviewerUserId: e.reviewerUserId,
+    //   rating: e.rating
+    // )).toList();
 
     return RecruitPostEntity(
       id: model.id,
@@ -92,7 +93,7 @@ class RecruitPostEntity {
       views: model.views,
       images: images,
       postType: model.postType,
-      reviews: reviews,
+      // reviews: reviews,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
     );

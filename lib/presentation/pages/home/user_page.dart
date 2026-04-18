@@ -1,12 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
@@ -27,7 +25,7 @@ import '../../../data/models/application/application_model.dart';
 import '../../../data/models/post/recruit_post_model.dart';
 import '../../../data/models/user/user_model.dart';
 import '../../../domain/entities/purchase_entity.dart';
-import '../../../services/revenue_cat_purchases/purchase_management.dart';
+import '../../provider/purchase_provider.dart';
 import '../../bloc/auth_bloc/auth_bloc.dart';
 import '../../bloc/auth_bloc/auth_event.dart';
 import '../../bloc/auth_bloc/auth_state.dart';
@@ -164,8 +162,11 @@ class _UserPageState extends State<UserPage> {
                             iconAlignment: IconAlignment.end,
                           ),
                         ),
-                        Selector<PurchasesManagements, PurchaseEntity?>(
-                            selector: (context, purchase) => purchase.subscribedItem,
+                        Selector<PurchaseProvider, PurchaseEntity?>(
+                            selector: (context, provider) {
+                              return provider.subscribedList
+                                  .firstWhereOrNull((element) => element.isActive != null && element.isActive == true);
+                            },
                             builder: (context, info, child) {
                               String plan;
                               if (info != null){
@@ -565,7 +566,6 @@ class _UserPageState extends State<UserPage> {
                                   context
                                       .read<FirebaseMessagingProvider>()
                                       .readAllNotification();
-                                  context.read<PurchasesManagements>().logout();
                                 },
                                 style: OutlinedButton.styleFrom(
                                   shape: RoundedRectangleBorder(
