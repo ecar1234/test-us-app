@@ -1,15 +1,9 @@
 import 'dart:async';
-import 'dart:io';
-
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:in_app_purchase_android/billing_client_wrappers.dart';
-import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:logger/logger.dart';
 
-import 'package:test_us_app/domain/entities/purchase_entity.dart';
 import 'package:test_us_app/domain/use_cases/purchase_usecase.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_event.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_state.dart';
@@ -45,22 +39,22 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
 
     on<PurchaseOfferings>((event, emit) async {
       emit(PurchaseState(state: PurchaseProgressState.loading));
-      logger.i('[Purchase] offering loading....');
+      debugPrint('[Purchase] offering loading....');
 
       try {
         final products = await purchaseUseCase.getProducts();
         if(products.isEmpty){
           emit(PurchaseState(
               state: PurchaseProgressState.error, message: '상품 정보를 가져오는데 실패 했습니다.'));
-          logger.e('[Purchase] purchase service is not available');
+          debugPrint('[Purchase] purchase service is not available');
           return;
         }
 
         emit(GetOfferingCompletedState(products));
-        logger.i('[Purchase] offering loaded');
+        debugPrint('[Purchase] offering loaded');
       } on Exception catch (e) {
         emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
-        logger.e('[Purchase] offering loading failed');
+        debugPrint('[Purchase] offering loading failed');
       }
     });
 
@@ -82,8 +76,25 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
     });
 
     on<RequestAosUpdatePurchase>((event, emit) async {
-      final res = await purchaseUseCase.purchaseUpdateByAos(event.product, event.old);
+      final res = await purchaseUseCase.purchaseUpdateByAos(event.product, event.productId, event.old);
+      if(!res){
+        emit(PurchaseState(state: PurchaseProgressState.error, message: '[Purchase AOS] 업데이트 실패하였습니다.'));
+        logger.e('[Purchase] purchase failed');
+        return;
+      }
+      emit(PurchasePendingState());
+      logger.i('[Purchase] PurchasePendingState');
+    });
 
+    on<RequestIosPurchase>((event, emit) async {
+      final res = await purchaseUseCase.purchaseByIos();
+      if (!res) {
+        emit(PurchaseState(state: PurchaseProgressState.error, message: '구매에 실패하였습니다.'));
+        logger.e('[Purchase] purchase failed');
+        return;
+      }
+      emit(PurchasePendingState());
+      logger.i('[Purchase] PurchasePendingState');
     });
 
     on<RequestRestorePurchase>((event, emit) async {
@@ -124,6 +135,7 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
           if (purchaseDetails.status == PurchaseStatus.error) {
             emit(PurchaseState(state: PurchaseProgressState.error, message: purchaseDetails.error?.message));
             logger.i('[Purchase] purchase state update to error');
+            debugPrint('[Purchase]${purchaseDetails.error?.message}');
           } else if (purchaseDetails.status == PurchaseStatus.purchased) {
             emit(PurchaseCompletedState(details: purchaseDetails));
             logger.i('[Purchase] PurchaseCompletedState');

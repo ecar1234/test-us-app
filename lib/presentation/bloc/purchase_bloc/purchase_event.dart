@@ -23,9 +23,10 @@ class PrepareUpdateRestorePurchase extends PurchaseEvent {
 }
 class RequestAosUpdatePurchase extends PurchaseEvent {
   final ProductDetails product;
+  final String productId;
   final PurchaseDetails old;
 
-  RequestAosUpdatePurchase({required this.product, required this.old});
+  RequestAosUpdatePurchase({required this.product, required this.productId, required this.old});
 }
 class RequestIosPurchase extends PurchaseEvent {
   final ProductDetails product;

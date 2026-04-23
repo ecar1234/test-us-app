@@ -197,7 +197,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
           listener: (context, state) async {
             if(state is PurchaseInitCompletedState){
               final userProvider = context.read<UserProvider>();
-              //TODO : offering은 해결, 유져 정보 가져오기 실패. 서버 확인 (하는김에 entity 통합.)
               context.read<PurchaseBloc>().add(RequestUserPurchaseInfo(token: userProvider.token!, userId: userProvider.user!.id!));
             }else if(state is GetUserPurchaseInfoCompletedState){
               context.read<PurchaseProvider>().getUserPurchaseList(state.subscribeList);

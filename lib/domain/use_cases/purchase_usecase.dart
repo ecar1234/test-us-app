@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/billing_client_wrappers.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
@@ -16,11 +17,11 @@ class PurchaseUseCase {
   PurchaseUseCase(this._repository, this._inAppPurchase);
 
   final _iProductIds = <String>[
-    'std_1m',
+    'std_m1',
     'std_3m',
     'std_6m',
     'std_1y',
-    'pre_1m',
+    'pre_m1',
     'pre_3m',
     'pre_6m',
     'pre_1y',
@@ -53,6 +54,11 @@ class PurchaseUseCase {
     final List<String> productIds = Platform.isAndroid ? ['purchase'] : _iProductIds;
     final ProductDetailsResponse res = await _inAppPurchase.queryProductDetails(productIds.toSet());
     if (res.notFoundIDs.isNotEmpty) {
+      debugPrint('실패한 상품 IDs: ${res.notFoundIDs}');
+      // 여기서 return [] 을 하지 말고 계속 진행합니다.
+    }
+    if (res.productDetails.isEmpty) {
+      debugPrint('상품이 없습니다: ${res.productDetails}');
       return [];
     }
 
@@ -82,19 +88,33 @@ class PurchaseUseCase {
     }
     else {
       final offers = res.productDetails.map((product) {
-        return ProductEntity(
-          id: product.id, // iOS는 productId 자체가 고유함
-          groupId: product.id, // iOS는 그룹 개념이 코드상에선 약함
-          title: product.title,
-          description: product.description,
-          price: product.price,
-          rawPrice: product.rawPrice,
-          currencyCode: product.currencyCode,
-          period: '', // iOS 주기를 ISO 형식으로 변환 필요
-          originProduct: product,
-          offerToken: null, // iOS는 토큰 개념 없음
-        );
-      }).toList();
+
+        String inferredPeriod = '';
+        if (product.id.contains('m1')) inferredPeriod = 'P1M';
+        if (product.id.contains('1y')) inferredPeriod = 'P1Y';
+        if (product.id.contains('3m')) inferredPeriod = 'P3M';
+        if (product.id.contains('6m')) inferredPeriod = 'P6M';
+
+        try {
+          return ProductEntity(
+            id: product.id,
+            groupId: product.id,
+            title: product.title,
+            description: product.description,
+            price: product.price,
+            rawPrice: product.rawPrice,
+            currencyCode: product.currencyCode,
+            period: inferredPeriod, // UI가 이 값을 기다리고 있을 가능성이 높음
+            originProduct: product,
+            offerToken: null,
+          );
+        } catch (e) {
+          debugPrint('변환 중 에러 발생: $e');
+          return null; // 실패한 녀석은 null로 보냄
+        }
+      }).whereType<ProductEntity>().toList(); // null 제거
+
+      debugPrint('[최종 반환] 변환 완료된 상품 수: ${offers.length}');
       return offers;
     }
   }
@@ -111,12 +131,20 @@ class PurchaseUseCase {
      await _inAppPurchase.restorePurchases();
   }
 
-  Future<bool> purchaseUpdateByAos(ProductDetails product, PurchaseDetails old) async {
+  Future<bool> purchaseUpdateByAos(ProductDetails product, String productId, PurchaseDetails old) async {
     final convertOld = old as GooglePlayPurchaseDetails;
+    if (convertOld.purchaseID == null) throw Exception('invalid old purchase');
+
+    final offerToken = (product as GooglePlayProductDetails).productDetails.subscriptionOfferDetails!
+        .firstWhere((e) => e.basePlanId == productId).offerIdToken;
+
+    // NOTE: 테스트 시에는 시간압축으로 인해서 MODE 변경에 따른 오류가 발생.
+    // NOTE: 테스트 진행 시 proration은 chargeFullPrice 또는 deferred로 고정 후 진행.
     final grade = _checkProrationMode(old, product);
-    final proration = grade == 0
-        ? ReplacementMode.withTimeProration
-        : (grade == -1 ? ReplacementMode.withTimeProration : ReplacementMode.deferred);
+    // final proration = grade == 1
+    //     ? ReplacementMode.deferred : ReplacementMode.withTimeProration;
+    final proration =  ReplacementMode.chargeFullPrice;
+
 
     final param = GooglePlayPurchaseParam(
       productDetails: product,
@@ -124,8 +152,8 @@ class PurchaseUseCase {
         replacementMode: proration,
         oldPurchaseDetails: convertOld,
       ),
+      offerToken: offerToken,
     );
-
     final res = await _inAppPurchase.buyNonConsumable(purchaseParam: param);
     return res;
   }
