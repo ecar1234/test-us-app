@@ -1,0 +1,275 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "5170DC11",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6755170098",
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_developerTeamID" : "38DCD6F7UP",
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 799219866.04913294,
+    "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ],
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21959921",
+      "localizations" : [
+
+      ],
+      "name" : "purchase",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "29.99",
+          "familyShareable" : false,
+          "groupNumber" : 8,
+          "internalID" : "6760230508",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Premium 기능을 1년 무제한 이용 가능합니다.",
+              "displayName" : "Premium 1년 구독",
+              "locale" : "ko"
+            }
+          ],
+          "productID" : "pre_1y",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "pre-1y",
+          "subscriptionGroupID" : "21959921",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "7.99",
+          "familyShareable" : false,
+          "groupNumber" : 6,
+          "internalID" : "6760231638",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Premium 기능을 3개월 무제한 이용 가능합니다.",
+              "displayName" : "Premium 3개월 구독",
+              "locale" : "ko"
+            }
+          ],
+          "productID" : "pre_3m",
+          "recurringSubscriptionPeriod" : "P3M",
+          "referenceName" : "pre-3m",
+          "subscriptionGroupID" : "21959921",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "14.99",
+          "familyShareable" : false,
+          "groupNumber" : 7,
+          "internalID" : "6760228367",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Premium 기능을 6개월 무제한 이용 가능합니다.",
+              "displayName" : "Premium 6개월 구독",
+              "locale" : "ko"
+            }
+          ],
+          "productID" : "pre_6m",
+          "recurringSubscriptionPeriod" : "P6M",
+          "referenceName" : "pre-6m",
+          "subscriptionGroupID" : "21959921",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "2.99",
+          "familyShareable" : false,
+          "groupNumber" : 5,
+          "internalID" : "6760226947",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Premium 기능을 1개월 무제한 이용 가능합니다.",
+              "displayName" : "Premium 1개월 구독",
+              "locale" : "ko"
+            }
+          ],
+          "productID" : "pre_m1",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "pre-m1",
+          "subscriptionGroupID" : "21959921",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "11.99",
+          "familyShareable" : false,
+          "groupNumber" : 4,
+          "internalID" : "6760226823",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Standard 기능을 1년 무제한 이용 가능합니다.",
+              "displayName" : "Standard 1년 구독",
+              "locale" : "ko"
+            }
+          ],
+          "productID" : "std_1y",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "std-1y",
+          "subscriptionGroupID" : "21959921",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "2.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6760226791",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Standard 기능을 3개월 무제한 이용 가능합니다.",
+              "displayName" : "Standard 3개월 구독",
+              "locale" : "ko"
+            }
+          ],
+          "productID" : "std_3m",
+          "recurringSubscriptionPeriod" : "P3M",
+          "referenceName" : "std-3m",
+          "subscriptionGroupID" : "21959921",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "5.99",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "6760226821",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Standard 기능을 6개월 무제한 이용 가능합니다.",
+              "displayName" : "Standard 6개월 구독",
+              "locale" : "ko"
+            }
+          ],
+          "productID" : "std_6m",
+          "recurringSubscriptionPeriod" : "P6M",
+          "referenceName" : "std-6m",
+          "subscriptionGroupID" : "21959921",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "0.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6760226609",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Standard 기능을 1개월 무제한 이용 가능합니다.",
+              "displayName" : "Standard 1개월 구독",
+              "locale" : "ko"
+            }
+          ],
+          "productID" : "std_m1",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "std-m1",
+          "subscriptionGroupID" : "21959921",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

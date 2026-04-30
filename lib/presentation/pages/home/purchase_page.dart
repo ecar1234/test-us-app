@@ -94,7 +94,7 @@ class _PurchasePageState extends State<PurchasePage> {
               // aos 구독 업데이트 전 restore 상태
               BlocListener<PurchaseBloc, PurchaseState>(
                 listener: (context, state) {
-                  if (state is PurchaseRestoreCompletedState) {
+                  if (state is PurchaseRestoreCompletedState && Platform.isAndroid) {
                     context
                         .read<PurchaseBloc>()
                         .add(RequestAosUpdatePurchase(

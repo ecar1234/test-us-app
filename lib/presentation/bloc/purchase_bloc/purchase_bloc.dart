@@ -87,14 +87,20 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
     });
 
     on<RequestIosPurchase>((event, emit) async {
-      final res = await purchaseUseCase.purchaseByIos();
-      if (!res) {
-        emit(PurchaseState(state: PurchaseProgressState.error, message: '구매에 실패하였습니다.'));
-        logger.e('[Purchase] purchase failed');
-        return;
+      try {
+        final res = await purchaseUseCase.purchaseByIos(event.product);
+        if (!res) {
+          emit(PurchaseState(state: PurchaseProgressState.error, message: '구매에 실패하였습니다.'));
+          logger.e('[Purchase] purchase failed');
+          return;
+        }
+        emit(PurchasePendingState());
+        logger.i('[Purchase] PurchasePendingState');
+      } on Exception catch (e) {
+        debugPrint("[Purchase Exception] IOS purchase ${e.toString()}");
+        emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
+        logger.e('[Purchase] purchase error');
       }
-      emit(PurchasePendingState());
-      logger.i('[Purchase] PurchasePendingState');
     });
 
     on<RequestRestorePurchase>((event, emit) async {

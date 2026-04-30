@@ -157,8 +157,12 @@ class PurchaseUseCase {
     final res = await _inAppPurchase.buyNonConsumable(purchaseParam: param);
     return res;
   }
-  Future<bool> purchaseByIos() async {
-    return false;
+  Future<bool> purchaseByIos(ProductDetails product) async {
+    final purchaseParam = PurchaseParam(
+      productDetails: product,
+    );
+    final res = await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
+    return res;
   }
 
   Future<PurchaseEntity> verifyPurchase(String token, String userId, PurchaseDetails purchase) async {

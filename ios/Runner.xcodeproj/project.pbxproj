@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0454280C2FA3209300B97617 /* purchase.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0454280B2FA3209300B97617 /* purchase.storekit */; };
 		04CE00862F567B94009A51B0 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04CE00852F567B94009A51B0 /* StoreKit.framework */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		2125191327455FAF0EDE2C99 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BE122869CC85D6BE6459447 /* Pods_RunnerTests.framework */; };
@@ -44,6 +45,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0454280B2FA3209300B97617 /* purchase.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = purchase.storekit; sourceTree = "<group>"; };
 		04803B662EEAC4130037E746 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		04CE00852F567B94009A51B0 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		0BE122869CC85D6BE6459447 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -169,6 +171,7 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				0454280B2FA3209300B97617 /* purchase.storekit */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -274,6 +277,7 @@
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				B50A49E79AACB3865194733A /* GoogleService-Info.plist in Resources */,
+				0454280C2FA3209300B97617 /* purchase.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
