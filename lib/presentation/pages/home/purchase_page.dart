@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:bot_toast/bot_toast.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -11,6 +13,7 @@ import 'package:test_us_app/domain/entities/purchase_entity.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_event.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_state.dart';
 import 'package:test_us_app/presentation/components/one_action_dialog.dart';
+import 'package:test_us_app/presentation/components/simple_text_toast_box.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/presentation/provider/purchase_provider.dart';
@@ -44,60 +47,36 @@ class _PurchasePageState extends State<PurchasePage> {
             // todo: dialog를 컴포넌트 화시켜 / 원버튼, 투버튼.
             listeners: [
               BlocListener<PurchaseBloc, PurchaseState>(listener: (context, state) async {
-               if (state is PurchaseUpdateCompletedState) {
-                  // context.read<PurchasesManagements>().purchase(state.entity);
-                  String comment = '';
-                  if (state.grade == -1) {
-                    comment = 'Premium으로 업그레이드되었습니다!-지금 즉시 모든 프리미엄 혜택이 적용됩니다.';
-                  } else if (state.grade == 1) {
-                    comment = '플랜 변경 예약이 완료되었습니다.-현재 Premium 혜택은 이번 주기가 끝나는 ${state.entity.expireDate}까지 유지됩니다.';
-                  } else {
-                    comment = '${state.entity.plan}의 구독 기간이 성공적으로 변경되었습니다.-다음 갱신일부터 변경된 기간으로 결제가 진행됩니다.';
-                  }
-                  await showDialog(
-                      context: context,
-                      builder: (context) => Dialog(
-                          child: OneActionDialog(
-                              title: '구독 변경 성공',
-                              contents1: comment.split('-')[0],
-                              contents2: comment.split('-')[1],
-                              buttonText: '확인',
-                              onPressed: () => Get.back())));
-                  return;
-                }
-               else if (state is PurchaseCompletedByServerState) {
+                if (state is PurchaseUpdateCompletedState) {
+                  BotToast.showCustomNotification(
+                      toastBuilder: (context) => SimpleTextToastBox(text: '구독 업데이트 성공'),
+                      duration: Duration(seconds: 3),
+                      align: Alignment.bottomCenter
+                  );
+                } else if (state is PurchaseCompletedByServerState) {
                   // 구매 완료 후 서버에 저장 후 받은 데이터 저장하기
                   context.read<PurchaseProvider>().updatePurchaseByServer(state.entity);
+                  BotToast.showCustomNotification(
+                      toastBuilder: (context) => SimpleTextToastBox(text: '구독이 시작 되었습니다.'),
+                      duration: Duration(seconds: 3),
+                      align: Alignment.bottomCenter
+                  );
+                } else if (state.state == PurchaseProgressState.error) {
+                  debugPrint('[Purchase] ${state.message}');
+                  Get.snackbar('알림', state.message?? '구매 검증에 실패 했습니다.');
+                  context.read<PurchaseBloc>().add(PurchaseStateInitEvent());
+                  return;
+                } else if(state.state == PurchaseProgressState.failed) {
+                  debugPrint('[Purchase] ${state.message}');
+                  Get.snackbar('알림', state.message?? '알 수 없는 오류 발생. 다시 시도해 주세요.');
+                  return;
                 }
-               else if(state.state == PurchaseProgressState.error){
-                 debugPrint('[Purchase] ${state.message}');
-                 context.read<PurchaseBloc>().add(PurchaseStateInitEvent());
-               }
-               else if(state is PurchaseCompletedByServerState) {
-                 await showDialog(
-                     context: context,
-                     builder: (context) => Dialog(
-                         child: OneActionDialog(
-                             title: '구독 시작',
-                             contents1: '구독이 시작 되었습니다.',
-                             contents2: '이제 모든 ${_selectedProduct!.title} 기능을',
-                             contents3: '마음껏 이용해 보세요.',
-                             buttonText: '확인',
-                             onPressed: () {
-                               _selectedProduct = null;
-                               _isPeriodSelected = -1;
-                               Get.back();
-                             })));
-                 return;
-               }
               }),
               // aos 구독 업데이트 전 restore 상태
               BlocListener<PurchaseBloc, PurchaseState>(
                 listener: (context, state) {
                   if (state is PurchaseRestoreCompletedState && Platform.isAndroid) {
-                    context
-                        .read<PurchaseBloc>()
-                        .add(RequestAosUpdatePurchase(
+                    context.read<PurchaseBloc>().add(RequestAosUpdatePurchase(
                         product: _selectedProduct!.originProduct,
                         productId: _selectedProduct!.id!,
                         old: state.details));
@@ -108,12 +87,18 @@ class _PurchasePageState extends State<PurchasePage> {
               // 구매 완료 상태
               BlocListener<PurchaseBloc, PurchaseState>(
                 listener: (context, state) async {
-                  if (state is PurchaseCompletedState) {
+                  if (state is PurchaseCompletedState || state is PurchaseRestoreCompletedState) {
                     final token = context.read<UserProvider>().token ?? '';
                     final userId = context.read<UserProvider>().user!.id ?? '';
-                    context
-                        .read<PurchaseBloc>()
-                        .add(VerificationPurchase(token: token, userId: userId, details: state.details));
+                    _isPeriodSelected = -1;
+
+                    context.read<PurchaseBloc>().add(
+                      VerificationPurchase(
+                          token: token,
+                          userId: userId,
+                          details: (state as dynamic).details // 또는 공통 인터페이스 사용
+                      ),
+                    );
                   }
                 },
                 listenWhen: (previous, current) => previous is PurchasePendingState, // 구매 요처 후 대기 상태
@@ -392,50 +377,54 @@ class _PurchasePageState extends State<PurchasePage> {
                                   width: MediaQuery.sizeOf(context).width * 0.8,
                                   height: 50,
                                   child: ElevatedButton(
-                                      onPressed: _isPeriodSelected == -1 ? null : () {
-                                        if (context.read<UserProvider>().isLogged == false ||
-                                            context.read<UserProvider>().isLogged == null) {
-                                          Get.defaultDialog(
-                                              title: '알림',
-                                              middleText: '로그인 후 이용해주세요.',
-                                              textConfirm: '확인',
-                                              confirmTextColor: Colors.white,
-                                              onConfirm: () {
-                                                Get.back();
-                                              });
-                                          return;
-                                        }
+                                      onPressed: _isPeriodSelected == -1
+                                          ? null
+                                          : () {
+                                              if (context.read<UserProvider>().isLogged == false ||
+                                                  context.read<UserProvider>().isLogged == null) {
+                                                Get.defaultDialog(
+                                                    title: '알림',
+                                                    middleText: '로그인 후 이용해주세요.',
+                                                    textConfirm: '확인',
+                                                    confirmTextColor: Colors.white,
+                                                    onConfirm: () {
+                                                      Get.back();
+                                                    });
+                                                return;
+                                              }
 
-                                        // if (_selectedProduct == null && _isPeriodSelected == 0) {
-                                        //   if(_isPlanSelected.first == true){
-                                        //     _selectedProduct = context.read<PurchaseProvider>()
-                                        //         .products.firstWhere((item) => item.id == 'std-1m');
-                                        //   }else if(_isPlanSelected.last == true){
-                                        //     _selectedProduct = context.read<PurchaseProvider>()
-                                        //         .products.firstWhere((item) => item.id == 'pre-1m');
-                                        //   }
-                                        // }
-                                        // todo: aos 경우 restore 이후 purchaseDetail 정보를 얻어야 한다.
-                                        // todo: restore 이후 데이터가 업데이트 될때까지 bloc를 실행 하면 안된다.
-                                        final currentPlan = context
-                                            .read<PurchaseProvider>()
-                                            .subscribedList
-                                            .firstWhereOrNull((e) => e.isActive == true);
-                                        if (Platform.isAndroid) {
-                                          if (currentPlan == null) {
-                                            context
-                                                .read<PurchaseBloc>()
-                                                .add(RequestAosNewPurchase(product: _selectedProduct!.originProduct));
-                                          } else {
-                                            context.read<PurchaseBloc>().add(PrepareUpdateRestorePurchase());
-                                          }
-                                        } else if (Platform.isIOS) {
-                                          context
-                                              .read<PurchaseBloc>()
-                                              .add(RequestIosPurchase(product: _selectedProduct!.originProduct));
-                                        }
-                                        Get.back();
-                                      },
+                                              // if (_selectedProduct == null && _isPeriodSelected == 0) {
+                                              //   if(_isPlanSelected.first == true){
+                                              //     _selectedProduct = context.read<PurchaseProvider>()
+                                              //         .products.firstWhere((item) => item.id == 'std-1m');
+                                              //   }else if(_isPlanSelected.last == true){
+                                              //     _selectedProduct = context.read<PurchaseProvider>()
+                                              //         .products.firstWhere((item) => item.id == 'pre-1m');
+                                              //   }
+                                              // }
+                                              // todo: aos 경우 restore 이후 purchaseDetail 정보를 얻어야 한다.
+                                              // todo: restore 이후 데이터가 업데이트 될때까지 bloc를 실행 하면 안된다.
+                                              final currentPlan = context
+                                                  .read<PurchaseProvider>()
+                                                  .subscribedList
+                                                  .firstWhereOrNull((e) => e.isActive == true);
+                                              if (Platform.isAndroid) {
+                                                if (currentPlan == null) {
+                                                  context.read<PurchaseBloc>().add(
+                                                      RequestAosNewPurchase(product: _selectedProduct!.originProduct));
+                                                } else {
+                                                  context.read<PurchaseBloc>().add(PrepareUpdateRestorePurchase());
+                                                }
+                                              } else if (Platform.isIOS) {
+                                                if (kDebugMode) {
+                                                  context.read<PurchaseBloc>().add(IosPurchaseTestEvent('test'));
+                                                } else {
+                                                  context.read<PurchaseBloc>().add(
+                                                      RequestIosPurchase(product: _selectedProduct!.originProduct));
+                                                }
+                                              }
+                                              Get.back();
+                                            },
                                       style: ElevatedButton.styleFrom(
                                           backgroundColor: Theme.of(context).colorScheme.primary),
                                       child: Text('구매하기', style: TextStyle(color: Colors.white))),
@@ -503,7 +492,7 @@ class _PurchasePageState extends State<PurchasePage> {
         });
   }
 
-  Widget _planBuilder(String plan, void Function(void Function()) setState)  {
+  Widget _planBuilder(String plan, void Function(void Function()) setState) {
     return Expanded(
       child: Selector<PurchaseProvider, List<ProductEntity>>(
         selector: (context, provider) {
@@ -657,15 +646,17 @@ class _PurchasePageState extends State<PurchasePage> {
                           ],
                         ),
                       ),
-                      if(info != null && info.productId == products[idx].id)
-                      Positioned(
-                          top: 4,
-                          right: 8,
-                          child: SizedBox(
-                            child: Text('구독 중', style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold,
-                                color: plan == 'Premium' ? Colors.amber : Colors.blueAccent)),
-                          ))
+                      if (info != null && info.productId == products[idx].id)
+                        Positioned(
+                            top: 4,
+                            right: 8,
+                            child: SizedBox(
+                              child: Text('구독 중',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: plan == 'Premium' ? Colors.amber : Colors.blueAccent)),
+                            ))
                     ],
                   ),
                 );

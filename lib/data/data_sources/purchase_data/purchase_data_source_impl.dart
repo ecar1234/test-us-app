@@ -23,9 +23,10 @@ class PurchaseDataSourceImpl implements PurchaseDataSource {
 
   @override
   Future<void> eventLog(String info) async {
-    final res = await _netDriver.requestPostJson('', PurchaseApi.eventLog, {'eventData' : info});
+    final res = await _netDriver.requestPostJson('', PurchaseApi.verifyPurchaseIOS, {'userId' : '', 'transactionId' : info});
     if(res['status'] == 200){
       debugPrint('[Purchase Debug] eventLog delivery success');
+      return;
     } else {
       debugPrint('[Purchase Debug] eventLog delivery failed');
     }
@@ -43,9 +44,12 @@ class PurchaseDataSourceImpl implements PurchaseDataSource {
     if(res['status'] == 200){
       debugPrint('[Purchase Debug] verifyPurchase delivery success');
       return PurchaseModel.fromJson(res['subscribe']);
+    } else if(res['status'] == 204) {
+      debugPrint('[Purchase Debug] item is canceled or expired');
+      return PurchaseModel(id: 204);
     } else {
       debugPrint('[Purchase Debug] verifyPurchase delivery failed');
-      return PurchaseModel();
+      return PurchaseModel(id: 500);
     }
   }
   @override
@@ -54,9 +58,12 @@ class PurchaseDataSourceImpl implements PurchaseDataSource {
     if(res['status'] == 200){
       debugPrint('[Purchase Debug] verifyPurchase delivery success');
       return PurchaseModel.fromJson(res['subscribe']);
+    } else if(res['status'] == 204) {
+      debugPrint('[Purchase Debug] item is canceled or expired');
+      return PurchaseModel(id: 204);
     } else {
       debugPrint('[Purchase Debug] verifyPurchase delivery failed');
-      return PurchaseModel();
+      return PurchaseModel(id: 500);
     }
   }
 

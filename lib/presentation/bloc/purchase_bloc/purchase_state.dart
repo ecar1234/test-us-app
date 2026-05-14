@@ -48,7 +48,7 @@ class PurchaseUpdateCompletedState extends PurchaseState{
 }
 class PurchaseRestoreCompletedState extends PurchaseState{
   final PurchaseDetails details;
-  PurchaseRestoreCompletedState(this.details): super(state: PurchaseProgressState.success);
+  PurchaseRestoreCompletedState({required this.details}): super(state: PurchaseProgressState.success);
 }
 
 class GetUserPurchaseInfoCompletedState extends PurchaseState{

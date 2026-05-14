@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -27,7 +26,7 @@ class PurchaseUseCase {
     'pre_1y',
   ];
 
-  Future<void> eventLog() async {
+  Future<void> eventLog(String testWord) async {
     // Map<String, dynamic> data = {
     //   'productIdentifier': info.productIdentifier,
     //   'productPlanIdentifier': info.productPlanIdentifier,
@@ -39,7 +38,7 @@ class PurchaseUseCase {
     //   'store': info.store.name,
     // };
 
-    await _repository.eventLog();
+    await _repository.eventLog(testWord);
   }
 
   Future<void> errorLog(String errorInfo) async {
@@ -169,10 +168,11 @@ class PurchaseUseCase {
     Map<String, String> req = {};
     PurchaseEntity res;
     req['userId'] = userId;
-    req['token'] = purchase.verificationData.serverVerificationData;
     if(purchase.verificationData.source == 'google_play'){
+      req['token'] = purchase.verificationData.serverVerificationData;
       res = await _repository.verifyPurchaseAOS(token, userId, req);
     }else {
+      req['transactionId'] = purchase.purchaseID!;
       res = await _repository.verifyPurchaseIOS(token, userId, req);
     }
     if(res.isActive == true && purchase.pendingCompletePurchase){

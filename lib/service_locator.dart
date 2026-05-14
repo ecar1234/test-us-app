@@ -83,6 +83,7 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
 
   getIt.registerLazySingleton<GoogleSignIn>(() => signIn);
   String host = kDebugMode ? Host.baseDevUrl : Host.baseProdUrl;
+  // String host = Host.baseDevUrl;
   debugPrint('접속 URL : $host');
   getIt.registerLazySingleton<NetDriver>(() => NetDriver(host));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());

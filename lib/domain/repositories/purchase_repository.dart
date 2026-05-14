@@ -2,7 +2,7 @@
 import '../entities/purchase_entity.dart';
 
 abstract class PurchaseRepository {
-  Future<void> eventLog();
+  Future<void> eventLog(String testWord);
   Future<void> errorLog(String errorInfo);
   Future<void> refresh();
   Future<PurchaseEntity> verifyPurchaseIOS(String token, String userId, Map<String, String> req);

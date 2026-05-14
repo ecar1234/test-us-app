@@ -63,4 +63,9 @@ class PurchaseStateInitEvent extends PurchaseEvent {
   PurchaseStateInitEvent();
 }
 
+class IosPurchaseTestEvent extends PurchaseEvent {
+  final String transactionMock;
+  IosPurchaseTestEvent(this.transactionMock);
+}
+
 

@@ -13,8 +13,8 @@ class PurchaseRepositoryImpl implements PurchaseRepository{
   }
 
   @override
-  Future<void> eventLog() async {
-    await _remote.eventLog('');
+  Future<void> eventLog(String testWord) async {
+    await _remote.eventLog(testWord);
   }
 
   @override
@@ -25,11 +25,21 @@ class PurchaseRepositoryImpl implements PurchaseRepository{
   @override
   Future<PurchaseEntity> verifyPurchaseIOS(String token, String userId, Map<String, String> req) async {
     final res = await _remote.verifyPurchaseIOS(token, userId, req);
+    if(res.id == 204){
+      return PurchaseEntity(id: 204);
+    } else if(res.id == 500){
+      return PurchaseEntity(id: 500);
+    }
     return PurchaseEntity.toEntity(res);
   }
   @override
   Future<PurchaseEntity> verifyPurchaseAOS(String token, String userId, Map<String, String> req) async {
     final res = await _remote.verifyPurchaseAOS(token, userId, req);
+    if(res.id == 204){
+      return PurchaseEntity(id: 204);
+    } else if(res.id == 500){
+      return PurchaseEntity(id: 500);
+    }
     return PurchaseEntity.toEntity(res);
   }
 

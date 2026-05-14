@@ -21,7 +21,7 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
       final bool available = await _inAppPurchase.isAvailable();
       if (!available) {
         emit(PurchaseState(state: PurchaseProgressState.error, message: '구매 서비스를 사용할 수 없습니다.'));
-        logger.e('[Purchase] purchase service is not available');
+        debugPrint('[Purchase] purchase service is not available');
         return;
       }
       late StreamSubscription<List<PurchaseDetails>> subscription;
@@ -34,7 +34,7 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
         // handle error here.
       });
       emit(PurchaseInitCompletedState());
-      logger.i('[Purchase] stream listener initialized');
+      debugPrint('[Purchase] stream listener initialized');
     });
 
     on<PurchaseOfferings>((event, emit) async {
@@ -62,28 +62,28 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
       final res = await purchaseUseCase.newPurchaseByAos(event.product);
       if (!res) {
         emit(PurchaseState(state: PurchaseProgressState.error, message: '구매에 실패하였습니다.'));
-        logger.e('[Purchase] purchase failed');
+        debugPrint('[Purchase] purchase failed');
         return;
       }
       emit(PurchasePendingState());
-      logger.i('[Purchase] PurchasePendingState');
+      debugPrint('[Purchase] PurchasePendingState');
     });
 
     on<PrepareUpdateRestorePurchase>((event, emit) async {
       await purchaseUseCase.prepareUpdate();
       emit(UpdateLoadingState());
-      logger.i('[Purchase] prepare update : start restore');
+      debugPrint('[Purchase] prepare update : start restore');
     });
 
     on<RequestAosUpdatePurchase>((event, emit) async {
       final res = await purchaseUseCase.purchaseUpdateByAos(event.product, event.productId, event.old);
       if(!res){
         emit(PurchaseState(state: PurchaseProgressState.error, message: '[Purchase AOS] 업데이트 실패하였습니다.'));
-        logger.e('[Purchase] purchase failed');
+        debugPrint('[Purchase] purchase failed');
         return;
       }
       emit(PurchasePendingState());
-      logger.i('[Purchase] PurchasePendingState');
+      debugPrint('[Purchase] PurchasePendingState');
     });
 
     on<RequestIosPurchase>((event, emit) async {
@@ -91,15 +91,15 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
         final res = await purchaseUseCase.purchaseByIos(event.product);
         if (!res) {
           emit(PurchaseState(state: PurchaseProgressState.error, message: '구매에 실패하였습니다.'));
-          logger.e('[Purchase] purchase failed');
+          debugPrint('[Purchase] purchase failed');
           return;
         }
         emit(PurchasePendingState());
-        logger.i('[Purchase] PurchasePendingState');
+        debugPrint('[Purchase] PurchasePendingState');
       } on Exception catch (e) {
         debugPrint("[Purchase Exception] IOS purchase ${e.toString()}");
         emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
-        logger.e('[Purchase] purchase error');
+        debugPrint('[Purchase] purchase error');
       }
     });
 
@@ -109,26 +109,34 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
 
     on<VerificationPurchase>((event, emit) async {
       emit(PurchaseState(state: PurchaseProgressState.loading));
-      logger.i('[Purchase] verification starting....');
+      debugPrint('[Purchase] verification starting....');
       try {
         final res = await purchaseUseCase.verifyPurchase(event.token, event.userId, event.details);
+        if (res.id == 500 || res.id == 400) {
+          emit(PurchaseState(state: PurchaseProgressState.error, message: '구매 검증 실패.'));
+          debugPrint('[Purchase] verification failed');
+          return;
+        } else if(res.id == 204){
+          emit(PurchaseState(state: PurchaseProgressState.failed, message: '취소 또는 만료된 구독입니다.'));
+          return;
+        }
         emit(PurchaseCompletedByServerState(res));
-        logger.i('[Purchase] verification && purchase completed');
+        debugPrint('[Purchase] verification && purchase completed');
       } on Exception catch (e) {
         emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
-        logger.e('[Purchase] verification failed');
+        debugPrint('[Purchase] verification failed');
       }
     });
 
     on<RequestUserPurchaseInfo>((event, emit) async {
       try {
         emit(PurchaseState(state: PurchaseProgressState.loading));
-        logger.i('[Purchase] user purchase info loading....');
+        debugPrint('[Purchase] user purchase info loading....');
         final res = await purchaseUseCase.getPurchaseList(event.token, event.userId);
         emit(GetUserPurchaseInfoCompletedState(res));
       } on Exception catch (e) {
         emit(PurchaseState(state: PurchaseProgressState.error, message: e.toString()));
-        logger.e('[Purchase] user purchase info loading failed');
+        debugPrint('[Purchase] user purchase info loading failed');
       }
     });
 
@@ -136,18 +144,18 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
       for (final PurchaseDetails purchaseDetails in event.purchaseDetailsList) {
         if (purchaseDetails.status == PurchaseStatus.pending) {
           emit(PurchaseState(state: PurchaseProgressState.pending));
-          logger.i('[Purchase] purchase state update to pending');
+          debugPrint('[Purchase] purchase state update to pending');
         } else {
           if (purchaseDetails.status == PurchaseStatus.error) {
             emit(PurchaseState(state: PurchaseProgressState.error, message: purchaseDetails.error?.message));
-            logger.i('[Purchase] purchase state update to error');
+            debugPrint('[Purchase] purchase state update to error');
             debugPrint('[Purchase]${purchaseDetails.error?.message}');
           } else if (purchaseDetails.status == PurchaseStatus.purchased) {
             emit(PurchaseCompletedState(details: purchaseDetails));
-            logger.i('[Purchase] PurchaseCompletedState');
+            debugPrint('[Purchase] PurchaseCompletedState');
           } else if (purchaseDetails.status == PurchaseStatus.restored) {
-            emit(PurchaseRestoreCompletedState(purchaseDetails));
-            logger.i('[Purchase] PurchaseRestoreCompletedState');
+            emit(PurchaseRestoreCompletedState(details: purchaseDetails));
+            debugPrint('[Purchase] PurchaseRestoreCompletedState');
           }
 
         }
@@ -156,6 +164,9 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
 
     on<PurchaseStateInitEvent>((event, emit) async {
       emit(PurchaseState(state: PurchaseProgressState.initCompleted));
+    });
+    on<IosPurchaseTestEvent>((event, emit) async {
+      final res = await purchaseUseCase.eventLog(event.transactionMock);
     });
   }
 }
