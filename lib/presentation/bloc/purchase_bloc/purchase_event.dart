@@ -15,8 +15,9 @@ class PurchaseOfferings extends PurchaseEvent {
 
 class RequestAosNewPurchase extends PurchaseEvent {
   final ProductDetails product;
+  final String userId;
 
-  RequestAosNewPurchase({required this.product});
+  RequestAosNewPurchase({required this.product, required this.userId});
 }
 class PrepareUpdateRestorePurchase extends PurchaseEvent {
   PrepareUpdateRestorePurchase();
@@ -25,8 +26,10 @@ class RequestAosUpdatePurchase extends PurchaseEvent {
   final ProductDetails product;
   final String productId;
   final PurchaseDetails old;
+  final String userId;
 
-  RequestAosUpdatePurchase({required this.product, required this.productId, required this.old});
+
+  RequestAosUpdatePurchase({required this.product, required this.productId, required this.old, required this.userId});
 }
 class RequestIosPurchase extends PurchaseEvent {
   final ProductDetails product;

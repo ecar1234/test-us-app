@@ -59,7 +59,7 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
     });
 
     on<RequestAosNewPurchase>((event, emit) async {
-      final res = await purchaseUseCase.newPurchaseByAos(event.product);
+      final res = await purchaseUseCase.newPurchaseByAos(event.product, event.userId);
       if (!res) {
         emit(PurchaseState(state: PurchaseProgressState.error, message: '구매에 실패하였습니다.'));
         debugPrint('[Purchase] purchase failed');
@@ -76,7 +76,7 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
     });
 
     on<RequestAosUpdatePurchase>((event, emit) async {
-      final res = await purchaseUseCase.purchaseUpdateByAos(event.product, event.productId, event.old);
+      final res = await purchaseUseCase.purchaseUpdateByAos(event.product, event.productId, event.old, event.userId);
       if(!res){
         emit(PurchaseState(state: PurchaseProgressState.error, message: '[Purchase AOS] 업데이트 실패하였습니다.'));
         debugPrint('[Purchase] purchase failed');

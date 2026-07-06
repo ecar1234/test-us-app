@@ -79,7 +79,9 @@ class _PurchasePageState extends State<PurchasePage> {
                     context.read<PurchaseBloc>().add(RequestAosUpdatePurchase(
                         product: _selectedProduct!.originProduct,
                         productId: _selectedProduct!.id!,
-                        old: state.details));
+                        old: state.details,
+                        userId: context.read<UserProvider>().user!.id!
+                    ));
                   }
                 },
                 listenWhen: (previous, current) => previous is UpdateLoadingState, // 업데이트 전 restore 상태
@@ -411,7 +413,7 @@ class _PurchasePageState extends State<PurchasePage> {
                                               if (Platform.isAndroid) {
                                                 if (currentPlan == null) {
                                                   context.read<PurchaseBloc>().add(
-                                                      RequestAosNewPurchase(product: _selectedProduct!.originProduct));
+                                                      RequestAosNewPurchase(product: _selectedProduct!.originProduct, userId: context.read<UserProvider>().user!.id!));
                                                 } else {
                                                   context.read<PurchaseBloc>().add(PrepareUpdateRestorePurchase());
                                                 }

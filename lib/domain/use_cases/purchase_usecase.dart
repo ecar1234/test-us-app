@@ -118,9 +118,10 @@ class PurchaseUseCase {
     }
   }
 
-  Future<bool> newPurchaseByAos(ProductDetails product)async{
+  Future<bool> newPurchaseByAos(ProductDetails product, String userId)async{
     final param = GooglePlayPurchaseParam(
       productDetails: product as GooglePlayProductDetails,
+      applicationUserName: userId
     );
     final res = await _inAppPurchase.buyNonConsumable(purchaseParam: param);
     return res;
@@ -130,7 +131,7 @@ class PurchaseUseCase {
      await _inAppPurchase.restorePurchases();
   }
 
-  Future<bool> purchaseUpdateByAos(ProductDetails product, String productId, PurchaseDetails old) async {
+  Future<bool> purchaseUpdateByAos(ProductDetails product, String productId, PurchaseDetails old, String userId) async {
     final convertOld = old as GooglePlayPurchaseDetails;
     if (convertOld.purchaseID == null) throw Exception('invalid old purchase');
 
@@ -140,9 +141,9 @@ class PurchaseUseCase {
     // NOTE: 테스트 시에는 시간압축으로 인해서 MODE 변경에 따른 오류가 발생.
     // NOTE: 테스트 진행 시 proration은 chargeFullPrice 또는 deferred로 고정 후 진행.
     final grade = _checkProrationMode(old, product);
-    // final proration = grade == 1
-    //     ? ReplacementMode.deferred : ReplacementMode.withTimeProration;
-    final proration =  ReplacementMode.chargeFullPrice;
+    final proration = grade == 1
+        ? ReplacementMode.deferred : ReplacementMode.withTimeProration;
+    // final proration =  ReplacementMode.chargeFullPrice;
 
 
     final param = GooglePlayPurchaseParam(
@@ -152,6 +153,7 @@ class PurchaseUseCase {
         oldPurchaseDetails: convertOld,
       ),
       offerToken: offerToken,
+      applicationUserName: userId
     );
     final res = await _inAppPurchase.buyNonConsumable(purchaseParam: param);
     return res;
