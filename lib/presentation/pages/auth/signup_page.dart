@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
+import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
@@ -142,13 +143,12 @@ class _SignupPageState extends State<SignupPage> {
                             return;
                           }
                           final userInfo = UserEntity(
-                            email: emailController.text,
-                            password: passwordController.text,
-                            nickname: nicknameController.text,
-                            userType: TypeConversionUtil().toUserType(userTypeController.text),
-                            role: TypeConversionUtil().toUserRole(roleController.text),
-                            method: AuthType.email
-                          );
+                              email: emailController.text,
+                              password: passwordController.text,
+                              nickname: nicknameController.text,
+                              userType: TypeConversionUtil().toUserType(userTypeController.text),
+                              role: TypeConversionUtil().toUserRole(roleController.text),
+                              method: AuthType.email);
                           try {
                             // logger.i('회원가입 시도: ${{
                             //   "email": userInfo.email,
@@ -157,37 +157,25 @@ class _SignupPageState extends State<SignupPage> {
                             //   "userType": userInfo.userType,
                             //   "role": userInfo.role
                             // }}');
-                            final state = await context
-                                .read<UserProvider>()
-                                .signup(userInfo);
+                            final state = await context.read<UserProvider>().signup(userInfo);
                             // final isSignup = false;
                             if (context.mounted) {
-                              if(state == 200){
+                              if (state == 200) {
                                 await showDialog(
                                     context: context,
                                     builder: (context) {
-                                      return AlertDialog(
-                                        title: Text("회원가입 완료"),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text("함께 해주셔서 감사합니다."),
-                                            Text("모두가 함께 인사이트를 얻었으면 합니다.")
-                                          ],
-                                        ),
-                                        actions: [
-                                          SizedBox(
-                                            child: ElevatedButton(
-                                                onPressed: () {
-                                                  Get.back(result: true);
-                                                },
-                                                child: Text("확인")),
-                                          )
-                                        ],
+                                      return Dialog(
+                                        child: OneButtonAlert(
+                                            mainContent: "함께 해주셔서 감사합니다.",
+                                            subContent: "모두가 함께 인사이트를 얻었으면 합니다.",
+                                            buttonName: "확인",
+                                            onPressed: () {
+                                              Get.back(result: true);
+                                            }),
                                       );
                                     });
                                 Get.back();
-                              }else if(state == 409){
+                              } else if (state == 409) {
                                 Get.snackbar("회원 가입 실패", "존재 하거나, 사용 할 수 없는 이메일 입니다.\n다른 이메일을 사용해 주세요.");
                                 return;
                               }
@@ -199,8 +187,7 @@ class _SignupPageState extends State<SignupPage> {
                             logger.i('Stack trace: $stackTrace');
                             if (context.mounted) {
                               // 사용자에게 일반적인 에러 메시지 표시
-                              Get.snackbar(
-                                  "에러", "회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+                              Get.snackbar("에러", "회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
                               return;
                               // 또는 특정 에러에 맞는 메시지 표시
                               // if (e is NetworkException) { ... }
@@ -245,8 +232,7 @@ class _SignupPageState extends State<SignupPage> {
                       if (value.isEmpty) {
                         isValidateEmail = false;
                       } else {
-                        isValidateEmail = RegExp(
-                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                        isValidateEmail = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                             .hasMatch(emailController.text);
                       }
                     });
@@ -324,9 +310,8 @@ class _SignupPageState extends State<SignupPage> {
                 if (value.isEmpty) {
                   isPasswordVisible = false;
                 } else {
-                  isValidatePassword = RegExp(
-                          r'^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\$&*~]).{8,}$')
-                      .hasMatch(passwordController.text);
+                  isValidatePassword =
+                      RegExp(r'^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\$&*~]).{8,}$').hasMatch(passwordController.text);
                 }
               });
             },
@@ -394,8 +379,7 @@ class _SignupPageState extends State<SignupPage> {
                 if (value.isEmpty) {
                   isPasswordCheckVisible = false;
                 } else {
-                  isValidatePasswordCheck =
-                      passwordController.text == passwordCheckController.text;
+                  isValidatePasswordCheck = passwordController.text == passwordCheckController.text;
                 }
               });
             },
@@ -421,12 +405,10 @@ class _SignupPageState extends State<SignupPage> {
                     const Gap(8),
                     isValidatePasswordCheck
                         ? SizedBox(
-                            child: Text("비밀번호가 일치 합니다.",
-                                style: TextStyle(color: Colors.green)),
+                            child: Text("비밀번호가 일치 합니다.", style: TextStyle(color: Colors.green)),
                           )
                         : SizedBox(
-                            child: Text("비밀번호가 일치하지 않습니다.",
-                                style: TextStyle(color: Colors.redAccent)),
+                            child: Text("비밀번호가 일치하지 않습니다.", style: TextStyle(color: Colors.redAccent)),
                           )
                   ],
                 ))
@@ -468,20 +450,21 @@ class _SignupPageState extends State<SignupPage> {
                   width: (MediaQuery.sizeOf(context).width - 40) * 0.2,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () async{
+                    onPressed: () async {
                       if (nicknameController.text.isEmpty) {
                         Get.snackbar("알림", "닉네임을 입력해 주세요.");
                         return;
                       }
-                      final isNickname = await context.read<UserProvider>().isNicknameAvailable(nicknameController.text);
-                      if(!isNickname){
+                      final isNickname =
+                          await context.read<UserProvider>().isNicknameAvailable(nicknameController.text);
+                      if (!isNickname) {
                         Get.snackbar("알림", "이미 사용중인 닉네임 입니다.");
                         setState(() {
                           isNicknameVisible = true;
                           isValidateNickname = false;
                         });
                         return;
-                      }else {
+                      } else {
                         setState(() {
                           isNicknameVisible = true;
                           isValidateNickname = true;
@@ -574,8 +557,7 @@ class _SignupPageState extends State<SignupPage> {
                         initialSelection: "",
                         dropdownMenuEntries: [
                           DropdownMenuEntry(value: "", label: "선택"),
-                          DropdownMenuEntry(
-                              value: "INDIVIDUALS", label: "1인 개발자"),
+                          DropdownMenuEntry(value: "INDIVIDUALS", label: "1인 개발자"),
                           DropdownMenuEntry(value: "COMPANIES", label: "기업"),
                           DropdownMenuEntry(value: "NORMAL", label: "일반(비개발자)"),
                         ]),
@@ -584,6 +566,7 @@ class _SignupPageState extends State<SignupPage> {
               ),
             ),
           ),
+          const Gap(5),
           Flexible(
             flex: 1,
             child: SizedBox(
@@ -609,8 +592,7 @@ class _SignupPageState extends State<SignupPage> {
                         initialSelection: "",
                         dropdownMenuEntries: [
                           DropdownMenuEntry(value: "", label: "선택"),
-                          DropdownMenuEntry(
-                              value: "programmer", label: "프로그래머"),
+                          DropdownMenuEntry(value: "programmer", label: "프로그래머"),
                           DropdownMenuEntry(value: "planner", label: "기획자"),
                           DropdownMenuEntry(value: "marketer", label: "마케터"),
                           DropdownMenuEntry(value: "designer", label: "디자이너"),

@@ -7,6 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:test_us_app/domain/use_cases/application_usecase.dart';
 import 'package:test_us_app/domain/use_cases/image_usecase.dart';
+import 'package:test_us_app/permission_handler.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/image_bloc/image_bloc.dart';
@@ -30,6 +31,7 @@ import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/service_locator.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/provider/purchase_provider.dart';
+import 'package:test_us_app/services/firebase/firebase_options.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import 'domain/use_cases/base_post_usecase.dart';
@@ -50,7 +52,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   FlutterNativeSplash.preserve(widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
-  await serviceLocator(_firebaseMessagingBackgroundHandler);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await serviceLocator();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => GetIt.I.get<FirebaseMessagingProvider>()),
@@ -82,7 +88,7 @@ Future<void> main() async {
         BlocProvider(create: (context) => ReviewBloc(getIt<ReviewUseCase>(), getIt<UserUseCase>())),
         BlocProvider(create: (context) => MessageBloc(getIt<MessageUseCase>())),
         BlocProvider(create: (context) => PurchaseBloc(getIt<PurchaseUseCase>(), getIt<InAppPurchase>()))
-      ], child: const MetaDataSetting(),
+      ], child: const PermissionHandler(),
     ),
   ));
 }

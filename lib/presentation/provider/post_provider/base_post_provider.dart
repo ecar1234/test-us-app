@@ -153,38 +153,45 @@ class BasePostProvider extends ChangeNotifier {
 
   void userInfoUpdate(UserEntity user) {
     _favoritePost ??= [];
-    _recruitPosts ?? [];
-    _promotionPosts ?? [];
+    _recruitPosts ??= [];
+    _promotionPosts ??= [];
 
-    bool updated = false;
+    bool isPromotionUpdated = false;
+    bool isRecruitUpdated = false;
+    bool isFavoriteUpdated = false;
 
     for (final post in _promotionPosts!) {
       if (post.author?.id == user.id) {
         post.author = user;
-        updated = true;
+        isPromotionUpdated = true;
       }
     }
 
     for (final post in _recruitPosts!) {
       if (post.author?.id == user.id) {
         post.author = user;
-        updated = true;
+        isRecruitUpdated = true;
       }
     }
 
     for (final post in _favoritePost!) {
       if (post.author?.id == user.id) {
         post.author = user;
-        updated = true;
+        isFavoriteUpdated = true;
       }
     }
 
-    if (updated) {
-      // 핵심 포인트
+    if (isPromotionUpdated) {
       _promotionPosts = List<PromotionPostEntity>.from(_promotionPosts!);
+    }
+    if (isRecruitUpdated) {
       _recruitPosts = List<RecruitPostEntity>.from(_recruitPosts!);
+    }
+    if (isFavoriteUpdated) {
       _favoritePost = List<dynamic>.from(_favoritePost!);
+    }
 
+    if (isPromotionUpdated || isRecruitUpdated || isFavoriteUpdated) {
       notifyListeners();
     }
   }

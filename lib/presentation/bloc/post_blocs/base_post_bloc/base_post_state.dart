@@ -4,6 +4,7 @@ import '../../../../domain/entities/promotion_post_entity.dart';
 import '../../../../domain/entities/recruit_post_entity.dart';
 
 enum BasePostLoadState {
+  initialState,
   serviceStartState,
   dataLoadState,
   initPostDataLoadingState,

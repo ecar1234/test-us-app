@@ -156,7 +156,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           ? FileImage(File(profileImage!.path))
                           : (widget.user.profileImg == null || widget.user.profileImg!.url == null
                               ? const AssetImage('assets/images/Generic avatar.png')
-                              // 2-2. 기존 네트워크 이미지가 있으면 CachedNetworkImageProvider로 표시
                               : CachedNetworkImageProvider(widget.user.profileImg!.url!)) as ImageProvider,
                     ),
                   ),
@@ -349,6 +348,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         nickname: _nicknameController.text,
                         userType: typeUtil.toUserType(_userTypeController.text),
                         role: typeUtil.toUserRole(_userRoleController.text),
+                        profileImg: widget.user.profileImg,
                       );
 
                       if (profileImage != null) {

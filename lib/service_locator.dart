@@ -72,19 +72,17 @@ import 'domain/use_cases/user_usecase.dart';
 
 final getIt = GetIt.instance;
 
-Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebaseMessagingBackgroundHandler) async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+Future<void> serviceLocator() async {
 
   final GoogleSignIn signIn = GoogleSignIn.instance;
   await signIn.initialize();
 
   getIt.registerLazySingleton<GoogleSignIn>(() => signIn);
+
   String host = kDebugMode ? Host.baseDevUrl : Host.baseProdUrl;
   // String host = Host.baseDevUrl;
   debugPrint('접속 URL : $host');
+
   getIt.registerLazySingleton<NetDriver>(() => NetDriver(host));
   getIt.registerSingleton<ResponsiveHeightProvider>(ResponsiveHeightProvider());
   // getIt.registerSingleton<ThemeProvider>(ThemeProvider());
@@ -118,7 +116,6 @@ Future<void> serviceLocator(Future<void> Function(RemoteMessage message) firebas
   getIt.registerLazySingleton<RoomRepository>(() => RoomRepositoryImpl(getIt<RoomDataSource>()));
   getIt.registerLazySingleton<RoomMemberRepository>(() => RoomMemberRepositoryImpl(getIt<RoomMemberDataSource>()));
   getIt.registerLazySingleton<PurchaseRepository>(() => PurchaseRepositoryImpl(getIt<PurchaseDataSource>()));
-
 
   // use case
   getIt.registerLazySingleton<UserUseCase>(() => UserUseCase(getIt<UserRepository>()));

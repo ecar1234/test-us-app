@@ -3,16 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
-import 'package:test_us_app/presentation/components/one_action_dialog.dart';
-import 'package:test_us_app/presentation/provider/purchase_provider.dart';
+import 'package:test_us_app/presentation/components/alerts/two_button_confirm_alert.dart';
 
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
-import '../pages/post/promotion_post_pages/promotion_post_create_page.dart';
-import '../pages/post/tester_post_pages/recruit_post_create_page.dart';
-import '../provider/post_provider/promotion_post_provider.dart';
-import '../provider/post_provider/recruit_post_provider.dart';
+import '../pages/auth/login_page.dart';
 import '../provider/user_provider.dart';
-import 'login_dialogs.dart';
 
 class CustomBottomBar extends StatefulWidget {
   final int currentIndex;
@@ -127,7 +122,20 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                         onSelected: (value) {
                           final isLogin = context.read<UserProvider>().isLogged ?? false;
                           if (!isLogin) {
-                            showDialog(context: context, builder: (context) => const LoginDialog());
+                            showDialog(context: context, builder: (context) =>
+                                TwoButtonConfirmAlert(
+                                    width: 350,
+                                    mainContent: '로그인이 필요합니다.',
+                                    mainContentSize: 18,
+                                    confirmButtonName: '로그인',
+                                    cancelButtonName: '확인',
+                                    onPressedConfirm: () {
+                                      Navigator.pop(context);
+                                      Get.to(() => const LoginPage());
+                                    },
+                                    onPressedCancel: () {
+                                      Navigator.pop(context);
+                                    }));
                             return;
                           }
 

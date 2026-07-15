@@ -15,6 +15,7 @@ import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
+import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_create_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
@@ -32,8 +33,9 @@ import '../../../bloc/app_bloc/app_bloc.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
-import '../../../components/login_dialogs.dart';
+import '../../../components/alerts/two_button_confirm_alert.dart';
 import '../../../provider/post_provider/base_post_provider.dart';
+import '../../auth/login_page.dart';
 import '../post_image_detail_page.dart';
 
 class RecruitPostDetailPage extends StatefulWidget {
@@ -75,30 +77,13 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
             await showDialog(
                 context: context,
                 builder: (context) => Dialog(
-                      child: Container(
-                          height: 200,
-                          width: MediaQuery.sizeOf(context).width,
-                          padding: EdgeInsets.all(10),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '게시글이 삭제 되었거나, 존재하지 않습니다.',
-                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                              ),
-                              const Gap(20),
-                              SizedBox(
-                                height: 40,
-                                width: 120,
-                                child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text('뒤로가기')),
-                              )
-                            ],
-                          )),
+                      child: OneButtonAlert(
+                          mainContent: '게시글이 삭제 되었거나, 존재하지 않습니다.',
+                          buttonName: '뒤로가기',
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          }),
                     ));
           }
         }, builder: (context, state) {
@@ -165,66 +150,71 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                           await showDialog(
                               context: context,
                               builder: (context) => Dialog(
-                                child: Container(
-                                    height: 200,
-                                    width: MediaQuery.sizeOf(context).width,
-                                    padding: EdgeInsets.all(10),
-                                    child: LayoutBuilder(
-                                      builder: (context, constraints) => Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            '삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?',
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                          ),
-                                          const Gap(20),
-                                          Row(
+                                    child: Container(
+                                        height: 200,
+                                        width: MediaQuery.sizeOf(context).width,
+                                        padding: EdgeInsets.all(10),
+                                        child: LayoutBuilder(
+                                          builder: (context, constraints) => Column(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              Flexible(
-                                                flex: 3,
-                                                child: SizedBox(
-                                                  width: constraints.maxWidth * 0.3,
-                                                  child: OutlinedButton(
-                                                      onPressed: () {
-                                                        Get.back();
-                                                      },
-                                                      style: OutlinedButton.styleFrom(
-                                                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                                      ),
-                                                      child: Text('취소')),
-                                                ),
+                                              Text(
+                                                '삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?',
+                                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                                               ),
-                                              const Gap(10),
-                                              Flexible(
-                                                flex: 7,
-                                                child: SizedBox(
-                                                  width: constraints.maxWidth * 0.7,
-                                                  child: ElevatedButton(
-                                                      onPressed: () {
-                                                        final token = context.read<UserProvider>().token ?? "";
-                                                        try {
-                                                          context.read<RecruitPostBloc>().add(RequestPostDeleteEvent(token, post));
-                                                        } on Exception catch (e) {
-                                                          Get.snackbar('알림', '삭제 실패');
-                                                          logger.e(e.toString());
-                                                          return;
-                                                        }
-                                                        Get.back();
-                                                      },
-                                                      style: OutlinedButton.styleFrom(
-                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                                      ),
-                                                      child: Text('확인')),
-                                                ),
-                                              )
+                                              const Gap(20),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Flexible(
+                                                    flex: 3,
+                                                    child: SizedBox(
+                                                      width: constraints.maxWidth * 0.3,
+                                                      child: OutlinedButton(
+                                                          onPressed: () {
+                                                            Get.back();
+                                                          },
+                                                          style: OutlinedButton.styleFrom(
+                                                            side: BorderSide(
+                                                                color: Theme.of(context).colorScheme.primary),
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(10)),
+                                                          ),
+                                                          child: Text('취소')),
+                                                    ),
+                                                  ),
+                                                  const Gap(10),
+                                                  Flexible(
+                                                    flex: 7,
+                                                    child: SizedBox(
+                                                      width: constraints.maxWidth * 0.7,
+                                                      child: ElevatedButton(
+                                                          onPressed: () {
+                                                            final token = context.read<UserProvider>().token ?? "";
+                                                            try {
+                                                              context
+                                                                  .read<RecruitPostBloc>()
+                                                                  .add(RequestPostDeleteEvent(token, post));
+                                                            } on Exception catch (e) {
+                                                              Get.snackbar('알림', '삭제 실패');
+                                                              logger.e(e.toString());
+                                                              return;
+                                                            }
+                                                            Get.back();
+                                                          },
+                                                          style: OutlinedButton.styleFrom(
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(10)),
+                                                          ),
+                                                          child: Text('확인')),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             ],
                                           ),
-                                        ],
-                                      ),
-                                    )),
-                              ));
+                                        )),
+                                  ));
                           // Get.defaultDialog(title: "알림", middleText: "삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?", actions: [
                           //   ElevatedButton(
                           //     onPressed: () {
@@ -264,10 +254,11 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                           overflow: TextOverflow.ellipsis,
                         )),
                     background: GestureDetector(
-                      onTap: (){
-                        Get.to(() => PostImageDetailPage(images: post.images!,));
-
-                      },
+                        onTap: () {
+                          Get.to(() => PostImageDetailPage(
+                                images: post.images!,
+                              ));
+                        },
                         child: _buildImages(post.images!)));
               },
             )),
@@ -332,11 +323,13 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                             width: 30,
                             child: CircleAvatar(
                                 radius: 40,
-                                backgroundImage: isActive ?  (post.author!.profileImg == null
-                                    ? const AssetImage('assets/images/Generic avatar.png')
-                                    : CachedNetworkImageProvider(post.author!.profileImg!.url!,) as ImageProvider)
-                                    : const AssetImage('assets/images/Generic avatar.png')
-                            ),
+                                backgroundImage: isActive
+                                    ? (post.author!.profileImg == null
+                                        ? const AssetImage('assets/images/Generic avatar.png')
+                                        : CachedNetworkImageProvider(
+                                            post.author!.profileImg!.url!,
+                                          ) as ImageProvider)
+                                    : const AssetImage('assets/images/Generic avatar.png')),
                           ),
                           const Gap(5),
                           Text(
@@ -395,7 +388,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
 
     // if (app.id == null) return _beforeApplicationSection(context, initPostData);
     return Selector<ApplicationProvider, ApplicationEntity>(selector: (context, provider) {
-      final app = provider.userApplications!.firstWhere((e) => e.postId == widget.postId!, orElse: () => ApplicationEntity());
+      final app =
+          provider.userApplications!.firstWhere((e) => e.postId == widget.postId!, orElse: () => ApplicationEntity());
       return app;
     }, builder: (context, application, child) {
       if (!isLogged) return _beforeApplicationSection(context, post);
@@ -604,9 +598,9 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
   }
 
   Widget _beforeApplicationSection(BuildContext context, RecruitPostEntity post) {
-    if(post.platform == ApplicationPlatform.mobile) {
-      if(Platform.isIOS && post.mobileOs == MobileOsType.android
-          || Platform.isAndroid && post.mobileOs == MobileOsType.ios){
+    if (post.platform == ApplicationPlatform.mobile) {
+      if (Platform.isIOS && post.mobileOs == MobileOsType.android ||
+          Platform.isAndroid && post.mobileOs == MobileOsType.ios) {
         return Center(
           child: SizedBox(
             height: 50,
@@ -628,7 +622,21 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
           onPressed: () async {
             final isLogged = context.read<UserProvider>().isLogged ?? false;
             if (!isLogged) {
-              showDialog(context: context, builder: (context) => LoginDialog());
+              showDialog(
+                  context: context,
+                  builder: (context) => TwoButtonConfirmAlert(
+                      width: 350,
+                      mainContent: '로그인이 필요합니다.',
+                      mainContentSize: 18,
+                      confirmButtonName: '로그인',
+                      cancelButtonName: '확인',
+                      onPressedConfirm: () {
+                        Navigator.pop(context);
+                        Get.to(() => const LoginPage());
+                      },
+                      onPressedCancel: () {
+                        Navigator.pop(context);
+                      }));
               return;
             }
 

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_state.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
@@ -41,7 +42,7 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? MediaQuery.sizeOf(context).height-120;
-
+    final hasPassword = context.read<UserProvider>().user!.method != AuthType.email && context.read<UserProvider>().user!.password != 'authUserRegister';
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -69,7 +70,7 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    if(!widget.isOtp)
+                    if(!widget.isOtp && hasPassword)
                     SizedBox(
                       height: 60,
                       width: MediaQuery.sizeOf(context).width * 0.7,
