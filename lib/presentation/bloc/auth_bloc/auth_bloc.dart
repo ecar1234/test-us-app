@@ -99,7 +99,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final userInfo = UserEntity(
             email: googleUser.email,
             nickname: googleUser.displayName,
-            profileImg: ImageEntity(url: googleUser.photoUrl));
+            profileImg: ImageEntity(url: googleUser.photoUrl),
+            method: AuthType.google
+        );
         emit(AuthState(state: UserAuthState.authLoginCompletedState, user: userInfo, message: 'google'));
         logger.i('state : Google login completed state');
       } catch (e) {
@@ -137,7 +139,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final userInfo = UserEntity(
             email: naverUser.account!.email,
             nickname: naverUser.account!.name,
-            profileImg: ImageEntity(url: naverUser.account!.profileImage));
+            profileImg: ImageEntity(url: naverUser.account!.profileImage),
+            method: AuthType.naver
+        );
         emit(AuthState(state: UserAuthState.authLoginCompletedState, user: userInfo, message: 'naver'));
         logger.i('state : Naver login completed state');
         return;
@@ -221,6 +225,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(AuthState(state: UserAuthState.errorState, message: '비밀번호 변경에 실패했습니다.'));
         }
       } on Exception catch (e) {
+        logger.e(e.toString());
+        emit(AuthState(state: UserAuthState.errorState, message: e.toString()));
+      }
+    });
+    on<VerifyPasswordEvent>((event, emit) async {
+      emit(AuthState(state: UserAuthState.loadingState));
+      logger.i('state : loading state');
+      try {
+        final res = await userUseCase.isPasswordValid(event.token, event.userId, event.password);
+        emit(PasswordCheckCompletedState(res));
+        logger.i('state : Password verification completed state: $res');
+        return;
+      }on Exception catch (e) {
         logger.e(e.toString());
         emit(AuthState(state: UserAuthState.errorState, message: e.toString()));
       }

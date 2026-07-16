@@ -74,7 +74,7 @@ class UserDataSourceImpl implements UserDataSource {
   Future<bool> isPasswordValid(String token, String userId, String password) async {
     final res = await netDriver.requestPostJson("", UserApi.isPasswordValid, {'userId': userId, 'password': password});
     if (res['status'] == 200) {
-      return true;
+      return res['valid'];
     } else if (res['status'] == 404) {
       return false;
     } else {

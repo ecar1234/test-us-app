@@ -90,6 +90,12 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                       ),
                     ),
                     const Gap(50),
+                    Text(
+                      "( 새 비밀번호는 8자 이상 / 영문, 숫자, 특수문자 포함 )",
+                      style: TextStyle(fontSize: 14, color: Colors.blueAccent),
+                    ),
+                    const Gap(10),
+                    // 신규 비빌번호
                     SizedBox(
                       width: MediaQuery.sizeOf(context).width * 0.7,
                       child: Column(
@@ -108,7 +114,7 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                                     isNewPwVisible = false;
                                   } else {
                                     isNewPwVisible = RegExp(
-                                        r'^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\$&*~]).{8,}$')
+                                        r'^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$&*~]).{8,}$')
                                         .hasMatch(_newPwController.text);
                                   }
                                 });
@@ -160,7 +166,8 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                         ],
                       ),
                     ),
-                    const Gap(5),
+                    const Gap(20),
+                    // 비밀번호 확인
                     SizedBox(
                       width: MediaQuery.sizeOf(context).width * 0.7,
                       child: Column(
@@ -210,7 +217,7 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                                     isNewPwCheckVisible
                                         ? SizedBox(
                                       child: Text(
-                                        "사용할 수 있는 비밀번호 입니다.",
+                                        "비밀번호가 일치 합니다.",
                                         style: TextStyle(color: Colors.green),
                                       ),
                                     )
@@ -228,11 +235,6 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                       ),
                     ),
                     const Gap(40),
-                    Text(
-                      "( 새 비밀번호는 8자 이상 / 영문, 숫자, 특수문자 포함 )",
-                      style: TextStyle(fontSize: 14, color: Colors.blueAccent),
-                    ),
-                    const Gap(10),
                     SizedBox(
                         width: MediaQuery.sizeOf(context).width,
                         child: Row(

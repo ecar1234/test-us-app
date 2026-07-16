@@ -10,6 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_event.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
+import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
+import 'package:test_us_app/presentation/pages/my_pages/user_info/password_check_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/user_info/password_update_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/user_info/user_delete_page.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
@@ -68,36 +70,25 @@ class _UserInfoPageState extends State<UserInfoPage> {
           title: Text('내 정보'),
         ),
         body: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
           },
           child: BlocListener<UserBloc, UserState>(
             listener: (context, state) async {
               if (state.state == UserDataState.userInfoUpdateCompletedState) {
-                await showDialog(context: context, builder: (context) => Dialog(
-                  child: Container(
-                    height: 200,
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text('정보 업데이트 완료'),
-                        SizedBox(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              context.read<UserProvider>().updateUserInfo(state.user!);
-                              context.read<BasePostProvider>().userInfoUpdate(state.user!);
-                              Get.back();
-                              Get.back();
-                            },
-                            child: Text('확인'),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ));
+                await showDialog(
+                    context: context,
+                    builder: (context) => OneButtonAlert(
+                      title: '업데이트',
+                        mainContent: '업데이트 진행 완료.',
+                        buttonName: '확인',
+                        onPressed: () {
+                          context.read<UserProvider>().updateUserInfo(state.user!);
+                          context.read<BasePostProvider>().userInfoUpdate(state.user!);
+                          Get.back();
+                          Get.back();
+                        }));
               }
             },
             child: SingleChildScrollView(
@@ -133,7 +124,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
     // final activePlan = context.read<PurchasesManagements>().subscribedItem;
     // final volumeLimit = activePlan == null ? 6 : (activePlan.plan == 'standard' ? 7 : 10);
     final volumeLimit = 5;
-
 
     return SizedBox(
         height: hei * 0.25,
@@ -330,51 +320,52 @@ class _UserInfoPageState extends State<UserInfoPage> {
             ),
             const Gap(20),
             BlocSelector<UserBloc, UserState, bool>(
-              selector: (state) => state.state == UserDataState.loadingState,
-              builder: (context, isLoading) {
-                return SizedBox(
-                width: wid * 0.6,
-                height: 50,
-                child: ElevatedButton(
-                    onPressed: () async {
-                      if(isLoading){
-                        Get.snackbar('알림', '업데이트 중입니다.');
-                        return;
-                      }
-                      final token = context.read<UserProvider>().token ?? '';
-                      final userInfo = UserEntity(
-                        id: widget.user.id,
-                        email: widget.user.email,
-                        nickname: _nicknameController.text,
-                        userType: typeUtil.toUserType(_userTypeController.text),
-                        role: typeUtil.toUserRole(_userRoleController.text),
-                        profileImg: widget.user.profileImg,
-                      );
+                selector: (state) => state.state == UserDataState.loadingState,
+                builder: (context, isLoading) {
+                  return SizedBox(
+                    width: wid * 0.6,
+                    height: 50,
+                    child: ElevatedButton(
+                        onPressed: () async {
+                          if (isLoading) {
+                            Get.snackbar('알림', '업데이트 중입니다.');
+                            return;
+                          }
+                          final token = context.read<UserProvider>().token ?? '';
+                          final userInfo = UserEntity(
+                            id: widget.user.id,
+                            email: widget.user.email,
+                            nickname: _nicknameController.text,
+                            userType: typeUtil.toUserType(_userTypeController.text),
+                            role: typeUtil.toUserRole(_userRoleController.text),
+                            profileImg: widget.user.profileImg,
+                          );
 
-                      if (profileImage != null) {
-                        context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo,
-                            profileImage: profileImage, oldImage: widget.user.profileImg));
-                      } else {
-                        if (widget.user.profileImg != null) {
-                          userInfo.profileImg = widget.user.profileImg;
-                        }
-                        final checkNickname = await context.read<UserProvider>().isNicknameAvailable(_nicknameController.text);
-                        if(checkNickname && context.mounted){
-                          context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo));
-                        }else {
-                          Get.snackbar('알림', '이미 존재하는 닉네임입니다.');
-                          return;
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: isLoading ? CircularProgressIndicator() : Text('업데이트')),
-              );}
-            ),
+                          if (profileImage != null) {
+                            context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo,
+                                profileImage: profileImage, oldImage: widget.user.profileImg));
+                          } else {
+                            if (widget.user.profileImg != null) {
+                              userInfo.profileImg = widget.user.profileImg;
+                            }
+                            final checkNickname =
+                                await context.read<UserProvider>().isNicknameAvailable(_nicknameController.text);
+                            if (checkNickname && context.mounted) {
+                              context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo));
+                            } else {
+                              Get.snackbar('알림', '이미 존재하는 닉네임입니다.');
+                              return;
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: isLoading ? CircularProgressIndicator() : Text('업데이트')),
+                  );
+                }),
           ],
         ));
   }
@@ -402,16 +393,24 @@ class _UserInfoPageState extends State<UserInfoPage> {
           children: [
             GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: (){
-                Get.to(() => PasswordUpdatePage());
+              onTap: () {
+                if(widget.user.method != AuthType.email ){
+                  Get.snackbar('알림', '이메일 로그인만 가능합니다.');
+                  return;
+                }
+                Get.to(() => PasswordCheckPage());
+                return;
               },
               child: SizedBox(
                 height: 40,
-                width: wid-40,
+                width: wid - 40,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("비밀번호 변경", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
+                    Text(
+                      "비밀번호 변경",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
                     Icon(Icons.arrow_forward_ios_sharp, size: 16)
                   ],
                 ),
@@ -422,16 +421,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
             ),
             GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: (){
+              onTap: () {
                 // Get.to(() => UserDeletePage());
               },
               child: SizedBox(
                 height: 40,
-                width: wid-40,
+                width: wid - 40,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("구매 내역 관리", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
+                    Text(
+                      "구매 내역 관리",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
                     Icon(Icons.arrow_forward_ios_sharp, size: 16)
                   ],
                 ),
@@ -442,16 +444,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
             ),
             GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: (){
+              onTap: () {
                 Get.to(() => UserDeletePage());
               },
               child: SizedBox(
                 height: 40,
-                width: wid-40,
+                width: wid - 40,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("회원 탈퇴", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
+                    Text(
+                      "회원 탈퇴",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
                     Icon(Icons.arrow_forward_ios_sharp, size: 16)
                   ],
                 ),

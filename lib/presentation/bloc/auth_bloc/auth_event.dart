@@ -72,6 +72,12 @@ class VerifyOtpEvent extends AuthEvent {
   VerifyOtpEvent(this.email, this.otp);
 }
 
+class VerifyPasswordEvent extends AuthEvent {
+  final String token;
+  final String userId;
+  final String password;
+  VerifyPasswordEvent(this.token, this.userId, this.password);
+}
 
 class LogoutEvent extends AuthEvent {
   LogoutEvent();

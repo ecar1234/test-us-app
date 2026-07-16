@@ -30,31 +30,27 @@ class OneButtonAlert extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if(title != null)
               Text(title!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),)
             else
-              const Gap(100),
-            if(title != null)
-              const Gap(10),
-            Expanded(
-              child: Column(
-                children: [
-                  Text(mainContent, style: TextStyle(fontSize: 14),),
-                  const Gap(10),
-                  if(subContent != null)
-                  Text(subContent!, style: TextStyle(fontSize: 14),),
-                ],
-              )
+              const Gap(30),
+            Column(
+              children: [
+                Text(mainContent, style: TextStyle(fontSize: 14),),
+                const Gap(10),
+                if(subContent != null)
+                Text(subContent!, style: TextStyle(fontSize: 14),),
+              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  height: 50,
+                  height: 40,
                   width: 100,
                   child: ElevatedButton(
                       onPressed: onPressed,

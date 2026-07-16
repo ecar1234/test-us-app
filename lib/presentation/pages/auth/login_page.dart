@@ -48,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Scaffold(
             appBar: AppBar(),
             body: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
               },

@@ -18,6 +18,7 @@ enum UserAuthState {
   findEmailCompletedState,
   findPasswordCompletedState,
   verifyOtpCompletedState,
+  passwordCheckCompletedState,
   logoutState,
   loginFailedState,
   authFailedState,
@@ -44,7 +45,12 @@ class FindPasswordCompletedState extends AuthState {
 }
 class VerifyOtpCompletedState extends AuthState {
   final bool isVerified;
-  VerifyOtpCompletedState(this.isVerified) : super(state: UserAuthState.findPasswordCompletedState);
+  VerifyOtpCompletedState(this.isVerified) : super(state: UserAuthState.passwordCheckCompletedState);
+}
+
+class PasswordCheckCompletedState extends AuthState {
+  final bool isVerified;
+  PasswordCheckCompletedState(this.isVerified) : super(state: UserAuthState.findPasswordCompletedState);
 }
 
 
