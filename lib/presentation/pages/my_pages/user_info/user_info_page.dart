@@ -37,9 +37,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
   final _nicknameController = TextEditingController();
   final _userTypeController = TextEditingController();
   final _userRoleController = TextEditingController();
-  XFile? profileImage;
+  XFile? _selectProfileImage;
   final ImagePicker _picker = ImagePicker();
   final typeUtil = TypeConversionUtil();
+
+  bool _isPicks = false;
 
   @override
   void initState() {
@@ -80,7 +82,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 await showDialog(
                     context: context,
                     builder: (context) => OneButtonAlert(
-                      title: '업데이트',
+                        title: '업데이트',
                         mainContent: '업데이트 진행 완료.',
                         buttonName: '확인',
                         onPressed: () {
@@ -142,8 +144,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     child: CircleAvatar(
                       radius: 40,
                       backgroundColor: Colors.grey.shade200,
-                      backgroundImage: profileImage != null
-                          ? FileImage(File(profileImage!.path))
+                      backgroundImage: _selectProfileImage != null
+                          ? FileImage(File(_selectProfileImage!.path))
                           : (widget.user.profileImg == null || widget.user.profileImg!.url == null
                               ? const AssetImage('assets/images/Generic avatar.png')
                               : CachedNetworkImageProvider(widget.user.profileImg!.url!)) as ImageProvider,
@@ -154,16 +156,30 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       right: 0,
                       child: GestureDetector(
                         onTap: () async {
-                          final image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
-                          if (image == null) {
-                            return;
-                          } else if (File(image.path).lengthSync() / (1024 * 1024) > volumeLimit) {
-                            Get.snackbar('알림', '${volumeLimit}MB를 초과하는 이미지는 업로드 할 수 없습니다.');
-                            return;
-                          } else {
-                            setState(() {
-                              profileImage = image;
-                            });
+                          if (_isPicks) return;
+
+                          setState(() {
+                            _isPicks = true; // 잠금장치 ON
+                          });
+
+                          try {
+                            final image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
+                            if (image == null) {
+                              return;
+                            } else if (File(image.path).lengthSync() / (1024 * 1024) > volumeLimit) {
+                              Get.snackbar('알림', '${volumeLimit}MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                              return;
+                            } else {
+                              setState(() {
+                                _selectProfileImage = image;
+                              });
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                _isPicks = false; // 잠금장치 off
+                              });
+                            }
                           }
                         },
                         child: Container(
@@ -341,9 +357,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             profileImg: widget.user.profileImg,
                           );
 
-                          if (profileImage != null) {
+                          if (_selectProfileImage != null) {
                             context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo,
-                                profileImage: profileImage, oldImage: widget.user.profileImg));
+                                profileImage: _selectProfileImage, oldImage: widget.user.profileImg));
                           } else {
                             if (widget.user.profileImg != null) {
                               userInfo.profileImg = widget.user.profileImg;
@@ -394,7 +410,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
-                if(widget.user.method != AuthType.email ){
+                if (widget.user.method != AuthType.email) {
                   Get.snackbar('알림', '이메일 로그인만 가능합니다.');
                   return;
                 }
