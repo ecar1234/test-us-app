@@ -107,7 +107,8 @@ class UserDataSourceImpl implements UserDataSource {
 
   @override
   Future<bool> updatePassword(String token, String userId, String newPassword) async {
-    final res = await netDriver.requestPutJson(token, UserApi.updatePassword, {"userId": userId, "newPassword": newPassword});
+    final res = await netDriver.requestPostJson(token, AuthApi.updatePassword,
+        {"userId": userId, "newPassword": newPassword});
     if (res['status'] == 200) {
       return true;
     } else {

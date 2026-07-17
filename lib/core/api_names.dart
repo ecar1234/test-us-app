@@ -26,7 +26,7 @@ class UserApi {
   static const String getUsersByIds = '/api/v1/user/getUsersByIds';
   static const String getUserByEmail = '/api/v1/user/getUserByEmail';
   static const String getUserByNickname = '/api/v1/user/getUserByNickname';
-  static const String updatePassword = '/api/v1/user/changePassword';
+  // static const String updatePassword = '/api/v1/user/updatePassword';
   static const String getAllUsers = '/api/v1/user/getAllUsers';
   static const String isNicknameAvailable = '/api/v1/user/isNicknameAvailable';
   static const String isEmailAvailable = '/api/v1/user/isEmailAvailable';

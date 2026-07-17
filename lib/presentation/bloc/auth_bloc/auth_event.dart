@@ -40,10 +40,10 @@ class LoginCompletedEvent extends AuthEvent {
 class PasswordUpdateEvent extends AuthEvent {
   final String token;
   final String userId;
-  final String oldPw;
+  // final String oldPw;
   final String newPw;
 
-  PasswordUpdateEvent(this.token, this.userId, this.oldPw, this.newPw);
+  PasswordUpdateEvent(this.token, this.userId, this.newPw);
 }
 class PasswordChangeEvent extends AuthEvent {
   final String email;

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
+import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
 import 'package:test_us_app/presentation/pages/my_pages/user_info/password_update_page.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
@@ -44,7 +46,16 @@ class _PasswordCheckPageState extends State<PasswordCheckPage> {
             listener: (context, state) {
               if (state is PasswordCheckCompletedState) {
                 if (state.isVerified) {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordUpdatePage()));
+                  showDialog(context: context, builder: (context) =>
+                      OneButtonAlert(
+                        title: '인증 완료',
+                          mainContent: '비밀번호 설정 페이지로 이동 합니다.',
+                          buttonName: '확인',
+                          onPressed: (){
+                            Get.back();
+                            Get.off(() => PasswordUpdatePage());
+                            return;
+                          }));
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text('기존 비밀번호가 일치하지 않습니다.'),

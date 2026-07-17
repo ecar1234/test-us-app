@@ -9,6 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:test_us_app/presentation/pages/home/user_page.dart';
+import 'package:test_us_app/presentation/pages/my_pages/user_info/password_update_page.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import 'mata_data_setting.dart';
@@ -145,6 +147,10 @@ class _PermissionHandlerState extends State<PermissionHandler> {
       debugShowCheckedModeBanner: false,
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
+      getPages: [
+        GetPage(name: '/userPage', page: () => const UserPage()),
+        GetPage(name: '/passwordUpdatePage', page: () => const PasswordUpdatePage())
+      ],
       home: const Scaffold(
         backgroundColor: Colors.white,
         body: Center(

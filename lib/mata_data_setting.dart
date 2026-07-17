@@ -123,6 +123,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
               context
                   .read<BasePostProvider>()
                   .getInitPosts(state.favoritePosts!, state.recruitPosts!, state.promotionPosts!);
+              FlutterNativeSplash.remove();
               // context.read<RecruitPostProvider>().getInitPosts(state.recruitPosts!);
               // context.read<PromotionPostProvider>().getInitPromotionPosts(state.promotionPosts!);
             },
@@ -147,7 +148,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
           BlocListener<AuthBloc, AuthState>(
             listener: (context, state) async {
               GetIt.I.get<AuthService>().loginCompletionHandler(context, state);
-              FlutterNativeSplash.remove();
             },
             listenWhen: (preState, state) => state.state == UserAuthState.loginCompletedState,
           ),

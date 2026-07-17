@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_state.dart';
+import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 
 import '../../../../services/common_height_provider.dart';
@@ -244,10 +245,10 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                               width: MediaQuery.sizeOf(context).width * 0.4,
                               height: 50,
                               child: ElevatedButton(onPressed: (){
-                                if(_oldPwController.text.isEmpty && !widget.isOtp){
-                                  Get.snackbar('알림', '기존 비밀번호를 입력해주세요.');
-                                  return;
-                                }
+                                // if(_oldPwController.text.isEmpty && !widget.isOtp){
+                                //   Get.snackbar('알림', '기존 비밀번호를 입력해주세요.');
+                                //   return;
+                                // }
                                 if(_newPwController.text.isEmpty) {
                                   Get.snackbar('알림', '새 비밀번호를 입력해주세요.');
                                   return;
@@ -268,9 +269,11 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                                 final token = context.read<UserProvider>().token ?? "";
                                 final user = context.read<UserProvider>().user;
                                 if(widget.isOtp){
-                                  context.read<AuthBloc>().add(PasswordChangeEvent(widget.email!, _newPwController.text));
+                                  context.read<AuthBloc>()
+                                      .add(PasswordChangeEvent(widget.email!, _newPwController.text));
                                 }else {
-                                  context.read<AuthBloc>().add(PasswordUpdateEvent(token, user!.id!, _oldPwController.text, _newPwController.text));
+                                  context.read<AuthBloc>()
+                                      .add(PasswordUpdateEvent(token, user!.id!, _newPwController.text));
                                 }
                               }, style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
@@ -293,42 +296,10 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
   }
 
   Future<void> _completeDialog(BuildContext context){
-    return showDialog(context: context, builder: (context) => Dialog(
-      child: Container(
-        height: 200,
-        width: MediaQuery.sizeOf(context).width * 0.6,
-        padding: EdgeInsets.all(10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Column(
-              children: [
-                Text('비밀번호 변경이 완료되었습니다.'),
-                Text('다시 로그인 해주세요.'),
-              ],
-            ),
-            const Gap(30),
-            SizedBox(
-              height: 50,
-              width: 120,
-              child: ElevatedButton(onPressed: (){
-                Get.back();
-                context.read<UserProvider>().logout();
-                context.read<AuthBloc>().add(LogoutEvent());
-                Get.offAll(() => MainPage());
-              },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),)
-                  ),
-                  child: Text('확인')),
-            )
-          ],
-        ),
-      )
-    ));
-
+    return showDialog(context: context, builder: (context) =>
+        OneButtonAlert(mainContent: '비밀번호 설정을 완료 했습니다.', buttonName: '확인', onPressed: (){
+          Get.back();
+          Get.back();
+        }));
   }
 }

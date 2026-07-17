@@ -28,6 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final token = await pref.getToken();
         if (token.isEmpty) {
           emit(AuthState(state: UserAuthState.beforeLoginState));
+          logger.i('state : before login state');
           return;
         } else {
           final serverToken = await userUseCase.autoLogin(token);
@@ -37,6 +38,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           }
           final user = await pref.getUserInfo();
           emit(AuthState(state: UserAuthState.loginCompletedState, user: user, token: serverToken));
+          logger.i('state : login completed state');
         }
       } on Exception catch (e) {
         logger.e(e);
@@ -194,13 +196,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthState(state: UserAuthState.loadingState));
       logger.i('state : loading state');
       try {
-        final isPwValid = await userUseCase.isPasswordValid(event.token, event.userId, event.oldPw);
-        if (!isPwValid) {
-          emit(AuthState(state: UserAuthState.authFailedState, message: '기존 비밀번호가 일치하지 않습니다.'));
-          logger.e('기존 비밀번호가 일치하지 않습니다.');
-          return;
-        }
-        logger.i('password is valid');
         final res = await userUseCase.updatePassword(event.token, event.userId, event.newPw);
         if (res) {
           emit(AuthState(state: UserAuthState.passwordUpdateCompletedState));
