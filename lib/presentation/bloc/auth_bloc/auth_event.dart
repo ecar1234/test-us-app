@@ -58,8 +58,8 @@ class RequestUserDeleteEvent extends AuthEvent {
 }
 
 class FindEmailEvent extends AuthEvent {
-  final String nickname;
-  FindEmailEvent(this.nickname);
+  final String email;
+  FindEmailEvent(this.email);
 }
 class FindPasswordEvent extends AuthEvent {
   final String email;

@@ -28,7 +28,7 @@ abstract class UserRepository {
   Future<void> createFirebaseToken(String token, String messagingToken, String userId, String deviceType);
   Future<void> updateFirebaseToken(String token, String messagingToken, String userId, String deviceType);
   Future<void> deleteFirebaseToken(String token, String messagingToken, String userId);
-  Future<String> findEmail(String nickname);
+  Future<bool> findEmail(String email);
   Future<bool> findPassword(String email);
   Future<bool> verifyOtp(String email, String otp);
 }

@@ -106,8 +106,8 @@ class UserUseCase {
     await repository.deleteFirebaseToken(token, messagingToken ,userId);
   }
 
-  Future<String> findEmail(String nickname) async {
-    final res = await repository.findEmail(nickname);
+  Future<bool> findEmail(String email) async {
+    final res = await repository.findEmail(email);
     return res;
   }
 

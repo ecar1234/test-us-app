@@ -256,10 +256,10 @@ class UserDataSourceImpl implements UserDataSource {
   }
 
   @override
-  Future<String> findEmail(String nickname) async {
-    final res = await netDriver.requestPostJson("", AuthApi.findEmail, {'nickname': nickname});
+  Future<bool> findEmail(String email) async {
+    final res = await netDriver.requestPostJson("", AuthApi.findEmail, {'email': email});
     if (res['status'] == 200) {
-      return res['email'];
+      return res['result'];
     } else {
       return res['error'];
     }

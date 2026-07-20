@@ -256,13 +256,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthState(state: UserAuthState.loadingState));
       logger.i('state : loading state');
       try {
-        final email = await userUseCase.findEmail(event.nickname);
-        if (email.contains('found')) {
-          emit(AuthState(state: UserAuthState.failedState, message: '해당 닉네임을 가진 유저가 없습니다.'));
-          logger.e('state : failed state');
-          return;
-        }
-        emit(FindEmailCompletedState(email));
+        final result = await userUseCase.findEmail(event.email);
+        emit(FindEmailCompletedState(result));
         logger.i('state : find email completed state');
       } on Exception catch (e) {
         logger.e(e.toString());

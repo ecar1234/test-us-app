@@ -35,8 +35,8 @@ class AuthState {
 }
 
 class FindEmailCompletedState extends AuthState {
-  final String email;
-  FindEmailCompletedState(this.email) : super(state: UserAuthState.findEmailCompletedState);
+  final bool result;
+  FindEmailCompletedState(this.result) : super(state: UserAuthState.findEmailCompletedState);
 }
 
 class FindPasswordCompletedState extends AuthState {

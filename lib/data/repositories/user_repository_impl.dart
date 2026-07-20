@@ -143,8 +143,8 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<String> findEmail(String nickname) async {
-    final res = await remote.findEmail(nickname);
+  Future<bool> findEmail(String email) async {
+    final res = await remote.findEmail(email);
     return res;
   }
 
