@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,6 +43,7 @@ class _PermissionHandlerState extends State<PermissionHandler> {
     if (isAllGranted) {
       // 모두 성공 시 ➡️ 메인 페이지로 이동 (더이상 스플래시로 못 돌아오게 replacement)
       if (mounted) {
+        FlutterNativeSplash.remove();
         Get.off(() => const MetaDataSetting());
       }
     } else {

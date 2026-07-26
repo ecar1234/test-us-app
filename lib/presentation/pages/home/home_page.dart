@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -12,6 +13,7 @@ import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/data/models/post/recruit_post_model.dart';
 import 'package:test_us_app/domain/entities/firebase_messaging_entity.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
+import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_state.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
@@ -27,9 +29,11 @@ import '../../../data/models/user/user_model.dart';
 import '../../../data/sharedPreferences/auth_preference.dart';
 import '../../../domain/entities/recruit_post_entity.dart';
 import '../../../services/common_height_provider.dart';
+import '../../bloc/auth_bloc/auth_bloc.dart';
 import '../../bloc/post_blocs/base_post_bloc/base_post_event.dart';
 import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
+import '../../bloc/user_bloc/user_bloc.dart';
 import '../../components/notifications_page.dart';
 import '../auth/login_page.dart';
 
@@ -44,6 +48,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final pref = AuthPreference.instance;
+  final TextEditingController _changeController = TextEditingController();
+
   // bool _isRefresh = false;
   @override
   Widget build(BuildContext context) {
@@ -54,6 +60,66 @@ class _HomePageState extends State<HomePage> {
             title: const Text('TESTUS', style: TextStyle(fontWeight: FontWeight.bold)),
             // 추후 로고 이미지로 변경
             actions: [
+              if(kDebugMode)
+                   Selector<UserProvider, bool>(
+                     selector: (context, provider) => provider.isLogged ?? false,
+                     builder:(context, isLogin, child) => ElevatedButton(
+                         onPressed: isLogin ? () {
+                           showDialog(
+                               context: context,
+                               builder: (context) {
+                                 final nick = context.read<UserProvider>().user!.nickname;
+                                 return Dialog(
+                                   child: Container(
+                                       height: 300,
+                                       width: 300,
+                                       padding: EdgeInsets.all(10),
+                                       child: Column(
+                                         mainAxisAlignment: MainAxisAlignment.center,
+                                         crossAxisAlignment: CrossAxisAlignment.center,
+                                         children: [
+                                           Text('current : $nick'),
+                                           const Gap(20),
+                                           DropdownMenu(
+                                               controller: _changeController,
+                                               initialSelection: nick,
+                                               menuHeight: 200,
+                                               dropdownMenuEntries: List.generate(11, (index) {
+                                                 if (index == 0) {
+                                                   return DropdownMenuEntry(value: 'master', label: 'master');
+                                                 }
+                                                 return DropdownMenuEntry(value: 'test$index', label: 'test$index');
+                                               })),
+                                           const Gap(20),
+                                           SizedBox(
+                                             height: 50,
+                                             width: 100,
+                                             child: ElevatedButton(
+                                                 onPressed: ()async{
+                                                   if(_changeController.text == nick){
+                                                     Get.snackbar('알림', '아이디 같음');
+                                                     return;
+                                                   }
+                                                   final email = nick == 'master'
+                                                       ? 'master@master.com'
+                                                       : '${_changeController.text}@test.com';
+                                                   context.read<AuthBloc>().add(LogoutEvent());
+                                                   context.read<AuthBloc>()
+                                                       .add(EmailLoginEvent(email, 'qwer1234!'));
+                                                   Get.back();
+                                                   return;
+                                                 },
+                                               child: Text('교체'),
+                                             )
+                                           )
+                                         ],
+                                       )),
+                                 );
+                               });
+                           return ;
+                         } : null,
+                         child: Text('Change')),
+                   ),
               Selector<UserProvider, bool>(
                   selector: (context, provider) => provider.isLogged ?? false,
                   builder: (context, isLogin, child) => !isLogin
@@ -61,18 +127,15 @@ class _HomePageState extends State<HomePage> {
                           onPressed: () {
                             Get.to(() => LoginPage());
                           },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)
-                        )
-                      ),
+                          style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                           child: Text('로그인', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)))
                       : Selector<FirebaseMessagingProvider, List<FirebaseMessagingEntity>>(
                           selector: (context, provider) => provider.notifications ?? [],
                           builder: (context, notifications, child) {
                             final count = notifications.where((e) => e.isRead == false).length;
-                            
+
                             return IconButton(
                               onPressed: () {
                                 Get.to(() => NotificationsPage());
@@ -111,22 +174,21 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           if (controller.value > 0)
                             Positioned(
-                              top: controller.value * 30,
-                              child: Opacity(
-                                opacity: controller.value.clamp(0, 1),
-                                child: Transform.scale(
-                                  scale: controller.value.clamp(0.0, 1.0),
-                                  child: Text(
-                                    'Grow up with TESTUS',
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
+                                top: controller.value * 30,
+                                child: Opacity(
+                                  opacity: controller.value.clamp(0, 1),
+                                  child: Transform.scale(
+                                    scale: controller.value.clamp(0.0, 1.0),
+                                    child: Text(
+                                      'Grow up with TESTUS',
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              )
-                            ),
+                                )),
                           Transform.translate(
                             offset: Offset(0, 80 * controller.value),
                             child: child,
@@ -268,13 +330,9 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (context, idx) {
                     final isRecruit = favoritePost[idx] is RecruitPostEntity;
 
-                    final bgColor = isRecruit
-                        ? const Color(0xFFFFE0B2)
-                        : const Color(0xFFE3F2FD);
+                    final bgColor = isRecruit ? const Color(0xFFFFE0B2) : const Color(0xFFE3F2FD);
 
-                    final textColor = isRecruit
-                        ? const Color(0xFFBF360C)
-                        : const Color(0xFF0D47A1);
+                    final textColor = isRecruit ? const Color(0xFFBF360C) : const Color(0xFF0D47A1);
                     return GestureDetector(
                       onTap: () async {
                         favoritePost[idx].postType == "RecruitmentPostEntity"
@@ -325,15 +383,18 @@ class _HomePageState extends State<HomePage> {
                                       bottom: 5,
                                       right: 5,
                                       child: Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                                      decoration: BoxDecoration(
-                                        color: bgColor,
-                                        border: Border.all(color: Colors.grey.shade300),
-                                        borderRadius: BorderRadius.circular(10),
+                                        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                                        decoration: BoxDecoration(
+                                          color: bgColor,
+                                          border: Border.all(color: Colors.grey.shade300),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Text(
+                                          isRecruit ? "모집" : "홍보",
+                                          style: TextStyle(fontSize: 14, color: textColor),
+                                        ),
                                       ),
-                                      child: Text(isRecruit ? "모집" : "홍보",
-                                        style: TextStyle(fontSize: 14, color: textColor),),
-                                    ),)
+                                    )
                                   ],
                                 );
                               }),
@@ -350,9 +411,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 SizedBox(
                                   child: Text(
-                                    favoritePost[idx].platform! == ApplicationPlatform.web
-                                        ? "WEB"
-                                        : "Mobile",
+                                    favoritePost[idx].platform! == ApplicationPlatform.web ? "WEB" : "Mobile",
                                     style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
@@ -375,9 +434,9 @@ class _HomePageState extends State<HomePage> {
                             ),
                             SizedBox(
                                 child: Text(
-                                  TypeConversionUtil().postCategoryToString(favoritePost[idx].category),
-                                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                                )),
+                              TypeConversionUtil().postCategoryToString(favoritePost[idx].category),
+                              style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                            )),
                             SizedBox(
                                 child: Text(
                               "${favoritePost[idx].author!.nickname}",
@@ -687,7 +746,7 @@ class _HomePageState extends State<HomePage> {
                                     const Gap(5),
                                     SizedBox(
                                         child: Text(
-                                          isActive ? posts[idx].author!.nickname ?? '알수 없는 회원' : '알수 없는 회원',
+                                      isActive ? posts[idx].author!.nickname ?? '알수 없는 회원' : '알수 없는 회원',
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w500,

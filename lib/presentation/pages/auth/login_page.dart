@@ -410,7 +410,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      launchUrl(Uri.parse('https://readygoprivate.imweb.me/?mode=policy'));
+                                      launchUrl(Uri.parse('https://devon-studio.vercel.app/#/terms_of_service'));
                                       debugPrint('이용약관');
                                     },
                                 ),
@@ -422,7 +422,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      launchUrl(Uri.parse('https://readygoprivate.imweb.me/?mode=privacy'));
+                                      launchUrl(Uri.parse('https://devon-studio.vercel.app/#/privacy_policy'));
                                       debugPrint('개인정보');
                                     },
                                 ),

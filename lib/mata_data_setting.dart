@@ -123,7 +123,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
               context
                   .read<BasePostProvider>()
                   .getInitPosts(state.favoritePosts!, state.recruitPosts!, state.promotionPosts!);
-              FlutterNativeSplash.remove();
               // context.read<RecruitPostProvider>().getInitPosts(state.recruitPosts!);
               // context.read<PromotionPostProvider>().getInitPromotionPosts(state.promotionPosts!);
             },
