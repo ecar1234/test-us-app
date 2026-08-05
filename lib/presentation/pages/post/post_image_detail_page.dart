@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -25,7 +27,15 @@ class PostImageDetailPage extends StatelessWidget {
               minScale: 1.0,
               maxScale: 4.0,
               child: Center(
-                child: CachedNetworkImage(
+                child: images[idx].isLocal??false ?
+                    Image.file(
+                        File(images[idx].url!),
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.error, color: Colors.white);
+                      }
+                    )
+                    : CachedNetworkImage(
                   imageUrl: images[idx].url!,
                   fit: BoxFit.contain,
                   placeholder: (context, url) =>

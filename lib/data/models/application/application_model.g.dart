@@ -19,7 +19,9 @@ ApplicationModel _$ApplicationModelFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
-      postId: json['postId'] as String?,
+      postInfo: json['postInfo'] == null
+          ? null
+          : PostInfoModel.fromJson(json['postInfo'] as Map<String, dynamic>),
       applicantId: json['applicantId'] as String?,
     );
 
@@ -31,7 +33,7 @@ Map<String, dynamic> _$ApplicationModelToJson(ApplicationModel instance) =>
       'status': _$ApplicationStatusEnumMap[instance.status],
       'appliedAt': instance.appliedAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
-      'postId': instance.postId,
+      'postInfo': instance.postInfo,
       'applicantId': instance.applicantId,
     };
 
@@ -50,4 +52,47 @@ const _$ApplicationStatusEnumMap = {
   ApplicationStatus.accepted: 'accepted',
   ApplicationStatus.rejected: 'rejected',
   ApplicationStatus.cancel: 'cancel',
+};
+
+PostInfoModel _$PostInfoModelFromJson(Map<String, dynamic> json) =>
+    PostInfoModel(
+      postId: json['postId'] as String?,
+      title: json['title'] as String?,
+      thumbnailUrl: json['thumbnailUrl'] as String?,
+      isExpired: json['isExpired'] as bool?,
+      category: $enumDecodeNullable(_$PostCategoryEnumMap, json['category']),
+    );
+
+Map<String, dynamic> _$PostInfoModelToJson(PostInfoModel instance) =>
+    <String, dynamic>{
+      'postId': instance.postId,
+      'title': instance.title,
+      'thumbnailUrl': instance.thumbnailUrl,
+      'isExpired': instance.isExpired,
+      'category': _$PostCategoryEnumMap[instance.category],
+    };
+
+const _$PostCategoryEnumMap = {
+  PostCategory.game: 'game',
+  PostCategory.travel: 'travel',
+  PostCategory.developerTool: 'developer_tool',
+  PostCategory.health: 'health',
+  PostCategory.education: 'education',
+  PostCategory.finance: 'finance',
+  PostCategory.weather: 'weather',
+  PostCategory.news: 'news',
+  PostCategory.books: 'books',
+  PostCategory.life: 'life',
+  PostCategory.business: 'business',
+  PostCategory.photography: 'photography',
+  PostCategory.social: 'social',
+  PostCategory.shopping: 'shopping',
+  PostCategory.entertainment: 'entertainment',
+  PostCategory.sports: 'sports',
+  PostCategory.utility: 'utility',
+  PostCategory.food: 'food',
+  PostCategory.music: 'music',
+  PostCategory.medical: 'medical',
+  PostCategory.magazine: 'magazine',
+  PostCategory.etc: 'etc',
 };

@@ -35,6 +35,7 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
             body: Selector<BasePostProvider, List<PromotionPostEntity>>(
                 selector: (context, provider) => provider.userPromotionPosts ?? [],
                 builder: (context, posts, child) {
+                  final isDarkMode = context.read<ThemeProvider>().isDarkMode;
                   if (posts.isEmpty) {
                     return SizedBox(
                       width: MediaQuery.sizeOf(context).width,
@@ -42,10 +43,21 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('작성 된 모집글이 없습니다.', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                          Text('작성 된 서비스 홍보가 없습니다.', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                           const Gap(10),
-                          Text('나만의 서비스가 있다면 테스터를'),
-                          Text('모집해 보세요.'),
+                          RichText(text: TextSpan(
+                            style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black, fontSize: 14),
+                            children: [
+                              TextSpan(text: '나만의 서비스가 있다면'),
+                              TextSpan(text: ' TESTUS',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, 
+                                      color: Theme.of(context).colorScheme.primary)),
+                              TextSpan(text: '에서'),
+                            ]
+                          )),
+                          Text('홍보해 보세요.')
                         ],
                       ),
                     );

@@ -360,17 +360,37 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                 const Gap(40),
                 if (post.author != null && post.author!.id != user?.id)
                   BlocListener<AppBloc, AppState>(
-                      listener: (context, state) {
+                      listener: (context, state) async {
                         if (state.state == UserAppState.applicationCompletedState) {
-                          context.read<ApplicationProvider>().requestApply(state.application!);
+                          await showDialog(
+                              context: context,
+                              builder: (context) => OneButtonAlert(
+                                  title: '알림',
+                                  mainContent: '신청이 완료되었습니다.',
+                                  buttonName: '확인',
+                                  onPressed: () {
+                                    context.read<ApplicationProvider>().requestApply(state.application!);
+                                    Get.back();
+                                  }));
+                          return;
                         }
                         if (state.state == UserAppState.applicationUpdateCompletedState) {
-                          context.read<ApplicationProvider>().requestUpdateApplication(state.application!);
+                          await showDialog(
+                              context: context,
+                              builder: (context) => OneButtonAlert(
+                                  title: '알림',
+                                  mainContent: '업데이트 완료되었습니다.',
+                                  buttonName: '확인',
+                                  onPressed: () {
+                                    context.read<ApplicationProvider>().requestUpdateApplication(state.application!);
+                                    Get.back();
+                                  }));
+                          return;
                         }
                         if (state.state == UserAppState.applicationCancelCompletedState) {
                           context.read<ApplicationProvider>().cancelApplication(state.application!);
+                          context.read<BasePostProvider>().updateRecruitPost(state.post!);
                         }
-                        context.read<BasePostProvider>().updateRecruitPost(state.post!);
                       },
                       listenWhen: (prev, current) => current.state != UserAppState.loadingState,
                       child: isActive ? _applicationSection(context, post) : SizedBox()),
@@ -388,8 +408,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
 
     // if (app.id == null) return _beforeApplicationSection(context, initPostData);
     return Selector<ApplicationProvider, ApplicationEntity>(selector: (context, provider) {
-      final app =
-          provider.userApplications!.firstWhere((e) => e.postId == widget.postId!, orElse: () => ApplicationEntity());
+      final app = provider.userApplications!
+          .firstWhere((e) => e.postInfo!.postId! == widget.postId!, orElse: () => ApplicationEntity());
       return app;
     }, builder: (context, application, child) {
       if (!isLogged) return _beforeApplicationSection(context, post);
@@ -399,6 +419,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
           return _afterApplicationSection(context, post);
         case ApplicationStatus.rejected:
           return _rejectedApplicationSection(context);
+        case ApplicationStatus.cancel:
+          return _canceledApplicationSection(context);
         default:
           return _beforeApplicationSection(context, post);
       }
@@ -414,7 +436,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Selector<ApplicationProvider, ApplicationEntity>(
-                selector: (context, provider) => provider.userApplications!.firstWhere((e) => e.postId == post.id),
+                selector: (context, provider) =>
+                    provider.userApplications!.firstWhere((e) => e.postInfo!.postId! == post.id),
                 builder: (context, app, child) => Flexible(
                   flex: 3,
                   child: SizedBox(
@@ -424,15 +447,28 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                         onPressed: () async {
                           final token = context.read<UserProvider>().token ?? '';
                           final appId = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
-                            return element.postId == post.id;
+                            return element.postInfo!.postId! == post.id;
                           }).id!;
 
-                          context.read<AppBloc>().add(RequestCancelEvent(token, appId));
+                          await showDialog(
+                              context: context,
+                              builder: (context) => TwoButtonConfirmAlert(
+                                  title: '알림',
+                                  mainContent: '정말 신청 취소 하시나요?',
+                                  confirmButtonName: '취소',
+                                  cancelButtonName: '진행',
+                                  onPressedConfirm: () {
+                                    Get.back();
+                                  },
+                                  onPressedCancel: () {
+                                    context.read<AppBloc>().add(RequestCancelEvent(token, appId));
+                                    Get.back();
+                                  }));
                         },
                         style: OutlinedButton.styleFrom(
                             side: BorderSide(color: Theme.of(context).primaryColor),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                        child: Text('취소')),
+                        child: Text('신청 취소')),
                   ),
                 ),
               ),
@@ -446,7 +482,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Selector<ApplicationProvider, ApplicationEntity>(
-              selector: (context, provider) => provider.userApplications!.firstWhere((e) => e.postId == post.id),
+              selector: (context, provider) =>
+                  provider.userApplications!.firstWhere((e) => e.postInfo!.postId! == post.id),
               builder: (context, app, child) => Flexible(
                 flex: 3,
                 child: SizedBox(
@@ -456,15 +493,28 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                       onPressed: () async {
                         final token = context.read<UserProvider>().token ?? '';
                         final appId = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
-                          return element.postId == post.id;
+                          return element.postInfo!.postId! == post.id;
                         }).id!;
 
-                        context.read<AppBloc>().add(RequestCancelEvent(token, appId));
+                        await showDialog(
+                            context: context,
+                            builder: (context) => TwoButtonConfirmAlert(
+                                title: '알림',
+                                mainContent: '정말 신청 취소 하시나요?',
+                                confirmButtonName: '취소',
+                                cancelButtonName: '진행',
+                                onPressedConfirm: () {
+                                  Get.back();
+                                },
+                                onPressedCancel: () {
+                                  context.read<AppBloc>().add(RequestCancelEvent(token, appId));
+                                  Get.back();
+                                }));
                       },
                       style: OutlinedButton.styleFrom(
                           side: BorderSide(color: Theme.of(context).primaryColor),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                      child: Text('취소')),
+                      child: Text('신청 취소')),
                 ),
               ),
             ),
@@ -485,7 +535,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                             bool isAndroidDevice = Platform.isAndroid;
 
                             final prevApp = context.read<ApplicationProvider>().userApplications!.firstWhere((element) {
-                              return element.postId == post.id &&
+                              return element.postInfo!.postId! == post.id &&
                                   element.applicantId == context.read<UserProvider>().user!.id;
                             });
                             if (prevApp.mobileOs == MobileOsType.ios) {
@@ -570,7 +620,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                               platform: prevApp.platform,
                                               mobileOs: isAndroid ? MobileOsType.android : MobileOsType.ios,
                                               status: ApplicationStatus.pending,
-                                              postId: post.id,
+                                              postInfo: PostInfo(postId: post.id),
                                               applicantId: userId);
 
                                           context.read<AppBloc>().add(RequestUpdateApplicationEvent(token, app));
@@ -642,10 +692,9 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
 
             final token = context.read<UserProvider>().token ?? '';
             final userId = isLogged ? context.read<UserProvider>().user!.id : '';
-            final application = context
-                .read<ApplicationProvider>()
-                .userApplications!
-                .firstWhere((e) => e.postId == post.id! && e.applicantId == userId, orElse: () => ApplicationEntity());
+            final application = context.read<ApplicationProvider>().userApplications!.firstWhere(
+                (e) => e.postInfo!.postId! == post.id! && e.applicantId == userId,
+                orElse: () => ApplicationEntity());
 
             if (post.platform == ApplicationPlatform.web) {
               if (application.id != null && application.status == ApplicationStatus.cancel) {
@@ -654,7 +703,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                     id: prevApp.id,
                     platform: prevApp.platform,
                     mobileOs: null,
-                    postId: post.id,
+                    postInfo: PostInfo(postId: post.id),
                     status: ApplicationStatus.pending,
                     applicantId: userId);
 
@@ -663,7 +712,10 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                 final platform = post.platform;
                 // context.read<AppBloc>().add(ApplicationDataLoadEvent());
                 final app = ApplicationEntity(
-                    platform: platform, status: ApplicationStatus.pending, postId: post.id, applicantId: userId);
+                    platform: platform,
+                    status: ApplicationStatus.pending,
+                    postInfo: PostInfo(postId: post.id),
+                    applicantId: userId);
 
                 context.read<AppBloc>().add(RequestApplyEvent(token, app));
               }
@@ -733,7 +785,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                         id: prevApp.id,
                                         platform: prevApp.platform,
                                         mobileOs: isAndroid ? MobileOsType.android : MobileOsType.ios,
-                                        postId: post.id,
+                                        postInfo: PostInfo(postId: post.id),
                                         status: ApplicationStatus.pending,
                                         applicantId: userId);
 
@@ -741,7 +793,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                   } else {
                                     final app = ApplicationEntity(
                                         mobileOs: isAndroid ? MobileOsType.android : MobileOsType.ios,
-                                        postId: post.id,
+                                        postInfo: PostInfo(
+                                            postId: post.id, title: post.title, thumbnailUrl: post.images?.first.url),
                                         applicantId: userId);
 
                                     context.read<AppBloc>().add(RequestApplyEvent(token, app));
@@ -781,6 +834,17 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
             )
           ],
         ));
+  }
+
+  Widget _canceledApplicationSection(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          child: Text('신청 취소된 프로덕트는 재신청 할 수 없습니다.', style: TextStyle(color: Colors.grey, fontSize: 16)),
+        ),
+      ],
+    );
   }
 
   Future<void> _linkOpen(LinkableElement link) async {

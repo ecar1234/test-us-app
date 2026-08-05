@@ -42,7 +42,7 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  List<String> menu = ['메시지 관리', '팔로우 관리', '테스터 모집 관리', '나의 테스터 신청', '나의 서비스 홍보', '리뷰 관리', '사이드 프로젝트 관리'];
+  List<String> menu = ['메시지 관리', '팔로우 관리', '테스터 모집 관리', '테스터 신청 관리', '서비스 홍보 관리', '리뷰 관리', '사이드 프로젝트 관리'];
 
   @override
   Widget build(BuildContext context) {

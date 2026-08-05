@@ -15,6 +15,7 @@ import 'package:test_us_app/domain/entities/purchase_entity.dart';
 
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
+import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
 import 'package:test_us_app/presentation/pages/post/tester_post_pages/recruit_post_detail_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
@@ -655,11 +656,31 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
           final provider = context.read<BasePostProvider>();
           if (state.state == RecruitPostLoadState.postCreateCompletedState) {
             provider.createRecruitPost(state.post!);
-            await _alertDialog(context, '등록');
+            await showDialog(
+              context: context,
+              builder: (context) => OneButtonAlert(
+                  title: '알림',
+                  mainContent: '테스터 모집글을 게시 했습니다.',
+                  buttonName: '확인',
+                  onPressed: () {
+                    Navigator.pop(context);
+                    if (context.mounted) Navigator.pop(context);
+                  }),
+            );
           } else if (state.state == RecruitPostLoadState.postUpdateCompletedState) {
             provider.updateRecruitPost(state.post!);
             provider.updateUserRecruitPosts(state.post!);
-            await _alertDialog(context, '수정');
+            await showDialog(
+              context: context,
+              builder: (context) => OneButtonAlert(
+                  title: '알림',
+                  mainContent: '테스터 모집글을 수정 했습니다.',
+                  buttonName: '확인',
+                  onPressed: () {
+                    Navigator.pop(context);
+                    if (context.mounted) Navigator.pop(context);
+                  }),
+            );
           } else if (state.state == RecruitPostLoadState.errorState ||
               state.state == RecruitPostLoadState.failedState) {
             Get.snackbar('알림', '등록 실패');

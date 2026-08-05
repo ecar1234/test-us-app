@@ -154,7 +154,7 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
               listener: (context, state) async {
                 context.read<ApplicationProvider>().setMyApplications(state.applications!);
 
-                final postIds = state.applications!.map((e) => e.postId!).toList();
+                final postIds = state.applications!.map((e) => e.postInfo!.postId!).toList();
                 final token = context.read<UserProvider>().token ?? '';
                 context.read<RecruitPostBloc>().add(RequestAppRecruitPosts(token, postIds));
               },

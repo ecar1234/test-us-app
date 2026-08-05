@@ -57,6 +57,7 @@ const _$UserStatusEnumMap = {
 };
 
 const _$UserTypeEnumMap = {
+  UserType.master: 'MASTER',
   UserType.individuals: 'INDIVIDUALS',
   UserType.companies: 'COMPANIES',
   UserType.normal: 'NORMAL',

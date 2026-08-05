@@ -40,6 +40,8 @@ class TypeConversionUtil {
         return "COMPANIES";
       case UserType.normal:
         return "NORMAL";
+      case UserType.master:
+        return "MASTER";
     }
   }
 

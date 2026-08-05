@@ -18,7 +18,7 @@ class ApplicationProvider with ChangeNotifier{
 
 
   void setMyApplications(List<ApplicationEntity> applications) async {
-    _userApplications ??= applications;
+    _userApplications = applications;
     notifyListeners();
   }
 
@@ -27,10 +27,10 @@ class ApplicationProvider with ChangeNotifier{
       _userApplications!.clear();
       _userApplications = [];
     }
-    if(_userApplicationPosts != null && _userApplicationPosts!.isNotEmpty) {
-      _userApplicationPosts!.clear();
-      _userApplicationPosts = [];
-    }
+    // if(_userApplicationPosts != null && _userApplicationPosts!.isNotEmpty) {
+    //   _userApplicationPosts!.clear();
+    //   _userApplicationPosts = [];
+    // }
     notifyListeners();
   }
 
@@ -47,15 +47,15 @@ class ApplicationProvider with ChangeNotifier{
   }
   void cancelApplication(ApplicationEntity newApp)  {
     _userApplications ??= [];
-    _userApplicationPosts ??= [];
+    // _userApplicationPosts ??= [];
 
     if(_userApplications!.any((element) => element.id == newApp.id)){
       _userApplications = _userApplications!.where((element) => element.id != newApp.id).toList();
       _userApplications!.add(newApp);
     }
-    if(_userApplicationPosts!.any((element) => element.id == newApp.postId)){
-      _userApplicationPosts = _userApplicationPosts!.where((element) => element.id != newApp.postId).toList();
-    }
+    // if(_userApplicationPosts!.any((element) => element.id == newApp.postId)){
+    //   _userApplicationPosts = _userApplicationPosts!.where((element) => element.id != newApp.postId).toList();
+    // }
     notifyListeners();
   }
 
@@ -107,6 +107,7 @@ class ApplicationProvider with ChangeNotifier{
     }
     notifyListeners();
   }
+
   Future<void> completeApplication(String token, String appId) async {}
 
   Future<void> rejectApplication(String token, String appId) async {}

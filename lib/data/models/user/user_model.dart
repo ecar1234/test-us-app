@@ -5,6 +5,8 @@ import '../image/image_model.dart';
 part 'user_model.g.dart';
 
 enum UserType {
+  @JsonValue('MASTER')
+  master,
   @JsonValue('INDIVIDUALS')
   individuals,
   @JsonValue('COMPANIES')

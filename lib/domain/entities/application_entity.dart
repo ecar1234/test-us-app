@@ -1,3 +1,5 @@
+import 'package:test_us_app/data/models/post/recruit_post_model.dart';
+
 import '../../data/models/application/application_model.dart';
 
 class ApplicationEntity {
@@ -7,7 +9,7 @@ class ApplicationEntity {
   ApplicationStatus? status;
   DateTime? appliedAt;
   DateTime? updatedAt;
-  String? postId;
+  PostInfo? postInfo;
   String? applicantId;
 
   ApplicationEntity({
@@ -17,11 +19,12 @@ class ApplicationEntity {
     this.status,
     this.appliedAt,
     this.updatedAt,
-    this.postId,
+    this.postInfo,
     this.applicantId,
   });
 
   static ApplicationEntity toEntity(ApplicationModel model) {
+    final postInfo = PostInfo.toEntity(model.postInfo!);
     return ApplicationEntity(
       id: model.id,
       platform: model.platform,
@@ -29,12 +32,13 @@ class ApplicationEntity {
       status: model.status,
       appliedAt: model.appliedAt,
       updatedAt: model.updatedAt,
-      postId: model.postId,
+      postInfo: postInfo,
       applicantId: model.applicantId,
     );
   }
 
   static ApplicationModel toModel(ApplicationEntity entity) {
+    final postInfo = PostInfo.toModel(entity.postInfo!);
     return ApplicationModel(
       id: entity.id,
       platform: entity.platform,
@@ -42,8 +46,39 @@ class ApplicationEntity {
       status: entity.status,
       appliedAt: entity.appliedAt,
       updatedAt: entity.updatedAt,
-      postId: entity.postId,
+      postInfo: postInfo,
       applicantId: entity.applicantId,
+    );
+  }
+}
+
+class PostInfo {
+  String? title;
+  String? postId;
+  String? thumbnailUrl;
+  bool? isExpired;
+  PostCategory? category;
+
+  PostInfo({
+    this.title,
+    this.postId,
+    this.thumbnailUrl,
+    this.isExpired,
+    this.category
+  });
+  static PostInfo toEntity(PostInfoModel model) {
+
+    return PostInfo(
+      title: model.title,
+      postId: model.postId,
+      thumbnailUrl: model.thumbnailUrl,
+      isExpired: model.isExpired,
+      category: model.category
+    );
+  }
+  static PostInfoModel toModel(PostInfo entity) {
+    return PostInfoModel(
+      postId: entity.postId,
     );
   }
 }

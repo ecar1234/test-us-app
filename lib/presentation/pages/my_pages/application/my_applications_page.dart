@@ -11,6 +11,8 @@ import 'package:test_us_app/domain/entities/application_entity.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_event.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import 'package:test_us_app/presentation/components/alerts/two_button_confirm_alert.dart';
+import 'package:test_us_app/presentation/components/buttons/custom_outline_button.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
@@ -51,14 +53,14 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
         },
         child: Padding(
             padding: EdgeInsets.all(20),
-            child: Selector<ApplicationProvider, List<RecruitPostEntity>>(
+            child: Selector<ApplicationProvider, List<ApplicationEntity>>(
               selector: (context, provider) {
                 // todo: createdAt 내림차순
-                return provider.userApplicationPosts ?? [];
+                return provider.userApplications ?? [];
               },
-              builder: (context, posts, child) {
+              builder: (context, applications, child) {
                 final hei = GetIt.I.get<ResponsiveHeightProvider>().hei ?? 0;
-                return posts.isEmpty
+                return applications.isEmpty
                     ? SizedBox(
                         width: MediaQuery.sizeOf(context).width,
                         height: hei,
@@ -74,24 +76,19 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                       )
                     : ListView.separated(
                         itemBuilder: (context, idx) {
-                          bool isExpired =
-                              posts[idx].status == PostStatus.expired || posts[idx].status == PostStatus.end;
-                          final application = context
-                              .read<ApplicationProvider>()
-                              .userApplications!
-                              .firstWhere((e) => e.postId == posts[idx].id);
+                          final posts = applications.map((e) => e.postInfo!).toList();
                           return GestureDetector(
-                            onTap: (){
-                              if(posts[idx].status != PostStatus.active){
-                                Get.snackbar('알림', '종료(만료)된 프로덕트 입니다.');
+                            onTap: () {
+                              if (posts[idx].isExpired!) {
+                                Get.snackbar('알림', '종료(만료) 또는 삭제된 프로덕트 입니다.');
                                 return;
                               }
-                              Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
+                              Get.to(() => RecruitPostDetailPage(postId: posts[idx].postId!));
                             },
                             child: Container(
-                              // height: 150,
+                              height: 120,
                               width: MediaQuery.sizeOf(context).width,
-                              padding: EdgeInsets.all(10),
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                   color: isDarkMode ? Colors.grey.shade800 : Colors.white,
                                   border: Border.all(color: Colors.grey),
@@ -114,50 +111,81 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                                     Flexible(
                                         flex: 3,
                                         child: SizedBox(
-                                            width: constraints.maxWidth * 0.4,
-                                            height: 150,
+                                            width: constraints.maxWidth * 0.3,
+                                            // height: 150,
                                             child: ClipRRect(
                                               borderRadius: BorderRadius.circular(10),
                                               child: CachedNetworkImage(
-                                                imageUrl: posts[idx].images![0].url!,
+                                                imageUrl: posts[idx].thumbnailUrl!,
                                                 fit: BoxFit.cover,
-                                                color: isExpired ? Colors.grey.shade200 : null,
-                                                colorBlendMode: isExpired ? BlendMode.saturation : null,
+                                                color: posts[idx].isExpired! ? Colors.grey.shade200 : null,
+                                                colorBlendMode: posts[idx].isExpired! ? BlendMode.saturation : null,
                                               ),
                                             ))),
                                     Flexible(
                                       flex: 7,
                                       child: Container(
-                                        height: 150,
+                                        // height: 150,
                                         width: constraints.maxWidth * 0.7,
-                                        padding: EdgeInsets.symmetric(horizontal: 10),
+                                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                                         child: Column(
                                             mainAxisAlignment: MainAxisAlignment.start,
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              SizedBox(
-                                                height: 30,
-                                                child: Text(
-                                                  posts[idx].title!,
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.bold,
-                                                      overflow: TextOverflow.ellipsis),
-                                                  maxLines: 1,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    Text(posts[idx].platform!.name.toUpperCase(),
-                                                        style: TextStyle(color: Colors.grey.shade600)),
-                                                    if (posts[idx].platform == ApplicationPlatform.mobile)
-                                                      Text('(${TypeConversionUtil().getPostOs(posts[idx].mobileOs??MobileOsType.ios)})',
-                                                          style: TextStyle(color: Colors.grey.shade600))
-                                                  ],
-                                                ),
+                                              Row(
+                                                children: [
+                                                  Flexible(
+                                                    flex: 7,
+                                                    child: SizedBox(
+                                                      width: (constraints.maxWidth * 0.7) * 0.7,
+                                                      child: Text(
+                                                        posts[idx].title!,
+                                                        style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight: FontWeight.bold,
+                                                            overflow: TextOverflow.ellipsis),
+                                                        maxLines: 1,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Flexible(
+                                                    flex: 2,
+                                                    child: Container(
+                                                      padding: EdgeInsets.symmetric(horizontal: 5),
+                                                      decoration: BoxDecoration(
+                                                        color: applications[idx].status == ApplicationStatus.pending
+                                                            ? Colors.blue.shade600
+                                                            : applications[idx].status == ApplicationStatus.rejected
+                                                                ? Colors.black87
+                                                                : applications[idx].status == ApplicationStatus.cancel
+                                                                    ? Colors.red.shade300
+                                                                    : Theme.of(context).colorScheme.primary,
+                                                        border: Border.all(color: Colors.grey),
+                                                        borderRadius: BorderRadius.circular(10),
+                                                      ),
+                                                      width: (constraints.maxWidth * 0.7) * 0.2,
+                                                      child: Text(
+                                                        applications[idx].status == ApplicationStatus.pending
+                                                            ? '대기중'
+                                                            : applications[idx].status == ApplicationStatus.rejected
+                                                                ? '거부됨'
+                                                                : applications[idx].status == ApplicationStatus.accepted
+                                                                    ? '테스트 중'
+                                                                    : applications[idx].status ==
+                                                                            ApplicationStatus.cancel
+                                                                        ? '취소'
+                                                                        : "종료",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey.shade300,
+                                                          fontWeight: FontWeight.bold,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                        textAlign: TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                               Container(
                                                 padding: EdgeInsets.symmetric(horizontal: 5),
@@ -169,15 +197,9 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                                                     TypeConversionUtil().postCategoryToString(posts[idx].category!),
                                                     style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
                                               ),
-                                              SizedBox(
-                                                child: Text('${posts[idx].author!.nickname}',
-                                                    style: TextStyle(
-                                                        color: Colors.grey.shade600,
-                                                        fontSize: 15,
-                                                        fontWeight: FontWeight.w500)),
-                                              ),
                                               const Gap(10),
-                                               _buttonBuilder(posts[idx].status! ,application.status!, constraints.maxWidth)
+                                              _buttonBuilder(applications[idx].id!, applications[idx].status!,
+                                                  constraints.maxWidth)
                                             ]),
                                       ),
                                     ),
@@ -188,32 +210,58 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                           );
                         },
                         separatorBuilder: (context, idx) => Gap(10),
-                        itemCount: posts.length);
+                        itemCount: applications.length);
               },
             )),
       ),
     ));
   }
 
-  Widget _buttonBuilder(PostStatus postState, ApplicationStatus state, double wid) {
+  Widget _buttonBuilder(int appId, ApplicationStatus state, double wid) {
     String message = '';
-    if(postState == PostStatus.end){
-      message = '테스트 종료';
-    } else if (state == ApplicationStatus.pending) {
-      message = '테스터 신청 중';
+    if (state == ApplicationStatus.pending) {
+      message = '신청 취소';
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CustomOutlineButton(
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    final token = context.read<UserProvider>().token ?? '';
+                    return TwoButtonConfirmAlert(
+                        mainContent: '취소하면 재신청이 할 수 없습니다.',
+                        subContent: '정말 취소하시겠습니까?',
+                        confirmButtonName: '진행',
+                        cancelButtonName: '취소',
+                        onPressedConfirm: () {
+                          context.read<AppBloc>().add(RequestCancelEvent(token, appId));
+                          Get.back();
+                          return;
+                        },
+                        onPressedCancel: () {
+                          Get.back();
+                          return;
+                        });
+                  });
+            },
+            text: message,
+            wid: wid * 0.4,
+            hei: 30,
+          ),
+        ],
+      );
+    } else if (state == ApplicationStatus.cancel) {
+      message = '신청 취소된 프로덕트 입니다.';
     } else if (state == ApplicationStatus.rejected) {
-      message ='테스터 신청 미승인';
+      message = '승인 거부된 프로덕트 입니다.';
     } else if (state == ApplicationStatus.accepted) {
-      message = '테스터 선정(테스트 진행 중)';
+      message = '테스트 완료 후 리뷰를 남겨주세요.';
     }
-    return Container(
-        height: 40,
-        width: wid,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Center(
-            child:Text(message)));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [Text(message, style: TextStyle(fontSize: 14, color: Colors.grey))],
+    );
   }
 }
