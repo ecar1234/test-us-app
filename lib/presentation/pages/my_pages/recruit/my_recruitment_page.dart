@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/recruit_post_entity.dart';
+import 'package:test_us_app/presentation/components/buttons/custom_outline_button.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/utils/time_util.dart';
@@ -17,6 +18,7 @@ import '../../../../services/theme_provider.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_event.dart';
 import '../../../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
+import '../../../components/alerts/two_button_confirm_alert.dart';
 import '../../../provider/user_provider.dart';
 import '../../post/tester_post_pages/recruit_post_detail_page.dart';
 import 'application_management_page.dart';
@@ -30,11 +32,13 @@ class MyRecruitmentPage extends StatefulWidget {
 
 class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
   late RecruitPostBloc recruitPostBloc;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
   }
+
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
@@ -58,8 +62,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
           if (state.state == RecruitPostLoadState.postEndCompletedState) {
             context.read<BasePostProvider>().updateRecruitPost(state.post!);
             context.read<BasePostProvider>().updateUserRecruitPosts(state.post!);
-          }
-          else if(state.state == RecruitPostLoadState.getUserRecruitmentPostsCompletedState){
+          } else if (state.state == RecruitPostLoadState.getUserRecruitmentPostsCompletedState) {
             context.read<RecruitPostProvider>().getUserRecruitmentPosts(state.posts!);
           }
         },
@@ -117,12 +120,12 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                           Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
                         },
                   child: Container(
-                    height: 155,
+                    height: 140,
                     width: MediaQuery.sizeOf(context).width,
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
                         color: isDarkMode ? Colors.grey.shade800 : Colors.white,
-                        border: Border.all(color: Colors.grey),
+                        // border: Border.all(color: Colors.grey),
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: isDarkMode
                             ? null
@@ -142,7 +145,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                             flex: 3,
                             child: SizedBox(
                                 width: (MediaQuery.sizeOf(context).width - 50) * 0.35,
-                                // height: 140,
+                                height: 130,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: CachedNetworkImage(
@@ -158,8 +161,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                             // height: 140,
                             width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
                             padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
+                            child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                               Column(
                                 children: [
                                   SizedBox(
@@ -171,7 +173,9 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                         Text(
                                           posts[idx].title!,
                                           style: TextStyle(
-                                              fontSize: 16, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              overflow: TextOverflow.ellipsis),
                                           maxLines: 1,
                                         ),
                                       ],
@@ -184,7 +188,8 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                       children: [
                                         SizedBox(child: Text(posts[idx].platform!.name.toUpperCase())),
                                         if (posts[idx].platform == ApplicationPlatform.mobile)
-                                          Text(' (${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)})')
+                                          Text(' (${TypeConversionUtil().getPostOs(posts[idx].mobileOs!)})',
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                   ),
@@ -193,59 +198,79 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       // NOTE: 현재는 period가 7일로 고정 되어 있지만, 상확에 따라 변경필요, 변수로 period 포함 시키는 로직 필요.
-                                      Text('게시 만료 : ${TimeUtil().getDateTimeString(posts[idx].createdAt!
-                                          .add(Duration(days: 7)), false)}'),
+                                      Text(
+                                          '게시 만료 : ${TimeUtil().getDateTimeString(posts[idx].createdAt!.add(Duration(days: 7)), false)}'),
                                     ],
                                   )),
                                 ],
                               ),
-                              // const Gap(10),
-                              if (isExpired)
-                                SizedBox(
-                                  height: 40,
-                                  width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
-                                  child: ElevatedButton(
-                                      onPressed: () {
-                                        //TODO: 테스트 종료 -> status.end 로 update
-                                        //TODO: alert으로 테스트 종료 시 리뷰를 쓰도록 이동 또는 알림
-                                        final token = context.read<UserProvider>().token ?? '';
-                                        final postId = posts[idx].id!;
-                                        context.read<RecruitPostBloc>().add(RequestPostEndEvent(token, postId));
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          padding: EdgeInsets.zero,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          )),
-                                      child: Text('테스트 종료')),
-                                )
-                              else
-                                SizedBox(
-                                  height: 40,
-                                  width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
-                                  child: ElevatedButton(
-                                    onPressed: posts[idx].applications!.isEmpty
-                                        ? null
-                                        : () {
-                                            Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
-                                          },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      elevation: 2,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (!isExpired)
+                                    Row(
                                       children: [
-                                        Text('신청 인원', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                                        Text(
-                                            ' ( ${posts[idx].applications!.isEmpty ? 0 : posts[idx].applications!.length} / 8 )'),
+                                        SizedBox(
+                                          height: 40,
+                                          width: 100,
+                                          child: ElevatedButton(
+                                            onPressed: posts[idx].applications!.isEmpty
+                                                ? null
+                                                : () {
+                                                    Get.to(() => ApplicationManagementPage(postId: posts[idx].id!));
+                                                  },
+                                            style: ElevatedButton.styleFrom(
+                                              padding: EdgeInsets.symmetric(horizontal: 10),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              elevation: 2,
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Text('신청 인원',
+                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                                                //note: 테스터 신청 인원도 8명이 아니라 플랜에 따라 변경 되어야함.
+                                                Text('(${posts[idx].applications!.length})'),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const Gap(16),
                                       ],
                                     ),
+                                  CustomOutlineButton(
+                                    text: '테스트 종료',
+                                    hei: 40,
+                                    wid: 100,
+                                    horizontalPadding: 10,
+                                    onPressed: () {
+                                      //TODO: 테스트 종료 -> status.end 로 update
+                                      //TODO: alert으로 테스트 종료 시 리뷰를 쓰도록 이동 또는 알림
+                                      showDialog(context: context, builder: (context){
+                                        return TwoButtonConfirmAlert(
+                                          title: '테스트 종료',
+                                          titleSize: 18,
+                                          mainContent: '테스트를 종료하시겠습니까?',
+                                          subContent: '테스트 종료 후 리뷰를 남겨주세요.',
+                                          confirmButtonName: '진행',
+                                          cancelButtonName: '취소',
+                                          onPressedConfirm: () {
+                                            final token = context.read<UserProvider>().token ?? '';
+                                            final postId = posts[idx].id!;
+                                            context.read<RecruitPostBloc>().add(RequestPostEndEvent(token, postId));
+                                          },
+                                          onPressedCancel: () {
+                                            Get.back();
+                                            return;
+                                          },
+                                        );
+                                      });
+                                    },
                                   ),
-                                ),
+                                ],
+                              ),
                             ]),
                           ),
                         ),
