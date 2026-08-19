@@ -1,19 +1,29 @@
 import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_event.dart';
 import 'package:test_us_app/presentation/pages/home/user_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/user_info/password_update_page.dart';
+import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
+import 'package:test_us_app/services/common_height_provider.dart';
+import 'package:test_us_app/services/firebase/messaging_service.dart';
+import 'package:test_us_app/services/notification/notification_service.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
+import 'domain/entities/firebase_messaging_entity.dart';
 import 'mata_data_setting.dart';
 
 class PermissionHandler extends StatefulWidget {
@@ -28,60 +38,75 @@ class _PermissionHandlerState extends State<PermissionHandler> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _checkAndRequestPermissions();
-  }
 
-  Future<void> _checkAndRequestPermissions() async {
-    // 1. 필요한 3가지 권한 동시에 요청
-    debugPrint('[Permission request] start!!');
-    Map<Permission, PermissionStatus> statuses = await [Permission.photos, Permission.notification].request();
-
-    final isAllGranted = statuses.values.every((status) => status == PermissionStatus.granted);
-
-    debugPrint('[Permission request] result : $isAllGranted');
-
-    if (isAllGranted) {
-      // 모두 성공 시 ➡️ 메인 페이지로 이동 (더이상 스플래시로 못 돌아오게 replacement)
+    final messagingProvider = context.read<FirebaseMessagingProvider>();
+    Future.microtask(() async {
+      MessagingService().init(messagingProvider);
+      await _initSystem();
+      NotificationService().init();
+      await _initializeNotification();
       if (mounted) {
-        FlutterNativeSplash.remove();
         Get.off(() => const MetaDataSetting());
       }
-    } else {
-      // 하나라도 거부 시 ➡️ 플러터 화면 위에 알럿 팝업 노출
-      if (mounted) {
-        _showPermissionDeniedDialog();
-      }
-    }
+    });
   }
 
-  void _showPermissionDeniedDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // 바깥 터치로 안 닫히게 설정
-      builder: (context) => AlertDialog(
-        title: const Text('필수 권한 안내'),
-        content: const Text('앱 사용을 위해 카메라, 갤러리, 알림 권한이 필수적입니다. 허용되지 않아 앱을 종료합니다.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (Platform.isAndroid) {
-                SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-              } else if (Platform.isIOS) {
-                exit(0);
-              }
-            },
-            child: const Text('종료'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await openAppSettings();
-            },
-            child: const Text('설정으로 이동'),
-          ),
-        ],
-      ),
-    );
+  Future<void> _initSystem() async {
+    GetIt.I.get<ResponsiveHeightProvider>().setHeight(context);
+    context.read<ThemeProvider>().getIsDarkMod();
+    debugPrint('[SYSTEM] set height / get bright mode');
   }
+
+  Future<void> _initializeNotification() async {
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+// 포그라운드
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      _handleMessageProcessing(message);
+    });
+// 백그라운드
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      _handleMessageProcessing(message, shouldNavigate: true);
+// 이동 로직 추가 (권장)
+    });
+// 앱 종료시
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message == null) return;
+      _handleMessageProcessing(message, shouldNavigate: true);
+    });
+
+// 토큰 업데이트
+    FirebaseMessaging.instance.onTokenRefresh.listen((String messagingToken) {
+      MessagingService().saveToken(messagingToken);
+    });
+
+    debugPrint('[SYSTEM] init FCM completed');
+  }
+
+  void _handleMessageProcessing(RemoteMessage message, {bool shouldNavigate = false}) {
+    final notification = FirebaseMessagingEntity(
+      id: message.messageId!,
+      title: message.notification?.title,
+      body: message.notification?.body,
+      createdAt: DateTime.now(),
+      data: message.data,
+      isRead: false,
+    );
+
+// 데이터 저장
+    MessagingService().saveNotification(notification);
+
+// 이동 로직이 필요한 경우 (클릭 이벤트 등)
+    if (shouldNavigate) {
+      NotificationService().showNotification(message);
+    }
+    debugPrint('[SYSTEM] set FCM processing completed');
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -152,6 +177,15 @@ class _PermissionHandlerState extends State<PermissionHandler> {
       getPages: [
         GetPage(name: '/userPage', page: () => const UserPage()),
         GetPage(name: '/passwordUpdatePage', page: () => const PasswordUpdatePage())
+      ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('ko', 'KR'), // 한국어
+        Locale('en', 'US'), // 영어
       ],
       home: const Scaffold(
         backgroundColor: Colors.white,
