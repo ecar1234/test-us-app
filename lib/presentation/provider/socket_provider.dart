@@ -106,7 +106,7 @@ class SocketProvider with ChangeNotifier {
     _socket.joinUser(userId);
   }
 
-  /// ✅ 메시지 전송
+  /// ✅ 메시지 전송.
   /// 서버 emit → 다시 chat_message 로 내려오는 구조
   void sendMessage(TReqMessageEntity message) {
     debugPrint('[SocketProvider] sendMessage');

@@ -13,9 +13,7 @@ MessageModel _$MessageModelFromJson(Map<String, dynamic> json) => MessageModel(
           ? null
           : User.fromJson(json['sender'] as Map<String, dynamic>),
       roomId: (json['roomId'] as num?)?.toInt(),
-      createdAt: json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
+      createdAt: MessageModel._dateTimeFromUtc(json['createdAt'] as String),
     );
 
 Map<String, dynamic> _$MessageModelToJson(MessageModel instance) =>

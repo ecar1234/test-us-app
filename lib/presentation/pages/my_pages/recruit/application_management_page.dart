@@ -66,7 +66,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
   }
 
   Widget _mainBuilder(List<TResRecruitPostApplicationsInfo> info) {
-    final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
+    final isDarkMode = context.read<ThemeProvider>().isDarkMode;
     return BlocListener<AppBloc, AppState>(
       listener: (context, state) {
         if (state.state == UserAppState.applicationCompletedState) {

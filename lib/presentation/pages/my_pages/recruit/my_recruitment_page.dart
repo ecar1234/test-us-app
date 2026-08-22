@@ -208,11 +208,13 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   if (!isExpired)
-                                    Row(
-                                      children: [
-                                        SizedBox(
+                                    Flexible(
+                                      flex: 5,
+                                      child: SizedBox(
+                                        width: ((MediaQuery.sizeOf(context).width - 50) * 0.65)*0.5,
+                                        child: SizedBox(
                                           height: 40,
-                                          width: 100,
+                                          // width: ((MediaQuery.sizeOf(context).width - 50) * 0.65)*0.5,
                                           child: ElevatedButton(
                                             onPressed: posts[idx].applications!.isEmpty
                                                 ? null
@@ -237,37 +239,42 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
                                             ),
                                           ),
                                         ),
-                                        const Gap(16),
-                                      ],
+                                      ),
                                     ),
-                                  CustomOutlineButton(
-                                    text: '테스트 종료',
-                                    hei: 40,
-                                    wid: 100,
-                                    horizontalPadding: 10,
-                                    onPressed: () {
-                                      //TODO: 테스트 종료 -> status.end 로 update
-                                      //TODO: alert으로 테스트 종료 시 리뷰를 쓰도록 이동 또는 알림
-                                      showDialog(context: context, builder: (context){
-                                        return TwoButtonConfirmAlert(
-                                          title: '테스트 종료',
-                                          titleSize: 18,
-                                          mainContent: '테스트를 종료하시겠습니까?',
-                                          subContent: '테스트 종료 후 리뷰를 남겨주세요.',
-                                          confirmButtonName: '진행',
-                                          cancelButtonName: '취소',
-                                          onPressedConfirm: () {
-                                            final token = context.read<UserProvider>().token ?? '';
-                                            final postId = posts[idx].id!;
-                                            context.read<RecruitPostBloc>().add(RequestPostEndEvent(token, postId));
-                                          },
-                                          onPressedCancel: () {
-                                            Get.back();
-                                            return;
-                                          },
-                                        );
-                                      });
-                                    },
+                                  if (!isExpired)
+                                    const Gap(16),
+                                  Flexible(
+                                    flex: 5,
+                                    child: CustomOutlineButton(
+                                      text: '테스트 종료',
+                                      hei: 40,
+                                      wid: ((MediaQuery.sizeOf(context).width - 50) * 0.65)*0.5,
+                                      horizontalPadding: 10,
+                                      onPressed: () {
+                                        //TODO: 테스트 종료 -> status.end 로 update
+                                        //TODO: alert으로 테스트 종료 시 리뷰를 쓰도록 이동 또는 알림
+                                        showDialog(context: context, builder: (context){
+                                          return TwoButtonConfirmAlert(
+                                            title: '테스트 종료',
+                                            titleSize: 18,
+                                            mainContent: '테스트를 종료하시겠습니까?',
+                                            subContent: '테스트 종료 후 리뷰를 남겨주세요.',
+                                            confirmButtonName: '진행',
+                                            cancelButtonName: '취소',
+                                            onPressedConfirm: () {
+                                              final token = context.read<UserProvider>().token ?? '';
+                                              final postId = posts[idx].id!;
+                                              context.read<RecruitPostBloc>().add(RequestPostEndEvent(token, postId));
+                                              Get.back();
+                                            },
+                                            onPressedCancel: () {
+                                              Get.back();
+                                              return;
+                                            },
+                                          );
+                                        });
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),

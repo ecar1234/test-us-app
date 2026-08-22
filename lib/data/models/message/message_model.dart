@@ -10,6 +10,7 @@ class MessageModel {
   String? content;
   User? sender;
   int? roomId;
+  @JsonKey(fromJson: _dateTimeFromUtc)
   DateTime? createdAt;
 
   MessageModel({
@@ -22,4 +23,8 @@ class MessageModel {
 
   factory MessageModel.fromJson(Map<String, dynamic> json) => _$MessageModelFromJson(json);
   Map<String, dynamic> toJson() => _$MessageModelToJson(this);
+
+  static DateTime _dateTimeFromUtc (String time){
+    return DateTime.parse(time).toLocal();
+  }
 }

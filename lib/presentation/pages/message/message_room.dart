@@ -45,8 +45,7 @@ class _MessageRoomState extends State<MessageRoom> {
     _senderId = context.read<UserProvider>().user!.id!;
     _socketProvider = context.read<SocketProvider>();
     _roomProvider = context.read<RoomProvider>();
-
-    _initializeData();
+    if (mounted) _initializeData();
   }
 
   void _initializeData() {
@@ -59,15 +58,15 @@ class _MessageRoomState extends State<MessageRoom> {
       // 신규 방 생성 시나리오
       // socketProvider.joinUser(widget.targetUser!.userId!);
       _socketProvider.joinUser(_senderId);
-      context
-          .read<MessageBloc>()
-          .add(RequestRoomMessagesByPostIdEvent(token, widget.postId!, widget.targetUser!.userId!));
+      context.read<MessageBloc>().add(RequestRoomMessagesByPostIdEvent(
+          token, widget.postId!, widget.targetUser!.userId!));
     } else if (widget.roomId != null) {
       // 기존 방 입장 시나리오
       // socketProvider.joinUser(widget.targetUser!.userId!);
       _socketProvider.joinUser(_senderId);
       _socketProvider.joinRoom(widget.roomId!);
-      context.read<MessageBloc>().add(RequestRoomMessagesByRoomIdEvent(token, widget.roomId!, _senderId));
+      context.read<MessageBloc>().add(
+          RequestRoomMessagesByRoomIdEvent(token, widget.roomId!, _senderId));
     }
 
     _isInitialized = true;
@@ -78,7 +77,7 @@ class _MessageRoomState extends State<MessageRoom> {
     super.dispose();
     _controller.dispose();
     _focusNode.dispose();
-    _socketProvider.leaveRoom(_roomId, _senderId, widget.targetUser?.userId);
+    // _socketProvider.leaveRoom(_roomId, _senderId, widget.targetUser?.userId);
   }
 
   @override
@@ -87,7 +86,9 @@ class _MessageRoomState extends State<MessageRoom> {
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
-              title: Text(widget.targetUser != null ? '${widget.targetUser!.nickname}' : '알 수 없는 유져'),
+              title: Text(widget.targetUser != null
+                  ? '${widget.targetUser!.nickname}'
+                  : '알 수 없는 유져'),
             ),
             body: GestureDetector(
               behavior: HitTestBehavior.opaque,
@@ -97,17 +98,20 @@ class _MessageRoomState extends State<MessageRoom> {
               child: BlocListener<MessageBloc, MessageBlocState>(
                   listener: (context, state) {
                     if (state is RoomMessagesLoadCompletedState) {
-                      _socketProvider.setMessages(state.messageList);
+                      final fetch = state.messageList.isNotEmpty? state.messageList.reversed : state.messageList;
+                      _socketProvider.setMessages(fetch.toList());
 
                       if (state.messageList.isNotEmpty) {
                         setState(() {
                           _roomId = state.messageList.last.roomId;
                         });
-                        _roomProvider.updateRoom(state.messageList.last, _senderId, isJoin: true);
+                        _roomProvider.updateRoom(
+                            state.messageList.last, _senderId,
+                            isJoin: true);
                       }
                     } else if (state.state == MessageLoadState.failedState) {
                       Get.snackbar('알림', '이용 할 수 없습니다.');
-                      Navigator.pop(context);
+                      // Navigator.pop(context);
                     }
                   },
                   child: Padding(
@@ -116,24 +120,34 @@ class _MessageRoomState extends State<MessageRoom> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Selector<SocketProvider, List<MessageEntity>>(selector: (context, provider) {
-                            if (provider.messages == null || provider.messages!.isEmpty) {
+                          child: Selector<SocketProvider, List<MessageEntity>>(
+                              selector: (context, provider) {
+                            if (provider.messages == null ||
+                                provider.messages!.isEmpty) {
                               return [];
                             }
-                            return provider.messages!.where((message) {
-                              if (_roomId != null) {
-                                return message.roomId == _roomId;
-                              }
-                              return false;
-                            }).toList();
+                            return provider.messages!;
                           }, builder: (context, messages, child) {
                             final isLeft = widget.targetUser == null;
-                            final itemCount = messages.length + (isLeft ? 1 : 0);
+                            final itemCount =
+                                messages.length + (isLeft ? 1 : 0);
 
-                            // if (itemCount == 0) {
-                            //   return Center(child: Text('메시지가 없습니다.'));
-                            // }
+                            bool isSameUser(MessageEntity? a, MessageEntity? b) =>
+                                a?.sender?.userId != null && a?.sender?.userId == b?.sender?.userId;
 
+                            bool isSameMinute(DateTime? a, DateTime? b) {
+                              if (a == null || b == null) return false;
+                              return a.year == b.year &&
+                                  a.month == b.month &&
+                                  a.day == b.day &&
+                                  a.hour == b.hour &&
+                                  a.minute == b.minute;
+                            }
+
+                            bool isSameDay(DateTime? a, DateTime? b) {
+                              if (a == null || b == null) return false;
+                              return a.year == b.year && a.month == b.month && a.day == b.day;
+                            }
                             return ListView.separated(
                                 padding: EdgeInsets.only(bottom: 10),
                                 physics: BouncingScrollPhysics(),
@@ -145,58 +159,40 @@ class _MessageRoomState extends State<MessageRoom> {
                                   }
 
                                   final messageIdx = isLeft ? idx - 1 : idx;
-                                  if (messageIdx < 0 || messageIdx >= messages.length) {
+                                  if (messageIdx < 0 ||
+                                      messageIdx >= messages.length) {
                                     return const SizedBox.shrink();
                                   }
-                                  final message = messages[messageIdx];
+                                  final current = messages[idx];
+                                  final previous = idx < messages.length - 1 ? messages[idx + 1] : null; // 과거 대화
+                                  final next = idx > 0 ? messages[idx - 1] : null; // 더 최신
 
-                                  final DateTime? createdAt = message.createdAt;
-                                  final next = messageIdx > 0 ? messages[messageIdx - 1] : null;
-                                  final prev = messageIdx < messages.length - 1 ? messages[messageIdx + 1] : null;
+                                  // [프로필]: 같은 사람 & 같은 분의 "첫 번째 메시지"에만 프로필 표시 (이전 메시지와 다를 때)
+                                  final bool showProfile = !isSameUser(current, previous) ||
+                                      !isSameMinute(current.createdAt, previous?.createdAt);
 
-                                  bool isSameUser(MessageEntity? a, MessageEntity? b) =>
-                                      a?.sender!.userId == b?.sender!.userId;
+                                  // [시간]: 같은 사람 & 같은 분의 "마지막 메시지"에만 시간 표시 (다음 메시지와 다를 때)
+                                  final bool showTime = !isSameUser(current, next) ||
+                                      !isSameMinute(current.createdAt, next?.createdAt);
 
-                                  bool isSameMinute(DateTime? a, DateTime? b) {
-                                    if (a == null || b == null) return false;
-                                    return a.year == b.year &&
-                                        a.month == b.month &&
-                                        a.day == b.day &&
-                                        a.hour == b.hour &&
-                                        a.minute == b.minute;
-                                  }
-
-                                  bool showProfile =
-                                      !isSameUser(message, prev) || !isSameMinute(message.createdAt, prev?.createdAt);
-                                  bool showTime =
-                                      !isSameUser(message, next) || !isSameMinute(message.createdAt, next?.createdAt);
-                                  bool showDateHeader = false;
-
-                                  if (createdAt != null) {
-                                    if (messageIdx == messages.length - 1) {
-                                      showDateHeader = true;
-                                    } else {
-                                      final nextCreatedAt = messages[messageIdx + 1].createdAt;
-                                      if (nextCreatedAt != null) {
-                                        showDateHeader = createdAt.year != nextCreatedAt.year ||
-                                            createdAt.month != nextCreatedAt.month ||
-                                            createdAt.day != nextCreatedAt.day;
-                                      }
-                                    }
-                                  }
+                                  // [날짜 헤더]: 하루의 시작(이전 메시지와 날짜가 다르거나 첫 번째 메시지일 때)
+                                  final bool showDateHeader = !isSameDay(current.createdAt, previous?.createdAt) || previous == null;
+                                  final isMyMessage = current.sender?.userId == _senderId;
 
                                   return Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      if (showDateHeader) _buildDateHeader(createdAt!),
-                                      if (message.sender!.userId != _senderId)
-                                        _buildLeftMessage(message, showProfile, showTime)
-                                      else if (message.sender!.userId == _senderId)
-                                        _buildRightMessage(message),
+                                      if (showDateHeader && current.createdAt != null)
+                                        _buildDateHeader(current.createdAt!),
+                                      if (isMyMessage)
+                                        _buildRightMessage(current, showTime)
+                                      else
+                                        _buildLeftMessage(current, showProfile, showTime),
                                     ],
                                   );
                                 },
-                                separatorBuilder: (context, idx) => const Gap(10),
+                                separatorBuilder: (context, idx) =>
+                                    const Gap(10),
                                 itemCount: itemCount);
                           }),
                         ),
@@ -212,7 +208,9 @@ class _MessageRoomState extends State<MessageRoom> {
                                 flex: 8,
                                 child: SizedBox(
                                   height: 40,
-                                  width: (MediaQuery.sizeOf(context).width - 40) * 0.8,
+                                  width:
+                                      (MediaQuery.sizeOf(context).width - 40) *
+                                          0.8,
                                   child: TextField(
                                     controller: _controller,
                                     focusNode: _focusNode,
@@ -224,7 +222,8 @@ class _MessageRoomState extends State<MessageRoom> {
                                     decoration: const InputDecoration(
                                       // isDense: true,
                                       counterText: "",
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6),
                                     ),
                                     style: TextStyle(fontSize: 14),
                                   ),
@@ -235,19 +234,23 @@ class _MessageRoomState extends State<MessageRoom> {
                                 flex: 2,
                                 child: SizedBox(
                                   height: 40,
-                                  width: (MediaQuery.sizeOf(context).width - 40) * 0.2,
+                                  width:
+                                      (MediaQuery.sizeOf(context).width - 40) *
+                                          0.2,
                                   child: ElevatedButton(
                                       onPressed: widget.targetUser == null
                                           ? null
                                           : () {
                                               if (_controller.text.isEmpty) {
-                                                Get.snackbar('알림', '메시지를 입력해주세요.');
+                                                Get.snackbar(
+                                                    '알림', '메시지를 입력해주세요.');
                                                 return;
                                               }
                                               final req = TReqMessageEntity(
                                                 roomId: _roomId,
                                                 content: _controller.text,
-                                                targetId: widget.targetUser!.userId,
+                                                targetId:
+                                                    widget.targetUser!.userId,
                                                 postId: widget.postId,
                                               );
                                               _socketProvider.sendMessage(req);
@@ -256,7 +259,8 @@ class _MessageRoomState extends State<MessageRoom> {
                                       style: ElevatedButton.styleFrom(
                                         padding: EdgeInsets.zero,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
                                       ),
                                       child: Text('전송')),
@@ -311,9 +315,11 @@ class _MessageRoomState extends State<MessageRoom> {
     return a.year != b.year || a.month != b.month || a.day != b.day;
   }
 
-  Widget _buildLeftMessage(MessageEntity message, bool showProfile, bool showTime) {
+  Widget _buildLeftMessage(
+      MessageEntity message, bool showProfile, bool showTime) {
     final isDarkMode = context.read<ThemeProvider>().isDarkMode;
-    final isActive = widget.targetUser != null && message.sender!.status == UserStatus.active;
+    final isActive = widget.targetUser != null &&
+        message.sender!.status == UserStatus.active;
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,9 +333,11 @@ class _MessageRoomState extends State<MessageRoom> {
                       width: 40,
                       height: 40,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(color: Colors.grey[200]),
-                      errorWidget: (context, url, error) =>
-                          Image.asset('assets/images/default avatar.png', fit: BoxFit.cover),
+                      placeholder: (context, url) =>
+                          Container(color: Colors.grey[200]),
+                      errorWidget: (context, url, error) => Image.asset(
+                          'assets/images/default avatar.png',
+                          fit: BoxFit.cover),
                     )
                   : Image.asset(
                       'assets/images/default avatar.png',
@@ -381,16 +389,18 @@ class _MessageRoomState extends State<MessageRoom> {
     );
   }
 
-  Widget _buildRightMessage(MessageEntity message) {
+  Widget _buildRightMessage(MessageEntity message, bool showTime) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(
-          TimeUtil().getChatDateTimeString(message.createdAt!),
-          style: TextStyle(fontSize: 12, color: Colors.grey),
-        ),
-        const Gap(10),
+        if (showTime) ...[
+          Text(
+            TimeUtil().getChatDateTimeString(message.createdAt!),
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+          const Gap(10),
+        ],
         Container(
           key: ValueKey(message.id),
           constraints: BoxConstraints(

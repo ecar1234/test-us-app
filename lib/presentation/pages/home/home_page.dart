@@ -383,7 +383,7 @@ class _HomePageState extends State<HomePage> {
                                       bottom: 5,
                                       right: 5,
                                       child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                                        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                                         decoration: BoxDecoration(
                                           color: bgColor,
                                           border: Border.all(color: Colors.grey.shade300),
@@ -391,7 +391,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                         child: Text(
                                           isRecruit ? "모집" : "홍보",
-                                          style: TextStyle(fontSize: 14, color: textColor),
+                                          style: TextStyle(fontSize: 12, color: textColor),
                                         ),
                                       ),
                                     )
