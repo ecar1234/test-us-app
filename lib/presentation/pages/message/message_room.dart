@@ -98,8 +98,9 @@ class _MessageRoomState extends State<MessageRoom> {
               child: BlocListener<MessageBloc, MessageBlocState>(
                   listener: (context, state) {
                     if (state is RoomMessagesLoadCompletedState) {
-                      final fetch = state.messageList.isNotEmpty? state.messageList.reversed : state.messageList;
-                      _socketProvider.setMessages(fetch.toList());
+                      // final fetch = state.messageList.isNotEmpty? state.messageList.reversed : state.messageList;
+                      // _socketProvider.setMessages(fetch.toList());
+                      _socketProvider.setMessages(state.messageList);
 
                       if (state.messageList.isNotEmpty) {
                         setState(() {
