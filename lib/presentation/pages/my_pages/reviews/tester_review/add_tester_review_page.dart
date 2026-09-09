@@ -52,7 +52,7 @@ class _AddTesterReviewPageState extends State<AddTesterReviewPage> {
                 context.read<ReviewProvider>().updateTesterReview(state.review);
                 await _alertDialog(context, widget.tester.nickname!);
               }
-              if(state.state == ReviewDataState.errorState || state.state == ReviewDataState.failedState){
+              if(state is ReviewDataErrorState || state is ReviewDataFailedState){
                 Get.snackbar('알림', '리뷰 전송에 실패했습니다.');
               }
             },

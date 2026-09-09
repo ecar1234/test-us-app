@@ -13,94 +13,99 @@ class NetDriver {
 
   NetDriver(this.baseUrl);
 
-  final logger = Logger();
-  final dio = Dio();
+  final _logger = Logger();
+  final _dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    )
+  );
 
   Future<Map<String, dynamic>> requestGetJson(String token, String url, {String? param = ""}) async {
-    dio.options.headers['Content-Type'] = 'application/json';
+    _dio.options.headers['Content-Type'] = 'application/json';
     if (token.isNotEmpty) {
-      dio.options.headers['Authorization'] = 'Bearer $token';
+      _dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url/$param';
     // logger.d(api);
-    final res = await dio.get(api, options: Options(validateStatus: (status) {
+    final res = await _dio.get(api, options: Options(validateStatus: (status) {
       return status != null && status < 501;
     }));
     if (res.statusCode == 200 || res.statusCode == 202) {
       // logger.e(res.statusMessage);
       return res.data;
     } else {
-      logger.d('[Error URL] $url');
-      logger.e("${res.statusCode} : ${res.statusMessage}s");
-      logger.w(res.data);
+      _logger.d('[Error URL] $url');
+      _logger.e("${res.statusCode} : ${res.statusMessage}s");
+      _logger.w(res.data);
       return res.data;
     }
   }
 
   Future<Map<String, dynamic>> requestPostJson(String token, String url, Map<String, dynamic> data) async {
-    dio.options.headers['Content-Type'] = 'application/json';
+    _dio.options.headers['Content-Type'] = 'application/json';
     if (token.isNotEmpty) {
-      dio.options.headers['Authorization'] = 'Bearer $token';
+      _dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
 
     try {
-      final res = await dio.post(api, data: data, options: Options(validateStatus: (status) {
+      final res = await _dio.post(api, data: data, options: Options(validateStatus: (status) {
         return status != null && status < 500;
       }));
       if (res.statusCode == 200) {
         return res.data;
       } else {
-        logger.e("${res.statusCode} : ${res.statusMessage}");
+        _logger.e("${res.statusCode} : ${res.statusMessage}");
         return res.data;
       }
     } on DioException catch (e) {
-      logger.e(e.response?.data);
+      _logger.e(e.response?.data);
       return e.response?.data;
     }
   }
 
   Future<Map<String, dynamic>> requestPutJson(String token, String url, Map<String, dynamic> data) async {
-    dio.options.headers['Content-Type'] = 'application/json';
+    _dio.options.headers['Content-Type'] = 'application/json';
     if (token.isNotEmpty) {
-      dio.options.headers['Authorization'] = 'Bearer $token';
+      _dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
     try {
-      final res = await dio.put(api, data: data, options: Options(validateStatus: (status) {
+      final res = await _dio.put(api, data: data, options: Options(validateStatus: (status) {
         return status != null && status < 500;
       }));
       if (res.statusCode == 200) {
         return res.data;
       } else {
-        logger.e("${res.statusCode} : ${res.statusMessage}s");
+        _logger.e("${res.statusCode} : ${res.statusMessage}s");
         return res.data;
       }
     } on Exception catch (e) {
       // TODO
-      logger.e(e.toString());
+      _logger.e(e.toString());
       return {};
     }
   }
 
   Future<Map<String, dynamic>> requestDeleteJson(String token, String url) async {
-    dio.options.headers['Content-Type'] = 'application/json';
+    _dio.options.headers['Content-Type'] = 'application/json';
     // dio.options.headers['Authorization'] = 'Bearer $token';
     final api = '$baseUrl$url';
-    final res = await dio.delete(api);
+    final res = await _dio.delete(api);
     if (res.statusCode == 200) {
       return res.data;
     } else {
-      logger.e("${res.statusCode} : ${res.statusMessage}s");
+      _logger.e("${res.statusCode} : ${res.statusMessage}s");
       return res.data;
     }
   }
 
   Future<Map<String, dynamic>> requestRegisterFormData(
       String token, String url, List<XFile> data, Map<String, dynamic> post) async {
-    dio.options.headers['Content-Type'] = 'multipart/form-data';
+    _dio.options.headers['Content-Type'] = 'multipart/form-data';
     if (token.isNotEmpty) {
-      dio.options.headers['Authorization'] = 'Bearer $token';
+      _dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
 
@@ -123,7 +128,7 @@ class NetDriver {
       'images': files,
     });
 
-    final res = await dio.post(api, data: form, options: Options(validateStatus: (status) {
+    final res = await _dio.post(api, data: form, options: Options(validateStatus: (status) {
       return status != null && status < 500;
     }));
 
@@ -133,15 +138,15 @@ class NetDriver {
       }
       return res.data;
     } else {
-      logger.e("${res.statusCode} : ${res.statusMessage}s");
+      _logger.e("${res.statusCode} : ${res.statusMessage}s");
       return res.data;
     }
   }
 
   Future<Map<String, dynamic>> requestUpdateFormData(String token, String url, Map<String, dynamic> post, List<XFile> data, List<Map<String, dynamic>> deleteImages) async {
-    dio.options.headers['Content-Type'] = 'multipart/form-data';
+    _dio.options.headers['Content-Type'] = 'multipart/form-data';
     if (token.isNotEmpty) {
-      dio.options.headers['Authorization'] = 'Bearer $token';
+      _dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
 
@@ -170,42 +175,42 @@ class NetDriver {
 
     final form = FormData.fromMap(formData);
 
-    final res = await dio.put(api, data: form, options: Options(validateStatus: (status) {
+    final res = await _dio.put(api, data: form, options: Options(validateStatus: (status) {
       return status != null && status < 500;
     }));
 
     if (res.statusCode == 200) {
       return res.data;
     } else {
-      logger.e("${res.statusCode} : ${res.statusMessage}s");
+      _logger.e("${res.statusCode} : ${res.statusMessage}s");
       return res.data;
     }
   }
 
   Future<Map<String, dynamic>> requestImagesDeleteFormData(String token, String url, List<Map<String, dynamic>> data) async {
-    dio.options.headers['Content-Type'] = 'multipart/form-data';
+    _dio.options.headers['Content-Type'] = 'multipart/form-data';
     if (token.isNotEmpty) {
-      dio.options.headers['Authorization'] = 'Bearer $token';
+      _dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
     final form = FormData.fromMap({
       'deleteImages': data,
     });
-    final res = await dio.delete(api, data: form, options: Options(validateStatus: (status) {
+    final res = await _dio.delete(api, data: form, options: Options(validateStatus: (status) {
       return status != null && status < 500;
     }));
 
     if (res.statusCode == 200) {
       return res.data;
     } else {
-      logger.e("${res.statusCode} : ${res.statusMessage}s");
+      _logger.e("${res.statusCode} : ${res.statusMessage}s");
       return res.data;
     }
   }
 
   Future<Map<String, dynamic>> updateProfileFormData(String token, String url, Map<String, dynamic> data, Map<String, dynamic> images) async {
     if (token.isNotEmpty) {
-      dio.options.headers['Authorization'] = 'Bearer $token';
+      _dio.options.headers['Authorization'] = 'Bearer $token';
     }
     final api = '$baseUrl$url';
 
@@ -226,14 +231,14 @@ class NetDriver {
 
     final form = FormData.fromMap(formData);
 
-    final res = await dio.post(api, data: form, options: Options(validateStatus: (status) {
+    final res = await _dio.post(api, data: form, options: Options(validateStatus: (status) {
       return status != null && status < 500;
     }));
 
     if (res.statusCode == 200) {
       return res.data;
     } else {
-      logger.e("${res.statusCode} : ${res.statusMessage}s");
+      _logger.e("${res.statusCode} : ${res.statusMessage}s");
       return res.data;
     }
 

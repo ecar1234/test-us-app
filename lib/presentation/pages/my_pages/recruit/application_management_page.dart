@@ -336,7 +336,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                                           ],
                                                         );
                                                       }));
-                                                } else if (state.state == ReviewDataState.errorState) {
+                                                } else if (state is ReviewDataErrorState) {
                                                   return Container(
                                                       height: 200,
                                                       width: MediaQuery.sizeOf(context).width * 0.8,
@@ -351,7 +351,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                                           )
                                                         ],
                                                       ));
-                                                } else if (state.state == ReviewDataState.loadingState) {
+                                                } else if (state is ReviewDataLoadingState) {
                                                   return SizedBox(
                                                     height: 200,
                                                     width: MediaQuery.sizeOf(context).width * 0.8,

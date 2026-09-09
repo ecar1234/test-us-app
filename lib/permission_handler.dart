@@ -36,7 +36,6 @@ class PermissionHandler extends StatefulWidget {
 class _PermissionHandlerState extends State<PermissionHandler> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     final messagingProvider = context.read<FirebaseMessagingProvider>();

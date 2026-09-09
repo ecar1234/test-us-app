@@ -1,5 +1,6 @@
 
 
+import '../entities/package/review_init_data_entity.dart';
 import '../entities/post_review_entity.dart';
 import '../entities/user_review_entity.dart';
 
@@ -12,4 +13,5 @@ abstract class ReviewRepository {
   Future<PostReviewEntity> addRecruitPostReview(String token, PostReviewEntity review);
   Future<PostReviewEntity> addPromotionPostReview(String token, PostReviewEntity review);
   Future<UserReviewEntity> addTesterReview(String token, UserReviewEntity review);
+  Future<ResReviewInitEntity> requestReviewInitData(String token, String userId, List<String> posts);
 }

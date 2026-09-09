@@ -75,3 +75,11 @@ class ChangeStateToGetTestersReview extends ReviewEvent {
 
   ChangeStateToGetTestersReview({required this.reviews, required this.users});
 }
+
+class RequestReviewInitDate extends ReviewEvent {
+  final String token;
+  final String userId;
+  final List<String> postIds;
+
+  RequestReviewInitDate({required this.token, required this.userId, required this.postIds});
+}

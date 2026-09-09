@@ -97,7 +97,7 @@ class RecruitPostModel {
   int? views;
   List<ImageModel>? images;
   String? postType;
-  List<RecruitReviewModel>? reviews;
+  // List<RecruitReviewModel>? reviews;
   List<int>? applications;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -117,7 +117,7 @@ class RecruitPostModel {
     this.views,
     this.images,
     this.postType,
-    this.reviews,
+    // this.reviews,
     this.createdAt,
     this.updatedAt,
   });

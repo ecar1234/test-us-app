@@ -1,4 +1,5 @@
 
+import '../entities/package/review_init_data_entity.dart';
 import '../entities/post_review_entity.dart';
 import '../entities/user_review_entity.dart';
 import '../repositories/review_repository.dart';
@@ -44,6 +45,11 @@ class ReviewUseCase {
 
   Future<List<UserReviewEntity>> getTestersReviewOnPost(String token, List<String> ids, int appId) async {
     final res = await repository.getTestersReviews(token, ids, appId);
+    return res;
+  }
+
+  Future<ResReviewInitEntity> requestReviewInitData(String token, String userId, List<String> posts) async {
+    final res = await repository.requestReviewInitData(token, userId, posts);
     return res;
   }
 }

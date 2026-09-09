@@ -32,6 +32,8 @@ import 'package:test_us_app/service_locator.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 import 'package:test_us_app/services/firebase/firebase_options.dart';
+import 'package:test_us_app/services/network/network_controller.dart';
+import 'package:test_us_app/services/network/network_service.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import 'domain/use_cases/base_post_usecase.dart';
@@ -56,6 +58,10 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // final service = NetworkService();
+  // final networkController = NetworkController(service);
+  // await networkController.initialize();
+
   await serviceLocator();
   runApp(MultiProvider(
     providers: [
@@ -75,6 +81,7 @@ Future<void> main() async {
           return socketProvider!..setRoomProvider(roomProvider);
         },
       ),
+      // ChangeNotifierProvider.value(value: networkController)
     ],
     child: MultiBlocProvider(
       providers: [

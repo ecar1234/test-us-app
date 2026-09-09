@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/core/api_names.dart';
 import 'package:test_us_app/data/data_sources/review_data/review_data_source.dart';
+import 'package:test_us_app/data/models/review/packages/res_review_init_model.dart';
 import 'package:test_us_app/data/models/review/user_review_model.dart';
 import 'package:test_us_app/domain/entities/user_review_entity.dart';
 
@@ -109,6 +110,17 @@ class ReviewDataSourceImpl implements ReviewDataSource {
       return UserReviewModel.fromJson(res['review']);
     } else {
       throw Exception(res['message']);
+    }
+  }
+
+  @override
+  Future<ResReviewInitModel> requestReviewInitData(String token, String userId, List<String> posts) async {
+    final res = await netDriver.requestPostJson(token, ReviewApi.requestReviewInitData, {'userId': userId, 'postIds' : posts});
+    if(res['status'] == 200){
+      final initData = {'userReviews': res['userReviews'], 'applyPostReviews': res['applyPostReviews']};
+      return ResReviewInitModel.fromJson(initData);
+    }else {
+      return ResReviewInitModel();
     }
   }
 }

@@ -9,8 +9,10 @@ part of 'application_model.dart';
 ApplicationModel _$ApplicationModelFromJson(Map<String, dynamic> json) =>
     ApplicationModel(
       id: (json['id'] as num?)?.toInt(),
-      platform:
-          $enumDecodeNullable(_$ApplicationPlatformEnumMap, json['platform']),
+      platform: $enumDecodeNullable(
+        _$ApplicationPlatformEnumMap,
+        json['platform'],
+      ),
       mobileOs: $enumDecodeNullable(_$MobileOsTypeEnumMap, json['mobileOs']),
       status: $enumDecodeNullable(_$ApplicationStatusEnumMap, json['status']),
       appliedAt: json['appliedAt'] == null

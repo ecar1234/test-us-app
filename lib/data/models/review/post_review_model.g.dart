@@ -11,8 +11,10 @@ PostReviewModel _$PostReviewModelFromJson(Map<String, dynamic> json) =>
       reviewId: json['reviewId'] as String?,
       rating: (json['rating'] as num?)?.toDouble(),
       comment: json['comment'] as String?,
-      reviewType:
-          $enumDecodeNullable(_$PostReviewTypeEnumMap, json['reviewType']),
+      reviewType: $enumDecodeNullable(
+        _$PostReviewTypeEnumMap,
+        json['reviewType'],
+      ),
       reviewerUserId: json['reviewerUserId'] as String?,
       createdAt: json['createdAt'] == null
           ? null

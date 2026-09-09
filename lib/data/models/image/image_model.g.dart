@@ -7,17 +7,17 @@ part of 'image_model.dart';
 // **************************************************************************
 
 ImageModel _$ImageModelFromJson(Map<String, dynamic> json) => ImageModel(
-      id: (json['id'] as num?)?.toInt(),
-      filename: json['filename'] as String?,
-      originalname: json['originalname'] as String?,
-      mimetype: json['mimetype'] as String?,
-      size: (json['size'] as num?)?.toInt(),
-      postType: $enumDecodeNullable(_$PostTypeEnumMap, json['postType']),
-      url: json['url'] as String?,
-      createdAt: json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
-    );
+  id: (json['id'] as num?)?.toInt(),
+  filename: json['filename'] as String?,
+  originalname: json['originalname'] as String?,
+  mimetype: json['mimetype'] as String?,
+  size: (json['size'] as num?)?.toInt(),
+  postType: $enumDecodeNullable(_$PostTypeEnumMap, json['postType']),
+  url: json['url'] as String?,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+);
 
 Map<String, dynamic> _$ImageModelToJson(ImageModel instance) =>
     <String, dynamic>{

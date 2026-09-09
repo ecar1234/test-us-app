@@ -7,48 +7,46 @@ part of 'user_model.dart';
 // **************************************************************************
 
 UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
-      userId: json['userId'] as String?,
-      email: json['email'] as String?,
-      password: json['password'] as String?,
-      nickname: json['nickname'] as String?,
-      profileImg: json['profileImg'] == null
-          ? null
-          : ImageModel.fromJson(json['profileImg'] as Map<String, dynamic>),
-      status: $enumDecodeNullable(_$UserStatusEnumMap, json['status']),
-      userType: $enumDecodeNullable(_$UserTypeEnumMap, json['userType']),
-      role: $enumDecodeNullable(_$UserRoleEnumMap, json['role']),
-      userName: json['userName'] as String?,
-      birth: json['birth'] == null
-          ? null
-          : DateTime.parse(json['birth'] as String),
-      method: $enumDecodeNullable(_$AuthTypeEnumMap, json['method']),
-      applications: (json['applications'] as List<dynamic>?)
-          ?.map((e) => (e as num).toInt())
-          .toList(),
-      createdAt: json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
-          ? null
-          : DateTime.parse(json['updatedAt'] as String),
-    );
+  userId: json['userId'] as String?,
+  email: json['email'] as String?,
+  password: json['password'] as String?,
+  nickname: json['nickname'] as String?,
+  profileImg: json['profileImg'] == null
+      ? null
+      : ImageModel.fromJson(json['profileImg'] as Map<String, dynamic>),
+  status: $enumDecodeNullable(_$UserStatusEnumMap, json['status']),
+  userType: $enumDecodeNullable(_$UserTypeEnumMap, json['userType']),
+  role: $enumDecodeNullable(_$UserRoleEnumMap, json['role']),
+  userName: json['userName'] as String?,
+  birth: json['birth'] == null ? null : DateTime.parse(json['birth'] as String),
+  method: $enumDecodeNullable(_$AuthTypeEnumMap, json['method']),
+  applications: (json['applications'] as List<dynamic>?)
+      ?.map((e) => (e as num).toInt())
+      .toList(),
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
+);
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
-      'userId': instance.userId,
-      'email': instance.email,
-      'password': instance.password,
-      'nickname': instance.nickname,
-      'profileImg': instance.profileImg,
-      'status': _$UserStatusEnumMap[instance.status],
-      'userType': _$UserTypeEnumMap[instance.userType],
-      'role': _$UserRoleEnumMap[instance.role],
-      'userName': instance.userName,
-      'birth': instance.birth?.toIso8601String(),
-      'method': _$AuthTypeEnumMap[instance.method],
-      'applications': instance.applications,
-      'createdAt': instance.createdAt?.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
-    };
+  'userId': instance.userId,
+  'email': instance.email,
+  'password': instance.password,
+  'nickname': instance.nickname,
+  'profileImg': instance.profileImg,
+  'status': _$UserStatusEnumMap[instance.status],
+  'userType': _$UserTypeEnumMap[instance.userType],
+  'role': _$UserRoleEnumMap[instance.role],
+  'userName': instance.userName,
+  'birth': instance.birth?.toIso8601String(),
+  'method': _$AuthTypeEnumMap[instance.method],
+  'applications': instance.applications,
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
+};
 
 const _$UserStatusEnumMap = {
   UserStatus.active: 'ACTIVE',

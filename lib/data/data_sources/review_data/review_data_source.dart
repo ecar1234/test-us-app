@@ -1,6 +1,6 @@
 
+import 'package:test_us_app/data/models/review/packages/res_review_init_model.dart';
 import 'package:test_us_app/data/models/review/user_review_model.dart';
-import 'package:test_us_app/domain/entities/user_review_entity.dart';
 
 import '../../models/review/post_review_model.dart';
 
@@ -13,4 +13,5 @@ abstract class ReviewDataSource {
   Future<PostReviewModel> addRecruitPostReview(String token, PostReviewModel review);
   Future<PostReviewModel> addPromotionPostReview(String token, PostReviewModel review);
   Future<UserReviewModel> addTesterReview(String token, UserReviewModel review);
+  Future<ResReviewInitModel> requestReviewInitData(String token, String userId, List<String> posts);
 }

@@ -11,8 +11,10 @@ PromotionPostModel _$PromotionPostModelFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String?,
       title: json['title'] as String?,
       subtitle: json['subtitle'] as String?,
-      platform:
-          $enumDecodeNullable(_$ApplicationPlatformEnumMap, json['platform']),
+      platform: $enumDecodeNullable(
+        _$ApplicationPlatformEnumMap,
+        json['platform'],
+      ),
       mobileOs: $enumDecodeNullable(_$MobileOsTypeEnumMap, json['mobileOs']),
       category: $enumDecodeNullable(_$PostCategoryEnumMap, json['category']),
       contents: json['contents'] as String?,
@@ -27,8 +29,9 @@ PromotionPostModel _$PromotionPostModelFromJson(Map<String, dynamic> json) =>
           .toList(),
       domain: json['domain'] as String?,
       postType: json['postType'] as String?,
-      reviews:
-          (json['reviews'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      reviews: (json['reviews'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),

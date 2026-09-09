@@ -48,7 +48,7 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
       body: BlocConsumer<ReviewBloc, ReviewState>(listener: (context, state) {
 
       }, builder: (context, state) {
-        if(state.state == ReviewDataState.loadingState){
+        if(state is ReviewDataLoadingState){
           return SizedBox(
             height: hei,
             width: MediaQuery.sizeOf(context).width,

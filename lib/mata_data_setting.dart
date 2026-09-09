@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
@@ -26,20 +25,16 @@ import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_event.dart'
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_state.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
+import 'package:test_us_app/presentation/components/disconnected_page.dart';
 import 'package:test_us_app/presentation/pages/main_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
-import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/auth/auth_service.dart';
-import 'package:test_us_app/services/common_height_provider.dart';
-import 'package:test_us_app/services/firebase/messaging_service.dart';
-import 'package:test_us_app/services/notification/notification_service.dart';
-import 'package:test_us_app/services/theme_provider.dart';
+import 'package:test_us_app/services/network/network_controller.dart';
 
 import 'data/sharedPreferences/firebase_messaging_preference.dart';
-import 'domain/entities/firebase_messaging_entity.dart';
 
 class MetaDataSetting extends StatefulWidget {
   const MetaDataSetting({super.key});
@@ -54,11 +49,14 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
 
   @override
   void initState() {
-// TODO: implement initState
     super.initState();
-    context.read<BasePostBloc>().add(RequestInitDataEvent());
+
     FlutterNativeSplash.remove();
     _checkAndRequestPermissions();
+    _requestPostInitData();
+    // final network = context.read<NetworkController>();
+    // if(network.isConnected){
+    // }
   }
 
   Future<void> _checkAndRequestPermissions() async {
@@ -79,7 +77,6 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
 
     if (isAllGranted) {
       debugPrint('[SYSTEM] Permission handler pass');
-
     } else {
       // 하나라도 거부 시 ➡️ 플러터 화면 위에 알럿 팝업 노출
       debugPrint('[SYSTEM] Permission handler false');
@@ -88,6 +85,10 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         return;
       }
     }
+  }
+
+  void _requestPostInitData() {
+    context.read<BasePostBloc>().add(RequestInitDataEvent());
   }
 
   void _showPermissionDeniedDialog() {
@@ -218,8 +219,4 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
       )
     ], child: const MainPage());
   }
-// Future<void> _firebaseMessagingTokenLogic(BuildContext context) async {
-//   final token = context.read<UserProvider>().token ?? '';
-//   final userId = context.read<UserProvider>().user?.id ?? '';
-// }
 }

@@ -1,7 +1,7 @@
 
 class Host {
-  static const String baseDevUrl = 'http://dev.testusserver.xyz';
-  static const String baseProdUrl = 'https://main.testusserver.xyz';
+  static const String baseDevUrl = 'http://dev.testusserver.site';
+  static const String baseProdUrl = 'https://main.testusserver.site';
 }
 
 class AuthApi {
@@ -97,6 +97,7 @@ class ReviewApi {
   static const String getReviewByNickname = '/api/v1/review/getReviewByNickname';
   static const String getReviewByPostReviewId = '/api/v1/review/getReviewByPostReviewId';
   static const String getReviewByUserReviewId = '/api/v1/review/getReviewByUserReviewId';
+  static const String requestReviewInitData = '/api/v1/review/requestReviewInitData';
 }
 
 class MessageApi {

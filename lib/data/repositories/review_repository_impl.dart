@@ -2,6 +2,7 @@
 
 import 'package:test_us_app/domain/entities/user_review_entity.dart';
 
+import '../../domain/entities/package/review_init_data_entity.dart';
 import '../../domain/entities/post_review_entity.dart';
 import '../../domain/repositories/review_repository.dart';
 import '../data_sources/review_data/review_data_source.dart';
@@ -60,5 +61,11 @@ class ReviewRepositoryImpl implements ReviewRepository {
   Future<UserReviewEntity> getReviewByUserReviewId(String token, String reviewId) async {
     final res = await remote.getReviewByUserReviewId(token, reviewId);
     return UserReviewEntity.toEntity(res);
+  }
+
+  @override
+  Future<ResReviewInitEntity> requestReviewInitData(String token, String userId, List<String> posts) async {
+    final res = await remote.requestReviewInitData(token, userId, posts);
+    return ResReviewInitEntity.toEntity(res);
   }
 }

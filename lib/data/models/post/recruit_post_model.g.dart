@@ -31,8 +31,10 @@ RecruitPostModel _$RecruitPostModelFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String?,
       subtitle: json['subtitle'] as String?,
       contents: json['contents'] as String?,
-      platform:
-          $enumDecodeNullable(_$ApplicationPlatformEnumMap, json['platform']),
+      platform: $enumDecodeNullable(
+        _$ApplicationPlatformEnumMap,
+        json['platform'],
+      ),
       mobileOs: $enumDecodeNullable(_$MobileOsTypeEnumMap, json['mobileOs']),
       category: $enumDecodeNullable(_$PostCategoryEnumMap, json['category']),
       status: $enumDecodeNullable(_$PostStatusEnumMap, json['status']),
@@ -45,9 +47,6 @@ RecruitPostModel _$RecruitPostModelFromJson(Map<String, dynamic> json) =>
           ?.map((e) => ImageModel.fromJson(e as Map<String, dynamic>))
           .toList(),
       postType: json['postType'] as String?,
-      reviews: (json['reviews'] as List<dynamic>?)
-          ?.map((e) => RecruitReviewModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -71,7 +70,6 @@ Map<String, dynamic> _$RecruitPostModelToJson(RecruitPostModel instance) =>
       'views': instance.views,
       'images': instance.images,
       'postType': instance.postType,
-      'reviews': instance.reviews,
       'applications': instance.applications,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),

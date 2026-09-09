@@ -7,8 +7,10 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/domain/entities/post_review_entity.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_bloc.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_event.dart';
+import 'package:test_us_app/presentation/provider/review_provider.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import '../../../../../data/models/application/application_model.dart';
@@ -173,42 +175,45 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
                                   )),
                               const Gap(10),
                               //Fixme: post의 review를 삭제하고 다시 가져오는 방법을 찾아야함.
-                              // if (posts[idx]
-                              //     .reviews!
-                              //     .any((element) => element.reviewerUserId == context.read<UserProvider>().user!.id!))
-                              //   SizedBox(
-                              //     height: 30,
-                              //     width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
-                              //     child: ElevatedButton(
-                              //         onPressed: ()async {
-                              //           await _checkReviewedModal(context, posts[idx]);
-                              //         },
-                              //         style: ElevatedButton.styleFrom(
-                              //           padding: EdgeInsets.zero,
-                              //           shape: RoundedRectangleBorder(
-                              //             borderRadius: BorderRadius.circular(10),
-                              //           ),
-                              //           elevation: 2,
-                              //         ),
-                              //         child: Text('나의 리뷰 보기')),
-                              //   )
-                              // else
-                              //   SizedBox(
-                              //     height: 30,
-                              //     width: (MediaQuery.sizeOf(context).width - 50) * 0.65,
-                              //     child: ElevatedButton(
-                              //         onPressed: () {
-                              //           Get.to(() => AddServiceReviewPage(post: posts[idx]));
-                              //         },
-                              //         style: ElevatedButton.styleFrom(
-                              //           padding: EdgeInsets.zero,
-                              //           shape: RoundedRectangleBorder(
-                              //             borderRadius: BorderRadius.circular(10),
-                              //           ),
-                              //           elevation: 2,
-                              //         ),
-                              //         child: Text('서비스 리뷰 하기')),
-                              //   ),
+                                  SizedBox(
+                                    height: 30,
+                                    width: (MediaQuery
+                                        .sizeOf(context)
+                                        .width - 50) * 0.65,
+                                    child: Selector<ReviewProvider, PostReviewEntity?>(
+                                      selector: (context, provider) {
+                                        final reviews = provider.applicationPostReviews!;
+                                        if(reviews.isEmpty){
+                                          return null;
+                                        }else if(reviews.any((review) => review.postId == posts[idx].id)){
+                                          return reviews.firstWhere((review) => review.postId == posts[idx].id);
+                                        }else {
+                                          return null;
+                                        }
+                                        
+                                      },
+                                      builder: (context, review, child) {
+                                        return ElevatedButton(
+                                            onPressed: () async {
+                                              if(review != null){
+                                                await _checkReviewedModal(
+                                                    context, posts[idx].title!, review);
+                                              }else {
+                                                Get.to(() => AddServiceReviewPage(post: posts[idx]));
+                                              }
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              padding: EdgeInsets.zero,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    10),
+                                              ),
+                                              elevation: 2,
+                                            ),
+                                            child: Text(review != null ? '리뷰확인 하기' : '리뷰 작성 하기'));
+                                      },
+                                    ),
+                                  )
                             ]),
                           ),
                         ),
@@ -240,135 +245,69 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
     );
   }
 
-  Future<void> _checkReviewedModal(BuildContext context, RecruitPostEntity post) async {
-    final token = context.read<UserProvider>().token!;
-    // final reviewId = post.reviews!.firstWhere((element) => element.reviewerUserId == context.read<UserProvider>().user!.id!).reviewId ?? "";
-    final reviewId = '';
-    //Fixme: post의 review를 삭제하고 다시 가져오는 방법을 찾아야함.
-    if(reviewId.isEmpty) {
-      return showDialog(context: context, builder: (context) => AlertDialog(
-      title: Text('알림'),
-      content: Text('리뷰가 존재 하지 않습니다.'),
-      actions: [
-        TextButton(onPressed: () {
-          Navigator.pop(context);
-        }, child: Text('확인'))
-      ]
-    ));
-    }
-    // final review = context.read<ReviewBloc>().add(RequestReviewByPostReviewIdEvent() -> 사용 안함.
-    //Fixme: post의 review를 삭제하고 다시 가져오는 방법을 찾아야함.
-    // context.read<ReviewBloc>().add(RequestReviewByPostReviewIdEvent(token, reviewId));
+  Future<void> _checkReviewedModal(BuildContext context, String title, PostReviewEntity review) async {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
+    _contentController.text = review.comment!;
     return showDialog(
         context: context,
         builder: (BuildContext context) {
-          return BlocConsumer<ReviewBloc, ReviewState>(
-            listener: (context, state){},
-            builder:(context, state) {
-              if(state is GetReviewByPostReviewIdCompletedState) {
-                _contentController.text = state.review.comment!;
-                return Dialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                insetPadding: EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                    height: hei * 0.7,
-                    width: MediaQuery.sizeOf(context).width - 40,
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '${post.title}',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const Gap(20),
-                        RatingBar.builder(
-                          initialRating: state.review.rating!,
-                          minRating: 1,
-                          direction: Axis.horizontal,
-                          allowHalfRating: true,
-                          itemCount: 5,
-                          itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
-                          ignoreGestures: true,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Icon(
-                              Icons.star,
-                              color: Colors.amber,
-                            );
-                          },
-                          onRatingUpdate: (double value) {},
-                        ),
-                        Text('평점: ${state.review.rating}', style: TextStyle(fontSize: 16)),
-                        const Gap(20),
-                        SizedBox(
-                          height: hei * 0.3,
-                          child: TextField(
-                            controller: _contentController,
-                            readOnly: true,
-                            minLines: 20,
-                            maxLines: 30,
-                          ),
-                        ),
-                        const Gap(20),
-                        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          SizedBox(
-                              height: 50,
-                              width: 100,
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                  child: Text('확인')))
-                        ])
-                      ],
-                    )),
-              );
-              }else if(state.state == ReviewDataState.errorState) {
-                return Dialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    insetPadding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Container( height: hei * 0.3,
-                      width: MediaQuery.sizeOf(context).width - 40,
-                      padding: EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          Text(
-                            '리뷰를 불러오는중 오류가 발생했습니다.',),
-                          const Gap(20),
-                          CircularProgressIndicator(),
-                          const Gap(20),
-                          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                            SizedBox(
-                                height: 50,
-                                width: 100,
-                              child: ElevatedButton(onPressed: (){
+          return Dialog(
+            child: Container(
+                height: hei * 0.7,
+                width: MediaQuery.sizeOf(context).width - 40,
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Gap(20),
+                    RatingBar.builder(
+                      initialRating: review.rating!,
+                      minRating: 1,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      itemCount: 5,
+                      itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
+                      ignoreGestures: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                        );
+                      },
+                      onRatingUpdate: (double value) {},
+                    ),
+                    Text('평점: ${review.rating}', style: TextStyle(fontSize: 16)),
+                    const Gap(20),
+                    SizedBox(
+                      height: hei * 0.3,
+                      child: TextField(
+                        controller: _contentController,
+                        readOnly: true,
+                        minLines: 20,
+                        maxLines: 30,
+                      ),
+                    ),
+                    const Gap(20),
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      SizedBox(
+                          height: 50,
+                          width: 100,
+                          child: ElevatedButton(
+                              onPressed: () {
+                                _contentController.clear();
                                 Navigator.pop(context);
-                              }, child: Text('닫기')),
-                            )
-                          ])
-                        ],
-                      )
-                    )
-                );
-              }else {
-                return Dialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  insetPadding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Container(
-                    height: hei * 0.6,
-                    width: MediaQuery.sizeOf(context).width - 40,
-                    padding: EdgeInsets.all(20),
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  )
-                );
-              }
-            },
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                              child: Text('확인')))
+                    ])
+                  ],
+                )),
           );
         });
   }

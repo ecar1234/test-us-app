@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_state.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/application_post_review/service_review_main_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/tester_review/tester_review_main_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/user_review_page/user_review_main_page.dart';
+import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/review_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 
@@ -30,7 +32,8 @@ class _ReviewPageState extends State<ReviewPage> {
     super.initState();
     final token = context.read<UserProvider>().token!;
     final userId = context.read<UserProvider>().user!.id!;
-    context.read<ReviewBloc>().add(RequestUserReviewEvent(token, userId));
+    final posts = context.read<ApplicationProvider>().userApplicationPosts?.map((post) => post.id!).toList() ?? [];
+    context.read<ReviewBloc>().add(RequestReviewInitDate(token: token, userId: userId, postIds: posts));
   }
   @override
   Widget build(BuildContext context) {
@@ -43,8 +46,11 @@ class _ReviewPageState extends State<ReviewPage> {
         ),
         body: BlocListener<ReviewBloc, ReviewState>(
           listener: (context, state){
-            if(state is GetUserReviewDataCompletedState){
-              context.read<ReviewProvider>().setUserReviews(state.reviews);
+            if(state is ReviewInitDataCompletedState){
+              context.read<ReviewProvider>().setReviewInitData(state.initData);
+            }else if(state is ReviewDataErrorState) {
+              Get.snackbar('알림', '리뷰정보를 가져오는 중 에러가 발생했습니다.');
+              return;
             }
           },
           child: SizedBox(
