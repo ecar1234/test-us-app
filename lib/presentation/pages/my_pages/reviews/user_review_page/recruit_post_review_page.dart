@@ -23,11 +23,13 @@ class _RecruitPostReviewPageState extends State<RecruitPostReviewPage> {
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
     return LayoutBuilder(
-      builder: (context, constrains) => Container(
+      builder: (context, constrains) =>
+          Container(
           height: constrains.maxHeight,
           width: MediaQuery.sizeOf(context).width,
           padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Selector<BasePostProvider, List<RecruitPostEntity>>(selector: (context, provider) {
+          child: Selector<BasePostProvider, List<RecruitPostEntity>>(
+              selector: (context, provider) {
             return provider.userRecruitPosts ?? [];
           }, builder: (context, posts, child) {
             if (posts.isEmpty) {
