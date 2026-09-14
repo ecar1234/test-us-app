@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:test_us_app/domain/entities/package/review_init_data_entity.dart';
+import 'package:test_us_app/domain/entities/recruit_review_average_entity.dart';
 
 import '../../domain/entities/post_review_entity.dart';
 import '../../domain/entities/user_review_entity.dart';
@@ -14,8 +15,8 @@ class ReviewProvider extends ChangeNotifier{
   List<UserReviewEntity>? _userReviews;
   List<UserReviewEntity>? get userReviews => _userReviews;
 
-  // List<PostReviewEntity>? _postReviews;
-  // List<PostReviewEntity>? get postReviews => _postReviews;
+  List<RecruitReviewAverageEntity>? _postReviewAverages;
+  List<RecruitReviewAverageEntity>? get postReviewAverages => _postReviewAverages;
 
   List<UserReviewEntity>? _testersReviewOnPost;
   List<UserReviewEntity>? get testersReviewOnPost => _testersReviewOnPost;
@@ -51,7 +52,7 @@ class ReviewProvider extends ChangeNotifier{
   void setReviewInitData(ResReviewInitEntity reviewData){
     _userReviews = reviewData.userReviews;
     _applicationPostReviews = reviewData.applyPostReviews;
-    // _postReviews = reviewData.postReviews;
+    _postReviewAverages = reviewData.postReviewAverages;
 
     notifyListeners();
   }

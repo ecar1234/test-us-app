@@ -13,5 +13,5 @@ abstract class ReviewRepository {
   Future<PostReviewEntity> addRecruitPostReview(String token, PostReviewEntity review);
   Future<PostReviewEntity> addPromotionPostReview(String token, PostReviewEntity review);
   Future<UserReviewEntity> addTesterReview(String token, UserReviewEntity review);
-  Future<ResReviewInitEntity> requestReviewInitData(String token, String userId, List<String> posts);
+  Future<ResReviewInitEntity> requestReviewInitData(String token, String userId, List<String> myPosts, List<String>applyPosts);
 }

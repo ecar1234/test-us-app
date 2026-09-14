@@ -64,7 +64,7 @@ class ReviewDataSourceImpl implements ReviewDataSource {
     final res = await netDriver.requestGetJson(token, ReviewApi.getReviewByPostId, param: postId);
     if(res['status'] == 200){
       if(res['reviews'] == null || (res['reviews'] as List).isEmpty) return [];
-      return (res['reviews'] as List).map((e) => PostReviewModel.fromJson(e)).toList();
+      return (res['reviews'] as List<dynamic>).map((e) => PostReviewModel.fromJson(e as Map<String, dynamic>)).toList();
     }else {
       throw Exception(res['message']);
     }
@@ -114,11 +114,11 @@ class ReviewDataSourceImpl implements ReviewDataSource {
   }
 
   @override
-  Future<ResReviewInitModel> requestReviewInitData(String token, String userId, List<String> posts) async {
-    final res = await netDriver.requestPostJson(token, ReviewApi.requestReviewInitData, {'userId': userId, 'postIds' : posts});
+  Future<ResReviewInitModel> requestReviewInitData(String token, String userId, List<String> myPosts, List<String> applyPost) async {
+    final res = await netDriver
+        .requestPostJson(token, ReviewApi.requestReviewInitData, {'userId': userId, 'userPosts' : myPosts, 'applyPosts': applyPost});
     if(res['status'] == 200){
-      final initData = {'userReviews': res['userReviews'], 'applyPostReviews': res['applyPostReviews']};
-      return ResReviewInitModel.fromJson(initData);
+      return ResReviewInitModel.fromJson(res['initData']);
     }else {
       return ResReviewInitModel();
     }

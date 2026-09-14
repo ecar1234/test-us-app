@@ -8,6 +8,8 @@ import 'package:test_us_app/presentation/pages/my_pages/reviews/application_post
 import 'package:test_us_app/presentation/pages/my_pages/reviews/tester_review/tester_review_main_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/user_review_page/user_review_main_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/review_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 
@@ -32,13 +34,14 @@ class _ReviewPageState extends State<ReviewPage> {
     super.initState();
     final token = context.read<UserProvider>().token!;
     final userId = context.read<UserProvider>().user!.id!;
-    final posts = context.read<ApplicationProvider>().userApplicationPosts?.map((post) => post.id!).toList() ?? [];
-    context.read<ReviewBloc>().add(RequestReviewInitDate(token: token, userId: userId, postIds: posts));
+    final applyPosts = context.read<ApplicationProvider>().userApplicationPosts?.map((post) => post.id!).toList() ?? [];
+    final myPosts = context.read<BasePostProvider>().userRecruitPosts?.map((post) => post.id!).toList() ?? [];
+    context.read<ReviewBloc>().add(RequestReviewInitDate(token: token, userId: userId, myPosts: myPosts, applyPosts: applyPosts));
   }
   @override
   Widget build(BuildContext context) {
     final hei = GetIt.I.get<ResponsiveHeightProvider>().hei!;
-    final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
+    // final isDarkMode = context.watch<ThemeProvider>().isDarkMode;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(

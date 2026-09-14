@@ -48,8 +48,8 @@ class ReviewUseCase {
     return res;
   }
 
-  Future<ResReviewInitEntity> requestReviewInitData(String token, String userId, List<String> posts) async {
-    final res = await repository.requestReviewInitData(token, userId, posts);
+  Future<ResReviewInitEntity> requestReviewInitData(String token, String userId, List<String> myPosts, List<String> applyPosts) async {
+    final res = await repository.requestReviewInitData(token, userId, myPosts, applyPosts);
     return res;
   }
 }

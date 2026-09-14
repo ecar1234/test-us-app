@@ -8,19 +8,6 @@ import '../../data/models/post/recruit_post_model.dart';
 import 'image_entity.dart';
 
 final logger = Logger();
-class RecruitReviewEntity {
-  String? reviewId;
-  String? postId;
-  String? reviewerUserId;
-  double? rating;
-
-  RecruitReviewEntity({
-    this.reviewId,
-    this.postId,
-    this.reviewerUserId,
-    this.rating
-  });
-}
 
 class RecruitPostEntity {
   String? id;
@@ -35,8 +22,6 @@ class RecruitPostEntity {
   int? views;
   List<ImageEntity>? images;
   String? postType;
-  // FIXME: 굳이 초반에 reviews data가 필요한 이유?? review는 review 페이지 들어갔을 때 로드해도 될듯?  
-  // List<RecruitReviewEntity>? reviews;
   UserEntity? author;
   List<int>? applications;
   DateTime? createdAt;
@@ -57,7 +42,6 @@ class RecruitPostEntity {
     this.views,
     this.images,
     this.postType,
-    // this.reviews,
     this.createdAt,
     this.updatedAt,
   });
@@ -70,14 +54,6 @@ class RecruitPostEntity {
       status: model.author!.status,
     );
     final images = model.images!.map((e) => ImageEntity.toImageEntity(e)).toList();
-    // final applications = model.applications!.map((e) => ApplicationEntity.toEntity(e)).toList();
-    // final reviews = model.reviews!.map((e) => RecruitReviewEntity(
-    //   reviewId: e.reviewId,
-    //   postId: e.postId,
-    //   reviewerUserId: e.reviewerUserId,
-    //   rating: e.rating
-    // )).toList();
-
     return RecruitPostEntity(
       id: model.id,
       title: model.title,
@@ -93,21 +69,17 @@ class RecruitPostEntity {
       views: model.views,
       images: images,
       postType: model.postType,
-      // reviews: reviews,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
     );
   }
 
   static RecruitPostModel toPostModel(RecruitPostEntity entity) {
-    final user = UserModel(
-      userId: entity.author!.id,
-      nickname: entity.author!.nickname,
-    );
-    final List<ImageModel> images =
-        entity.images != null ? entity.images!.map((e) => ImageEntity.toImageModel(e)).toList() : [];
-    // final List<ApplicationModel> applications =
-    //     entity.applications != null ? entity.applications!.map((e) => ApplicationEntity.toModel(e)).toList() : [];
+    final user = UserModel(userId: entity.author!.id, nickname: entity.author!.nickname);
+    final List<ImageModel> images = entity.images != null
+        ? entity.images!.map((e) => ImageEntity.toImageModel(e)).toList()
+        : [];
+
     return RecruitPostModel(
       id: entity.id,
       title: entity.title,

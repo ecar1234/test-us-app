@@ -12,7 +12,7 @@ class RecruitPostTesterReviewsEntity {
 
   RecruitPostTesterReviewsEntity({this.user, this.userReview, this.appId});
 
-  RecruitPostTesterReviewsEntity toEntity(RecruitPostTesterReviewsModel model) {
+  static RecruitPostTesterReviewsEntity toEntity(RecruitPostTesterReviewsModel model) {
     final review = model.review == null ? null :  UserReviewEntity(
       reviewId: model.review!.reviewId,
       rating: model.review!.rating,

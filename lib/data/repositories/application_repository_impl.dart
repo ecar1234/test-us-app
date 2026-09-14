@@ -58,7 +58,7 @@ class ApplicationRepositoryImpl implements ApplicationRepository {
   @override
   Future<List<RecruitPostTesterReviewsEntity>> getTesterReviewsByAppIds(String token, List<int> applicationIds) async {
     final res = await remote.getTesterReviewsByAppIds(token, applicationIds);
-    return res.map<RecruitPostTesterReviewsEntity>((e) => RecruitPostTesterReviewsEntity().toEntity(e)).toList();
+    return res.map<RecruitPostTesterReviewsEntity>((e) => RecruitPostTesterReviewsEntity.toEntity(e)).toList();
 
   }
 }

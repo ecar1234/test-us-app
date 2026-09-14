@@ -150,7 +150,7 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
       emit(ReviewDataLoadingState());
       logger.i('Review State: Review init Loading');
       try {
-        final initData = await useCase.requestReviewInitData(event.token, event.userId, event.postIds);
+        final initData = await useCase.requestReviewInitData(event.token, event.userId, event.myPosts, event.applyPosts);
         emit(ReviewInitDataCompletedState(initData: initData));
         logger.i('Review State: Review init completed');
       } on Exception catch (e) {

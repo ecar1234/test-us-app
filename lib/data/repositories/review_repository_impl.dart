@@ -64,8 +64,8 @@ class ReviewRepositoryImpl implements ReviewRepository {
   }
 
   @override
-  Future<ResReviewInitEntity> requestReviewInitData(String token, String userId, List<String> posts) async {
-    final res = await remote.requestReviewInitData(token, userId, posts);
+  Future<ResReviewInitEntity> requestReviewInitData(String token, String userId, List<String> myPosts, List<String> applyPosts) async {
+    final res = await remote.requestReviewInitData(token, userId, myPosts, applyPosts);
     return ResReviewInitEntity.toEntity(res);
   }
 }

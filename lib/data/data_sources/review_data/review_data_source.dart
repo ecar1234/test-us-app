@@ -13,5 +13,5 @@ abstract class ReviewDataSource {
   Future<PostReviewModel> addRecruitPostReview(String token, PostReviewModel review);
   Future<PostReviewModel> addPromotionPostReview(String token, PostReviewModel review);
   Future<UserReviewModel> addTesterReview(String token, UserReviewModel review);
-  Future<ResReviewInitModel> requestReviewInitData(String token, String userId, List<String> posts);
+  Future<ResReviewInitModel> requestReviewInitData(String token, String userId, List<String> myPosts, List<String> applyPosts);
 }

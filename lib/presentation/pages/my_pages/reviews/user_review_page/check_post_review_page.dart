@@ -19,9 +19,9 @@ import '../../../../bloc/user_bloc/user_bloc.dart';
 import '../../../../bloc/user_bloc/user_state.dart';
 
 class CheckPostReviewPage extends StatefulWidget {
-  final List<RecruitReviewEntity> reviews;
+  final String postId;
 
-  const CheckPostReviewPage({super.key, required this.reviews});
+  const CheckPostReviewPage({super.key, required this.postId});
 
   @override
   State<CheckPostReviewPage> createState() => _CheckPostReviewPageState();
@@ -33,7 +33,7 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
     // TODO: implement initState
     super.initState();
     final token = context.read<UserProvider>().token!;
-    context.read<ReviewBloc>().add(RequestPostReviewEvent(token, widget.reviews[0].postId!));
+    context.read<ReviewBloc>().add(RequestPostReviewEvent(token, widget.postId));
   }
 
   @override
@@ -65,6 +65,7 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
               ),
             );
           }
+          final reviews = state.reviews;
           return Container(
             height: hei,
             width: MediaQuery.sizeOf(context).width,
@@ -76,7 +77,7 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
                     physics: BouncingScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, idx) {
-                      final user = state.users.firstWhere((element) => element.id == widget.reviews[idx].reviewerUserId);
+                      final user = state.users.firstWhere((element) => element.id == reviews[idx].reviewerUserId);
                       final isActive = user.status == UserStatus.active;
                       return Container(
                           padding: EdgeInsets.all(10),
@@ -120,7 +121,7 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
                                   color: Colors.amber,
                                 ),
                                 onRatingUpdate: (rating){},
-                                initialRating: widget.reviews[idx].rating!,
+                                initialRating: reviews[idx].rating!,
                                 minRating: 1,
                                 direction: Axis.horizontal,
                                 allowHalfRating: true,
@@ -134,9 +135,8 @@ class _CheckPostReviewPageState extends State<CheckPostReviewPage> {
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
-
                                   children: [
-                                    Text(state.reviews[idx].comment!, style: TextStyle(fontSize: 16)),
+                                    Expanded(child: Text(state.reviews[idx].comment!, style: TextStyle(fontSize: 16))),
                                   ],
                                 ),
                               )
