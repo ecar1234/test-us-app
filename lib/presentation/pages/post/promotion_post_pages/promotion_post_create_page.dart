@@ -11,13 +11,10 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
-import 'package:test_us_app/domain/entities/purchase_entity.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_detail_page.dart';
-import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 
 import '../../../../data/models/post/recruit_post_model.dart';
 import '../../../../domain/entities/image_entity.dart';
-import '../../../../domain/entities/recruit_post_entity.dart';
 import '../../../../services/common_height_provider.dart';
 import '../../../../utils/type_conversion_util.dart';
 import '../../../bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
@@ -26,7 +23,6 @@ import '../../../bloc/post_blocs/promotion_bloc/promotion_state.dart';
 
 import '../../../provider/post_provider/base_post_provider.dart';
 import '../../../provider/user_provider.dart';
-import '../tester_post_pages/recruit_post_detail_page.dart';
 
 class PromotionPostCreatePage extends StatefulWidget {
   final PromotionPostEntity? post;
