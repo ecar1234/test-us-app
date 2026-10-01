@@ -709,11 +709,11 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                       height: 60,
                       width: MediaQuery.sizeOf(context).width - 40,
                       child: Center(child: Text('플랫폼을 선택해 주세요.', style: TextStyle(fontSize: 16, color: Colors.grey)))),
-                if (_webCheck) _urlTextFiled(context, '웹사이트', _webUrlController),
+                if (_webCheck) _urlTextFiled(context, false, _webUrlController),
                 if (_mobileCheck)
                   Column(children: [
-                    if (_androidCheck) _urlTextFiled(context, 'Play Store', _androidUrlController),
-                    if (_iosCheck) _urlTextFiled(context, 'App Store', _iosUrlController)
+                    if (_androidCheck) _urlTextFiled(context, true, _androidUrlController),
+                    if (_iosCheck) _urlTextFiled(context, true, _iosUrlController)
                   ])
               ],
             ),
@@ -1017,7 +1017,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
         ));
   }
 
-  Widget _urlTextFiled(BuildContext context, String title, TextEditingController controller) {
+  Widget _urlTextFiled(BuildContext context, bool isMobile, TextEditingController controller) {
     return SizedBox(
         height: 60,
         width: MediaQuery.sizeOf(context).width - 40,
@@ -1028,7 +1028,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                 flex: 2,
                 child: SizedBox(
                     width: (MediaQuery.sizeOf(context).width - 40) * 0.2,
-                    child: Text("$title : ", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
+                    child: Text("Link : ", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
               ),
               Flexible(
                 flex: 8,
@@ -1038,7 +1038,7 @@ class _PromotionPostCreatePageState extends State<PromotionPostCreatePage> {
                   child: TextField(
                     controller: controller,
                     decoration: InputDecoration(
-                      hintText: title == '웹사이트' ? 'https://' : 'Store download link',
+                      hintText: isMobile ?(_iosCheck ? 'App store download link' : 'Play store download link') : 'https://',
                       hintStyle: TextStyle(color: Colors.grey.shade600),
                     ),
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
