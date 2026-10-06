@@ -133,16 +133,37 @@ class PurchaseUseCase {
 
   Future<bool> purchaseUpdateByAos(ProductDetails product, String productId, PurchaseDetails old, String userId) async {
     final convertOld = old as GooglePlayPurchaseDetails;
-    if (convertOld.purchaseID == null) throw Exception('invalid old purchase');
+    if (convertOld.purchaseID == null || convertOld.purchaseID!.isEmpty) {
+      throw Exception('Invalid or missing old purchase ID');
+    }
 
-    final offerToken = (product as GooglePlayProductDetails).productDetails.subscriptionOfferDetails!
-        .firstWhere((e) => e.basePlanId == productId).offerIdToken;
+    final googleProduct = product as GooglePlayProductDetails;
+    final offerDetails = googleProduct.productDetails.subscriptionOfferDetails;
+
+    if (offerDetails == null || offerDetails.isEmpty) {
+      throw Exception('No subscription offer details available');
+    }
+
+// 2. OfferToken 안전 추출
+    final selectedOffer = offerDetails.firstWhere(
+          (e) => e.basePlanId == productId,
+      orElse: () => offerDetails.first,
+    );
 
     // NOTE: 테스트 시에는 시간압축으로 인해서 MODE 변경에 따른 오류가 발생.
     // NOTE: 테스트 진행 시 proration은 chargeFullPrice 또는 deferred로 고정 후 진행.
     final grade = _checkProrationMode(old, product);
-    final proration = grade == 1
-        ? ReplacementMode.deferred : ReplacementMode.withTimeProration;
+    final ReplacementMode proration;
+    if (grade > 0) {
+      // 업그레이드 (예: Standard -> Premium)
+      proration = ReplacementMode.withTimeProration;
+    } else if (grade < 0) {
+      // 다운그레이드 (예: Premium -> Standard)
+      proration = ReplacementMode.deferred;
+    } else {
+      // 동일 티어 옵션 변경 (기본값)
+      proration = ReplacementMode.withTimeProration;
+    }
     // final proration =  ReplacementMode.chargeFullPrice;
 
 
@@ -152,7 +173,7 @@ class PurchaseUseCase {
         replacementMode: proration,
         oldPurchaseDetails: convertOld,
       ),
-      offerToken: offerToken,
+      offerToken: selectedOffer.offerIdToken,
       applicationUserName: userId
     );
     final res = await _inAppPurchase.buyNonConsumable(purchaseParam: param);
@@ -225,6 +246,6 @@ class PurchaseUseCase {
       newPlan = 2;
     }
 
-    return currentPlan - newPlan;
+    return newPlan - currentPlan;
   }
 }

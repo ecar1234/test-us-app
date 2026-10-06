@@ -45,4 +45,9 @@ class PurchaseProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  PurchaseEntity? getUserPurchasePlan () {
+    final plan = _subscribedList.firstWhereOrNull((item) => item.isActive == true);
+    return plan;
+  }
 }
