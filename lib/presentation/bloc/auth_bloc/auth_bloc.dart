@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_naver_login/flutter_naver_login.dart';
-import 'package:flutter_naver_login/interface/types/naver_login_result.dart';
-import 'package:flutter_naver_login/interface/types/naver_login_status.dart';
+import 'package:naver_login_flutter/naver_login_flutter.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
@@ -13,7 +11,6 @@ import 'package:test_us_app/domain/use_cases/user_usecase.dart';
 
 import '../../../data/sharedPreferences/auth_preference.dart';
 import '../../../data/sharedPreferences/firebase_messaging_preference.dart';
-import '../../provider/user_provider.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -116,13 +113,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<RequestNaverAuth>((event, emit) async {
       emit(AuthState(state: UserAuthState.naverAuthPendingState));
-      try {
-        final NaverLoginResult naverUser = await FlutterNaverLogin.logIn();
-        if (naverUser.status == NaverLoginStatus.error) {
-          emit(AuthState(state: UserAuthState.authFailedState, message: naverUser.errorMessage));
-          return;
+      late NaverLoginResult naverUser;
+        try {
+          naverUser = await FlutterNaverLogin.logIn();
+          if (naverUser.status == NaverLoginStatus.error) {
+            emit(AuthState(state: UserAuthState.authFailedState, message: naverUser.errorMessage));
+            return;
+          }
+        } on Exception catch (e) {
+          debugPrint('$e');
+          logger.i('state : naver login failed state');
+          emit(AuthState(state: UserAuthState.authFailedState, message: '네이버 유져 정보를 가져오지 못했습니다. 다시 시도해주세요.'));
         }
-
+      try {
         final findUser = await userUseCase.getUserByEmail(naverUser.account!.email!);
         if (findUser != null) {
           final loginRes = await userUseCase.authLogin(
@@ -148,8 +151,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         logger.i('state : Naver login completed state');
         return;
       } catch (e) {
-        logger.e(e);
-        logger.i('state : login failed state');
+        debugPrint('$e');
+        logger.i('state : server login failed state');
         emit(AuthState(state: UserAuthState.authFailedState, message: '네이버 유져 정보를 가져오지 못했습니다. 다시 시도해주세요.'));
       }
     });
