@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
@@ -25,14 +24,12 @@ import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_event.dart'
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_state.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_state.dart';
-import 'package:test_us_app/presentation/components/disconnected_page.dart';
 import 'package:test_us_app/presentation/pages/main_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/auth/auth_service.dart';
-import 'package:test_us_app/services/network/network_controller.dart';
 
 import 'data/sharedPreferences/firebase_messaging_preference.dart';
 

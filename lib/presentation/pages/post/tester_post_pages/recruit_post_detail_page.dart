@@ -132,7 +132,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
               icon: Icon(Platform.isAndroid ? Icons.arrow_back : Icons.arrow_back_ios_new),
             ),
             actions: [
-              isAuthor
+              isAuthor && widget.post == null
                   ? PopupMenuButton(
                       icon: Icon(Icons.more_vert_rounded),
                       itemBuilder: (BuildContext context) {

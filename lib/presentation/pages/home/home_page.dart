@@ -122,6 +122,8 @@ class _HomePageState extends State<HomePage> {
                    ),
               Selector<UserProvider, bool>(
                   selector: (context, provider) => provider.isLogged ?? false,
+                  //TODO: 추후 자동 로그인역시 서버와 소통해서 로그인 로그 기록을 남겨야 함으로
+                  //TODO: 서버 통신을 무조건 구성해야 하고, 로그인 관련 통신 중에는 loading으로 처리하도록 변경 필요!!!
                   builder: (context, isLogin, child) => !isLogin
                       ? ElevatedButton(
                           onPressed: () {

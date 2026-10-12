@@ -47,7 +47,7 @@ class _StandardPlanState extends State<StandardPlan> {
                       if(plan == null){
                         return null;
                       }else {
-                        if(plan.plan! == 'Standard'){
+                        if(plan.plan! == 'standard'){
                           return plan;
                         }else {
                           return null;
@@ -74,8 +74,10 @@ class _StandardPlanState extends State<StandardPlan> {
                 ],
               )
           ),
+          const Divider(height: 8, thickness: 2,),
           Expanded(
             child: ListView.separated(
+                physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, idx){
                   return SizedBox(
                     height: 30,

@@ -47,7 +47,7 @@ class _PremiumPlanState extends State<PremiumPlan> {
                         if(plan == null){
                           return null;
                         }else {
-                          if(plan.plan! == 'Premium'){
+                          if(plan.plan! == 'premium'){
                             return plan;
                           }else {
                             return null;
@@ -74,8 +74,10 @@ class _PremiumPlanState extends State<PremiumPlan> {
                 ],
               )
           ),
+          const Divider(height: 8, thickness: 2,),
           Expanded(
             child: ListView.separated(
+                physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, idx){
                   return SizedBox(
                     height: 30,

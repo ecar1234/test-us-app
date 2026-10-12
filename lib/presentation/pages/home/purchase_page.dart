@@ -261,10 +261,12 @@ class _PurchasePageState extends State<PurchasePage> with SingleTickerProviderSt
                                           // }
                                           // todo: aos 경우 restore 이후 purchaseDetail 정보를 얻어야 한다.
                                           // todo: restore 이후 데이터가 업데이트 될때까지 bloc를 실행 하면 안된다.
-                                          final currentPlan = context
-                                              .read<PurchaseProvider>()
-                                              .subscribedList
-                                              .firstWhereOrNull((e) => e.isActive == true);
+                                          final currentPlan = context.read<PurchaseProvider>().getUserPurchasePlan();
+                                          if(currentPlan != null && currentPlan.productId == _selectedProduct!.id){
+                                            Get.back();
+                                            Get.snackbar('알림', '이미 사용중인 상품입니다.');
+                                            return;
+                                          }
                                           if (Platform.isAndroid) {
                                             if (currentPlan == null) {
                                               context.read<PurchaseBloc>().add(
@@ -386,7 +388,8 @@ class _PurchasePageState extends State<PurchasePage> with SingleTickerProviderSt
               }
             }
             return products;
-          } else {
+          }
+          else {
             final list = provider.products.where((product) => product.id!.contains('pre')).toList();
             for (final product in list) {
               switch (product.period) {
@@ -485,7 +488,7 @@ class _PurchasePageState extends State<PurchasePage> with SingleTickerProviderSt
                                             ),
                                           ),
                                         ),
-                                      //TODO: 구독 중 표시 로직 + aos 구매 테스트 / ios 구매 테스트 / 서버 데이터 저장 확인
+                                      //TODO: 구독 중 표시를 여기에?? 아니면 가격표 위에?
                                       // const Gap(10),
                                       // if (isUsed)
                                       //

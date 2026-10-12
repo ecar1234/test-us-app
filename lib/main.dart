@@ -18,7 +18,6 @@ import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recru
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_bloc.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
-import 'package:test_us_app/presentation/pages/main_page.dart';
 import 'package:test_us_app/presentation/provider/application_provider.dart';
 import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
 import 'package:test_us_app/presentation/provider/room_provider.dart';
@@ -32,12 +31,9 @@ import 'package:test_us_app/service_locator.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 import 'package:test_us_app/services/firebase/firebase_options.dart';
-import 'package:test_us_app/services/network/network_controller.dart';
-import 'package:test_us_app/services/network/network_service.dart';
 import 'package:test_us_app/services/theme_provider.dart';
 
 import 'domain/use_cases/base_post_usecase.dart';
-import 'domain/use_cases/firebase_messaging_usecase.dart';
 import 'domain/use_cases/message_usecase.dart';
 import 'domain/use_cases/promotion_post_usecase.dart';
 import 'domain/use_cases/purchase_usecase.dart';

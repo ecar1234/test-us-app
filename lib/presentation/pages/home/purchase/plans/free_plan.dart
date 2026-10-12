@@ -71,8 +71,10 @@ class _FreePlanState extends State<FreePlan> {
                 ],
               )
           ),
+          const Divider(height: 8, thickness: 2,),
           Expanded(
             child: ListView.separated(
+              physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, idx){
                   return SizedBox(
                     height: 30,
