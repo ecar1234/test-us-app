@@ -3,21 +3,18 @@ import 'dart:io';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
-import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_event.dart';
 import 'package:test_us_app/presentation/pages/home/user_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/user_info/password_update_page.dart';
 import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
+import 'package:test_us_app/presentation/routes/app_router.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/services/firebase/messaging_service.dart';
 import 'package:test_us_app/services/notification/notification_service.dart';
@@ -37,17 +34,47 @@ class _PermissionHandlerState extends State<PermissionHandler> {
   @override
   void initState() {
     super.initState();
+    debugPrint('[SYSTEM] init permission');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeApp();
+    });
+    // final messagingProvider = context.read<FirebaseMessagingProvider>();
+    // Future.microtask(() async {
+    //   MessagingService().init(messagingProvider);
+    //   await _initSystem();
+    //   NotificationService().init();
+    //   await _initializeNotification();
+    // });
+    //
+    // WidgetsBinding.instance.addPostFrameCallback((_)async{
+    //   if (mounted) {
+    //     context.pushReplacementNamed('meta_setting');
+    //   }
+    // });
+  }
 
-    final messagingProvider = context.read<FirebaseMessagingProvider>();
-    Future.microtask(() async {
+  Future<void> _initializeApp() async {
+    try {
+      // 1. 필요한 비동기 시스템 초기화 진행
+      final messagingProvider = context.read<FirebaseMessagingProvider>();
       MessagingService().init(messagingProvider);
-      await _initSystem();
+
+      await _initSystem(); // 이제 context가 준비되었으므로 안전합니다.
       NotificationService().init();
       await _initializeNotification();
+
+    } catch (e, stackTrace) {
+      // 에러 발생 시 디버그 콘솔에 출력하여 원인을 파악할 수 있게 함
+      debugPrint('[SYSTEM] 초기화 중 예외 발생: $e\n$stackTrace');
+    } finally {
+      // 2. try 안에서 성공하든, catch로 에러가 빠지든 무조건 실행되는 영역
       if (mounted) {
-        Get.off(() => const MetaDataSetting());
+        context.pushReplacementNamed('meta_setting');
+
+        // 3. 네이티브 스플래시 무조건 제거 보장
+        FlutterNativeSplash.remove();
       }
-    });
+    }
   }
 
   Future<void> _initSystem() async {
@@ -110,88 +137,10 @@ class _PermissionHandlerState extends State<PermissionHandler> {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = context.watch<ThemeProvider>().isDarkMode;
-    return GetMaterialApp(
-      theme: FlexThemeData.light(
-        scheme: FlexScheme.damask,
-        // surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-        // blendLevel: 9,
-        subThemesData: const FlexSubThemesData(
-          interactionEffects: true,
-          tintedDisabledControls: true,
-          useM2StyleDividerInM3: true,
-          inputDecoratorIsFilled: true,
-          inputDecoratorBorderType: FlexInputBorderType.outline,
-          alignedDropdown: true,
-          navigationRailUseIndicator: true,
-        ),
-        keyColors: const FlexKeyColors(
-          keepPrimary: true,
-          keepSecondary: true,
-          keepTertiary: true,
-          keepError: true,
-          keepPrimaryContainer: true,
-          keepSecondaryContainer: true,
-          keepTertiaryContainer: true,
-          keepErrorContainer: true,
-        ),
-        variant: FlexSchemeVariant.monochrome,
-// Direct ThemeData properties.
-        visualDensity: FlexColorScheme.comfortablePlatformDensity,
-        cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-        useMaterial3: true,
-        swapLegacyOnMaterial3: true,
-        fontFamily: GoogleFonts.notoSans().fontFamily,
+    return SafeArea(child: Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
       ),
-      darkTheme: FlexThemeData.dark(
-          scheme: FlexScheme.damask,
-          subThemesData: const FlexSubThemesData(
-            interactionEffects: true,
-            tintedDisabledControls: true,
-            useM2StyleDividerInM3: true,
-            inputDecoratorIsFilled: true,
-            inputDecoratorBorderType: FlexInputBorderType.outline,
-            alignedDropdown: true,
-            navigationRailUseIndicator: true,
-          ),
-          keyColors: const FlexKeyColors(
-            keepPrimary: true,
-            keepSecondary: true,
-            keepTertiary: true,
-            keepError: true,
-            keepPrimaryContainer: true,
-            keepSecondaryContainer: true,
-            keepTertiaryContainer: true,
-            keepErrorContainer: true,
-          ),
-          variant: FlexSchemeVariant.monochrome,
-// Direct ThemeData properties.
-          visualDensity: FlexColorScheme.comfortablePlatformDensity,
-          cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-          useMaterial3: true,
-          swapLegacyOnMaterial3: true),
-      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      debugShowCheckedModeBanner: false,
-      builder: BotToastInit(),
-      navigatorObservers: [BotToastNavigatorObserver()],
-      getPages: [
-        GetPage(name: '/userPage', page: () => const UserPage()),
-        GetPage(name: '/passwordUpdatePage', page: () => const PasswordUpdatePage())
-      ],
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('ko', 'KR'), // 한국어
-        Locale('en', 'US'), // 영어
-      ],
-      home: const Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: CircularProgressIndicator(), // 혹은 앱 로고 이미지
-        ),
-      ),
-    );
+    ));
   }
 }

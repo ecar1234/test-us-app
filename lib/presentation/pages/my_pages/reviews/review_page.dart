@@ -1,7 +1,7 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_state.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/application_post_review/service_review_main_page.dart';
@@ -52,7 +52,8 @@ class _ReviewPageState extends State<ReviewPage> {
             if(state is ReviewInitDataCompletedState){
               context.read<ReviewProvider>().setReviewInitData(state.initData);
             }else if(state is ReviewDataErrorState) {
-              Get.snackbar('알림', '리뷰정보를 가져오는 중 에러가 발생했습니다.');
+              BotToast.showSimpleNotification(title: '알림', subTitle: '리뷰정보를 가져오는 중 에러가 발생했습니다.', duration: Duration(seconds: 3));
+              // Get.snackbar('알림', '리뷰정보를 가져오는 중 에러가 발생했습니다.');
               return;
             }
           },

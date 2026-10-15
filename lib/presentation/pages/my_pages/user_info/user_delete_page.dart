@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_state.dart';
 import 'package:test_us_app/presentation/pages/main_page.dart';
@@ -41,7 +41,8 @@ class _UserDeletePageState extends State<UserDeletePage> {
               listener: (context, state) async {
                 if (state.state == UserAuthState.userDeleteCompletedState) {
                   context.read<UserProvider>().logout();
-                  Get.offAll(() => MainPage());
+                  context.goNamed('main');
+                  // Get.offAll(() => MainPage());
                 }
               },
               child: Container(
@@ -135,7 +136,7 @@ class _UserDeletePageState extends State<UserDeletePage> {
                         height: 40,
                         child: ElevatedButton(
                           onPressed: () {
-                            Get.back();
+                            context.pop();
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.zero,
@@ -155,7 +156,7 @@ class _UserDeletePageState extends State<UserDeletePage> {
                             final userId = context.read<UserProvider>().user!.id ?? "";
 
                             context.read<AuthBloc>().add(RequestUserDeleteEvent(token, userId));
-                            Get.back();
+                            context.pop();
                           },
                           style: OutlinedButton.styleFrom(
                             padding: EdgeInsets.zero,

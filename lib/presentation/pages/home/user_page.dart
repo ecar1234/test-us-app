@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
@@ -127,7 +128,8 @@ class _UserPageState extends State<UserPage> {
                             height: 30,
                             child: TextButton.icon(
                               onPressed: () {
-                                Get.to(() => const LoginPage());
+                                context.pushNamed('login');
+                                // Get.to(() => const LoginPage());
                               },
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
@@ -146,7 +148,8 @@ class _UserPageState extends State<UserPage> {
                                 height: 30,
                                 child: TextButton.icon(
                                   onPressed: () {
-                                    Get.to(() => UserInfoPage(user: user));
+                                    context.pushNamed('user_info', extra: user);
+                                    // Get.to(() => UserInfoPage(user: user));
                                   },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
@@ -421,7 +424,8 @@ class _UserPageState extends State<UserPage> {
                                   cancelButtonName: '확인',
                                   onPressedConfirm: () {
                                     Navigator.pop(context);
-                                    Get.to(() => const LoginPage());
+                                    context.pushNamed('login');
+                                    // Get.to(() => const LoginPage());
                                   },
                                   onPressedCancel: () {
                                     Navigator.pop(context);
@@ -481,26 +485,31 @@ class _UserPageState extends State<UserPage> {
     switch (idx) {
       case 0:
         debugPrint(menu[idx]);
-        Get.to(() => MessageMainPage());
+        context.pushNamed('message_main');
+        // Get.to(() => MessageMainPage());
         break;
       case 1:
         debugPrint(menu[idx]);
         break;
       case 2:
         debugPrint(menu[idx]);
-        Get.to(() => const MyRecruitmentPage());
+        context.pushNamed('my_recruit');
+        // Get.to(() => const MyRecruitmentPage());
         break;
       case 3:
         debugPrint(menu[idx]);
-        Get.to(() => MyApplicationsPage());
+        context.pushNamed('my_applications');
+        // Get.to(() => MyApplicationsPage());
         break;
       case 4:
         debugPrint(menu[idx]);
-        Get.to(() => const MyPromotionPage());
+        context.pushNamed('my_promotion');
+        // Get.to(() => const MyPromotionPage());
         break;
       case 5:
         debugPrint(menu[idx]);
-        Get.to(() => ReviewPage());
+        context.pushNamed('my_reviews');
+        // Get.to(() => ReviewPage());
         break;
       case 6:
         debugPrint(menu[idx]);
@@ -532,7 +541,7 @@ class _UserPageState extends State<UserPage> {
                   context.read<FirebaseMessagingProvider>().readAllNotification();
                 },
                 onPressedCancel: () {
-                  Get.back();
+                  context.pop();
                 }
           );
         });

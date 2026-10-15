@@ -1,13 +1,14 @@
 import 'dart:io';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -172,7 +173,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                                       width: constraints.maxWidth * 0.3,
                                                       child: OutlinedButton(
                                                           onPressed: () {
-                                                            Get.back();
+                                                            context.pop();
                                                           },
                                                           style: OutlinedButton.styleFrom(
                                                             side: BorderSide(
@@ -196,11 +197,12 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                                                   .read<RecruitPostBloc>()
                                                                   .add(RequestPostDeleteEvent(token, post));
                                                             } on Exception catch (e) {
-                                                              Get.snackbar('알림', '삭제 실패');
+                                                              BotToast.showSimpleNotification(title: '알림', subTitle: '게시글 삭제에 실패 했습니다.' , duration: Duration(seconds: 3));
+                                                              // Get.snackbar('알림', '삭제 실패');
                                                               logger.e(e.toString());
                                                               return;
                                                             }
-                                                            Get.back();
+                                                            context.pop();
                                                           },
                                                           style: OutlinedButton.styleFrom(
                                                             shape: RoundedRectangleBorder(
@@ -255,9 +257,10 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                         )),
                     background: GestureDetector(
                         onTap: () {
-                          Get.to(() => PostImageDetailPage(
-                                images: post.images!,
-                              ));
+                          context.pushNamed('post_image_detail', extra: post.images!);
+                          // Get.to(() => PostImageDetailPage(
+                          //       images: post.images!,
+                          //     ));
                         },
                         child: _buildImages(post.images!)));
               },
@@ -370,7 +373,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                   buttonName: '확인',
                                   onPressed: () {
                                     context.read<ApplicationProvider>().requestApply(state.application!);
-                                    Get.back();
+                                    context.pop();
                                   }));
                           return;
                         }
@@ -383,7 +386,7 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                   buttonName: '확인',
                                   onPressed: () {
                                     context.read<ApplicationProvider>().requestUpdateApplication(state.application!);
-                                    Get.back();
+                                    context.pop();
                                   }));
                           return;
                         }
@@ -458,11 +461,11 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                   confirmButtonName: '취소',
                                   cancelButtonName: '진행',
                                   onPressedConfirm: () {
-                                    Get.back();
+                                    context.pop();
                                   },
                                   onPressedCancel: () {
                                     context.read<AppBloc>().add(RequestCancelEvent(token, appId));
-                                    Get.back();
+                                    context.pop();
                                   }));
                         },
                         style: OutlinedButton.styleFrom(
@@ -504,11 +507,11 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                 confirmButtonName: '취소',
                                 cancelButtonName: '진행',
                                 onPressedConfirm: () {
-                                  Get.back();
+                                  context.pop();
                                 },
                                 onPressedCancel: () {
                                   context.read<AppBloc>().add(RequestCancelEvent(token, appId));
-                                  Get.back();
+                                  context.pop();
                                 }));
                       },
                       style: OutlinedButton.styleFrom(
@@ -606,11 +609,13 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                                       child: ElevatedButton(
                                         onPressed: () async {
                                           if (prevApp.mobileOs == MobileOsType.ios && isAndroidDevice == false) {
-                                            Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
+                                            BotToast.showSimpleNotification(title: '알림', subTitle: 'OS가 변경 되지 않았습니다.', duration: Duration(seconds: 3));
+                                            // Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
                                             return;
                                           }
                                           if (prevApp.mobileOs == MobileOsType.android && isAndroidDevice == true) {
-                                            Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
+                                            BotToast.showSimpleNotification(title: '알림', subTitle: 'OS가 변경 되지 않았습니다.', duration: Duration(seconds: 3));
+                                            // Get.snackbar('알림', 'OS가 변경 되지 않았습니다.');
                                             return;
                                           }
                                           final token = context.read<UserProvider>().token ?? '';
@@ -682,7 +687,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
                       cancelButtonName: '확인',
                       onPressedConfirm: () {
                         Navigator.pop(context);
-                        Get.to(() => const LoginPage());
+                        context.pushNamed('login');
+                        // Get.to(() => const LoginPage());
                       },
                       onPressedCancel: () {
                         Navigator.pop(context);
@@ -852,7 +858,8 @@ class _RecruitPostDetailPageState extends State<RecruitPostDetailPage> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      Get.snackbar('알림', '존재하지 않는 주소입니다.');
+      BotToast.showSimpleNotification(title: '알림', subTitle: '존재하지 않는 주소 입니다.', duration: Duration(seconds: 3));
+      // Get.snackbar('알림', '존재하지 않는 주소입니다.');
     }
   }
 

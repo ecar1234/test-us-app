@@ -1,11 +1,9 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:get_it/get_it.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:go_router/go_router.dart';
 import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
-import 'package:test_us_app/services/common_height_provider.dart';
 
 import '../../bloc/auth_bloc/auth_bloc.dart';
 import '../../bloc/auth_bloc/auth_event.dart';
@@ -72,7 +70,7 @@ class _FindUserEmailPageState extends State<FindUserEmailPage> {
                                   subContent: _emailController.text,
                                   buttonName: '확인',
                                   onPressed: () {
-                                    Get.back();
+                                    context.pop();
                                   }));
                         } else {
                           showDialog(
@@ -82,7 +80,7 @@ class _FindUserEmailPageState extends State<FindUserEmailPage> {
                                   mainContent: '회원가입 된 이메일이 아닙니다.',
                                   buttonName: '확인',
                                   onPressed: () {
-                                    Get.back();
+                                    context.pop();
                                   }));
                         }
                       }
@@ -93,11 +91,21 @@ class _FindUserEmailPageState extends State<FindUserEmailPage> {
                       child: ElevatedButton(
                           onPressed: () {
                             if (_emailController.text.isEmpty) {
-                              Get.snackbar('알림', '이메일 입력 후 다시 시도해 주세요.');
+                              BotToast.showSimpleNotification(
+                                title: '알림',
+                                subTitle: '이메일 입력 후 다시 시도해 주세요.',
+                                duration: const Duration(seconds: 3),
+                              );
+                              // Get.snackbar('알림', '이메일 입력 후 다시 시도해 주세요.');
                               return;
                             }
                             if (!_isValidateEmail) {
-                              Get.snackbar('알림', '이메일 형식을 다시 확인해 주세요.');
+                              BotToast.showSimpleNotification(
+                                title: '알림',
+                                subTitle: '이메일 형식을 다시 확인해 주세요.',
+                                duration: const Duration(seconds: 3),
+                              );
+                              // Get.snackbar('알림', '이메일 형식을 다시 확인해 주세요.');
                               return;
                             }
                             context.read<AuthBloc>().add(FindEmailEvent(_emailController.text));
@@ -116,38 +124,38 @@ class _FindUserEmailPageState extends State<FindUserEmailPage> {
     );
   }
 
-  String _maskEmail(String email) {
-    try {
-      // 1. @ 기준으로 로컬(ID)과 도메인 분리
-      final parts = email.split('@');
-      if (parts.length != 2) return email;
-
-      String local = parts[0];
-      String domainFull = parts[1];
-
-      // 2. 도메인을 다시 . 기준으로 분리 (도메인 이름과 확장자)
-      final domainParts = domainFull.split('.');
-      if (domainParts.length < 2) return email;
-
-      String domainName = domainParts[0];
-      String extension = domainParts[1];
-
-      // --- 마스킹 처리 ---
-
-      // 로컬: 첫 두 글자 + 나머지는 *
-      String maskedLocal = local.length >= 2 ? local.substring(0, 2) + '*' * (local.length - 2) : '$local*';
-
-      // 도메인 이름: 첫 글자 + 마지막 글자 (사이는 *)
-      String maskedDomain = domainName.length >= 2
-          ? domainName[0] + '*' * (domainName.length - 2) + domainName[domainName.length - 1]
-          : '$domainName*';
-
-      // 확장자: 첫 글자 + 나머지는 *
-      String maskedExtension = extension.isNotEmpty ? extension[0] + '*' * (extension.length - 1) : "";
-
-      return "$maskedLocal@$maskedDomain.$maskedExtension";
-    } catch (e) {
-      return '잘못된 이메일 형식입니다.'; // 에러 발생 시 원본 반환
-    }
-  }
+  // String _maskEmail(String email) {
+  //   try {
+  //     // 1. @ 기준으로 로컬(ID)과 도메인 분리
+  //     final parts = email.split('@');
+  //     if (parts.length != 2) return email;
+  //
+  //     String local = parts[0];
+  //     String domainFull = parts[1];
+  //
+  //     // 2. 도메인을 다시 . 기준으로 분리 (도메인 이름과 확장자)
+  //     final domainParts = domainFull.split('.');
+  //     if (domainParts.length < 2) return email;
+  //
+  //     String domainName = domainParts[0];
+  //     String extension = domainParts[1];
+  //
+  //     // --- 마스킹 처리 ---
+  //
+  //     // 로컬: 첫 두 글자 + 나머지는 *
+  //     String maskedLocal = local.length >= 2 ? local.substring(0, 2) + '*' * (local.length - 2) : '$local*';
+  //
+  //     // 도메인 이름: 첫 글자 + 마지막 글자 (사이는 *)
+  //     String maskedDomain = domainName.length >= 2
+  //         ? domainName[0] + '*' * (domainName.length - 2) + domainName[domainName.length - 1]
+  //         : '$domainName*';
+  //
+  //     // 확장자: 첫 글자 + 나머지는 *
+  //     String maskedExtension = extension.isNotEmpty ? extension[0] + '*' * (extension.length - 1) : "";
+  //
+  //     return "$maskedLocal@$maskedDomain.$maskedExtension";
+  //   } catch (e) {
+  //     return '잘못된 이메일 형식입니다.'; // 에러 발생 시 원본 반환
+  //   }
+  // }
 }

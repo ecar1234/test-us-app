@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
 import 'package:test_us_app/presentation/components/alerts/two_button_confirm_alert.dart';
 
 import '../bloc/post_blocs/recruit_post_bloc/recruit_post_state.dart';
-import '../pages/auth/login_page.dart';
 import '../provider/user_provider.dart';
 
 class CustomBottomBar extends StatefulWidget {
@@ -131,7 +130,8 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                                     cancelButtonName: '확인',
                                     onPressedConfirm: () {
                                       Navigator.pop(context);
-                                      Get.to(() => const LoginPage());
+                                      context.pushNamed('login');
+                                      // Get.to(() => const LoginPage());
                                     },
                                     onPressedCancel: () {
                                       Navigator.pop(context);

@@ -1,10 +1,11 @@
 import 'dart:io';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as path;
@@ -235,10 +236,12 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                                 if (image == null) {
                                   return;
                                 } else if (File(image.path).lengthSync() / (1024 * 1024) > volumeLimit) {
-                                  Get.snackbar('알림', '${volumeLimit}Mb를 초과하는 이미지는 업로드 할 수 없습니다.');
+                                  BotToast.showSimpleNotification(title: '알림', subTitle: '${volumeLimit}Mb를 초과하는 이미지는 업로드 할 수 없습니다.', duration: Duration(seconds: 3));
+                                  // Get.snackbar('알림', '${volumeLimit}Mb를 초과하는 이미지는 업로드 할 수 없습니다.');
                                   return;
                                 } else if (_existedImages.length + _selectedImages.length >= imagesLimit) {
-                                  Get.snackbar('알림', '최대 $imagesLimit개의 이미지를 선택할 수 있습니다.');
+                                  BotToast.showSimpleNotification(title: '알림', subTitle: '최대 $imagesLimit개의 이미지를 선택할 수 있습니다.', duration: Duration(seconds: 3));
+                                  // Get.snackbar('알림', '최대 $imagesLimit개의 이미지를 선택할 수 있습니다.');
                                   return;
                                 } else {
                                   setState(() {
@@ -255,20 +258,23 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                                           : imagesLimit,
                                     )
                                     .onError((e, state) {
-                                      Get.snackbar('알림', '이미지 선택에 실패했습니다.');
+                                  BotToast.showSimpleNotification(title: '알림', subTitle: '이미지 선택에 실패했습니다.', duration: Duration(seconds: 3));
+                                      // Get.snackbar('알림', '이미지 선택에 실패했습니다.');
                                       return [];
                                     });
                                 if (images.isEmpty) {
                                   return;
                                 } else if (images.length + _existedImages.length > imagesLimit) {
-                                  Get.snackbar('알림', '최대 $imagesLimit개의 이미지를 선택할 수 있습니다.');
+                                  BotToast.showSimpleNotification(title: '알림', subTitle: '최대 $imagesLimit개의 이미지를 선택할 수 있습니다.', duration: Duration(seconds: 3));
+                                  // Get.snackbar('알림', '최대 $imagesLimit개의 이미지를 선택할 수 있습니다.');
                                   return;
                                 } else {
                                   final sizeList = images
                                       .map((e) => File(e.path).lengthSync() / (1024 * 1024))
                                       .toList();
                                   if (sizeList.any((element) => element > volumeLimit)) {
-                                    Get.snackbar('알림', '${volumeLimit}MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                                    BotToast.showSimpleNotification(title: '알림', subTitle: '${volumeLimit}Mb를 초과하는 이미지는 업로드 할 수 없습니다.', duration: Duration(seconds: 3));
+                                    // Get.snackbar('알림', '${volumeLimit}MB를 초과하는 이미지는 업로드 할 수 없습니다.');
                                     return;
                                   }
                                 }
@@ -309,7 +315,10 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                       return GestureDetector(
                         onTap: () async {
                           final image = await transactionToImageEntity(_selectedImages[idx]);
-                          Get.to(() => PostImageDetailPage(images: [image]));
+                          if(context.mounted) {
+                            context.pushNamed('post_image_detail', extra: [image]);
+                          }
+                          // Get.to(() => PostImageDetailPage(images: [image]));
                         },
                         child: SizedBox(
                           height: 110,
@@ -697,7 +706,8 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
             ),
           );
         } else if (state.state == RecruitPostLoadState.errorState || state.state == RecruitPostLoadState.failedState) {
-          Get.snackbar('알림', '등록 실패');
+          BotToast.showSimpleNotification(title: "알림", subTitle: '등록 싫패', duration: Duration(seconds: 3));
+          // Get.snackbar('알림', '등록 실패');
           return;
         }
       },
@@ -717,16 +727,19 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                     if (_titleController.text.isEmpty ||
                         _subtitleController.text.isEmpty ||
                         _contentController.text.isEmpty) {
-                      Get.snackbar("알림", "모든 항목을 입력해주세요.");
+                      BotToast.showSimpleNotification(title: "알림", subTitle: '모든 항목을 입력해주세요', duration: Duration(seconds: 3));
+                      // Get.snackbar("알림", "모든 항목을 입력해주세요.");
                       return;
                     }
                     if (_selectedPlatform == null) {
-                      Get.snackbar("알림", "플랫폼 선택해주세요.");
+                      BotToast.showSimpleNotification(title: "알림", subTitle: '플랫폼 선택해주세요.', duration: Duration(seconds: 3));
+                      // Get.snackbar("알림", "플랫폼 선택해주세요.");
                       return;
                     }
 
                     if (_selectedCategory == null) {
-                      Get.snackbar("알림", "카테고리를 선택해주세요.");
+                      BotToast.showSimpleNotification(title: "알림", subTitle: '카테고리를 선택해주세요.', duration: Duration(seconds: 3));
+                      // Get.snackbar("알림", "카테고리를 선택해주세요.");
                       return;
                     }
 
@@ -755,7 +768,8 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         author: user,
                         images: postImage,
                       );
-                      Get.to(() => RecruitPostDetailPage(post: post));
+                      context.pushNamed('recruit_detail', extra: post);
+                      // Get.to(() => RecruitPostDetailPage(post: post));
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -771,22 +785,27 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                   width: 150,
                   child: ElevatedButton(
                     onPressed: () async {
-                      if (isLoading) {
-                        Get.snackbar("알림", "잠시만 기다려주세요.");
-                        return;
-                      }
+                      // if (isLoading) {
+                      //   BotToast.showLoading();
+                      //   // Get.snackbar("알림", "잠시만 기다려주세요.");
+                      //
+                      // }
+                      final cancel = BotToast.showLoading();
                       if (_titleController.text.isEmpty ||
                           _subtitleController.text.isEmpty ||
                           _contentController.text.isEmpty) {
-                        Get.snackbar("알림", "모든 항목을 입력해주세요.");
+                        BotToast.showSimpleNotification(title: "알림", subTitle: '모든 항목을 입력해주세요', duration: Duration(seconds: 3));
+                        // Get.snackbar("알림", "모든 항목을 입력해주세요.");
                         return;
                       }
                       if (_selectedCategory == null) {
-                        Get.snackbar("알림", "플랫폼을 선택해주세요.");
+                        BotToast.showSimpleNotification(title: "알림", subTitle: '모든 항목을 입력해주세요', duration: Duration(seconds: 3));
+                        // Get.snackbar("알림", "플랫폼을 선택해주세요.");
                         return;
                       }
                       if (_selectedImages.isEmpty) {
-                        Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
+                        BotToast.showSimpleNotification(title: "알림", subTitle: '모든 항목을 입력해주세요', duration: Duration(seconds: 3));
+                        // Get.snackbar("알림", "최소 한장의 이미지를 선택해주세요.");
                         return;
                       }
                       try {
@@ -803,8 +822,11 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         context.read<RecruitPostBloc>().add(RequestPostCreateEvent(token, post, _selectedImages));
                       } on Exception catch (e) {
                         logger.e(e);
-                        Get.snackbar('알림', '등록 실패');
+                        BotToast.showSimpleNotification(title: '알림', subTitle: '등록 하지 못했습니다. 다시 시도해 주세요.', duration: Duration(seconds: 3));
+                        // Get.snackbar('알림', '등록 실패');
                         return;
+                      } finally {
+                        cancel();
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -819,10 +841,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                   width: 150,
                   child: ElevatedButton(
                     onPressed: () async {
-                      if (isLoading) {
-                        Get.snackbar("알림", "잠시만 기다려주세요.");
-                        return;
-                      }
+                      final cancel = BotToast.showLoading();
                       final post = RecruitPostEntity(
                         id: widget.post!.id,
                         title: _titleController.text,
@@ -842,7 +861,10 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         );
                       } on Exception catch (e) {
                         logger.e(e);
-                        Get.snackbar('알림', '수정 실패');
+                        BotToast.showSimpleNotification(title: '알림', subTitle: '수정하지 못했습니다. 다시 시도해 주세요.', duration: Duration(seconds: 3));
+                        // Get.snackbar('알림', '수정 실패');
+                      }finally {
+                        cancel();
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -880,24 +902,24 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
     return images;
   }
 
-  Future<void> _alertDialog(BuildContext context, String content) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("게시 성공"),
-          content: Text("테스터 모집글을 $content 했습니다."),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                if (context.mounted) Navigator.pop(context);
-              },
-              child: Text("확인"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // Future<void> _alertDialog(BuildContext context, String content) {
+  //   return showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text("게시 성공"),
+  //         content: Text("테스터 모집글을 $content 했습니다."),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.pop(context);
+  //               if (context.mounted) Navigator.pop(context);
+  //             },
+  //             child: Text("확인"),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 }

@@ -1,8 +1,9 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:test_us_app/data/models/user/user_model.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_state.dart';
@@ -56,7 +57,8 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
           child: BlocListener<AuthBloc, AuthState>(
             listener: (context, state) async {
               if(state.state == UserAuthState.errorState){
-                Get.snackbar('알림', state.message ?? '알 수 없는 문제로 비밀번호 변경에 실패했습니다.');
+                BotToast.showSimpleNotification(title: '알림', subTitle: '알 수 없는 문제로 비밀번호 변경에 실패했습니다.', duration: Duration(seconds: 3));
+                // Get.snackbar('알림', state.message ?? '알 수 없는 문제로 비밀번호 변경에 실패했습니다.');
                 return;
               }else if(state.state == UserAuthState.passwordUpdateCompletedState){
                 await _completeDialog(context);
@@ -247,19 +249,23 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
                               //   return;
                               // }
                               if(_newPwController.text.isEmpty) {
-                                Get.snackbar('알림', '새 비밀번호를 입력해주세요.');
+                                BotToast.showSimpleNotification(title: '알림', subTitle: '새 비밀번호를 입력해주세요.', duration: Duration(seconds: 3));
+                                // Get.snackbar('알림', '새 비밀번호를 입력해주세요.');
                                 return;
                               }
                               if(_newPwCheckController.text.isEmpty){
-                                Get.snackbar('알림', '새 비밀번호 확인을 입력해주세오.');
+                                BotToast.showSimpleNotification(title: '알림', subTitle: '새 비밀번호 확인을 입력해주세오.', duration: Duration(seconds: 3));
+                                // Get.snackbar('알림', '새 비밀번호 확인을 입력해주세오.');
                                 return;
                               }
                               if(!isNewPwVisible){
-                                Get.snackbar('알림', '비밀번호 형식을 다시 확인해주세요.');
+                                BotToast.showSimpleNotification(title: '알림', subTitle: '비밀번호 형식을 다시 확인해주세요.', duration: Duration(seconds: 3));
+                                // Get.snackbar('알림', '비밀번호 형식을 다시 확인해주세요.');
                                 return;
                               }
                               if(!isNewPwCheckVisible){
-                                Get.snackbar('알림', '비밀번호 확인이 일치하지 않습니다.');
+                                BotToast.showSimpleNotification(title: '알림', subTitle: '비밀번호 확인이 일치하지 않습니다.', duration: Duration(seconds: 3));
+                                // Get.snackbar('알림', '비밀번호 확인이 일치하지 않습니다.');
                                 return;
                               }
 
@@ -294,8 +300,8 @@ class _PasswordUpdatePageState extends State<PasswordUpdatePage> {
   Future<void> _completeDialog(BuildContext context){
     return showDialog(context: context, builder: (context) =>
         OneButtonAlert(mainContent: '비밀번호 설정을 완료 했습니다.', buttonName: '확인', onPressed: (){
-          Get.back();
-          Get.back();
+          context.pop();
+          context.pop();
         }));
   }
 }

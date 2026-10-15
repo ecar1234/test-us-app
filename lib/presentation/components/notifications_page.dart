@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:test_us_app/presentation/pages/message/message_main_page.dart';
-import 'package:test_us_app/presentation/pages/my_pages/application/my_applications_page.dart';
-import 'package:test_us_app/presentation/pages/my_pages/recruit/my_recruitment_page.dart';
-import 'package:test_us_app/presentation/pages/my_pages/reviews/review_page.dart';
 import 'package:test_us_app/utils/time_util.dart';
 
 import '../../domain/entities/firebase_messaging_entity.dart';
@@ -75,13 +71,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         return GestureDetector(
                           onTap: () {
                             if (notifications[idx].data!['type'] == 'recruit') {
-                              Get.to(() => MyRecruitmentPage());
+                              context.pushNamed('my_recruit');
+                              // Get.to(() => MyRecruitmentPage());
                             } else if (notifications[idx].data!['type'] == 'application') {
-                              Get.to(() => MyApplicationsPage());
+                              context.pushNamed('my_applications');
+                              // Get.to(() => MyApplicationsPage());
                             } else if (notifications[idx].data!['type'] == 'chat') {
-                              Get.to(() => MessageMainPage());
+                              context.pushNamed('message_main');
+                              // Get.to(() => MessageMainPage());
                             } else {
-                              Get.to(() => ReviewPage());
+                              context.pushNamed('my_reviews');
+                              // Get.to(() => ReviewPage());
                             }
                           },
                           child: Container(
@@ -117,7 +117,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                           onPressed: () {
                                             context
                                                 .read<FirebaseMessagingProvider>()
-                                                .removeNotification(notifications![idx].id!);
+                                                .removeNotification(notifications[idx].id!);
                                           },
                                           style: TextButton.styleFrom(
                                             padding: EdgeInsets.zero,

@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
@@ -86,7 +86,8 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              Get.to(() => PromotionPostDetailPage(postId: posts[idx].id));
+                              context.pushNamed('promotion_detail', pathParameters: {'postId' : posts[idx].id!});
+                              // Get.to(() => PromotionPostDetailPage(postId: posts[idx].id));
                             },
                             child: Container(
                               width: (MediaQuery.sizeOf(context).width - 50),

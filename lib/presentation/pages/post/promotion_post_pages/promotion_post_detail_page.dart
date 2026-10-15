@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -7,14 +8,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/domain/entities/promotion_post_entity.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_state.dart';
+import 'package:test_us_app/presentation/components/alerts/two_button_confirm_alert.dart';
 import 'package:test_us_app/presentation/pages/post/post_image_detail_page.dart';
 import 'package:test_us_app/presentation/pages/post/promotion_post_pages/promotion_post_create_page.dart';
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
@@ -57,48 +59,45 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
     final hei = GetIt.instance.get<ResponsiveHeightProvider>().hei!;
     return SafeArea(
       child: Scaffold(
-        body: BlocConsumer<PromotionBloc, PromotionPostState>(listener: (context, state) {
-          final provider = context.read<BasePostProvider>();
-          if (state.state == PromotionPostLoadState.postDeleteCompletedState) {
-            provider.deletePromotionPost(state.postId!);
-            Get.back();
-          } else if (state.state == PromotionPostLoadState.getPostByIdCompletedState ||
-              state.state == PromotionPostLoadState.postUpdateCompletedState) {
-            provider.updateUserPromotionPosts(state.post!);
-          }
-        }, builder: (context, state) {
-          if (widget.post != null) {
-            return _buildPostInfo(context, widget.post!, hei);
-          }
-          if (state.state == PromotionPostLoadState.postLoadingState) {
+        body: BlocConsumer<PromotionBloc, PromotionPostState>(
+          listener: (context, state) {
+            final provider = context.read<BasePostProvider>();
+            if (state.state == PromotionPostLoadState.postDeleteCompletedState) {
+              provider.deletePromotionPost(state.postId!);
+              context.pop();
+            } else if (state.state == PromotionPostLoadState.getPostByIdCompletedState ||
+                state.state == PromotionPostLoadState.postUpdateCompletedState) {
+              provider.updateUserPromotionPosts(state.post!);
+            }
+          },
+          builder: (context, state) {
+            if (widget.post != null) {
+              return _buildPostInfo(context, widget.post!, hei);
+            }
+            if (state.state == PromotionPostLoadState.postLoadingState) {
+              return SizedBox(
+                width: MediaQuery.sizeOf(context).width,
+                height: hei,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (state.state == PromotionPostLoadState.getPostByIdCompletedState ||
+                state.state == PromotionPostLoadState.postUpdateCompletedState) {
+              return _buildPostInfo(context, state.post!, hei);
+            } else if (state.state == PromotionPostLoadState.errorState) {
+              return SizedBox(
+                width: MediaQuery.sizeOf(context).width,
+                height: hei,
+                child: Center(child: Text('알 수 없는 오류 발생.')),
+              );
+            }
             return SizedBox(
               width: MediaQuery.sizeOf(context).width,
               height: hei,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             );
-          }
-          if (state.state == PromotionPostLoadState.getPostByIdCompletedState ||
-              state.state == PromotionPostLoadState.postUpdateCompletedState) {
-            return _buildPostInfo(context, state.post!, hei);
-          } else if (state.state == PromotionPostLoadState.errorState) {
-            return SizedBox(
-              width: MediaQuery.sizeOf(context).width,
-              height: hei,
-              child: Center(
-                child: Text('알 수 없는 오류 발생.'),
-              ),
-            );
-          }
-          return SizedBox(
-            width: MediaQuery.sizeOf(context).width,
-            height: hei,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }),
+          },
+        ),
       ),
     );
   }
@@ -110,144 +109,160 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-            expandedHeight: hei * 0.3,
-            pinned: true,
-            leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Platform.isAndroid ? Icons.arrow_back : Icons.arrow_back_ios_new),
-            ),
-            actions: [
-              isAuthor
-                  ? PopupMenuButton(
-                      icon: Icon(Icons.more_vert_rounded),
-                      itemBuilder: (BuildContext context) {
-                        return [
-                          PopupMenuItem(value: 1, child: Text("수정하기")),
-                          PopupMenuItem(value: 2, child: Text("삭제하기"))
-                        ];
-                      },
-                      onSelected: (value) async {
-                        if (value == 1) {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) {
-                            return PromotionPostCreatePage(post: post);
-                          }));
-                        } else if (value == 2) {
-                          await showDialog(
-                              context: context,
-                              builder: (context) {
-                                return Container(
-                                    height: 200,
-                                    width: MediaQuery.sizeOf(context).width,
-                                    padding: EdgeInsets.all(10),
-                                    child: LayoutBuilder(
-                                      builder: (context, constraints) => Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            '삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?',
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                          ),
-                                          const Gap(20),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Flexible(
-                                                flex: 3,
-                                                child: SizedBox(
-                                                  width: constraints.maxWidth * 0.3,
-                                                  child: OutlinedButton(
-                                                      onPressed: () {
-                                                        Get.back();
-                                                      },
-                                                      style: OutlinedButton.styleFrom(
-                                                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(10)),
-                                                      ),
-                                                      child: Text('취소')),
-                                                ),
-                                              ),
-                                              const Gap(10),
-                                              Flexible(
-                                                flex: 7,
-                                                child: SizedBox(
-                                                  width: constraints.maxWidth * 0.7,
-                                                  child: ElevatedButton(
-                                                      onPressed: () {
-                                                        final token = context.read<UserProvider>().token ?? "";
-                                                        try {
-                                                          context
-                                                              .read<PromotionBloc>()
-                                                              .add(RequestPostDeleteEvent(token, post.id!));
-                                                        } on Exception catch (e) {
-                                                          Get.snackbar('알림', '삭제 실패');
-                                                          logger.e(e.toString());
-                                                          return;
-                                                        }
-                                                        Get.back();
-                                                      },
-                                                      style: OutlinedButton.styleFrom(
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(10)),
-                                                      ),
-                                                      child: Text('확인')),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ));
-                              });
-                          Get.defaultDialog(title: "알림", middleText: "삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?", actions: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Get.back();
-                              },
-                              child: Text("취소"),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                final token = context.read<UserProvider>().token ?? "";
-                                try {
-                                  context.read<PromotionBloc>().add(RequestPostDeleteEvent(token, post.id!));
-                                } on Exception catch (e) {
-                                  Get.snackbar('알림', '삭제 실패');
-                                  logger.e(e.toString());
-                                  return;
-                                }
-                                Get.back();
-                              },
-                              child: Text("확인"),
-                            )
-                          ]);
-                        }
-                      },
-                    )
-                  : SizedBox()
-            ],
-            flexibleSpace: LayoutBuilder(
-              builder: (context, constraints) {
-                final percent = (constraints.biggest.height - kToolbarHeight) / 100;
-                final opacity = percent.clamp(0.0, 1.0);
-                return FlexibleSpaceBar(
-                    title: Opacity(
-                        opacity: 1 - opacity,
-                        child: Text(
-                          post.title!,
-                          overflow: TextOverflow.ellipsis,
-                        )),
-                    background: GestureDetector(
-                        onTap: () {
-                          Get.to(() => PostImageDetailPage(
-                                images: post.images!,
-                              ));
-                        },
-                        child: _buildImages(post.images!)));
-              },
-            )),
+          expandedHeight: hei * 0.3,
+          pinned: true,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Platform.isAndroid ? Icons.arrow_back : Icons.arrow_back_ios_new),
+          ),
+          actions: [
+            isAuthor
+                ? PopupMenuButton(
+                    icon: Icon(Icons.more_vert_rounded),
+                    itemBuilder: (BuildContext context) {
+                      return [
+                        PopupMenuItem(value: 1, child: Text("수정하기")),
+                        PopupMenuItem(value: 2, child: Text("삭제하기")),
+                      ];
+                    },
+                    onSelected: (value) async {
+                      if (value == 1) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return PromotionPostCreatePage(post: post);
+                            },
+                          ),
+                        );
+                      } else if (value == 2) {
+                        // await showDialog(
+                        //     context: context,
+                        //     builder: (context) {
+                        //       return Container(
+                        //           height: 200,
+                        //           width: MediaQuery.sizeOf(context).width,
+                        //           padding: EdgeInsets.all(10),
+                        //           child: LayoutBuilder(
+                        //             builder: (context, constraints) => Column(
+                        //               mainAxisAlignment: MainAxisAlignment.center,
+                        //               children: [
+                        //                 Text(
+                        //                   '삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?',
+                        //                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        //                 ),
+                        //                 const Gap(20),
+                        //                 Row(
+                        //                   mainAxisAlignment: MainAxisAlignment.center,
+                        //                   children: [
+                        //                     Flexible(
+                        //                       flex: 3,
+                        //                       child: SizedBox(
+                        //                         width: constraints.maxWidth * 0.3,
+                        //                         child: OutlinedButton(
+                        //                             onPressed: () {
+                        //                               context.pop();
+                        //                             },
+                        //                             style: OutlinedButton.styleFrom(
+                        //                               side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        //                               shape: RoundedRectangleBorder(
+                        //                                   borderRadius: BorderRadius.circular(10)),
+                        //                             ),
+                        //                             child: Text('취소')),
+                        //                       ),
+                        //                     ),
+                        //                     const Gap(10),
+                        //                     Flexible(
+                        //                       flex: 7,
+                        //                       child: SizedBox(
+                        //                         width: constraints.maxWidth * 0.7,
+                        //                         child: ElevatedButton(
+                        //                             onPressed: () {
+                        //                               final token = context.read<UserProvider>().token ?? "";
+                        //                               try {
+                        //                                 context
+                        //                                     .read<PromotionBloc>()
+                        //                                     .add(RequestPostDeleteEvent(token, post.id!));
+                        //                               } on Exception catch (e) {
+                        //                                 BotToast.showSimpleNotification(title: '알림', subTitle: '삭제 하지 못했습니다. 다시 시도해 주세요.', duration: Duration(seconds: 3));
+                        //                                 // Get.snackbar('알림', '삭제 실패');
+                        //                                 logger.e(e.toString());
+                        //                                 return;
+                        //                               }
+                        //                               context.pop();
+                        //                             },
+                        //                             style: OutlinedButton.styleFrom(
+                        //                               shape: RoundedRectangleBorder(
+                        //                                   borderRadius: BorderRadius.circular(10)),
+                        //                             ),
+                        //                             child: Text('확인')),
+                        //                       ),
+                        //                     )
+                        //                   ],
+                        //                 ),
+                        //               ],
+                        //             ),
+                        //           ));
+                        //     });
+                        //NOTE: 이부분 dialog 어떤 것을 사용 하는지 확인 해야한다.
+                        await showDialog(
+                          context: context,
+                          builder: (context) => TwoButtonConfirmAlert(
+                            title: '알림',
+                            mainContent: '삭제된 게시글은 복구 할 수 없습니다.\n삭제하시겠습니까?',
+                            confirmButtonName: '취소',
+                            cancelButtonName: '확인',
+                            onPressedConfirm: () {
+                              context.pop();
+                            },
+                            onPressedCancel: () {
+                              final cancel = BotToast.showLoading();
+                              final token = context.read<UserProvider>().token ?? "";
+                              try {
+                                context.read<PromotionBloc>().add(RequestPostDeleteEvent(token, post.id!));
+                              } on Exception catch (e) {
+                                BotToast.showSimpleNotification(
+                                  title: '알림',
+                                  subTitle: '삭제 하지 못했습니다. 다시 시도해 주세요.',
+                                  duration: Duration(seconds: 3),
+                                );
+                                logger.e(e.toString());
+                                return;
+                              } finally {
+                                cancel();
+                              }
+                            },
+                          ),
+                        );
+                      }
+                    },
+                  )
+                : SizedBox(),
+          ],
+          flexibleSpace: LayoutBuilder(
+            builder: (context, constraints) {
+              final percent = (constraints.biggest.height - kToolbarHeight) / 100;
+              final opacity = percent.clamp(0.0, 1.0);
+              return FlexibleSpaceBar(
+                title: Opacity(
+                  opacity: 1 - opacity,
+                  child: Text(post.title!, overflow: TextOverflow.ellipsis),
+                ),
+                background: GestureDetector(
+                  onTap: () {
+                    context.pushNamed('post_image_detail', extra: post.images!);
+                    // Get.to(() => PostImageDetailPage(
+                    //       images: post.images!,
+                    //     ));
+                  },
+                  child: _buildImages(post.images!),
+                ),
+              );
+            },
+          ),
+        ),
         SliverToBoxAdapter(
           key: const ValueKey("postValue"),
           child: Container(
@@ -258,103 +273,102 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                    child: Text(
-                  post.title!,
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                )),
+                  child: Text(post.title!, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                ),
                 const Gap(5),
-                SizedBox(child: Text(post.subtitle!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                SizedBox(
+                  child: Text(post.subtitle!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
                 const Gap(5),
                 Row(
                   children: [
                     Text("카테고리"),
                     const Gap(10),
                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          TypeConversionUtil().postCategoryToString(post.category!),
-                        )),
+                      padding: EdgeInsets.symmetric(horizontal: 5),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(TypeConversionUtil().postCategoryToString(post.category!)),
+                    ),
                   ],
                 ),
-                Row(children: [
-                  Text("플랫폼"),
-                  const Gap(10),
-                  Text(post.platform!.name.toUpperCase()),
-                  const Gap(5),
-                  if (post.platform! == ApplicationPlatform.mobile)
-                    SizedBox(
-                      child: Text(
-                        "( ${TypeConversionUtil().getPostOs(post.mobileOs!)} )",
-                        style: TextStyle(
+                Row(
+                  children: [
+                    Text("플랫폼"),
+                    const Gap(10),
+                    Text(post.platform!.name.toUpperCase()),
+                    const Gap(5),
+                    if (post.platform! == ApplicationPlatform.mobile)
+                      SizedBox(
+                        child: Text(
+                          "( ${TypeConversionUtil().getPostOs(post.mobileOs!)} )",
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
                             color: Colors.grey.shade600,
-                            overflow: TextOverflow.ellipsis),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ),
-                    ),
-                ]),
+                  ],
+                ),
                 const Gap(10),
                 SizedBox(
                   child: Row(
                     children: [
                       SizedBox(
-                          child: Row(
-                        children: [
-                          SizedBox(
-                            height: 30,
-                            width: 30,
-                            child: CircleAvatar(
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: CircleAvatar(
                                 radius: 40,
                                 backgroundImage: isActive
                                     ? (post.author!.profileImg == null
-                                        ? const AssetImage('assets/images/Generic avatar.png')
-                                        : CachedNetworkImageProvider(
-                                            post.author!.profileImg!.url!,
-                                          ) as ImageProvider)
-                                    : const AssetImage('assets/images/Generic avatar.png')),
-                          ),
-                          const Gap(5),
-                          Text(
-                            '${post.author!.nickname}',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      )),
+                                          ? const AssetImage('assets/images/Generic avatar.png')
+                                          : CachedNetworkImageProvider(post.author!.profileImg!.url!) as ImageProvider)
+                                    : const AssetImage('assets/images/Generic avatar.png'),
+                              ),
+                            ),
+                            const Gap(5),
+                            Text(
+                              '${post.author!.nickname}',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 const Divider(),
                 const Gap(30),
                 ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: hei * 0.35,
-                  ),
+                  constraints: BoxConstraints(minHeight: hei * 0.35),
                   child: SizedBox(
-                      // height: constraints.maxHeight * 0.5,
-                      child: Linkify(
-                    text: post.contents!,
-                    // linkifiers: [WwwLinkifier(), PlayStoreLinkifier()],
-                    linkifiers: [WwwLinkifier()],
-                    linkStyle: const TextStyle(color: Colors.blue),
-                    onOpen: _linkOpen,
-                  )),
+                    // height: constraints.maxHeight * 0.5,
+                    child: Linkify(
+                      text: post.contents!,
+                      // linkifiers: [WwwLinkifier(), PlayStoreLinkifier()],
+                      linkifiers: [WwwLinkifier()],
+                      linkStyle: const TextStyle(color: Colors.blue),
+                      onOpen: _linkOpen,
+                    ),
+                  ),
                 ),
                 const Gap(40),
                 if (isActive)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _domainButton(post.platform!, post.domain!, post.mobileOs),
-                    ],
+                    children: [_domainButton(post.platform!, post.domain!, post.mobileOs)],
                   ),
               ],
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -364,19 +378,16 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      Get.snackbar('알림', '존재하지 않는 주소입니다.');
+      BotToast.showSimpleNotification(title: '알림', subTitle: '존재하지 않는 주소 입니다.', duration: Duration(seconds: 3));
+      // Get.snackbar('알림', '존재하지 않는 주소입니다.');
+      return;
     }
   }
 
   Widget _buildImages(List<ImageEntity> images) {
     if (images.length == 1) {
       if (images[0].isLocal == true) {
-        return Image.file(
-          File(images[0].url!),
-          fit: BoxFit.fitHeight,
-          height: double.infinity,
-          width: double.infinity,
-        );
+        return Image.file(File(images[0].url!), fit: BoxFit.fitHeight, height: double.infinity, width: double.infinity);
       } else {
         return CachedNetworkImage(
           imageUrl: images[0].url!,
@@ -389,35 +400,24 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
       return CarouselSlider(
         items: images.map((e) {
           if (e.isLocal == true) {
-            return Image.file(
-              File(e.url!),
+            return Image.file(File(e.url!), fit: BoxFit.fitHeight, height: double.infinity, width: double.infinity);
+          } else {
+            return CachedNetworkImage(
+              imageUrl: e.url!,
               fit: BoxFit.fitHeight,
               height: double.infinity,
               width: double.infinity,
+              progressIndicatorBuilder: (context, url, downloadProgress) {
+                return Shimmer.fromColors(
+                  baseColor: Colors.grey.shade300,
+                  highlightColor: Colors.grey.shade100,
+                  child: Container(height: double.infinity, width: double.infinity, color: Colors.white),
+                );
+              },
             );
-          } else {
-            return CachedNetworkImage(
-                imageUrl: e.url!,
-                fit: BoxFit.fitHeight,
-                height: double.infinity,
-                width: double.infinity,
-                progressIndicatorBuilder: (context, url, downloadProgress) {
-                  return Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
-                      child: Container(
-                        height: double.infinity,
-                        width: double.infinity,
-                        color: Colors.white,
-                      ));
-                });
           }
         }).toList(),
-        options: CarouselOptions(
-          autoPlay: false,
-          viewportFraction: 1.0,
-          height: 250,
-        ),
+        options: CarouselOptions(autoPlay: false, viewportFraction: 1.0, height: 250),
       );
     }
   }
@@ -425,56 +425,51 @@ class _PromotionPostDetailPageState extends State<PromotionPostDetailPage> {
   Widget _domainButton(ApplicationPlatform platform, String domain, MobileOsType? os) {
     if (platform == ApplicationPlatform.web) {
       return SizedBox(
-          width: 150,
-          height: 50,
-          child: ElevatedButton(
-              onPressed: () {
-                launchUrl(Uri.parse(domain));
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Colors.white,
-              ),
-              child: Text('사이트 구경하기')
-          ));
+        width: 150,
+        height: 50,
+        child: ElevatedButton(
+          onPressed: () {
+            launchUrl(Uri.parse(domain));
+          },
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Colors.white,
+          ),
+          child: Text('사이트 구경하기'),
+        ),
+      );
     } else if (platform == ApplicationPlatform.mobile) {
       if (os == MobileOsType.ios) {
         return GestureDetector(
           onTap: () {
             if (Platform.isAndroid) {
-              Get.snackbar('알림', '해당 기기에서 지원하지 않습니다');
+              BotToast.showSimpleNotification(
+                title: '알림',
+                subTitle: '해당 기기에서 지원하지 않습니다',
+                duration: Duration(seconds: 3),
+              );
+              // Get.snackbar('알림', '해당 기기에서 지원하지 않습니다');
               return;
             }
             launchUrl(Uri.parse(domain));
           },
-          child: SizedBox(
-              height: 50,
-              child: SvgPicture.asset(
-                'assets/images/App_Store_Badge.svg',
-                height: 50,
-              )),
+          child: SizedBox(height: 50, child: SvgPicture.asset('assets/images/App_Store_Badge.svg', height: 50)),
         );
       }
       return GestureDetector(
         onTap: () {
           if (Platform.isIOS) {
-            Get.snackbar('알림', '해당 기기에서 지원하지 않습니다');
+            BotToast.showSimpleNotification(title: '알림', subTitle: '해당 기기에서 지원하지 않습니다', duration: Duration(seconds: 3));
+            // Get.snackbar('알림', '해당 기기에서 지원하지 않습니다');
             return;
           }
           launchUrl(Uri.parse(domain));
         },
-        child: SizedBox(
-          height: 50,
-          child: Image.asset('assets/images/GetItOnGooglePlay_Badge.png'),
-        ),
+        child: SizedBox(height: 50, child: Image.asset('assets/images/GetItOnGooglePlay_Badge.png')),
       );
     } else {
-      return SizedBox(
-        height: 50,
-      );
+      return SizedBox(height: 50);
     }
   }
 }

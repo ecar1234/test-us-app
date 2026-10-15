@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/post_review_entity.dart';
@@ -36,12 +36,12 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
   final TextEditingController _contentController = TextEditingController();
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    final token = context.read<UserProvider>().token!;
-
-  }
+  // void initState() {
+  //   // TODO: implement initState
+  //   super.initState();
+  //   final token = context.read<UserProvider>().token!;
+  //
+  // }
 
   @override
   void dispose() {
@@ -199,7 +199,8 @@ class _ServiceReviewMainPageState extends State<ServiceReviewMainPage> {
                                                 await _checkReviewedModal(
                                                     context, posts[idx].title!, review);
                                               }else {
-                                                Get.to(() => AddServiceReviewPage(post: posts[idx]));
+                                                context.pushNamed('add_service_review', extra: posts[idx]);
+                                                // Get.to(() => AddServiceReviewPage(post: posts[idx]));
                                               }
                                             },
                                             style: ElevatedButton.styleFrom(

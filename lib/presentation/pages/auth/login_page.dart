@@ -1,16 +1,15 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_state.dart';
-import 'package:test_us_app/presentation/pages/auth/signup_page.dart';
-import 'package:test_us_app/services/auth/auth_service.dart';
 import 'package:test_us_app/services/common_height_provider.dart';
 import 'package:test_us_app/utils/type_conversion_util.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,7 +17,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../data/models/user/user_model.dart';
 import '../../../data/sharedPreferences/auth_preference.dart';
 import '../../bloc/auth_bloc/auth_event.dart';
-import 'find_user_info_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -99,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             );
                           });
-                      Get.back();
+                      if(context.mounted) context.pop();
                       return;
                     } else if (state.state == UserAuthState.authLoginCompletedState) {
                       final wid = MediaQuery.sizeOf(context).width - 80;
@@ -263,7 +261,12 @@ class _LoginPageState extends State<LoginPage> {
                                                   onPressed: () {
                                                     if (userTypeController.text.isEmpty ||
                                                         roleController.text.isEmpty) {
-                                                      Get.snackbar("알림", "유저 타입 또는 역할은 빈 값으로 설정할 수 없습니다.");
+                                                      BotToast.showSimpleNotification(
+                                                        title: '알림',
+                                                        subTitle: '유저 타입 또는 역할은 빈 값으로 설정할 수 없습니다.',
+                                                        duration: const Duration(seconds: 3),
+                                                      );
+                                                      // Get.snackbar("알림", "유저 타입 또는 역할은 빈 값으로 설정할 수 없습니다.");
                                                       return;
                                                     }
 
@@ -280,7 +283,8 @@ class _LoginPageState extends State<LoginPage> {
                                                             : AuthType.google);
 
                                                     context.read<AuthBloc>().add(OauthLoginEvent(user: userInfo));
-                                                    Get.back();
+
+                                                    context.pop();
                                                   },
                                                   child: Text("확인",
                                                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
@@ -291,10 +295,20 @@ class _LoginPageState extends State<LoginPage> {
                             );
                           });
                     } else if (state.state == UserAuthState.loginFailedState) {
-                      Get.snackbar("로그인 실패", state.message!);
+                      BotToast.showSimpleNotification(
+                        title: '알림',
+                        subTitle: state.message!,
+                        duration: const Duration(seconds: 3),
+                      );
+                      // Get.snackbar("로그인 실패", state.message!);
                       return;
                     } else if (state.state == UserAuthState.authFailedState) {
-                      Get.snackbar("로그인 실패", state.message!);
+                      BotToast.showSimpleNotification(
+                        title: '알림',
+                        subTitle: state.message!,
+                        duration: const Duration(seconds: 3),
+                      );
+                      // Get.snackbar("로그인 실패", state.message!);
                       return;
                     }
                   },
@@ -317,7 +331,12 @@ class _LoginPageState extends State<LoginPage> {
                             child: ElevatedButton(
                                 onPressed: () async {
                                   if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-                                    Get.snackbar("로그인 실패", "이메일 또는 비밀번호는 빈 값으로 설정할 수 없습니다.");
+                                    BotToast.showSimpleNotification(
+                                      title: '알림',
+                                      subTitle: '이메일 또는 비밀번호는 빈 값으로 설정할 수 없습니다.',
+                                      duration: const Duration(seconds: 3),
+                                    );
+                                    // Get.snackbar("로그인 실패", "이메일 또는 비밀번호는 빈 값으로 설정할 수 없습니다.");
                                     return;
                                   }
                                   context
@@ -346,7 +365,8 @@ class _LoginPageState extends State<LoginPage> {
                                 SizedBox(
                                   child: TextButton(
                                     onPressed: () {
-                                      Get.to(() => const SignupPage());
+                                      context.pushNamed('signup');
+                                      // Get.to(() => const SignupPage());
                                     },
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
@@ -374,7 +394,8 @@ class _LoginPageState extends State<LoginPage> {
                                   height: 20,
                                   child: TextButton(
                                     onPressed: () {
-                                      Get.to(() => const FindUserInfoPage());
+                                      context.pushNamed('find_info');
+                                      // Get.to(() => const FindUserInfoPage());
                                     },
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,

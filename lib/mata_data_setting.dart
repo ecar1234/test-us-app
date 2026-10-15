@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -145,8 +145,9 @@ class _MetaDataSettingState extends State<MetaDataSetting> {
         listener: (context, state) {
           context.read<UserProvider>().logout();
           context.read<AuthBloc>().add(LogoutEvent());
-          Get.snackbar("알림", "자동 로그인에 실패 했습니다. 다시 로그인 해주세요.",
-              duration: const Duration(seconds: 3));
+          BotToast.showSimpleNotification(title: '알림', subTitle: '로그아웃 되었습니다. 다시 로그인 해주새요.', duration: const Duration(seconds: 3));
+          // Get.snackbar("알림", "자동 로그인에 실패 했습니다. 다시 로그인 해주세요.",
+          //     duration: const Duration(seconds: 3));
         },
         listenWhen: (prev, current) =>
             current.state == UserAuthState.errorState,

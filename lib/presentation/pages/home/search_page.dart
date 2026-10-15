@@ -4,8 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:test_us_app/data/models/application/application_model.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_event.dart';
@@ -168,9 +168,11 @@ class _SearchPageState extends State<SearchPage> {
               GestureDetector(
                 onTap: () {
                   if (isRecruit) {
-                    Get.to(() => RecruitPostDetailPage(postId: searchResults[idx].id!));
+                    context.pushNamed('recruit_detail', pathParameters: {'postId' : searchResults[idx].id!});
+                    // Get.to(() => RecruitPostDetailPage(postId: searchResults[idx].id!));
                   } else if (searchResults[idx] is PromotionPostEntity) {
-                    Get.to(() => PromotionPostDetailPage(postId: searchResults[idx].id!));
+                    context.pushNamed('promotion_detail', pathParameters: {'postId' : searchResults[idx].id!});
+                    // Get.to(() => PromotionPostDetailPage(postId: searchResults[idx].id!));
                   }
                 },
                 child: Container(

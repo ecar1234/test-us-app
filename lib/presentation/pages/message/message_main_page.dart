@@ -1,11 +1,12 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 import 'package:test_us_app/domain/entities/room_entity.dart';
@@ -59,7 +60,9 @@ class _MessageMainPageState extends State<MessageMainPage> {
                         } else if (state is RoomDeleteCompletedState) {
                           context.read<RoomProvider>().deleteRoom(state.roomId);
                         } else if (state.state == MessageLoadState.errorState) {
-                          Get.snackbar("알림", "에러가 발생했습니다.");
+                          BotToast.showSimpleNotification(title: '알림', subTitle: '에러가 발생했습니다.', duration: const Duration(seconds: 3));
+                          // Get.snackbar("알림", "에러가 발생했습니다.");
+                          return;
                         }
                       }, builder: (context, state) {
                         if (state.state == MessageLoadState.dataLoadState) {
@@ -112,7 +115,8 @@ class _MessageMainPageState extends State<MessageMainPage> {
                                             status: targetUser.user!.status,
                                           )
                                         : null;
-                                    Get.to(() => MessageRoom(roomId: room.id, targetUser: user));
+                                    context.pushNamed('message_room', pathParameters: {'roomId' : room.id.toString()}, extra: user);
+                                    // Get.to(() => MessageRoom(roomId: room.id, targetUser: user));
                                   },
                                   child: SizedBox(
                                     child: Row(
@@ -263,7 +267,7 @@ class _MessageMainPageState extends State<MessageMainPage> {
                               width: constraints.maxWidth * 0.3,
                               child: OutlinedButton(
                                   onPressed: () {
-                                    Get.back();
+                                    context.pop();
                                   },
                                   style: OutlinedButton.styleFrom(
                                     side: BorderSide(color: Theme.of(context).colorScheme.primary),
@@ -282,7 +286,7 @@ class _MessageMainPageState extends State<MessageMainPage> {
                                     final token = context.read<UserProvider>().token ?? '';
                                     final userId = context.read<UserProvider>().user!.id ?? '';
                                     context.read<MessageBloc>().add(DeleteRoomEvent(token, roomId, userId));
-                                    Get.back();
+                                    context.pop();
                                   },
                                   style: OutlinedButton.styleFrom(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

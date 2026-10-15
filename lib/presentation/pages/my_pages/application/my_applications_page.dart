@@ -1,9 +1,10 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/data/models/application/application_model.dart';
@@ -80,10 +81,12 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                           return GestureDetector(
                             onTap: () {
                               if (posts[idx].isExpired!) {
-                                Get.snackbar('알림', '종료(만료) 또는 삭제된 프로덕트 입니다.');
+                                BotToast.showSimpleNotification(title: '알림', subTitle: '종료(만료) 또는 삭제된 프로덕트 입니다.', duration: const Duration(seconds: 3));
+                                // Get.snackbar('알림', '종료(만료) 또는 삭제된 프로덕트 입니다.');
                                 return;
                               }
-                              Get.to(() => RecruitPostDetailPage(postId: posts[idx].postId!));
+                              context.pushNamed('recruit_detail', pathParameters: {'postId': posts[idx].postId!});
+                              // Get.to(() => RecruitPostDetailPage(postId: posts[idx].postId!));
                             },
                             child: Container(
                               height: 120,
@@ -237,11 +240,11 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                         cancelButtonName: '취소',
                         onPressedConfirm: () {
                           context.read<AppBloc>().add(RequestCancelEvent(token, appId));
-                          Get.back();
+                          context.pop();
                           return;
                         },
                         onPressedCancel: () {
-                          Get.back();
+                          context.pop();
                           return;
                         });
                   });

@@ -1,14 +1,15 @@
 
 
+import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
 import 'package:test_us_app/presentation/pages/my_pages/application/my_applications_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/promotion/my_promotion_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/recruit/my_recruitment_page.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/review_page.dart';
+import 'package:test_us_app/presentation/routes/app_router.dart';
 
 import '../../presentation/pages/message/message_main_page.dart';
 
@@ -68,15 +69,26 @@ class NotificationService {
   // 알림 클릭 시 처리
   void _onTapNotification(NotificationResponse res) {
     if(res.data['type'] == 'recruit'){
-      Get.to(() => MyRecruitmentPage());
+      AppRouter.router.goNamed('my_recruit');
+      // Get.to(() => MyRecruitmentPage());
     }else if(res.data['type'] == 'application'){
-      Get.to(() => MyApplicationsPage());
+      AppRouter.router.goNamed('my_applications');
+      // Get.to(() => MyApplicationsPage());
     }else if(res.data['type'] == 'review'){
-      Get.to(() => ReviewPage());
+      AppRouter.router.goNamed('my_reviews');
+      // Get.to(() => ReviewPage());
     }else if(res.data['type'] == 'chat') {
-      Get.to(() => MessageMainPage());
+      final String? payloadString = res.payload;
+      if (payloadString == null || payloadString.isEmpty) return;
+      final Map<String, dynamic> payloadData = jsonDecode(payloadString);
+      final String? roomId = payloadData['data']?['roomId']?.toString();
+      if(roomId != null && roomId.isNotEmpty){
+        AppRouter.router.go('message/room/:$roomId');
+      }
+      // Get.to(() => MessageMainPage());
     }else if(res.data['type'] == 'promotion'){
-      Get.to(() => MyPromotionPage());
+      AppRouter.router.goNamed('my_promotion');
+      // Get.to(() => MyPromotionPage());
     }
     // payload를 확인하여 특정 화면으로 이동
   }

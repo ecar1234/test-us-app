@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
 import 'package:test_us_app/data/models/review/post_review_model.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_event.dart';
 import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
-import 'package:test_us_app/presentation/provider/application_provider.dart';
-import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
 import 'package:test_us_app/presentation/provider/review_provider.dart';
 
 import '../../../../../domain/entities/post_review_entity.dart';

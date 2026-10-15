@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_event.dart';
@@ -88,8 +89,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         onPressed: () {
                           context.read<UserProvider>().updateUserInfo(state.user!);
                           context.read<BasePostProvider>().userInfoUpdate(state.user!);
-                          Get.back();
-                          Get.back();
+                          context.pop();
+                          context.pop();
                         }));
               }
             },
@@ -167,7 +168,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             if (image == null) {
                               return;
                             } else if (File(image.path).lengthSync() / (1024 * 1024) > volumeLimit) {
-                              Get.snackbar('알림', '${volumeLimit}MB를 초과하는 이미지는 업로드 할 수 없습니다.');
+                              BotToast.showSimpleNotification(title: 'title', subTitle: '${volumeLimit}MB를 초과하는 이미지는 업로드 할 수 없습니다.', duration: Duration(seconds: 3));
                               return;
                             } else {
                               setState(() {
@@ -324,7 +325,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
               height: 50,
               child: ElevatedButton(
                   onPressed: () {
-                    Get.back();
+                    context.pop();
                   },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.zero,
@@ -343,10 +344,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     height: 50,
                     child: ElevatedButton(
                         onPressed: () async {
-                          if (isLoading) {
-                            Get.snackbar('알림', '업데이트 중입니다.');
-                            return;
-                          }
                           final token = context.read<UserProvider>().token ?? '';
                           final userInfo = UserEntity(
                             id: widget.user.id,
@@ -357,21 +354,29 @@ class _UserInfoPageState extends State<UserInfoPage> {
                             profileImg: widget.user.profileImg,
                           );
 
-                          if (_selectProfileImage != null) {
-                            context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo,
-                                profileImage: _selectProfileImage, oldImage: widget.user.profileImg));
-                          } else {
-                            if (widget.user.profileImg != null) {
-                              userInfo.profileImg = widget.user.profileImg;
-                            }
-                            final checkNickname =
-                                await context.read<UserProvider>().isNicknameAvailable(_nicknameController.text);
-                            if (checkNickname && context.mounted) {
-                              context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo));
+                          final cancel = BotToast.showLoading();
+                          try {
+                            if (_selectProfileImage != null) {
+                              context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo,
+                                  profileImage: _selectProfileImage, oldImage: widget.user.profileImg));
                             } else {
-                              Get.snackbar('알림', '이미 존재하는 닉네임입니다.');
-                              return;
+                              if (widget.user.profileImg != null) {
+                                userInfo.profileImg = widget.user.profileImg;
+                              }
+                              final checkNickname =
+                                  await context.read<UserProvider>().isNicknameAvailable(_nicknameController.text);
+                              if (checkNickname && context.mounted) {
+                                context.read<UserBloc>().add(RequestUserInfoUpdateEvent(token, userInfo));
+                              } else {
+                                BotToast.showSimpleNotification(title: 'title', subTitle: '이미 존재하는 닉네임입니다.', duration: Duration(seconds: 3));
+                                return;
+                              }
                             }
+                          } on Exception catch (e){
+                            BotToast.showSimpleNotification(title: 'title', subTitle: '이미 존재하는 닉네임입니다.', duration: Duration(seconds: 3));
+                            debugPrint('[user info update] error : ${e.toString()}');
+                          }finally {
+                            cancel();
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -411,10 +416,10 @@ class _UserInfoPageState extends State<UserInfoPage> {
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 if (widget.user.method != AuthType.email) {
-                  Get.snackbar('알림', '이메일 로그인만 가능합니다.');
+                  BotToast.showSimpleNotification(title: '알림', subTitle: '이메일 로그인만 가능합니다.', duration: Duration(seconds: 3));
                   return;
                 }
-                Get.to(() => PasswordCheckPage());
+                context.pushNamed('password_check');
                 return;
               },
               child: SizedBox(
@@ -461,7 +466,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
-                Get.to(() => UserDeletePage());
+                context.pushNamed('user_delete');
               },
               child: SizedBox(
                 height: 40,

@@ -1,8 +1,8 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 import 'package:test_us_app/domain/entities/message_entity.dart';
@@ -111,8 +111,10 @@ class _MessageRoomState extends State<MessageRoom> {
                             isJoin: true);
                       }
                     } else if (state.state == MessageLoadState.failedState) {
-                      Get.snackbar('알림', '이용 할 수 없습니다.');
+                      BotToast.showSimpleNotification(title: '알림', subTitle: '이용 할 수 없습니다.', duration: const Duration(seconds: 3));
+                      // Get.snackbar('알림', '이용 할 수 없습니다.');
                       // Navigator.pop(context);
+                      return;
                     }
                   },
                   child: Padding(
@@ -243,8 +245,7 @@ class _MessageRoomState extends State<MessageRoom> {
                                           ? null
                                           : () {
                                               if (_controller.text.isEmpty) {
-                                                Get.snackbar(
-                                                    '알림', '메시지를 입력해주세요.');
+                                                BotToast.showSimpleNotification(title: '알림', subTitle: '메시지를 입력해주세요.', duration: const Duration(seconds: 3));
                                                 return;
                                               }
                                               final req = TReqMessageEntity(

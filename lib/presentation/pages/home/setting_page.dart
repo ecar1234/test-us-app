@@ -1,6 +1,6 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -63,13 +63,16 @@ class _SettingPageState extends State<SettingPage> {
                       BlocListener<PurchaseBloc, PurchaseState>(
                         listener: (context, state) {
                           if (state is PurchaseRestoreCompletedState) {
-                            Get.snackbar("알림", '구독 내역이 복구 되었습니다.');
+                            BotToast.showSimpleNotification(title: '알림', subTitle: '구독 내역이 복구 되었습니다.', duration: const Duration(seconds: 3));
+                            // Get.snackbar("알림", '구독 내역이 복구 되었습니다.');
                             return;
                           }else if(state.state == PurchaseProgressState.error){
-                            Get.snackbar("알림", state.message ?? '구매 내역 복구 중 오류가 발생했습니다.');
+                            BotToast.showSimpleNotification(title: '알림', subTitle: '구매 내역 복구 중 오류가 발생했습니다.', duration: const Duration(seconds: 3));
+                            // Get.snackbar("알림", state.message ?? '구매 내역 복구 중 오류가 발생했습니다.');
                             return;
                           }else if(state.state == PurchaseProgressState.failed){
-                            Get.snackbar("알림", state.message ?? '구매 내역 복구에 실패 했습니다..');
+                            BotToast.showSimpleNotification(title: '알림', subTitle: '구매 내역 복구에 실패 했습니다.', duration: const Duration(seconds: 3));
+                            // Get.snackbar("알림", state.message ?? '구매 내역 복구에 실패 했습니다..');
                             return;
                           }
                         },

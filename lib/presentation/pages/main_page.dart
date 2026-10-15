@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'package:test_us_app/presentation/pages/home/purchase_page.dart';
@@ -84,10 +84,10 @@ class _MainState extends State<MainPage> {
                       });
                     },
                     onRecruit: () {
-                      Get.to(() => RecruitPostCreatePage());
+                      context.pushNamed('recruit_create');
                     },
                     onPromotion: () {
-                      Get.to(() => PromotionPostCreatePage());
+                      context.pushNamed('promotion_create');
                     },
                   ),
                 )

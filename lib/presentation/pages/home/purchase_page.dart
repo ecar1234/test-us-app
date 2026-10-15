@@ -1,17 +1,19 @@
 import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/purchase_entity.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_event.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_state.dart';
+import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
 import 'package:test_us_app/presentation/components/one_action_dialog.dart';
 import 'package:test_us_app/presentation/components/simple_text_toast_box.dart';
 import 'package:test_us_app/presentation/pages/home/purchase/plan_page_view.dart';
@@ -65,12 +67,14 @@ class _PurchasePageState extends State<PurchasePage> with SingleTickerProviderSt
                     );
                   } else if (state.state == PurchaseProgressState.error) {
                     debugPrint('[Purchase] ${state.message}');
-                    Get.snackbar('알림', state.message ?? '구매 검증에 실패 했습니다.');
+                    BotToast.showSimpleNotification(title: '알림', subTitle: state.message ?? '구매 검증에 실패 했습니다.', duration: const Duration(seconds: 3));
+                    // Get.snackbar('알림', state.message ?? '구매 검증에 실패 했습니다.');
                     context.read<PurchaseBloc>().add(PurchaseStateInitEvent());
                     return;
                   } else if (state.state == PurchaseProgressState.failed) {
                     debugPrint('[Purchase] ${state.message}');
-                    Get.snackbar('알림', state.message ?? '알 수 없는 오류 발생. 다시 시도해 주세요.');
+                    BotToast.showSimpleNotification(title: '알림', subTitle: state.message ?? '알 수 없는 오류 발생. 다시 시도해 주세요.', duration: const Duration(seconds: 3));
+                    // Get.snackbar('알림', state.message ?? '알 수 없는 오류 발생. 다시 시도해 주세요.');
                     return;
                   }
                 },
@@ -235,17 +239,17 @@ class _PurchasePageState extends State<PurchasePage> with SingleTickerProviderSt
                                 child: ElevatedButton(
                                   onPressed: _isPeriodSelected == -1
                                       ? null
-                                      : () {
+                                      : () async {
                                           if (context.read<UserProvider>().isLogged == false ||
                                               context.read<UserProvider>().isLogged == null) {
-                                            Get.defaultDialog(
-                                              title: '알림',
-                                              middleText: '로그인 후 이용해주세요.',
-                                              textConfirm: '확인',
-                                              confirmTextColor: Colors.white,
-                                              onConfirm: () {
-                                                Get.back();
-                                              },
+                                            await showDialog(context: context, builder: (context) =>
+                                                OneButtonAlert(
+                                                  title: '알림',
+                                                    mainContent: '로그인 후 이용해 주세요.',
+                                                    buttonName: '확인',
+                                                    onPressed: (){
+                                                      context.pop();
+                                                    })
                                             );
                                             return;
                                           }
@@ -263,8 +267,9 @@ class _PurchasePageState extends State<PurchasePage> with SingleTickerProviderSt
                                           // todo: restore 이후 데이터가 업데이트 될때까지 bloc를 실행 하면 안된다.
                                           final currentPlan = context.read<PurchaseProvider>().getUserPurchasePlan();
                                           if(currentPlan != null && currentPlan.productId == _selectedProduct!.id){
-                                            Get.back();
-                                            Get.snackbar('알림', '이미 사용중인 상품입니다.');
+                                            context.pop();
+                                            BotToast.showSimpleNotification(title: '알림', subTitle: '이미 사용중인 상품입니다.', duration: const Duration(seconds: 3));
+                                            // Get.snackbar('알림', '이미 사용중인 상품입니다.');
                                             return;
                                           }
                                           if (Platform.isAndroid) {
@@ -287,7 +292,7 @@ class _PurchasePageState extends State<PurchasePage> with SingleTickerProviderSt
                                               );
                                             }
                                           }
-                                          Get.back();
+                                          context.pop();
                                         },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Theme.of(context).colorScheme.primary,

@@ -1,14 +1,13 @@
 import 'dart:async';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_event.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_state.dart';
 import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
-import 'package:test_us_app/presentation/pages/my_pages/user_info/password_update_page.dart';
-import 'package:test_us_app/utils/time_util.dart';
 
 import '../../bloc/auth_bloc/auth_bloc.dart';
 
@@ -85,7 +84,7 @@ class _FindPasswordPageState extends State<FindPasswordPage> {
                     subContent: '인증번호가 발송되었습니다.',
                     buttonName: '확인',
                     onPressed: () {
-                      Get.back();
+                      context.pop();
                     }));
             return;
           } else if (state is VerifyOtpCompletedState) {
@@ -102,14 +101,11 @@ class _FindPasswordPageState extends State<FindPasswordPage> {
                     mainContent: '새 비밀번호를 설정해 주세요.',
                     buttonName: '확인',
                     onPressed: () {
-                      Get.back();
+                      context.pop();
                     }));
             return;
-          } else if (state.state == UserAuthState.failedState) {
-            Get.snackbar('알림', state.message!);
-            return;
-          } else if (state.state == UserAuthState.errorState) {
-            Get.snackbar('알림', state.message!);
+          } else if (state.state == UserAuthState.failedState || state.state == UserAuthState.errorState) {
+            BotToast.showSimpleNotification(title: '알림', subTitle: state.message!, duration: const Duration(seconds: 3));
             return;
           }
         },
@@ -149,7 +145,8 @@ class _FindPasswordPageState extends State<FindPasswordPage> {
                                 ? null
                                 : () {
                                     if (_codeController.text.isEmpty) {
-                                      Get.snackbar('알림', '인증번호는 빈 값으로 설정할 수 없습니다.');
+                                      BotToast.showSimpleNotification(title: '알림', subTitle: '인증번호는 빈 값으로 설정할 수 없습니다.', duration: const Duration(seconds: 3));
+                                      // Get.snackbar('알림', '인증번호는 빈 값으로 설정할 수 없습니다.');
                                       return;
                                     }
                                     context
@@ -163,7 +160,8 @@ class _FindPasswordPageState extends State<FindPasswordPage> {
                         child: ElevatedButton(
                             onPressed: () {
                               if (_codeController.text.isEmpty) {
-                                Get.snackbar('알림', '인증번호는 빈 값으로 설정할 수 없습니다.');
+                                BotToast.showSimpleNotification(title: '알림', subTitle: '인증번호는 빈 값으로 설정할 수 없습니다.', duration: const Duration(seconds: 3));
+                                // Get.snackbar('알림', '인증번호는 빈 값으로 설정할 수 없습니다.');
                                 return;
                               }
                               context.read<AuthBloc>().add(FindPasswordEvent(_emailController.text));
@@ -181,7 +179,8 @@ class _FindPasswordPageState extends State<FindPasswordPage> {
                   child: ElevatedButton(
                       onPressed: _isCodeValid
                           ? () {
-                              Get.off(() => PasswordUpdatePage(email: _emailController.text));
+                              context.pushReplacementNamed('password_update', pathParameters: {'email' : _emailController.text});
+                              // Get.off(() => PasswordUpdatePage(email: _emailController.text));
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
@@ -197,7 +196,8 @@ class _FindPasswordPageState extends State<FindPasswordPage> {
                   child: ElevatedButton(
                       onPressed: () {
                         if (_emailController.text.isEmpty) {
-                          Get.snackbar('알림', '이메일은 빈 값으로 설정할 수 없습니다.');
+                          BotToast.showSimpleNotification(title: '알림', subTitle: '이메일은 빈 값으로 설정할 수 없습니다.', duration: const Duration(seconds: 3));
+                          // Get.snackbar('알림', '이메일은 빈 값으로 설정할 수 없습니다.');
                           return;
                         }
                         context.read<AuthBloc>().add(FindPasswordEvent(_emailController.text));

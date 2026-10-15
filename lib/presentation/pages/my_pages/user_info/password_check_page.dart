@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:test_us_app/presentation/components/alerts/one_button_alert.dart';
 import 'package:test_us_app/presentation/pages/my_pages/user_info/password_update_page.dart';
@@ -52,8 +52,9 @@ class _PasswordCheckPageState extends State<PasswordCheckPage> {
                           mainContent: '비밀번호 설정 페이지로 이동 합니다.',
                           buttonName: '확인',
                           onPressed: (){
-                            Get.back();
-                            Get.off(() => PasswordUpdatePage());
+                            context.pop();
+                            context.pushReplacementNamed('password_update');
+                            // Get.off(() => PasswordUpdatePage());
                             return;
                           }));
                 } else {

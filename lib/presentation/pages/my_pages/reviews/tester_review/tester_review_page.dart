@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_state.dart';
@@ -145,12 +145,17 @@ class _TesterReviewPageState extends State<TesterReviewPage> {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         if (review.reviewId == null) {
-                                          Get.to(
-                                            () => AddTesterReviewPage(
-                                              tester: state.info[idx].user!,
-                                              appId: state.info[idx].appId!,
-                                            ),
+                                          context.pushNamed(
+                                            'add_tester_review',
+                                            pathParameters: {'appId': state.info[idx].appId!.toString()},
+                                            extra: state.info[idx].user!,
                                           );
+                                          // Get.to(
+                                          //   () => AddTesterReviewPage(
+                                          //     tester: state.info[idx].user!,
+                                          //     appId: state.info[idx].appId!,
+                                          //   ),
+                                          // );
                                         } else {
                                           _checkReviewedModal(context, state.info[idx].user!, review);
                                         }

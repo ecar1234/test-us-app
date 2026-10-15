@@ -1,13 +1,8 @@
-
-import 'dart:async';
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:logger/logger.dart';
 import 'package:test_us_app/domain/entities/purchase_entity.dart';
+import 'package:collection/collection.dart';
 
 import '../../domain/entities/product_entity.dart';
 

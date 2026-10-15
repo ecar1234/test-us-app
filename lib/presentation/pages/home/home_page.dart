@@ -1,11 +1,12 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -97,7 +98,8 @@ class _HomePageState extends State<HomePage> {
                                              child: ElevatedButton(
                                                  onPressed: ()async{
                                                    if(_changeController.text == nick){
-                                                     Get.snackbar('알림', '아이디 같음');
+                                                     BotToast.showSimpleNotification(title: '알림', subTitle: '같은 아이디 입니다.', duration: const Duration(seconds: 3));
+                                                     // Get.snackbar('알림', '아이디 같음');
                                                      return;
                                                    }
                                                    final email = nick == 'master'
@@ -106,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                                                    context.read<AuthBloc>().add(LogoutEvent());
                                                    context.read<AuthBloc>()
                                                        .add(EmailLoginEvent(email, 'qwer1234!'));
-                                                   Get.back();
+                                                   context.pop();
                                                    return;
                                                  },
                                                child: Text('교체'),
@@ -127,7 +129,8 @@ class _HomePageState extends State<HomePage> {
                   builder: (context, isLogin, child) => !isLogin
                       ? ElevatedButton(
                           onPressed: () {
-                            Get.to(() => LoginPage());
+                            context.pushNamed('login');
+                            // Get.to(() => LoginPage());
                           },
                           style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(horizontal: 10),
@@ -140,7 +143,8 @@ class _HomePageState extends State<HomePage> {
 
                             return IconButton(
                               onPressed: () {
-                                Get.to(() => NotificationsPage());
+                                context.pushNamed('notification');
+                                // Get.to(() => NotificationsPage());
                               },
                               icon: Badge.count(
                                 count: count,
@@ -153,7 +157,8 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.only(right: 20),
                 child: IconButton(
                     onPressed: () {
-                      Get.to(() => SettingPage());
+                      context.pushNamed('setting');
+                      // Get.to(() => SettingPage());
                     },
                     icon: const Icon(Icons.settings, size: 30)),
               ),
@@ -236,7 +241,8 @@ class _HomePageState extends State<HomePage> {
               width: (MediaQuery.sizeOf(context).width - 80) / 4,
               child: FilledButton(
                   onPressed: () {
-                    Get.to(() => PostMainPage(type: 'recruit'));
+                    context.pushNamed('post_main', queryParameters: {'type' : 'recruit'});
+                    // Get.to(() => PostMainPage(type: 'recruit'));
                   },
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
@@ -249,7 +255,8 @@ class _HomePageState extends State<HomePage> {
               width: (MediaQuery.sizeOf(context).width - 80) / 4,
               child: FilledButton(
                   onPressed: () {
-                    Get.to(() => PostMainPage(type: 'promotion'));
+                    context.pushNamed('post_main', queryParameters: {'type' : 'promotion'});
+                    // Get.to(() => PostMainPage(type: 'promotion'));
                   },
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
@@ -338,8 +345,8 @@ class _HomePageState extends State<HomePage> {
                     return GestureDetector(
                       onTap: () async {
                         favoritePost[idx].postType == "RecruitmentPostEntity"
-                            ? Get.to(() => RecruitPostDetailPage(postId: favoritePost[idx].id!))
-                            : Get.to(() => PromotionPostDetailPage(postId: favoritePost[idx].id!));
+                            ? context.pushNamed('Recruit_detail', pathParameters: {'postId' : favoritePost[idx].id!})
+                            : context.pushNamed('promotion_detail', pathParameters: {'postId' : favoritePost[idx].id!});
                       },
                       child: SizedBox(
                         // height: 220,
@@ -478,7 +485,8 @@ class _HomePageState extends State<HomePage> {
                       // await context.read<RecruitPostProvider>().getPostPagination(page: 1);
                       context.read<RecruitPostBloc>().add(RequestRecruitmentPaginationEvent(1, 10));
                       // widget.onTap(1);
-                      Get.to(() => PostMainPage(type: 'recruit'));
+                      context.pushNamed('post_main', queryParameters: {'type' : 'recruit'});
+                      // Get.to(() => PostMainPage(type: 'recruit'));
                     },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
                     child: Text(
@@ -514,7 +522,8 @@ class _HomePageState extends State<HomePage> {
                             final isActive = posts[idx].author!.status == UserStatus.active;
                             return GestureDetector(
                               onTap: () async {
-                                Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
+                                context.pushNamed('Recruit_detail', pathParameters: {'postId' : posts[idx].id!});
+                                // Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
                               },
                               child: SizedBox(
                                 height: 240,
@@ -631,7 +640,8 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () async {
                       // await context.read<RecruitPostProvider>().getPostPagination(page: 1);
                       // context.read<PromotionBloc>().add(RequestPromotionPaginationEvent(1, 10));
-                      Get.to(() => PostMainPage(type: 'promotion'));
+                      context.pushNamed('post_main', queryParameters: {'type' : 'promotion'});
+                      // Get.to(() => PostMainPage(type: 'promotion'));
                       // widget.onTap(1);
                     },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
@@ -666,7 +676,8 @@ class _HomePageState extends State<HomePage> {
                             final isActive = posts[idx].author!.status == UserStatus.active;
                             return GestureDetector(
                               onTap: () async {
-                                Get.to(() => PromotionPostDetailPage(postId: posts[idx].id!));
+                                context.pushNamed('promotion_detail', pathParameters: {'postId' : posts[idx].id!});
+                                // Get.to(() => PromotionPostDetailPage(postId: posts[idx].id!));
                               },
                               child: SizedBox(
                                 height: 230,

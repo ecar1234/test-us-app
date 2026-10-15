@@ -3,8 +3,8 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_event.dart';
@@ -173,10 +173,8 @@ class _PostMainPageState extends State<PostMainPage> {
                     return GestureDetector(
                       onTap: () async {
                         widget.type == 'recruit'
-                            ? Get.to(() => RecruitPostDetailPage(
-                                  postId: posts[idx].id!,
-                                ))
-                            : Get.to(() => PromotionPostDetailPage(postId: posts[idx].id!));
+                            ? context.pushNamed('recruit_detail', pathParameters: {'id' : posts[idx].id.toString() })
+                            : context.pushNamed('promotion_detail', pathParameters: {'id' : posts[idx].id.toString() });
                       },
                       child: SizedBox(
                         child: Column(

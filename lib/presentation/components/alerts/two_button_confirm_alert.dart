@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 
 class TwoButtonConfirmAlert extends StatelessWidget {
   const TwoButtonConfirmAlert({

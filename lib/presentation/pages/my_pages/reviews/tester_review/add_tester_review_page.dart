@@ -1,8 +1,8 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
 import 'package:test_us_app/domain/entities/application_entity.dart';
@@ -46,14 +46,17 @@ class _AddTesterReviewPageState extends State<AddTesterReviewPage> {
             listener: (context, state) async {
               if(state is CreateUserReviewCompletedState){
                 if(state.review.reviewId == null){
-                  Get.snackbar('알림', '리뷰가 전송되지 못했어요..');
+                  BotToast.showSimpleNotification(title: '알림', subTitle: '리뷰가 전송되지 못했어요.', duration: const Duration(seconds: 3));
+                  // Get.snackbar('알림', '리뷰가 전송되지 못했어요..');
                   return;
                 }
                 context.read<ReviewProvider>().updateTesterReview(state.review);
                 await _alertDialog(context, widget.tester.nickname!);
               }
               if(state is ReviewDataErrorState || state is ReviewDataFailedState){
-                Get.snackbar('알림', '리뷰 전송에 실패했습니다.');
+                BotToast.showSimpleNotification(title: '알림', subTitle: '리뷰 전송에 실패했습니다.', duration: const Duration(seconds: 3));
+                // Get.snackbar('알림', '리뷰 전송에 실패했습니다.');
+                return;
               }
             },
             child: SingleChildScrollView(
@@ -131,8 +134,8 @@ class _AddTesterReviewPageState extends State<AddTesterReviewPage> {
 
                                     context.read<ReviewBloc>().add(CreateUserReviewEvent(token, review));
                                   } on Exception catch (e) {
-                                    // TODO
-                                    Get.snackbar('알림', '리뷰 전송에 실패했습니다.');
+                                    BotToast.showSimpleNotification(title: '알림', subTitle: '리뷰 전송에 실패했습니다.', duration: const Duration(seconds: 3));
+                                    // Get.snackbar('알림', '리뷰 전송에 실패했습니다.');
                                     debugPrint(e.toString());
                                     return;
                                   }

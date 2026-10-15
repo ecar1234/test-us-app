@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:test_us_app/data/models/package/recruit_post_applications_model.dart';
@@ -415,7 +415,8 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
               onLeftTap: () => _userRejectDialog(context, info),
               rightText: "메시지 보내기",
               onRightTap: () {
-                Get.to(() => MessageRoom(targetUser: info.user!, postId: info.application!.postId!));
+                context.pushNamed('message_room', queryParameters: {'postId' : info.application!.postId!}, extra: info.user!);
+                // Get.to(() => MessageRoom(targetUser: info.user!, postId: info.application!.postId!));
               },
             );
           case ApplicationStatus.rejected:
@@ -527,7 +528,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                 width: constraints.maxWidth * 0.3,
                                 child: OutlinedButton(
                                     onPressed: () {
-                                      Get.back();
+                                      context.pop();
                                     },
                                     style: OutlinedButton.styleFrom(
                                       side: BorderSide(color: Theme.of(context).colorScheme.primary),
@@ -546,7 +547,7 @@ class _ApplicationManagementPageState extends State<ApplicationManagementPage> {
                                       final token = context.read<UserProvider>().token ?? '';
                                       context.read<AppBloc>().add(RequestRejectApplicationEvent(
                                           token, info.user!.userId!, info.application!.postId!, info.application!.id!));
-                                      Get.back();
+                                      context.pop();
                                     },
                                     style: OutlinedButton.styleFrom(
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

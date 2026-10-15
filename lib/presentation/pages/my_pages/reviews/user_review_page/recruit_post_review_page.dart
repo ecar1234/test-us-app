@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:test_us_app/domain/entities/post_review_entity.dart';
 import 'package:test_us_app/presentation/pages/my_pages/reviews/user_review_page/check_post_review_page.dart';
@@ -172,7 +173,8 @@ class _RecruitPostReviewPageState extends State<RecruitPostReviewPage> {
                                           child: ElevatedButton(
                                             onPressed: isOn
                                                 ? () {
-                                                    Get.to(() => CheckPostReviewPage(postId: average.postId!));
+                                                    context.pushNamed('check_post_review', extra: average.postId);
+                                                    // Get.to(() => CheckPostReviewPage(postId: average.postId!));
                                                   }
                                                 : null,
                                             style: ElevatedButton.styleFrom(
