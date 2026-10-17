@@ -173,8 +173,8 @@ class _PostMainPageState extends State<PostMainPage> {
                     return GestureDetector(
                       onTap: () async {
                         widget.type == 'recruit'
-                            ? context.pushNamed('recruit_detail', pathParameters: {'id' : posts[idx].id.toString() })
-                            : context.pushNamed('promotion_detail', pathParameters: {'id' : posts[idx].id.toString() });
+                            ? context.pushNamed('recruit_detail', queryParameters: {'postId' : posts[idx].id.toString() })
+                            : context.pushNamed('promotion_detail', queryParameters: {'postId' : posts[idx].id.toString() });
                       },
                       child: SizedBox(
                         child: Column(

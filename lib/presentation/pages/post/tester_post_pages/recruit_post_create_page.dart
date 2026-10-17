@@ -434,7 +434,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                         dropdownMenuEntries:periodOptions.map((val) {
                           return DropdownMenuEntry<int>(
                             value: val,
-                            label: '$val일',
+                            label: '$val',
                           );
                         }).toList(),
                       ),
@@ -817,7 +817,7 @@ class _RecruitPostCreatePageState extends State<RecruitPostCreatePage> {
                           category: _selectedCategory,
                           mobileOs: _mobileCheck ? _selectedOs : null,
                           author: context.read<UserProvider>().user!,
-                          period: 7,
+                          period: int.tryParse(_periodController.text),
                         );
                         context.read<RecruitPostBloc>().add(RequestPostCreateEvent(token, post, _selectedImages));
                       } on Exception catch (e) {

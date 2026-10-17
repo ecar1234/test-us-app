@@ -168,10 +168,10 @@ class _SearchPageState extends State<SearchPage> {
               GestureDetector(
                 onTap: () {
                   if (isRecruit) {
-                    context.pushNamed('recruit_detail', pathParameters: {'postId' : searchResults[idx].id!});
+                    context.pushNamed('recruit_detail', queryParameters: {'postId' : searchResults[idx].id!});
                     // Get.to(() => RecruitPostDetailPage(postId: searchResults[idx].id!));
                   } else if (searchResults[idx] is PromotionPostEntity) {
-                    context.pushNamed('promotion_detail', pathParameters: {'postId' : searchResults[idx].id!});
+                    context.pushNamed('promotion_detail', queryParameters: {'postId' : searchResults[idx].id!});
                     // Get.to(() => PromotionPostDetailPage(postId: searchResults[idx].id!));
                   }
                 },

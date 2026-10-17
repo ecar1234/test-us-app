@@ -85,7 +85,7 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
                                 // Get.snackbar('알림', '종료(만료) 또는 삭제된 프로덕트 입니다.');
                                 return;
                               }
-                              context.pushNamed('recruit_detail', pathParameters: {'postId': posts[idx].postId!});
+                              context.pushNamed('recruit_detail', queryParameters: {'postId': posts[idx].postId!});
                               // Get.to(() => RecruitPostDetailPage(postId: posts[idx].postId!));
                             },
                             child: Container(

@@ -183,10 +183,10 @@ class AppRouter {
             builder: (context, state) => const RecruitPostCreatePage(),
           ),
           GoRoute(
-            path: 'recruit/detail/:postId', // 동적 파라미터 :id 사용
+            path: 'recruit/detail', // 동적 파라미터 :id 사용
             name: 'recruit_detail',
             builder: (context, state) {
-              final postId = state.pathParameters['postId'];
+              final postId = state.uri.queryParameters['postId'];
               final post = state.extra as RecruitPostEntity?;
               return RecruitPostDetailPage(postId: postId, post: post);
             },
@@ -198,10 +198,10 @@ class AppRouter {
             builder: (context, state) => const PromotionPostCreatePage(),
           ),
           GoRoute(
-            path: 'promotion/detail/:postId',
+            path: 'promotion/detail',
             name: 'promotion_detail',
             builder: (context, state) {
-              final postId = state.pathParameters['postId'];
+              final postId = state.uri.queryParameters['postId'];
               final post= state.extra as PromotionPostEntity?;
               return PromotionPostDetailPage(postId: postId, post: post,);
             },

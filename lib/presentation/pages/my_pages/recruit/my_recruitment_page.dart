@@ -119,7 +119,7 @@ class _MyRecruitmentPageState extends State<MyRecruitmentPage> {
               onTap: isExpired
                   ? null
                   : () {
-                      context.pushNamed('recruit_detail', pathParameters: {'postId': posts[idx].id!});
+                      context.pushNamed('recruit_detail', queryParameters: {'postId': posts[idx].id!});
                       // Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
                     },
               child: Container(

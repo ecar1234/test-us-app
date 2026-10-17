@@ -345,8 +345,8 @@ class _HomePageState extends State<HomePage> {
                     return GestureDetector(
                       onTap: () async {
                         favoritePost[idx].postType == "RecruitmentPostEntity"
-                            ? context.pushNamed('Recruit_detail', pathParameters: {'postId' : favoritePost[idx].id!})
-                            : context.pushNamed('promotion_detail', pathParameters: {'postId' : favoritePost[idx].id!});
+                            ? context.pushNamed('recruit_detail', queryParameters: {'postId' : favoritePost[idx].id!})
+                            : context.pushNamed('promotion_detail', queryParameters: {'postId' : favoritePost[idx].id!});
                       },
                       child: SizedBox(
                         // height: 220,
@@ -522,7 +522,7 @@ class _HomePageState extends State<HomePage> {
                             final isActive = posts[idx].author!.status == UserStatus.active;
                             return GestureDetector(
                               onTap: () async {
-                                context.pushNamed('Recruit_detail', pathParameters: {'postId' : posts[idx].id!});
+                                context.pushNamed('recruit_detail', queryParameters: {'postId' : posts[idx].id!});
                                 // Get.to(() => RecruitPostDetailPage(postId: posts[idx].id!));
                               },
                               child: SizedBox(
@@ -676,7 +676,7 @@ class _HomePageState extends State<HomePage> {
                             final isActive = posts[idx].author!.status == UserStatus.active;
                             return GestureDetector(
                               onTap: () async {
-                                context.pushNamed('promotion_detail', pathParameters: {'postId' : posts[idx].id!});
+                                context.pushNamed('promotion_detail', queryParameters: {'postId' : posts[idx].id!});
                                 // Get.to(() => PromotionPostDetailPage(postId: posts[idx].id!));
                               },
                               child: SizedBox(

@@ -148,7 +148,7 @@ class _UserPageState extends State<UserPage> {
                                 height: 30,
                                 child: TextButton.icon(
                                   onPressed: () {
-                                    context.pushNamed('user_info', extra: user);
+                                    context.pushNamed('mypage', extra: user);
                                     // Get.to(() => UserInfoPage(user: user));
                                   },
                                   style: TextButton.styleFrom(

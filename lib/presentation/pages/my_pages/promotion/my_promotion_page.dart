@@ -86,7 +86,7 @@ class _MyPromotionPageState extends State<MyPromotionPage> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              context.pushNamed('promotion_detail', pathParameters: {'postId' : posts[idx].id!});
+                              context.pushNamed('promotion_detail', queryParameters: {'postId' : posts[idx].id!});
                               // Get.to(() => PromotionPostDetailPage(postId: posts[idx].id));
                             },
                             child: Container(
