@@ -138,6 +138,8 @@ class TypeConversionUtil {
         return "Android";
       case MobileOsType.ios:
         return "iOS";
+      case MobileOsType.empty:
+        return "empty";
     }
   }
 }

@@ -15,6 +15,8 @@ enum MobileOsType {
   ios,
   @JsonValue('android')
   android,
+  @JsonValue('empty')
+  empty
 }
 
 enum ApplicationStatus {

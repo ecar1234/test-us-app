@@ -11,6 +11,9 @@ import 'package:test_us_app/domain/entities/user_entity.dart';
 import 'package:test_us_app/mata_data_setting.dart';
 import 'package:test_us_app/permission_handler.dart';
 import 'package:test_us_app/presentation/components/notifications_page.dart';
+import 'package:test_us_app/presentation/pages/side_projects/project_recruit_create_page.dart';
+import 'package:test_us_app/presentation/pages/side_projects/project_recruit_detail_page.dart';
+import 'package:test_us_app/presentation/pages/side_projects/side_projects_main_page.dart';
 
 import '../pages/auth/find_password_page.dart';
 import '../pages/auth/find_user_email_page.dart';
@@ -180,7 +183,7 @@ class AppRouter {
           GoRoute(
             path: 'recruit/create',
             name: 'recruit_create',
-            builder: (context, state) => const RecruitPostCreatePage(),
+            builder: (context, state) => const RecruitPostCreatePage()
           ),
           GoRoute(
             path: 'recruit/detail', // 동적 파라미터 :id 사용
@@ -195,7 +198,7 @@ class AppRouter {
           GoRoute(
             path: 'promotion/create',
             name: 'promotion_create',
-            builder: (context, state) => const PromotionPostCreatePage(),
+            builder: (context, state) => const PromotionPostCreatePage()
           ),
           GoRoute(
             path: 'promotion/detail',
@@ -206,6 +209,31 @@ class AppRouter {
               return PromotionPostDetailPage(postId: postId, post: post,);
             },
           ),
+          GoRoute(
+              path: '/projects',
+            name: 'projects_main',
+            builder: (context, state) => const SideProjectsMainPage(),
+            routes: [
+              GoRoute(
+                  path: '/detail',
+                name: 'project_detail',
+                builder: (context, state) {
+                    final postId = state.uri.queryParameters['postId'];
+                    final post = state.extra as RecruitPostEntity?;
+                    return ProjectRecruitDetailPage();
+                }
+              ),
+              GoRoute(
+                  path: '/create',
+                  name: 'project_create',
+                  builder: (context, state) {
+                    final postId = state.uri.queryParameters['postId'];
+                    final post = state.extra as RecruitPostEntity?;
+                    return ProjectRecruitCreatePage();
+                  }
+              ),
+            ]
+          )
         ],
       ),
 

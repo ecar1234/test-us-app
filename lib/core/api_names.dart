@@ -26,12 +26,10 @@ class UserApi {
   static const String getUsersByIds = '/api/v1/user/getUsersByIds';
   static const String getUserByEmail = '/api/v1/user/getUserByEmail';
   static const String getUserByNickname = '/api/v1/user/getUserByNickname';
-  // static const String updatePassword = '/api/v1/user/updatePassword';
   static const String getAllUsers = '/api/v1/user/getAllUsers';
   static const String isNicknameAvailable = '/api/v1/user/isNicknameAvailable';
   static const String isEmailAvailable = '/api/v1/user/isEmailAvailable';
   static const String isPasswordValid = '/api/v1/user/isPasswordValid';
-  // static const String updateUserInfo = '/api/v1/user/updateUserInfo';
   static const String updateUserInfoWithImg = '/api/v1/user/updateUserInfoWithImg';
 }
 
@@ -48,41 +46,49 @@ class PostApi {
 }
 
 class RecruitPostApi {
-  static const String createRecruitPost = '/api/v1/post/createRecruitPost';
-  static const String update = '/api/v1/post/updateRecruitPost';
-  static const String end = '/api/v1/post/endRecruitPost';
-  static const String delete = '/api/v1/post/deleteRecruitPost';
-  static const String getPostById = '/api/v1/post/getRecruitPostById';
-  static const String getPostsByTitle = '/api/v1/post/getRecruitPostByTitle';
-  static const String getPostsPagination = '/api/v1/post/getRecruitPostPagination';
-  static const String getUserRecruitmentPosts = '/api/v1/post/getUserRecruitPosts';
-  static const String getAppRecruitPosts = '/api/v1/post/getAppRecruitPosts';
-  static const String getRecruitApplicationsByPostId = '/api/v1/post/getRecruitApplicationsByPostId';
+  static const String createRecruitPost = '/api/v1/post/recruit/createRecruitPost';
+  static const String update = '/api/v1/post/recruit/updateRecruitPost';
+  static const String end = '/api/v1/post/recruit/endRecruitPost';
+  static const String delete = '/api/v1/post/recruit/deleteRecruitPost';
+  static const String getPostById = '/api/v1/post/recruit/getRecruitPostById';
+  static const String getPostsByTitle = '/api/v1/post/recruit/getRecruitPostByTitle';
+  static const String getPostsPagination = '/api/v1/post/recruit/getRecruitPostPagination';
+  static const String getUserRecruitmentPosts = '/api/v1/post/recruit/getUserRecruitPosts';
+  static const String getAppRecruitPosts = '/api/v1/post/recruit/getAppRecruitPosts';
+  static const String getRecruitApplicationsByPostId = '/api/v1/post/recruit/getRecruitApplicationsByPostId';
 }
 
 class PromotionApi {
-  static const String createPromotionPost = '/api/v1/post/createPromotionPost';
-  static const String update = '/api/v1/post/updatePromotionPost';
-  static const String delete = '/api/v1/post/deletePromotionPost';
-  static const String getPostById = '/api/v1/post/getPromotionPostById';
-  static const String getPostsByTitle = '/api/v1/post/getPromotionPostByTitle';
-  static const String getPostsPagination = '/api/v1/post/getPromotionPostPagination';
-  static const String getUserRecruitmentPosts = '/api/v1/post/getUserPromotionPosts';
+  static const String createPromotionPost = '/api/v1/post/promotion/createPromotionPost';
+  static const String update = '/api/v1/post/promotion/updatePromotionPost';
+  static const String delete = '/api/v1/post/promotion/deletePromotionPost';
+  static const String getPostById = '/api/v1/post/promotion/getPromotionPostById';
+  static const String getPostsByTitle = '/api/v1/post/promotion/getPromotionPostByTitle';
+  static const String getPostsPagination = '/api/v1/post/promotion/getPromotionPostPagination';
+  static const String getUserRecruitmentPosts = '/api/v1/post/promotion/getUserPromotionPosts';
+}
+
+class SideProjectApi { // /api/v1/side-project
+  static const String upsertPost = '/api/v1/side-project/upsertSideProjectPost';
+  static const String updatePost = '/api/v1/side-project/updateSideProjectPost';
+  static const String getPostByPostId = '/api/v1/side-project/getSideProjectPostById';
+  static const String getUserPostsByUserId = '/api/v1/side-project/getUserSideProjects';
+  static const String getPostPagination = '/api/v1/side-project/getSideProjectPagination';
+  static const String getPostAppUsers = '/api/v1/side-project/getSideProjectAppUsers';
+}
+
+class CoffeeChatApi { // /api/v1/coffee-chat
+
 }
 
 class ApplicationApi {
-  // static const String findByPostId = '/api/v1/application/findByPostId';
   static const String findByUserId = '/api/v1/application/findByUserId';
-  // static const String findByUserNickname = '/api/v1/application/findByUserNickname';
-  // static const String findPostListByUserId = '/api/v1/application/findPostListByUserId';
-  // static const String getAppUserListInPost = '/api/v1/application/getAllUserListInPost';
   static const String application = '/api/v1/application/apply'; // 테스터 신청
   static const String update = '/api/v1/application/update';
   static const String cancel = '/api/v1/application/cancelAppUser';// 테스터 신청 수정
   static const String acceptUser = '/api/v1/application/acceptUser';
   static const String rejectUser = '/api/v1/application/rejectUser';
   static const String getRecruitApplications = '/api/v1/application/getRecruitApplications';
-  // static const String getAppPostList = '/api/v1/application/getAppPostList';
   static const String getTesterReviewsByAppIds = '/api/v1/application/getTesterReviewsByAppIds';
 }
 
@@ -107,7 +113,6 @@ class MessageApi {
   static const String requestMessageByPostId = '/api/v1/message/getMessageByPostId';
   static const String resetUnreadCount = '/api/v1/message/resetUnreadCount';
   static const String deleteRoomMember = '/api/v1/message/deleteRoomMember';
-  // static const String requestRoom = '/api/v1/message/requestRoom';
 }
 
 class JobApi {

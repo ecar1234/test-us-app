@@ -268,7 +268,9 @@ class _HomePageState extends State<HomePage> {
               height: 80,
               width: (MediaQuery.sizeOf(context).width - 80) / 4,
               child: FilledButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    context.pushNamed('projects_main');
+                  },
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                   child: Center(
@@ -286,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                   child: Center(
-                    child: Text("커뮤니티"),
+                    child: Text("커피챗"),
                   ))),
         ],
       ),
