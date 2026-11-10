@@ -10,7 +10,9 @@ import '../../provider/user_provider.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
   final logger = Logger();
-  UserBloc(UserUseCase userUseCase, ReviewUseCase reviewUseCase) : super(UserState(UserDataState.serviceStartState)) {
+  final UserUseCase userUseCase;
+  final ReviewUseCase reviewUseCase;
+  UserBloc(this.userUseCase, this.reviewUseCase) : super(UserState(UserDataState.serviceStartState)) {
 
     on<CreateFirebaseTokenEvent>((event, emit) async {
       try {

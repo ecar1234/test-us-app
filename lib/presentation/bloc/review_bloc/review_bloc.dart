@@ -9,8 +9,9 @@ import '../../../domain/use_cases/user_usecase.dart';
 
 class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   final logger = Logger();
-
-  ReviewBloc(ReviewUseCase useCase, UserUseCase userUseCase) : super(ReviewDataServiceStartState()) {
+  final ReviewUseCase useCase;
+  final UserUseCase userUseCase;
+  ReviewBloc(this.useCase, this.userUseCase) : super(ReviewDataServiceStartState()) {
 
     on<RequestUserReviewEvent>((event, emit) async {
       emit(ReviewDataLoadingState());

@@ -8,7 +8,9 @@ import 'message_event.dart';
 import 'message_state.dart';
 
 class MessageBloc extends Bloc<MessageBlocEvent, MessageBlocState> {
-  MessageBloc(MessageUseCase messageUseCase) : super(MessageBlocState(state: MessageLoadState.serviceStartState)) {
+  final MessageUseCase messageUseCase;
+
+  MessageBloc(this.messageUseCase) : super(MessageBlocState(state: MessageLoadState.serviceStartState)) {
     final logger = Logger();
 
     on<RequestRoomListEvent>((event, emit)async {

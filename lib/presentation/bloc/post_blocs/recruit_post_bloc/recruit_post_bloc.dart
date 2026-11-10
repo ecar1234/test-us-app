@@ -8,9 +8,10 @@ import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recru
 import 'recruit_post_event.dart';
 
 class RecruitPostBloc extends Bloc<RecruitPostEvent, RecruitPostState> {
-  Logger logger = Logger();
+  final logger = Logger();
 
-  RecruitPostBloc(RecruitPostUseCase postUseCase)
+  final RecruitPostUseCase postUseCase;
+  RecruitPostBloc(this.postUseCase)
       : super(RecruitPostState(state: RecruitPostLoadState.serviceStartState)) {
     // on<ServiceStartEvent>((event, emit) {
     //   emit(RecruitPostState(state: RecruitPostLoadState.serviceStartState));

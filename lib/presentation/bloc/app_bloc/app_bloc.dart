@@ -14,7 +14,12 @@ import 'app_state.dart';
 class AppBloc extends Bloc<AppEvent, AppState>{
   final pref = AuthPreference.instance;
   final logger = Logger();
-  AppBloc(ApplicationUseCase applicationUseCase, RecruitPostUseCase recruitPostUseCase, UserUseCase userUseCase): super(AppState()) {
+
+  final ApplicationUseCase applicationUseCase;
+  final RecruitPostUseCase recruitPostUseCase;
+  final UserUseCase userUseCase;
+
+  AppBloc(this.applicationUseCase, this.recruitPostUseCase, this.userUseCase): super(AppState()) {
 
     // on<ApplyRejectEvent>((event, emit) {
     //   emit(AppState(state: UserAppState.requestCompletedState));

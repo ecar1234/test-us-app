@@ -12,7 +12,8 @@ import 'base_post_state.dart';
 
 class BasePostBloc extends Bloc<BasePostEvent, BasePostState>{
   final logger = Logger();
-  BasePostBloc(BasePostUseCase postUseCase) : super(BasePostState(BasePostLoadState.initialState)){
+  final BasePostUseCase postUseCase;
+  BasePostBloc(this.postUseCase) : super(BasePostState(BasePostLoadState.initialState)){
 
     on<ServiceStartEvent>((event, emit){
       emit(BasePostState(BasePostLoadState.serviceStartState));

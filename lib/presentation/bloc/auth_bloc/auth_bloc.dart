@@ -19,7 +19,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final firebasePref = FirebaseMessagingPreference.instance;
   final logger = Logger();
 
-  AuthBloc(UserUseCase userUseCase) : super(AuthState(state: UserAuthState.serviceStartState)) {
+  final UserUseCase userUseCase;
+  AuthBloc(this.userUseCase) : super(AuthState(state: UserAuthState.serviceStartState)) {
     on<TokenCheckEvent>((event, emit) async {
       try {
         final token = await pref.getToken();

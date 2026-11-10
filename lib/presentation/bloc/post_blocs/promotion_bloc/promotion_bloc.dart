@@ -8,7 +8,8 @@ import '../../../../domain/entities/promotion_post_entity.dart';
 
 class PromotionBloc extends Bloc<PromotionEvent, PromotionPostState> {
   final logger = Logger();
-  PromotionBloc(PromotionPostUseCase useCase)
+  final PromotionPostUseCase useCase;
+  PromotionBloc(this.useCase)
       : super(PromotionPostState(state: PromotionPostLoadState.serviceStartState)) {
 
     on<RequestPostCreateEvent>((event, emit) async {

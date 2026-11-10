@@ -13,8 +13,8 @@ import '../../../domain/entities/product_entity.dart';
 class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
   final logger = Logger();
   final InAppPurchase _inAppPurchase;
-
-  PurchaseBloc(PurchaseUseCase purchaseUseCase, this._inAppPurchase)
+  final PurchaseUseCase purchaseUseCase;
+  PurchaseBloc(this.purchaseUseCase, this._inAppPurchase)
       : super(PurchaseState(state: PurchaseProgressState.serviceStart)) {
 
     on<PurchaseInit>((event, emit) async {
