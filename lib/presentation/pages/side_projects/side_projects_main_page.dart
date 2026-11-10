@@ -183,13 +183,14 @@ class _SideProjectsMainPageState extends State<SideProjectsMainPage> {
                                   height: 30,
                                   padding: EdgeInsets.symmetric(horizontal: 8),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
+                                    // border: Border.all(color: Colors.grey),
+                                    color: Colors.grey.shade300,
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisSize: MainAxisSize.min,
-                                    children: [Text('프론드엔드 1/2')],
+                                    children: [Text('프론드엔드 1/2', style: TextStyle(fontWeight: FontWeight.bold),)],
                                   ),
                                 ),
                               ],
@@ -205,7 +206,7 @@ class _SideProjectsMainPageState extends State<SideProjectsMainPage> {
                                   children: [
                                     Icon(Icons.remove_red_eye_outlined, color: Colors.grey),
                                     const Gap(4),
-                                    Text('43'),
+                                    Text('43', style: TextStyle(color: Colors.grey),),
                                   ],
                                 ),
                               ],
