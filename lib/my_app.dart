@@ -8,6 +8,7 @@ import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
+import 'package:test_us_app/domain/use_cases/side_project_usecase.dart';
 import 'package:test_us_app/permission_handler.dart';
 import 'package:test_us_app/presentation/bloc/app_bloc/app_bloc.dart';
 import 'package:test_us_app/presentation/bloc/auth_bloc/auth_bloc.dart';
@@ -16,6 +17,7 @@ import 'package:test_us_app/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/base_post_bloc/base_post_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/promotion_bloc/promotion_bloc.dart';
 import 'package:test_us_app/presentation/bloc/post_blocs/recruit_post_bloc/recruit_post_bloc.dart';
+import 'package:test_us_app/presentation/bloc/post_blocs/side_project_bloc/side_project_bloc.dart';
 import 'package:test_us_app/presentation/bloc/purchase_bloc/purchase_bloc.dart';
 import 'package:test_us_app/presentation/bloc/review_bloc/review_bloc.dart';
 import 'package:test_us_app/presentation/bloc/user_bloc/user_bloc.dart';
@@ -24,6 +26,7 @@ import 'package:test_us_app/presentation/provider/firebase_messaging_provider.da
 import 'package:test_us_app/presentation/provider/post_provider/base_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/promotion_post_provider.dart';
 import 'package:test_us_app/presentation/provider/post_provider/recruit_post_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/side_project_provider.dart';
 import 'package:test_us_app/presentation/provider/purchase_provider.dart';
 import 'package:test_us_app/presentation/provider/review_provider.dart';
 import 'package:test_us_app/presentation/provider/room_provider.dart';
@@ -66,6 +69,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => BasePostProvider()),
         ChangeNotifierProvider(create: (context) => RecruitPostProvider(getIt<RecruitPostUseCase>())),
         ChangeNotifierProvider(create: (context) => PromotionPostProvider()),
+        ChangeNotifierProvider(create: (context) => SideProjectProvider()),
         ChangeNotifierProvider(create: (context) => ApplicationProvider(getIt<ApplicationUseCase>())),
         ChangeNotifierProvider(create: (context) => ReviewProvider(getIt<ReviewUseCase>())),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
@@ -86,6 +90,7 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (context) => BasePostBloc(getIt<BasePostUseCase>())),
           BlocProvider(create: (context) => RecruitPostBloc(getIt<RecruitPostUseCase>())),
           BlocProvider(create: (context) => PromotionBloc(getIt<PromotionPostUseCase>())),
+          BlocProvider(create: (context) => SideProjectBloc(getIt<SideProjectUseCase>())),
           BlocProvider(create: (context) => ImageBloc(getIt<ImageUseCase>())),
           BlocProvider(create: (context) => AppBloc(getIt<ApplicationUseCase>(), getIt<RecruitPostUseCase>(), getIt<UserUseCase>())),
           BlocProvider(create: (context) => ReviewBloc(getIt<ReviewUseCase>(), getIt<UserUseCase>())),

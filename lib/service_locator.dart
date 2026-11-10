@@ -14,6 +14,8 @@ import 'package:test_us_app/data/data_sources/message_data/message_data_source_i
 import 'package:test_us_app/data/data_sources/post_data/base_post_datasource_impl.dart';
 import 'package:test_us_app/data/data_sources/post_data/recruit_post_datasource.dart';
 import 'package:test_us_app/data/data_sources/post_data/recruit_post_datasource_impl.dart';
+import 'package:test_us_app/data/data_sources/post_data/side_project_datasource.dart';
+import 'package:test_us_app/data/data_sources/post_data/side_project_datasource_impl.dart';
 import 'package:test_us_app/data/data_sources/purchase_data/purchase_data_source.dart';
 import 'package:test_us_app/data/data_sources/review_data/review_data_source.dart';
 import 'package:test_us_app/data/data_sources/review_data/review_data_source_impl.dart';
@@ -21,11 +23,15 @@ import 'package:test_us_app/data/data_sources/user_data/user_data_source.dart';
 import 'package:test_us_app/data/data_sources/user_data/user_data_source_impl.dart';
 import 'package:test_us_app/data/repositories/message_repository_impl.dart';
 import 'package:test_us_app/data/repositories/recruit_post_repository_impl.dart';
+import 'package:test_us_app/data/repositories/side_project_repository_impl.dart';
 import 'package:test_us_app/domain/repositories/message_repository.dart';
 import 'package:test_us_app/domain/repositories/purchase_repository.dart';
+import 'package:test_us_app/domain/repositories/side_project_repo.dart';
 import 'package:test_us_app/domain/use_cases/base_post_usecase.dart';
 import 'package:test_us_app/domain/use_cases/firebase_messaging_usecase.dart';
+import 'package:test_us_app/domain/use_cases/side_project_usecase.dart';
 import 'package:test_us_app/presentation/provider/firebase_messaging_provider.dart';
+import 'package:test_us_app/presentation/provider/post_provider/side_project_provider.dart';
 import 'package:test_us_app/presentation/provider/socket_provider.dart';
 import 'package:test_us_app/presentation/provider/user_provider.dart';
 import 'package:test_us_app/services/auth/auth_service.dart';
@@ -102,6 +108,7 @@ Future<void> serviceLocator() async {
   getIt.registerLazySingleton<RoomDataSource>(() => RoomDataSourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<RoomMemberDataSource>(() => RoomMemberDataSourceImpl(getIt<NetDriver>()));
   getIt.registerLazySingleton<PurchaseDataSource>(() => PurchaseDataSourceImpl(getIt<NetDriver>()));
+  getIt.registerLazySingleton<SideProjectDatasource>(() => SideProjectDatasourceImpl(getIt<NetDriver>()));
 
   // domain
   getIt.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(getIt<UserDataSource>()));
@@ -116,6 +123,7 @@ Future<void> serviceLocator() async {
   getIt.registerLazySingleton<RoomRepository>(() => RoomRepositoryImpl(getIt<RoomDataSource>()));
   getIt.registerLazySingleton<RoomMemberRepository>(() => RoomMemberRepositoryImpl(getIt<RoomMemberDataSource>()));
   getIt.registerLazySingleton<PurchaseRepository>(() => PurchaseRepositoryImpl(getIt<PurchaseDataSource>()));
+  getIt.registerLazySingleton<SideProjectRepo>(() => SideProjectRepositoryImpl(getIt<SideProjectDatasource>()));
 
   // use case
   getIt.registerLazySingleton<UserUseCase>(() => UserUseCase(getIt<UserRepository>()));
@@ -128,11 +136,13 @@ Future<void> serviceLocator() async {
   getIt.registerLazySingleton<FirebaseMessagingUseCase>(() => FirebaseMessagingUseCase());
   getIt.registerLazySingleton<MessageUseCase>(() => MessageUseCase(getIt<RoomRepository>(), getIt<MessageRepository>(), getIt<RoomMemberRepository>(), getIt<UserProvider>()));
   getIt.registerLazySingleton<PurchaseUseCase>(() => PurchaseUseCase(getIt<PurchaseRepository>(), getIt<InAppPurchase>()));
+  getIt.registerLazySingleton<SideProjectUseCase>(() => SideProjectUseCase(getIt<SideProjectRepo>()));
 
   //provider
   getIt.registerSingleton<FirebaseMessagingProvider>(FirebaseMessagingProvider(getIt<FirebaseMessagingUseCase>()));
   getIt.registerSingleton<UserProvider>(UserProvider(getIt<UserUseCase>()));
   getIt.registerSingleton<SocketProvider>(SocketProvider(getIt<ISocketClient>()));
   getIt.registerSingleton<PurchaseProvider>(PurchaseProvider());
+  getIt.registerSingleton<SideProjectProvider>(SideProjectProvider());
 
 }
